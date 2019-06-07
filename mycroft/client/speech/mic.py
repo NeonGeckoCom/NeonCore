@@ -425,17 +425,17 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         """
         self._stop_signaled = True
 
-    def _compile_metadata(self):
-        ww_module = self.wake_word_recognizer.__class__.__name__
+    def _compile_metadata(self, hw):
+        ww_module = self.hotwords[hw]["engine"].__class__.__name__
         if ww_module == 'PreciseHotword':
-            model_path = self.wake_word_recognizer.precise_model
+            model_path = self.hotwords[hw]["engine"].precise_model
             with open(model_path, 'rb') as f:
                 model_hash = md5(f.read()).hexdigest()
         else:
             model_hash = '0'
 
         return {
-            'name': self.wake_word_name.replace(' ', '-'),
+            'name': self.hotwords[hw]["engine"].key_phrase.replace(' ', '-'),
             'engine': md5(ww_module.encode('utf-8')).hexdigest(),
             'time': str(int(1000 * get_time())),
             'sessionId': SessionManager.get().session_id,
@@ -577,22 +577,12 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                         }
                         bus.emit("recognizer_loop:utterance", payload)
 
-                    # If enabled, play a wave file with a short sound
-                    # to audibly indicate recording has begun.
-                    elif listen and self.config.get('confirm_listening'):
-                        audio_file = resolve_resource_file(
-                            self.config.get('sounds').get('start_listening'))
-                        if audio_file:
-                            source.mute()
-                            play_wav(audio_file).wait()
-                            source.unmute()
-
                     audio = None
-                    mtd = None
+                    mtd = self._compile_metadata(hotword)
                     if self.save_wake_words:
                         # Save wake word locally
                         audio = self._create_audio_data(byte_data, source)
-                        mtd = self._compile_metadata()
+
                         if not isdir(self.saved_wake_words_dir):
                             os.mkdir(self.saved_wake_words_dir)
                         module = engine.__class__.__name__
@@ -611,7 +601,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                             target=self._upload_wake_word, daemon=True,
                             args=[audio or
                                   self._create_audio_data(byte_data, source),
-                                  mtd or self._compile_metadata()]
+                                  mtd]
                         ).start()
 
                     if listen:
@@ -675,6 +665,16 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
         LOG.debug("Recording...")
         emitter.emit("recognizer_loop:record_begin")
+
+        # If enabled, play a wave file with a short sound to audibly
+        # indicate recording has begun.
+        if self.config.get('confirm_listening'):
+            audio_file = resolve_resource_file(
+                self.config.get('sounds').get('start_listening'))
+            if audio_file:
+                source.mute()
+                play_wav(audio_file).wait()
+                source.unmute()
 
         frame_data = self._record_phrase(source, sec_per_buffer, stream)
         audio_data = self._create_audio_data(frame_data, source)
