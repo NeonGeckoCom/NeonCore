@@ -55,11 +55,6 @@ def handle_awoken():
     bus.emit(Message('mycroft.awoken'))
 
 
-def handle_wakeword(event):
-    LOG.info("Wakeword Detected: " + event['utterance'])
-    bus.emit(Message('recognizer_loop:wakeword', event))
-
-
 def handle_utterance(event):
     LOG.info("Utterance: " + str(event['utterances']))
     context = {'client_name': 'mycroft_listener'}
@@ -70,12 +65,12 @@ def handle_utterance(event):
 
 
 def handle_hotword(event):
-    listener_conf = Configuration.get()["listener"]
-    ww = listener_conf.get("wake_word", "hey mycroft")
-    suw = listener_conf.get("stand_up_word", "wake up")
-    if event["hotword"] != ww and event["hotword"] != suw:
+    if not event.get("listen", False):
         LOG.info("Hotword Detected: " + event['hotword'])
         bus.emit(Message('recognizer_loop:hotword', event))
+    else:
+        LOG.info("Wakeword Detected: " + event['hotword'])
+        bus.emit(Message('recognizer_loop:wakeword', event))
 
 
 def handle_unknown():
@@ -174,17 +169,16 @@ def main():
     Configuration.set_config_update_handlers(bus)
     config = Configuration.get()
 
-    # Register handlers on internal RecognizerLoop bus
+    # Register handlers on internal RecognizerLoop emitter
     loop = RecognizerLoop()
     loop.on('recognizer_loop:utterance', handle_utterance)
     loop.on('recognizer_loop:speech.recognition.unknown', handle_unknown)
     loop.on('speak', handle_speak)
     loop.on('recognizer_loop:record_begin', handle_record_begin)
     loop.on('recognizer_loop:awoken', handle_awoken)
-    loop.on('recognizer_loop:wakeword', handle_wakeword)
+    loop.on('recognizer_loop:hotword', handle_hotword)
     loop.on('recognizer_loop:record_end', handle_record_end)
     loop.on('recognizer_loop:no_internet', handle_no_internet)
-    loop.on('recognizer_loop:hotword', handle_hotword)
 
     # Register handlers for events on main Mycroft messagebus
     bus.on('open', handle_open)

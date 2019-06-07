@@ -128,8 +128,7 @@ class AudioConsumer(Thread):
     # In seconds, the minimum audio size to be sent to remote STT
     MIN_AUDIO_SIZE = 0.5
 
-    def __init__(self, state, queue, emitter, stt,
-                 wakeup_recognizer, wakeword_recognizer):
+    def __init__(self, state, queue, emitter, stt, wakeup_recognizer):
         super(AudioConsumer, self).__init__()
         self.daemon = True
         self.queue = queue
@@ -137,13 +136,7 @@ class AudioConsumer(Thread):
         self.emitter = emitter
         self.stt = stt
         self.wakeup_recognizer = wakeup_recognizer
-        self.wakeword_recognizer = wakeword_recognizer
         self.metrics = MetricsAggregator()
-        self.word = self.wakeword_recognizer.key_phrase
-        self.emitter.on("recognizer_loop:hotword", self._set_word)
-
-    def _set_word(self, event):
-        self.word = event.get("hotword", self.wakeword_recognizer.key_phrase)
 
     def run(self):
         while self.state.running:
@@ -186,18 +179,14 @@ class AudioConsumer(Thread):
     @staticmethod
     def _audio_length(audio):
         return float(len(audio.frame_data)) / (
-            audio.sample_rate * audio.sample_width)
+                audio.sample_rate * audio.sample_width)
 
     # TODO: Localization
     def process(self, audio):
         SessionManager.touch()
-        payload = {
-            'utterance': self.word,
-            'session': SessionManager.get().session_id,
-        }
-        self.emitter.emit("recognizer_loop:wakeword", payload)
-
-        if self._audio_length(audio) >= self.MIN_AUDIO_SIZE:
+        if self._audio_length(audio) < self.MIN_AUDIO_SIZE:
+            LOG.warning("Audio too short to be processed")
+        else:
             stopwatch = Stopwatch()
             with stopwatch:
                 transcription = self.transcribe(audio)
@@ -307,18 +296,16 @@ class RecognizerLoop(EventEmitter):
         if not device_index and device_name:
             device_index = find_input_device(device_name)
 
-        LOG.debug('Using microphone (None = default): '+str(device_index))
+        LOG.debug('Using microphone (None = default): ' + str(device_index))
 
         self.microphone = MutableMicrophone(device_index, rate,
                                             mute=self.mute_calls > 0)
 
-        self.wakeword_recognizer = self.create_wake_word_recognizer()
         # TODO - localization
         self.wakeup_recognizer = self.create_wakeup_recognizer()
         self.hotword_engines = {}
         self.create_hotword_engines()
-        self.responsive_recognizer = ResponsiveRecognizer(
-            self.wakeword_recognizer, self.hotword_engines)
+        self.responsive_recognizer = ResponsiveRecognizer(self.hotword_engines)
         self.state = RecognizerLoopState()
 
     def create_hotword_engines(self):
@@ -327,44 +314,17 @@ class RecognizerLoop(EventEmitter):
         for word in hot_words:
             data = hot_words[word]
             if word == self.wakeup_recognizer.key_phrase \
-                    or word == self.wakeword_recognizer.key_phrase \
                     or not data.get("active", True):
                 continue
-            module = data["module"]
             sound = data.get("sound")
             utterance = data.get("utterance")
             listen = data.get("listen", False)
             engine = HotWordFactory.create_hotword(word, lang=self.lang)
-            self.hotword_engines[word] = [engine, sound, utterance,
-                                          listen, module]
 
-    def create_wake_word_recognizer(self):
-        # Create a local recognizer to hear the wakeup word, e.g. 'Hey Mycroft'
-        LOG.info("creating wake word engine")
-        word = self.config.get("wake_word", "hey mycroft")
-
-        # TODO remove this, only for server settings compatibility
-        phonemes = self.config.get("phonemes")
-        thresh = self.config.get("threshold")
-
-        # Since we're editing it for server backwards compatibility
-        # use a copy so we don't alter the hash of the config and
-        # trigger a reload.
-        config = deepcopy(self.config_core.get("hotwords", {}))
-        if word not in config:
-            # Fallback to using config from "listener" block
-            LOG.warning('Wakeword doesn\'t have an entry falling back'
-                        'to old listener config')
-            config[word] = {'module': 'precise'}
-            if phonemes:
-                config[word]["phonemes"] = phonemes
-            if thresh:
-                config[word]["threshold"] = thresh
-            if phonemes is None or thresh is None:
-                config = None
-        return HotWordFactory.create_hotword(
-            word, config, self.lang, loop=self
-        )
+            self.hotword_engines[word] = {"engine": engine,
+                                          "sound": sound,
+                                          "utterance": utterance,
+                                          "listen": listen}
 
     def create_wakeup_recognizer(self):
         LOG.info("creating stand up word engine")
@@ -384,8 +344,7 @@ class RecognizerLoop(EventEmitter):
                                       stream_handler)
         self.producer.start()
         self.consumer = AudioConsumer(self.state, queue, self,
-                                      stt, self.wakeup_recognizer,
-                                      self.wakeword_recognizer)
+                                      stt, self.wakeup_recognizer)
         self.consumer.start()
 
     def stop(self):
@@ -460,7 +419,11 @@ class RecognizerLoop(EventEmitter):
     def reload(self):
         """Reload configuration and restart consumer and producer."""
         self.stop()
-        self.wakeword_recognizer.stop()
+        for hw in self.hotword_engines:
+            try:
+                self.hotword_engines[hw]["engine"].stop()
+            except Exception as e:
+                LOG.exception(e)
         # load config
         self._load_config()
         # restart

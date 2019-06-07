@@ -208,18 +208,16 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
     # Time between pocketsphinx checks for the wake word
     SEC_BETWEEN_WW_CHECKS = 0.2
 
-    def __init__(self, wake_word_recognizer, hot_word_engines=None):
+    def __init__(self, hot_word_engines):
 
         self.config = Configuration.get()
         listener_config = self.config.get('listener')
         self.upload_url = listener_config['wake_word_upload']['url']
         self.upload_disabled = listener_config['wake_word_upload']['disable']
-        self.wake_word_name = wake_word_recognizer.key_phrase
 
         self.overflow_exc = listener_config.get('overflow_exception', False)
 
         speech_recognition.Recognizer.__init__(self)
-        self.wake_word_recognizer = wake_word_recognizer
         self.audio = pyaudio.PyAudio()
         self.multiplier = listener_config.get('multiplier')
         self.energy_ratio = listener_config.get('energy_ratio')
@@ -241,7 +239,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
         # The maximum audio in seconds to keep for transcribing a phrase
         # The wake word must fit in this time
-        num_phonemes = wake_word_recognizer.num_phonemes
+        num_phonemes = 10
         len_phoneme = listener_config.get('phoneme_duration', 120) / 1000.0
         self.TEST_WW_SEC = num_phonemes * len_phoneme
         self.SAVED_WW_SEC = max(3, self.TEST_WW_SEC)
@@ -265,6 +263,12 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                           'Error: {}'.format(repr(e)))
 
         return self._account_id or '0'
+
+    def feed_hotwords(self, chunk):
+        """ feed sound chunk to hotword engines that perform streaming
+        predictions (precise) """
+        for hw in self.hotword_engines:
+            self.hotword_engines["engine"].update(chunk)
 
     def record_sound_chunk(self, source):
         return source.stream.read(source.CHUNK, self.overflow_exc)
@@ -531,21 +535,57 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                 byte_data = byte_data[len(chunk):] + chunk
 
             buffers_since_check += 1.0
-            self.wake_word_recognizer.update(chunk)
+            self.feed_hotwords(chunk)
             if buffers_since_check > buffers_per_check:
                 buffers_since_check -= buffers_per_check
                 chopped = byte_data[-test_size:] \
                     if test_size < len(byte_data) else byte_data
                 audio_data = chopped + silence
-                said_wake_word = \
-                    self.wake_word_recognizer.found_wake_word(audio_data)
-                if said_wake_word:
-                    SessionManager.touch()
+                said_hot_word = False
+                for hotword in self.check_for_hotwords(audio_data, emitter):
+                    said_hot_word = True
+                    engine = self.hotword_engines[hotword]["engine"]
+                    sound = self.hotword_engines[hotword]["sound"]
+                    utterance = self.hotword_engines[hotword]["utterance"]
+                    listen = self.hotword_engines[hotword]["listen"]
+
+                    LOG.debug("Hot Word: " + hotword)
+                    # If enabled, play a wave file with a short sound to audibly
+                    # indicate hotword was detected.
+                    if sound:
+                        try:
+                            audio_file = resolve_resource_file(sound)
+                            source.mute()
+                            play_wav(audio_file).wait()
+                            source.unmute()
+                        except Exception as e:
+                            LOG.warning(e)
+
+                    # Hot Word succeeded
                     payload = {
-                        'utterance': self.wake_word_name,
-                        'session': SessionManager.get().session_id,
+                        'hotword': hotword,
+                        'start_listening': listen,
+                        'sound': sound,
+                        "engine": engine.module
                     }
-                    bus.emit("recognizer_loop:wakeword", payload)
+                    bus.emit("recognizer_loop:hotword", payload)
+
+                    if utterance:
+                        # send the transcribed word on for processing
+                        payload = {
+                            'utterances': [utterance]
+                        }
+                        bus.emit("recognizer_loop:utterance", payload)
+
+                    # If enabled, play a wave file with a short sound
+                    # to audibly indicate recording has begun.
+                    elif listen and self.config.get('confirm_listening'):
+                        audio_file = resolve_resource_file(
+                            self.config.get('sounds').get('start_listening'))
+                        if audio_file:
+                            source.mute()
+                            play_wav(audio_file).wait()
+                            source.unmute()
 
                     audio = None
                     mtd = None
@@ -555,7 +595,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                         mtd = self._compile_metadata()
                         if not isdir(self.saved_wake_words_dir):
                             os.mkdir(self.saved_wake_words_dir)
-                        module = self.wake_word_recognizer.__class__.__name__
+                        module = engine.__class__.__name__
 
                         fn = join(
                             self.saved_wake_words_dir,
@@ -564,23 +604,6 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                         with open(fn, 'wb') as f:
                             f.write(audio.get_wav_data())
 
-                    payload = {
-                        'hotword': self.wake_word_recognizer.key_phrase,
-                        'start_listening': True,
-                        'sound': resolve_resource_file(
-                            self.config.get('sounds').get('start_listening')),
-                        "engine": self.wake_word_recognizer.module
-                    }
-                    bus.emit("recognizer_loop:hotword", payload)
-                    # If enabled, play a wave file with a short sound
-                    # to audibly indicate recording has begun.
-                    if self.config.get('confirm_listening'):
-                        audio_file = resolve_resource_file(
-                            self.config.get('sounds').get('start_listening'))
-                        if audio_file:
-                            source.mute()
-                            play_wav(audio_file).wait()
-                            source.unmute()
                     # if a wake word is success full then upload wake word
                     if self.config['opt_in'] and not self.upload_disabled:
                         # Upload wake word for opt_in people
@@ -590,51 +613,21 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                                   self._create_audio_data(byte_data, source),
                                   mtd or self._compile_metadata()]
                         ).start()
-                else:
-                    said_wake_word, said_hot_word = self.check_for_hotwords(
-                        audio_data, bus)
-                    if said_hot_word:
-                        # reset bytearray to store audio in, else many
-                        # serial detections
-                        byte_data = silence
+
+                    if listen:
+                        said_wake_word = True
+
+                if said_hot_word:
+                    # reset bytearray to store wake word audio in, else many
+                    # serial detections
+                    byte_data = silence
 
     def check_for_hotwords(self, audio_data, emitter):
         # check hot word
         for hotword in self.hotword_engines:
-            engine, sound, utterance, listen, module = \
-                    self.hotword_engines[hotword]
-            found = engine.found_wake_word(audio_data)
-            if found:
-                LOG.debug("Hot Word: " + hotword)
-                # If enabled, play a wave file with a short sound to audibly
-                # indicate hotword was detected.
-                if sound:
-                    try:
-                        file = resolve_resource_file(sound)
-                        if file:
-                            play_wav(file)
-                    except Exception as e:
-                        LOG.warning(e)
-                # Hot Word succeeded
-                payload = {
-                    'hotword': hotword,
-                    'start_listening': listen,
-                    'sound': sound,
-                    "engine": module
-                }
-                emitter.emit("recognizer_loop:hotword", payload)
-                if utterance:
-                    # send the transcribed word on for processing
-                    payload = {
-                        'utterances': [utterance]
-                    }
-                    emitter.emit("recognizer_loop:utterance", payload)
-                    return False, True
-                if listen:
-                    # start listening
-                    return True, True
-                return False, True
-        return False, False
+            engine = self.hotword_engines[hotword]["engine"]
+            if engine.found_wake_word(audio_data):
+                yield hotword
 
     @staticmethod
     def _create_audio_data(raw_data, source):
@@ -700,8 +693,8 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         if self.dynamic_energy_threshold and energy > 0:
             # account for different chunk sizes and rates
             damping = (
-                self.dynamic_energy_adjustment_damping ** seconds_per_buffer)
+                    self.dynamic_energy_adjustment_damping ** seconds_per_buffer)
             target_energy = energy * self.energy_ratio
             self.energy_threshold = (
-                self.energy_threshold * damping +
-                target_energy * (1 - damping))
+                    self.energy_threshold * damping +
+                    target_energy * (1 - damping))
