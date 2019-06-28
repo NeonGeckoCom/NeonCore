@@ -268,7 +268,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         """ feed sound chunk to hotword engines that perform streaming
         predictions (precise) """
         for hw in self.hotword_engines:
-            self.hotword_engines["engine"].update(chunk)
+            self.hotword_engines[hw]["engine"].update(chunk)
 
     def record_sound_chunk(self, source):
         return source.stream.read(source.CHUNK, self.overflow_exc)
