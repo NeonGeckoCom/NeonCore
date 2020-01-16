@@ -17,7 +17,7 @@
 
     This handles playback of audio and speech
 """
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, is_server
 from mycroft.messagebus.client import MessageBusClient
 from mycroft.util import reset_sigint_handler, wait_for_exit_signal, \
     create_daemon, create_echo_function, check_for_signal
@@ -37,13 +37,15 @@ def main():
 
     LOG.info("Starting Audio Services")
     bus.on('message', create_echo_function('AUDIO', ['mycroft.audio.service']))
-    audio = AudioService(bus)  # Connect audio service instance to message bus
+    if not is_server():
+        audio = AudioService(bus)  # Connect audio service instance to message bus
     create_daemon(bus.run_forever)
 
     wait_for_exit_signal()
 
     speech.shutdown()
-    audio.shutdown()
+    if not is_server():
+        audio.shutdown()
 
 
 main()

@@ -26,11 +26,11 @@ from os.path import dirname, exists, isdir, join
 
 import mycroft.util
 from mycroft.enclosure.api import EnclosureAPI
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, is_server
 from mycroft.messagebus.message import Message
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.util import (
-    play_wav, play_mp3, check_for_signal, create_signal, resolve_resource_file
+    play_wav, play_mp3, play_ogg, check_for_signal, create_signal, resolve_resource_file
 )
 from mycroft.util.log import LOG
 from queue import Queue, Empty
@@ -62,10 +62,14 @@ class PlaybackThread(Thread):
         self._terminated = False
         self._processing_queue = False
         # Check if the tts shall have a ducking role set
-        if Configuration.get().get('tts', {}).get('pulse_duck'):
+        if not is_server() and Configuration.get().get('tts', {}).get('pulse_duck'):
             self.pulse_env = _TTS_ENV
         else:
             self.pulse_env = None
+
+        # work variables, defined here for clarity
+        self.enclosure = None
+        self.p = None
 
     def init(self, tts):
         self.tts = tts
@@ -75,7 +79,8 @@ class PlaybackThread(Thread):
         while not self.queue.empty():
             self.queue.get()
         try:
-            self.p.terminate()
+            if self.p is not None:
+                self.p.terminate()
         except Exception:
             pass
 
@@ -110,11 +115,15 @@ class PlaybackThread(Thread):
                         self.p = play_wav(data, environment=self.pulse_env)
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data, environment=self.pulse_env)
+                    elif snd_type == 'ogg':
+                        self.p = play_ogg(data, environment=self.pulse_env)
 
                     if visemes:
                         self.show_visemes(visemes)
-                    self.p.communicate()
-                    self.p.wait()
+
+                    if self.p is not None:
+                        self.p.communicate()
+                        self.p.wait()
                 send_playback_metric(stopwatch, ident)
 
                 if self.queue.empty():
