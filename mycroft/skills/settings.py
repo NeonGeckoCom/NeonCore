@@ -61,7 +61,8 @@ import re
 from pathlib import Path
 from threading import Timer
 
-from mycroft.api import DeviceApi, is_paired
+from mycroft.api import DeviceApi, is_paired, is_disabled
+from mycroft.util.log import LOG
 from mycroft.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util import camel_case_split
@@ -231,6 +232,8 @@ class SettingsMetaUploader:
         The settingsmeta file does not change often, if at all.  Only perform
         the upload if a change in the file is detected.
         """
+        if is_disabled():
+            return None
         synced = False
         if is_paired():
             self.api = DeviceApi()
@@ -284,6 +287,8 @@ class SettingsMetaUploader:
         Even if a skill does not have a settingsmeta file, we will upload
         settings meta JSON containing a skill gid and name
         """
+        if is_disabled():
+            return None
         # Insert skill_gid and display_name
         self.settings_meta.update(
             skill_gid=self.skill_gid,
@@ -304,6 +309,8 @@ class SettingsMetaUploader:
 
     def _issue_api_call(self):
         """Use the API to send the settings meta to the server."""
+        if is_disabled():
+            return None
         try:
             self.api.upload_skill_metadata(self.settings_meta)
         except Exception:
@@ -343,6 +350,8 @@ class SkillSettingsDownloader:
     # TODO: implement as websocket
     def download(self):
         """Download the settings stored on the backend and check for changes"""
+        if is_disabled():
+            return None
         if is_paired():
             download_success = self._get_remote_settings()
             if download_success:
@@ -374,6 +383,8 @@ class SkillSettingsDownloader:
         Returns:
             skill_settings (dict or None): returns a dict if matches
         """
+        if is_disabled():
+            return False
         try:
             remote_settings = self.api.get_skill_settings()
         except Exception:

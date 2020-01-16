@@ -136,8 +136,8 @@ class RemoteConf(LocalConf):
         super(RemoteConf, self).__init__(None)
 
         cache = cache or WEB_CONFIG_CACHE
-        from mycroft.api import is_paired
-        if not is_paired():
+        from mycroft.api import is_paired, is_disabled
+        if not is_paired() or is_disabled():
             self.load_local(cache)
             return
 
@@ -145,7 +145,7 @@ class RemoteConf(LocalConf):
             # Here to avoid cyclic import
             from mycroft.api import DeviceApi
             api = DeviceApi()
-            setting = api.get_settings()
+            setting = api.get_settings() or {}
 
             try:
                 location = api.get_location()
