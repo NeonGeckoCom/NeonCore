@@ -20,17 +20,16 @@ import socket
 def get_device_type():
     # TODO avoic cyclic import
     from mycroft.configuration.config import Configuration
-    # This also allows arbitrary device types,
-    # for example a linux phone will also be "arm" and can not be differentiated this way
+
+    # a linux phone will also be "arm" and can not be easily differentiated from a raspberry pi
     device_type = Configuration.get()["device"].get("device_type")
+
+    # fallback to heuristic / guess device_type
     if device_type is None:
         device_type = "desktop"
         if "arm" in platform.machine():
             device_type = "pi"
         else:
-            # NOTE: i do not like this pattern, it is not portable
-            # SUGGESTION: new branch for server specific usage, 
-            # also makes rest of code cleaner and removes all the kruft around audio
             server_hosts = Configuration.get()["device"].get("server_hosts",
                                                              [".187.223", ".186.92", ".186.120"])
             host = socket.gethostbyname(socket.gethostname())
