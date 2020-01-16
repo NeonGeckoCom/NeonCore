@@ -4,7 +4,7 @@ from mycroft.messagebus.message import Message
 from mycroft.metrics import Stopwatch, report_timing
 from mycroft.util.log import LOG
 
-from ..skill_data import to_alnum
+from mycroft.skills.skill_data import to_alnum
 
 
 def unmunge_message(message, skill_id):
