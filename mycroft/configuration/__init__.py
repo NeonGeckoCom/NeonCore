@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from .config import Configuration, LocalConf, RemoteConf
-from .locations import SYSTEM_CONFIG, USER_CONFIG
+from mycroft.configuration.config import Configuration, LocalConf, RemoteConf
+from mycroft.configuration.locations import SYSTEM_CONFIG, USER_CONFIG
+import platform
+import socket
 
 
 # Compatibility
@@ -21,3 +23,23 @@ class ConfigurationManager(Configuration):
     @staticmethod
     def instance():
         return Configuration.get()
+
+
+def get_device_type():
+    device = "desktop"
+    if"arm" in platform.machine():
+        device = "pi"
+    else:
+        server_hosts = Configuration.get()["device"].get("server_hosts",
+                                                         [".187.223", ".186.92", ".186.120"])
+        host = socket.gethostbyname(socket.gethostname())
+        for h in server_hosts:
+            if h in host:
+                # TODO need clarification, a better check could be
+                # host.endswith(h)
+                device = "server"
+    return device
+
+
+def is_server():
+    return get_device_type() == "server"
