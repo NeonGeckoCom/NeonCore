@@ -26,19 +26,26 @@ class ConfigurationManager(Configuration):
 
 
 def get_device_type():
-    device = "desktop"
-    if"arm" in platform.machine():
-        device = "pi"
-    else:
-        server_hosts = Configuration.get()["device"].get("server_hosts",
-                                                         [".187.223", ".186.92", ".186.120"])
-        host = socket.gethostbyname(socket.gethostname())
-        for h in server_hosts:
-            if h in host:
-                # TODO need clarification, a better check could be
-                # host.endswith(h)
-                device = "server"
-    return device
+    # This also allows arbitrary device types,
+    # for example a linux phone will also be "arm" and can not be differentiated this way
+    device_type = Configuration.get()["device"].get("device_type")
+    if device_type is None:
+        device_type = "desktop"
+        if "arm" in platform.machine():
+            device_type = "pi"
+        else:
+            # NOTE: i do not like this pattern, it is not portable
+            # SUGGESTION: new branch for server specific usage, 
+            # also makes rest of code cleaner and removes all the kruft around audio
+            server_hosts = Configuration.get()["device"].get("server_hosts",
+                                                             [".187.223", ".186.92", ".186.120"])
+            host = socket.gethostbyname(socket.gethostname())
+            for h in server_hosts:
+                if h in host:
+                    # TODO need clarification, a better check could be
+                    # host.endswith(h)
+                    device_type = "server"
+    return device_type
 
 
 def is_server():
