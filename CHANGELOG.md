@@ -16,6 +16,9 @@ current dev branch
  
 ### Fixed
 
+- stt
+    - don't cast self.token to string
+        - google stt - default to package free key instead of throwing error
 
 
 ### Changed

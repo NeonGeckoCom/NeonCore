@@ -52,7 +52,7 @@ class STT(metaclass=ABCMeta):
 class TokenSTT(STT, metaclass=ABCMeta):
     def __init__(self):
         super(TokenSTT, self).__init__()
-        self.token = str(self.credential.get("token"))
+        self.token = self.credential.get("token")
 
 
 class GoogleJsonSTT(STT, metaclass=ABCMeta):
