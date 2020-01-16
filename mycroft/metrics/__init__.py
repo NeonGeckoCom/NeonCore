@@ -18,7 +18,7 @@ import time
 
 import requests
 
-from mycroft.api import DeviceApi, is_paired
+from mycroft.api import DeviceApi, is_paired, is_disabled
 from mycroft.configuration import Configuration
 from mycroft.session import SessionManager
 from mycroft.util.log import LOG
@@ -34,6 +34,8 @@ def report_metric(name, data):
         name (str): Name of metric. Must use only letters and hyphens
         data (dict): JSON dictionary to report. Must be valid JSON
     """
+    if is_disabled():
+        return
     try:
         if is_paired() and Configuration().get()['opt_in']:
             DeviceApi().report_metric(name, data)
@@ -172,6 +174,8 @@ class MetricsPublisher:
         conf = Configuration().get()['server']
         self.url = url or conf['url']
         self.enabled = enabled or conf['metrics']
+        if conf.get("disabled", True):
+            self.enabled = False
 
     def publish(self, events):
         if 'session_id' not in events:

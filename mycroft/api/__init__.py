@@ -56,11 +56,14 @@ class Api:
                                     USER_CONFIG],
                                    cache=False)
         config_server = config.get("server")
+        self.disabled = config_server.get("disabled", True)
         self.url = config_server.get("url")
         self.version = config_server.get("version")
         self.identity = IdentityManager.get()
 
     def request(self, params):
+        if self.disabled:
+            return
         self.check_token()
         if 'path' in params:
             params['path'] = params['path'].replace(UUID, self.identity.uuid)
@@ -69,6 +72,8 @@ class Api:
         return self.send(params)
 
     def check_token(self):
+        if self.disabled:
+            return
         # If the identity hasn't been loaded, load it
         if not self.identity.has_refresh():
             self.identity = IdentityManager.load()
@@ -80,6 +85,8 @@ class Api:
                 self.refresh_token()
 
     def refresh_token(self):
+        if self.disabled:
+            return
         LOG.debug('Refreshing token')
         if identity_lock.acquire(blocking=False):
             try:
@@ -120,6 +127,8 @@ class Api:
         Returns:
             Requests response object.
         """
+        if self.disabled:
+            return
         query_data = frozenset(params.get('query', {}).items())
         params_key = (params.get('path'), query_data)
         etag = self.params_to_etag.get(params_key)
@@ -162,6 +171,8 @@ class Api:
         Returns:
             data fetched from server
         """
+        if self.disabled:
+            return
         data = self.get_data(response)
 
         if 200 <= response.status_code < 300:
@@ -227,12 +238,16 @@ class DeviceApi(Api):
         super(DeviceApi, self).__init__("device")
 
     def get_code(self, state):
+        if self.disabled:
+            return
         IdentityManager.update()
         return self.request({
             "path": "/code?state=" + state
         })
 
     def activate(self, state, token):
+        if self.disabled:
+            return
         version = VersionManager.get()
         platform = "unknown"
         platform_build = ""
@@ -257,6 +272,8 @@ class DeviceApi(Api):
         })
 
     def update_version(self):
+        if self.disabled:
+            return
         version = VersionManager.get()
         platform = "unknown"
         platform_build = ""
@@ -279,6 +296,8 @@ class DeviceApi(Api):
         })
 
     def send_email(self, title, body, sender):
+        if self.disabled:
+            return
         return self.request({
             "method": "PUT",
             "path": "/" + UUID + "/message",
@@ -286,6 +305,8 @@ class DeviceApi(Api):
         })
 
     def report_metric(self, name, data):
+        if self.disabled:
+            return
         return self.request({
             "method": "POST",
             "path": "/" + UUID + "/metric/" + name,
@@ -294,6 +315,8 @@ class DeviceApi(Api):
 
     def get(self):
         """ Retrieve all device information from the web backend """
+        if self.disabled:
+            return
         return self.request({
             "path": "/" + UUID
         })
@@ -304,6 +327,8 @@ class DeviceApi(Api):
         Returns:
             str: JSON string with user configuration information.
         """
+        if self.disabled:
+            return
         return self.request({
             "path": "/" + UUID + "/setting"
         })
@@ -314,6 +339,8 @@ class DeviceApi(Api):
         Returns:
             str: JSON string with user location.
         """
+        if self.disabled:
+            return
         return self.request({
             "path": "/" + UUID + "/location"
         })
@@ -325,6 +352,8 @@ class DeviceApi(Api):
 
             Returns: dictionary with subscription information
         """
+        if self.disabled:
+            return
         return self.request({
             'path': '/' + UUID + '/subscription'})
 
@@ -334,6 +363,8 @@ class DeviceApi(Api):
             status of subscription. True if device is connected to a paying
             subscriber.
         """
+        if self.disabled:
+            return False
         try:
             return self.get_subscription().get('@type') != 'free'
         except Exception:
@@ -341,6 +372,8 @@ class DeviceApi(Api):
             return False
 
     def get_subscriber_voice_url(self, voice=None):
+        if self.disabled:
+            return
         self.check_token()
         archs = {'x86_64': 'x86_64', 'armv7l': 'arm', 'aarch64': 'arm'}
         arch = archs.get(get_arch())
@@ -358,6 +391,8 @@ class DeviceApi(Api):
             Returns:
                 json string containing token and additional information
         """
+        if self.disabled:
+            return
         return self.request({
             "method": "GET",
             "path": "/" + UUID + "/token/" + str(dev_cred)
@@ -389,6 +424,8 @@ class DeviceApi(Api):
         Arguments:
              data: dictionary with skills data from msm
         """
+        if self.disabled:
+            return
         if not isinstance(data, dict):
             raise ValueError('data must be of type dict')
 
@@ -451,6 +488,17 @@ class STTApi(Api):
         })
 
 
+def is_disabled():
+    # Load the config, skipping the REMOTE_CONFIG since we are
+    # getting the info needed to get to it!
+    config = Configuration.get([DEFAULT_CONFIG,
+                                SYSTEM_CONFIG,
+                                USER_CONFIG],
+                               cache=False)
+    config_server = config.get("server")
+    return config_server.get("disabled", False)
+
+
 class GeolocationApi(Api):
     """Web API wrapper for performing geolocation lookups."""
 
@@ -466,7 +514,8 @@ class GeolocationApi(Api):
         Returns:
             str: JSON structure with lookup results
         """
-
+        if self.disabled:
+            return {}
         response = self.request(dict(
             method="GET",
             query=dict(location=location),
@@ -481,6 +530,8 @@ def has_been_paired():
     Returns:
         bool: True if ever paired with backend (not factory reset)
     """
+    if is_disabled():
+        return True
     # This forces a load from the identity file in case the pairing state
     # has recently changed
     id = IdentityManager.load()
@@ -496,6 +547,8 @@ def is_paired(ignore_errors=True):
     Returns:
         bool: True if paired with backend
     """
+    if is_disabled():
+        return True
     global _paired_cache
     if _paired_cache:
         # NOTE: This assumes once paired, the unit remains paired.  So

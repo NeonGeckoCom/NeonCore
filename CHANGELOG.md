@@ -20,14 +20,23 @@ current dev branch
 
 ### Changed
 
+- mycroft backend
+    - make use of backend optional
+        - skill settings
+        - Api class
+        - remote config
+        - metrics
+    
 - remove relative imports everywhere
     - improves readability
     - removes dependency on work_dir (allows to run directly from pycharm)
     
     
 - mycroft.conf
+    - add config option to enable/disable backend usage
+    - change default STT to google
     - change data_dir to ~/mycroft_data
-    - allow to easily run code without worrying about permissions
+        - allow to easily run code without worrying about permissions
    
 ## [mycroft-16jan2020]
 
