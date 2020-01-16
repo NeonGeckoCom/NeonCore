@@ -21,7 +21,7 @@ from queue import Queue
 from threading import Thread
 
 from mycroft.api import STTApi, HTTPError
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, is_server
 from mycroft.util.log import LOG
 
 
@@ -477,6 +477,56 @@ class GoVivaceSTT(TokenSTT):
         return response.json()["result"]["hypotheses"][0]["transcript"]
 
 
+class ServerSTT(GoogleCloudStreamingSTT):
+
+    def __init__(self):
+        super().__init__()
+        from google.cloud import speech_v1p1beta1 as speech
+        from google.oauth2 import service_account
+        # TODO is this value static? should we read it from config?
+        GOOGLE_CLOUD_SPEECH_CREDENTIALS = service_account.Credentials.from_service_account_file(
+            '/var/www/html/Caffiend-9c9a15d24667.json')
+        self.client = speech.SpeechClient(credentials=GOOGLE_CLOUD_SPEECH_CREDENTIALS)
+
+    def execute(self, audio, language=None):
+        from google.cloud import speech_v1p1beta1 as speech
+
+        audio = speech.types.RecognitionAudio(content=audio.frame_data)
+        language = language or "en-US"
+
+        # TODO shouldn't this be configurable?
+        if not language.startswith('en'):
+            second_lang = ['en', 'es', 'ru']
+        else:
+            second_lang = ['es', 'fr', 'ru']
+
+        config = speech.types.RecognitionConfig(
+            encoding=speech.enums.RecognitionConfig.AudioEncoding.FLAC,
+            sample_rate_hertz=16000,
+            language_code=language,
+            alternative_language_codes=second_lang)
+
+        # Detects speech in the audio file
+        try:
+            response = self.client.recognize(config, audio)
+            # TODO handle all results
+            """
+            text = ''
+            
+            for result in response.results:
+                text += '{}'.format(result.alternatives[0].transcript)
+            """
+            # grab first results for now
+            text = response.results[0].alternatives[0].transcript
+            # NOTE automatic translation comes in a follow up PR,
+            # it will be done at the intent parser level like i do in jarbas-core
+            return text
+        except Exception as e:
+            LOG.exception(e)
+        LOG.error("Transcription error")
+        return None
+
+
 class STTFactory:
     CLASSES = {
         "mycroft": MycroftSTT,
@@ -497,6 +547,8 @@ class STTFactory:
 
     @staticmethod
     def create():
+        if is_server():
+            return ServerSTT()
         try:
             config = Configuration.get().get("stt", {})
             module = config.get("module", "mycroft")

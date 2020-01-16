@@ -30,6 +30,7 @@ current dev branch
 ### Fixed
 
 - stt
+    - add ServerSTT class
     - don't cast self.token to string
         - google stt - default to package free key instead of throwing error
 
