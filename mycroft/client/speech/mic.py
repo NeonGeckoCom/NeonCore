@@ -34,7 +34,8 @@ from tempfile import gettempdir
 from threading import Thread, Lock
 
 from mycroft.api import DeviceApi
-from mycroft.configuration import Configuration, is_server
+from mycroft.configuration import Configuration
+from mycroft.configuration.device import is_server
 from mycroft.session import SessionManager
 from mycroft.util import (
     check_for_signal,

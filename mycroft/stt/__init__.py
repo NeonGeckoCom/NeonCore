@@ -21,7 +21,8 @@ from queue import Queue
 from threading import Thread
 
 from mycroft.api import STTApi, HTTPError
-from mycroft.configuration import Configuration, is_server
+from mycroft.configuration import Configuration
+from mycroft.configuration.device import is_server
 from mycroft.util.log import LOG
 
 

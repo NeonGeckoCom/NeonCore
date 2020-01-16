@@ -49,7 +49,7 @@ from mycroft.util.signal import (
     ensure_directory_exists,
     get_ipc_directory
 )
-from mycroft.configuration import is_server
+from mycroft.configuration.device import is_server
 
 
 def resolve_resource_file(res_name):
