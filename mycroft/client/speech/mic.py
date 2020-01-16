@@ -34,7 +34,7 @@ from tempfile import gettempdir
 from threading import Thread, Lock
 
 from mycroft.api import DeviceApi
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, is_server
 from mycroft.session import SessionManager
 from mycroft.util import (
     check_for_signal,
@@ -138,12 +138,13 @@ class MutableMicrophone(Microphone):
         assert self.stream is None, \
             "This audio source is already inside a context manager"
         self.audio = pyaudio.PyAudio()
-        self.stream = MutableStream(self.audio.open(
-            input_device_index=self.device_index, channels=1,
-            format=self.format, rate=self.SAMPLE_RATE,
-            frames_per_buffer=self.CHUNK,
-            input=True,  # stream is an input stream
-        ), self.format, self.muted)
+        if not is_server():
+            self.stream = MutableStream(self.audio.open(
+                input_device_index=self.device_index, channels=1,
+                format=self.format, rate=self.SAMPLE_RATE,
+                frames_per_buffer=self.CHUNK,
+                input=True,  # stream is an input stream
+            ), self.format, self.muted)
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
