@@ -24,7 +24,7 @@ from mycroft.util import reset_sigint_handler, wait_for_exit_signal, \
 from mycroft.util.log import LOG
 
 import mycroft.audio.speech as speech
-from .audioservice import AudioService
+from mycroft.audio.audioservice import AudioService
 
 
 def main():
