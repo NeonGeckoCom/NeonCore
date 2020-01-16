@@ -13,20 +13,7 @@ current dev branch
 
 - added this changelog
 
-- configuration
-    - get_device_type
-    - is_server
-    
-- audio
-    - do not run audio service if is_server
-    - do not attempt to play_wav/mp3/ogg or record if is_server
-
-- mic
-    - do not start recording stream if is_server
-    
-- TTS
-    - support for .ogg format 
-    
+ 
 ### Fixed
 
 - stt

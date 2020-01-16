@@ -49,7 +49,6 @@ from mycroft.util.signal import (
     ensure_directory_exists,
     get_ipc_directory
 )
-from mycroft.configuration import is_server
 
 
 def resolve_resource_file(res_name):
@@ -159,8 +158,6 @@ def play_wav(uri, environment=None):
 
         Returns: subprocess.Popen object
     """
-    if is_server():
-        return None
     config = mycroft.configuration.Configuration.get()
     environment = environment or _get_pulse_environment(config)
     play_cmd = config.get("play_wav_cmdline")
@@ -189,8 +186,6 @@ def play_mp3(uri, environment=None):
 
         Returns: subprocess.Popen object
     """
-    if is_server():
-        return None
     config = mycroft.configuration.Configuration.get()
     environment = environment or _get_pulse_environment(config)
     play_cmd = config.get("play_mp3_cmdline")
@@ -219,8 +214,6 @@ def play_ogg(uri, environment=None):
 
         Returns: subprocess.Popen object
     """
-    if is_server():
-        return None
     config = mycroft.configuration.Configuration.get()
     environment = environment or _get_pulse_environment(config)
     play_cmd = config.get("play_ogg_cmdline")
@@ -237,8 +230,6 @@ def play_ogg(uri, environment=None):
 
 
 def record(file_path, duration, rate, channels):
-    if is_server():
-        return None
     if duration > 0:
         return subprocess.Popen(
             ["arecord", "-r", str(rate), "-c", str(channels), "-d",
@@ -256,8 +247,6 @@ def find_input_device(device_name):
 
         Returns: device_index (int) or None if device wasn't found
     """
-    if is_server():
-        return None
     LOG.info('Searching for input device: {}'.format(device_name))
     LOG.debug('Devices: ')
     pa = pyaudio.PyAudio()
