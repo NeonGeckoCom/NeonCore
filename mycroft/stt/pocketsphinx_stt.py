@@ -10,7 +10,6 @@ class PS_Recognizer:
     def __init__(self, language="en-US", language_directory=None,
                  acoustic_parameters_directory=None,
                  language_model_file=None, phoneme_dictionary_file=None):
-        super(PS_Recognizer, self).__init__()
         language = language.lower()
         language_directory = language_directory or os.path.join(
             MYCROFT_ROOT_PATH, "mycroft", "client", "speech", "recognizer",
