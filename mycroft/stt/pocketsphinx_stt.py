@@ -6,7 +6,7 @@ import os
 from pocketsphinx import pocketsphinx, Jsgf, FsgModel
 
 
-class PS_Recognizer(object):
+class PS_Recognizer:
     def __init__(self, language="en-US", language_directory=None,
                  acoustic_parameters_directory=None,
                  language_model_file=None, phoneme_dictionary_file=None):
