@@ -40,7 +40,7 @@ from mycroft.util import (
     check_for_signal,
     get_ipc_directory,
     resolve_resource_file,
-    play_wav
+    play_wav, play_mp3, play_ogg
 )
 from mycroft.util.log import LOG
 
@@ -426,16 +426,16 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         self._stop_signaled = True
 
     def _compile_metadata(self, hw):
-        ww_module = self.hotwords[hw]["engine"].__class__.__name__
+        ww_module = self.hotword_engines[hw]["engine"].__class__.__name__
         if ww_module == 'PreciseHotword':
-            model_path = self.hotwords[hw]["engine"].precise_model
+            model_path = self.hotword_engines[hw]["engine"].precise_model
             with open(model_path, 'rb') as f:
                 model_hash = md5(f.read()).hexdigest()
         else:
             model_hash = '0'
 
         return {
-            'name': self.hotwords[hw]["engine"].key_phrase.replace(' ', '-'),
+            'name': self.hotword_engines[hw]["engine"].key_phrase.replace(' ', '-'),
             'engine': md5(ww_module.encode('utf-8')).hexdigest(),
             'time': str(int(1000 * get_time())),
             'sessionId': SessionManager.get().session_id,
@@ -542,7 +542,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                     if test_size < len(byte_data) else byte_data
                 audio_data = chopped + silence
                 said_hot_word = False
-                for hotword in self.check_for_hotwords(audio_data, emitter):
+                for hotword in self.check_for_hotwords(audio_data, bus):
                     said_hot_word = True
                     engine = self.hotword_engines[hotword]["engine"]
                     sound = self.hotword_engines[hotword]["sound"]
@@ -556,7 +556,12 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                         try:
                             audio_file = resolve_resource_file(sound)
                             source.mute()
-                            play_wav(audio_file).wait()
+                            if audio_file.endswith(".wav"):
+                                play_wav(audio_file).wait()
+                            elif audio_file.endswith(".mp3"):
+                                play_mp3(audio_file).wait()
+                            elif audio_file.endswith(".ogg"):
+                                play_ogg(audio_file).wait()
                             source.unmute()
                         except Exception as e:
                             LOG.warning(e)
@@ -611,7 +616,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                     # serial detections
                     byte_data = silence
 
-    def check_for_hotwords(self, audio_data, emitter):
+    def check_for_hotwords(self, audio_data, bus):
         # check hot word
         for hotword in self.hotword_engines:
             engine = self.hotword_engines[hotword]["engine"]
@@ -626,7 +631,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         """
         return AudioData(raw_data, source.SAMPLE_RATE, source.SAMPLE_WIDTH)
 
-    def listen(self, source, emitter, stream=None):
+    def listen(self, source, bus, stream=None):
         """Listens for chunks of audio that Mycroft should perform STT on.
 
         This will listen continuously for a wake-up-word, then return the
@@ -635,7 +640,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
         Args:
             source (AudioSource):  Source producing the audio chunks
-            emitter (EventEmitter): Emitter for notifications of when recording
+            bus (EventEmitter): Emitter for notifications of when recording
                                     begins and ends.
             stream (AudioStreamHandler): Stream target that will receive chunks
                                          of the utterance audio while it is
@@ -657,13 +662,13 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         self.adjust_for_ambient_noise(source, 1.0)
 
         LOG.debug("Waiting for wake word...")
-        self._wait_until_wake_word(source, sec_per_buffer, emitter)
+        self._wait_until_wake_word(source, sec_per_buffer, bus)
         self._listen_triggered = False
         if self._stop_signaled:
             return
 
         LOG.debug("Recording...")
-        emitter.emit("recognizer_loop:record_begin")
+        bus.emit("recognizer_loop:record_begin")
 
         # If enabled, play a wave file with a short sound to audibly
         # indicate recording has begun.
@@ -677,7 +682,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
         frame_data = self._record_phrase(source, sec_per_buffer, stream)
         audio_data = self._create_audio_data(frame_data, source)
-        emitter.emit("recognizer_loop:record_end")
+        bus.emit("recognizer_loop:record_end")
         if self.save_utterances:
             LOG.info("Recording utterance")
             stamp = str(datetime.datetime.now())

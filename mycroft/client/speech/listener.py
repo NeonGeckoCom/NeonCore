@@ -208,8 +208,6 @@ class AudioConsumer(Thread):
                                'stt': self.stt.__class__.__name__})
             else:
                 ident = str(stopwatch.timestamp)
-        else:
-            LOG.warning("Audio too short to be processed")
 
     def transcribe(self, audio):
         def send_unknown_intent():
