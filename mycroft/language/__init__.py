@@ -5,9 +5,9 @@ from mycroft.util.log import LOG
 class LanguageDetector:
     def __init__(self):
         self.config = Configuration.get()["language"]
-        self.default_language = self.config["output"].split("-")[0]
+        self.default_language = self.config["user"].split("-")[0]
         # hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
-        self.hint_language = self.config["output"]
+        self.hint_language = self.config["user"].split("-")[0]
         self.boost = self.config["boost"]
 
     def detect(self, text):
@@ -19,7 +19,7 @@ class LanguageTranslator:
     def __init__(self):
         self.config = Configuration.get()["language"]
         self.boost = self.config["boost"]
-        self.default_language = self.config["output"].split("-")[0]
+        self.default_language = self.config["user"].split("-")[0]
         self.internal_language = self.config["internal"]
 
     def translate(self, text, target=None, source=None):

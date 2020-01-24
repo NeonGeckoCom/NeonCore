@@ -24,7 +24,8 @@ from mycroft.util.log import LOG
 from mycroft.util.parse import normalize
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.skills.padatious_service import PadatiousService
-from .intent_service_interface import open_intent_envelope
+from mycroft.skills.intent_service_interface import open_intent_envelope
+from mycroft.language import DetectorFactory, TranslatorFactory
 
 
 class AdaptIntent(IntentBuilder):
@@ -153,7 +154,12 @@ class ContextManager:
 class IntentService:
     def __init__(self, bus):
         self.config = Configuration.get().get('context', {})
+        self.language_config = Configuration.get()["language"]
         self.engine = IntentDeterminationEngine()
+        self.lang_detector = DetectorFactory.create()
+        self.translator = TranslatorFactory.create()
+
+        set_active_lang(self.language_config["internal"])
 
         # Dictionary for translating a skill id to a name
         self.skill_names = {}
@@ -314,10 +320,25 @@ class IntentService:
         """
         try:
             # Get language of the utterance
-            lang = message.data.get('lang', "en-us")
-            set_active_lang(lang)
-
+            lang = message.data.get('lang', self.language_config["user"])
             utterances = message.data.get('utterances', [])
+
+            message.context = message.context or {}
+            message.context["utterances_data"] = []
+
+            for idx, ut in enumerate(utterances):
+                detected_lang = self.lang_detector.detect(ut)
+                if detected_lang != self.language_config["internal"].split("-")[0]:
+                    utterances[idx] = self.translator.translate(ut,
+                                                                self.language_config["internal"])
+                # add language metadata to context
+                message.context["utterances_data"] += [{
+                    "source_lang": lang,
+                    "detected_lang": detected_lang,
+                    "internal": self.language_config["internal"],
+                    "was_translated": detected_lang == self.language_config["internal"].split("-")[0]
+                }]
+
             # normalize() changes "it's a boy" to "it is a boy", etc.
             norm_utterances = [normalize(u.lower(), remove_articles=False)
                                for u in utterances]
@@ -338,7 +359,8 @@ class IntentService:
                 if not converse:
                     # No conversation, use intent system to handle utterance
                     intent = self._adapt_intent_match(utterances,
-                                                      norm_utterances, lang)
+                                                      norm_utterances,
+                                                      self.language_config["internal"])
                     for utt in combined:
                         _intent = PadatiousService.instance.calc_intent(utt)
                         if _intent:
