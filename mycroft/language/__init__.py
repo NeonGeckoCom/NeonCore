@@ -6,6 +6,9 @@ class LanguageDetector:
     def __init__(self):
         self.config = Configuration.get()["language"]
         self.default_language = self.config["output"].split("-")[0]
+        # hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
+        self.hint_language = self.config["output"]
+        self.boost = self.config["boost"]
 
     def detect(self, text):
         # assume default language
@@ -27,9 +30,6 @@ class Pycld2Detector(LanguageDetector):
     def __init__(self):
         super().__init__()
         from jarbas_utils.lang.detect import detect_lang_naive
-        # hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
-        self.hint_language = self.config["output"]
-        self.boost = self.config["boost"]
         self._detect = detect_lang_naive
 
     def detect(self, text):
@@ -45,13 +45,15 @@ class Pycld3Detector(LanguageDetector):
     def __init__(self):
         super().__init__()
         from jarbas_utils.lang.detect import detect_lang_neural
-        # hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
-        self.hint_language = self.config["output"]
         self._detect = detect_lang_neural
 
     def detect(self, text):
-        return self._detect(text, hint_language=self.hint_language) or \
-               self.default_language
+        if self.boost:
+            return self._detect(text, hint_language=self.hint_language) or \
+                   self.default_language
+        else:
+            return self._detect(text) or \
+                   self.default_language
 
 
 class GoogleDetector(LanguageDetector):
