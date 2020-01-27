@@ -329,7 +329,7 @@ class DeepSpeechStreamThread(StreamThread):
         # https://deepspeech.readthedocs.io/en/latest/Python-API.html#native_client.python.Model.intermediateDecode
         # self.text = self.ds.intermediateDecode(self.ds_stream)
 
-    def get_prediction(self):
+    def finish_stream(self):
         self.text = self.ds.finishStream(self.ds_stream)
 
 
@@ -344,7 +344,7 @@ class DeepSpeechStreamingSTT(DeepSpeechSTT, StreamingSTT):
 
     def execute(self, audio, language=None):
         if self.stream:
-            self.stream.get_prediction()
+            self.stream.finish_stream()
         return self.stream_stop()
 
 
