@@ -347,6 +347,9 @@ class DeepSpeechStreamingSTT(DeepSpeechSTT, StreamingSTT):
             self.ds
         )
 
+    def execute(self, audio, language=None):
+        return self.stream_stop()
+
 
 class MycroftDeepSpeechSTT(STT):
     """Mycroft Hosted DeepSpeech"""
