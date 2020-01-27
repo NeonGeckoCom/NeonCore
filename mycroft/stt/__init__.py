@@ -334,11 +334,6 @@ class DeepSpeechStreamThread(StreamThread):
 
 
 class DeepSpeechStreamingSTT(DeepSpeechSTT, StreamingSTT):
-    def stream_stop(self):
-        if self.stream:
-            self.stream.get_prediction()
-        return super().stream_stop()
-
     def create_streaming_thread(self):
         self.queue = Queue()
         return DeepSpeechStreamThread(
@@ -348,6 +343,8 @@ class DeepSpeechStreamingSTT(DeepSpeechSTT, StreamingSTT):
         )
 
     def execute(self, audio, language=None):
+        if self.stream:
+            self.stream.get_prediction()
         return self.stream_stop()
 
 
