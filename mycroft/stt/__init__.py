@@ -312,17 +312,12 @@ class DeepSpeechSTT(STT):
         self.ds.enableDecoderWithLM(lm, trie, LM_ALPHA, LM_BETA)
 
     def execute(self, audio, language=None):
-        language = language or self.lang
-        if not language.startswith("en"):
-            raise ValueError("Deepspeech is currently english only")
         audio = np.frombuffer(audio.get_wav_data(), dtype=np.int16)
         return self.ds.stt(audio)
 
 
 class DeepSpeechStreamThread(StreamThread):
     def __init__(self, queue, language, ds):
-        if not language.startswith("en"):
-            raise ValueError("Deepspeech is currently english only")
         super().__init__(queue, language)
         self.ds = ds
         self.ds_stream = self.ds.createStream()
@@ -377,17 +372,12 @@ class DeepSpeechServerSTT(STT):
         super(DeepSpeechServerSTT, self).__init__()
 
     def execute(self, audio, language=None):
-        language = language or self.lang
-        if not language.startswith("en"):
-            raise ValueError("Deepspeech is currently english only")
         response = post(self.config.get("uri"), data=audio.get_wav_data())
         return response.text
 
 
 class DeepSpeechServerStreamThread(StreamThread):
     def __init__(self, queue, language, url):
-        if not language.startswith("en"):
-            raise ValueError("Deepspeech is currently english only")
         super().__init__(queue, language)
         self.url = url
 
