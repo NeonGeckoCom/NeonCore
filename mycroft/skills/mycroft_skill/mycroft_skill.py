@@ -31,7 +31,7 @@ from mycroft.api import DeviceApi
 from mycroft.audio import wait_while_speaking
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.enclosure.gui import SkillGUI
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, get_private_keys
 from mycroft.dialog import DialogLoader
 from mycroft.filesystem import FileSystemAccess
 from mycroft.messagebus.message import Message
@@ -161,6 +161,8 @@ class MycroftSkill:
         # Delegator classes
         self.event_scheduler = EventSchedulerInterface(self.name)
         self.intent_service = IntentServiceInterface()
+
+        self.keys = get_private_keys()
 
     @property
     def enclosure(self):

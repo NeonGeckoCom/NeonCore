@@ -28,6 +28,8 @@ class YandexTTS(TTS):
         self.type = "wav"
         self.config = Configuration.get().get("tts", {}).get("yandex", {})
         self.api_key = self.config.get("api_key")
+        if self.keys.get("yandex"):
+            self.api_key = self.keys["yandex"]["key"]
         self.voice = self.config.get("voice", "oksana")
         self.emotion = self.config.get("emotion", "neutral")
         self.speed = self.config.get("speed", 1.0)

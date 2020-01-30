@@ -21,7 +21,7 @@ from queue import Queue
 from threading import Thread
 
 from mycroft.api import STTApi, HTTPError
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, get_private_keys
 from mycroft.util.log import LOG
 
 
@@ -35,6 +35,7 @@ class STT(metaclass=ABCMeta):
         self.credential = self.config.get("credential", {})
         self.recognizer = Recognizer()
         self.can_stream = False
+        self.keys = get_private_keys()
 
     @staticmethod
     def init_language(config_core):
@@ -58,6 +59,8 @@ class TokenSTT(STT, metaclass=ABCMeta):
 class GoogleJsonSTT(STT, metaclass=ABCMeta):
     def __init__(self):
         super(GoogleJsonSTT, self).__init__()
+        if not self.credential.get("json") or self.keys.get("google_cloud"):
+            self.credential["json"] = self.keys["google_cloud"]
         self.json_credentials = json.dumps(self.credential.get("json"))
 
 
@@ -80,6 +83,8 @@ class KeySTT(STT, metaclass=ABCMeta):
 class GoogleSTT(TokenSTT):
     def __init__(self):
         super(GoogleSTT, self).__init__()
+        if self.keys.get("google"):
+            self.token = self.keys["google"]["key"]
 
     def execute(self, audio, language=None):
         self.lang = language or self.lang
@@ -102,6 +107,8 @@ class GoogleCloudSTT(GoogleJsonSTT):
 class WITSTT(TokenSTT):
     def __init__(self):
         super(WITSTT, self).__init__()
+        if self.keys.get("wit"):
+            self.token = self.keys["wit"]["key"]
 
     def execute(self, audio, language=None):
         LOG.warning("WITSTT language should be configured at wit.ai settings.")
@@ -111,6 +118,9 @@ class WITSTT(TokenSTT):
 class IBMSTT(BasicSTT):
     def __init__(self):
         super(IBMSTT, self).__init__()
+        if self.keys.get("ibm"):
+            self.username = self.keys["ibm"]["client_id"]
+            self.username = self.keys["ibm"]["client_key"]
 
     def execute(self, audio, language=None):
         self.lang = language or self.lang
@@ -118,7 +128,7 @@ class IBMSTT(BasicSTT):
                                              self.password, self.lang)
 
 
-class YandexSTT(STT):
+class YandexSTT(TokenSTT):
     """
         Yandex SpeechKit STT
         To use create service account with role 'editor' in your cloud folder,
@@ -130,7 +140,7 @@ class YandexSTT(STT):
             "yandex": {
                 "lang": "en-US",
                 "credential": {
-                    "api_key": "YOUR_API_KEY"
+                    "token": "YOUR_API_KEY"
                 }
             }
         }
@@ -138,8 +148,11 @@ class YandexSTT(STT):
     def __init__(self):
         super(YandexSTT, self).__init__()
         self.lang = self.config.get('lang') or self.lang
-        self.api_key = self.credential.get("api_key")
-        if self.api_key is None:
+
+        if self.keys.get("yandex"):
+            self.token = self.keys["yandex"]["key"]
+
+        if self.token is None:
             raise ValueError("API key for Yandex STT is not defined")
 
     def execute(self, audio, language=None):
@@ -165,7 +178,7 @@ class YandexSTT(STT):
 
         # Based on https://cloud.yandex.com/docs/speechkit/stt#request
         url = "https://stt.api.cloud.yandex.net/speech/v1/stt:recognize"
-        headers = {"Authorization": "Api-Key {}".format(self.api_key)}
+        headers = {"Authorization": "Api-Key {}".format(self.token)}
         params = "&".join([
             "lang={}".format(self.lang),
             "format=lpcm",
@@ -393,6 +406,10 @@ class GoogleCloudStreamingSTT(StreamingSTT):
         super(GoogleCloudStreamingSTT, self).__init__()
         # override language with module specific language selection
         self.language = self.config.get('lang') or self.lang
+
+        if not self.credential.get("json") or self.keys.get("google_cloud"):
+            self.credential["json"] = self.keys["google_cloud"]
+
         credentials = Credentials.from_service_account_info(
             self.credential.get('json')
         )
@@ -458,6 +475,8 @@ class PocketSphinxSTT(BasicSTT):
 class BingSTT(TokenSTT):
     def __init__(self):
         super(BingSTT, self).__init__()
+        if self.keys.get("bing"):
+            self.token = self.keys["bing"]["key"]
 
     def execute(self, audio, language=None):
         self.lang = language or self.lang
@@ -468,6 +487,9 @@ class BingSTT(TokenSTT):
 class HoundifySTT(KeySTT):
     def __init__(self):
         super(HoundifySTT, self).__init__()
+        if self.keys.get("houndify"):
+            self.id = self.keys["houndify"]["client_id"]
+            self.key = self.keys["houndify"]["client_key"]
 
     def execute(self, audio, language=None):
         self.lang = language or self.lang
@@ -477,6 +499,8 @@ class HoundifySTT(KeySTT):
 class GoVivaceSTT(TokenSTT):
     def __init__(self):
         super(GoVivaceSTT, self).__init__()
+        if self.keys.get("govivace"):
+            self.token = self.keys["govivace"]["key"]
         self.default_uri = "https://services.govivace.com:49149/telephony"
 
         if not self.lang.startswith("en") and not self.lang.startswith("es"):

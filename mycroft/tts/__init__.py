@@ -26,7 +26,7 @@ from os.path import dirname, exists, isdir, join
 
 import mycroft.util
 from mycroft.enclosure.api import EnclosureAPI
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, get_private_keys
 from mycroft.messagebus.message import Message
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.util import (
@@ -190,6 +190,7 @@ class TTS(metaclass=ABCMeta):
         self.clear_cache()
         self.spellings = self.load_spellings()
         self.tts_name = type(self).__name__
+        self.keys = get_private_keys()
 
     def load_spellings(self):
         """Load phonetic spellings of words as dictionary"""
