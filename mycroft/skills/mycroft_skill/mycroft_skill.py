@@ -44,6 +44,7 @@ from mycroft.util import (
 from mycroft.util.log import LOG
 from mycroft.util.format import pronounce_number, join_list
 from mycroft.util.parse import match_one, extract_number
+from mycroft.language import DetectorFactory, TranslatorFactory
 
 from .event_container import EventContainer, create_wrapper, get_handler_name
 from ..event_scheduler import EventSchedulerInterface
@@ -164,6 +165,11 @@ class MycroftSkill:
 
         self.keys = get_private_keys()
 
+        # Lang support
+        self.language_config = Configuration.get()["language"]
+        self.lang_detector = DetectorFactory.create()
+        self.translator = TranslatorFactory.create()
+
     @property
     def enclosure(self):
         if self._enclosure:
@@ -210,8 +216,7 @@ class MycroftSkill:
     @property
     def lang(self):
         """Get the configured language."""
-        lang_config = self.config_core["language"]
-        return lang_config.get("internal") or self.config_core.get('lang')
+        return self.language_config.get("internal") or self.config_core.get('lang')
 
     def bind(self, bus):
         """Register messagebus emitter with skill.
@@ -1071,12 +1076,27 @@ class MycroftSkill:
             wait (bool):            set to True to block while the text
                                     is being spoken.
         """
+        original = utterance
+        detected_lang = self.lang_detector.detect(utterance)
+        LOG.debug("Detected language: {lang}".format(lang=detected_lang))
+        if detected_lang != self.language_config["user"].split("-")[0]:
+            utterance = self.translator.translate(utterance, self.language_config["user"])
+
         # registers the skill as being active
         self.enclosure.register(self.name)
         data = {'utterance': utterance,
                 'expect_response': expect_response}
         message = dig_for_message()
         m = message.forward("speak", data) if message else Message("speak", data)
+
+        # add language metadata to context
+        m.context["utterance_data"] = {
+            "detected_lang": detected_lang,
+            "user_lang": self.language_config["user"],
+            "was_translated": detected_lang == self.language_config["user"].split("-")[0],
+            "original": original
+        }
+
         self.bus.emit(m)
 
         if wait:

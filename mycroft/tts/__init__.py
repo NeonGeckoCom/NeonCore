@@ -330,6 +330,9 @@ class TTS(metaclass=ABCMeta):
         sentence = self.validate_ssml(sentence)
 
         # multi lang support
+        # NOTE this is kinda optional because skills will translate
+        # However speak messages might be sent directly to bus
+        # this is here to cover that use case
         detected_lang = self.lang_detector.detect(sentence)
         LOG.debug("Detected language: {lang}".format(lang=detected_lang))
         if detected_lang != self.language_config["user"].split("-")[0]:
