@@ -13,7 +13,9 @@
 # limitations under the License.
 #
 from gtts import gTTS
-
+from logging import getLogger
+getLogger("gtts").setLevel("INFO")
+getLogger("urllib3.connectionpool").setLevel("INFO")
 from mycroft.tts import TTS, TTSValidator
 
 
