@@ -210,7 +210,8 @@ class MycroftSkill:
     @property
     def lang(self):
         """Get the configured language."""
-        return self.config_core.get('lang')
+        lang_config = self.config_core["language"]
+        return lang_config.get("internal") or self.config_core.get('lang')
 
     def bind(self, bus):
         """Register messagebus emitter with skill.

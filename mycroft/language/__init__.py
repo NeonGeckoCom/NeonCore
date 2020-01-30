@@ -5,6 +5,8 @@ from mycroft.util.log import LOG
 class LanguageDetector:
     def __init__(self):
         self.config = Configuration.get()["language"]
+        if not self.config.get("internal"):
+            self.config["internal"] = Configuration.get()["lang"]
         self.default_language = self.config["user"].split("-")[0]
         # hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
         self.hint_language = self.config["user"].split("-")[0]
@@ -18,6 +20,8 @@ class LanguageDetector:
 class LanguageTranslator:
     def __init__(self):
         self.config = Configuration.get()["language"]
+        if not self.config.get("internal"):
+            self.config["internal"] = Configuration.get()["lang"]
         self.boost = self.config["boost"]
         self.default_language = self.config["user"].split("-")[0]
         self.internal_language = self.config["internal"]
@@ -114,7 +118,7 @@ class DetectorFactory:
     @staticmethod
     def create(module=None):
         config = Configuration.get().get("language", {})
-        module = module or config.get("detection_module", "cld2")
+        module = module or config.get("detection_module", "cld3")
         try:
             clazz = DetectorFactory.CLASSES.get(module)
             return clazz()
@@ -123,8 +127,8 @@ class DetectorFactory:
             # default.
             LOG.exception('The selected language detector backend could not be loaded, '
                           'falling back to default...')
-            if module != 'cld2':
-                return Pycld2Detector()
+            if module != 'cld3':
+                return Pycld3Detector()
             else:
                 raise
 
