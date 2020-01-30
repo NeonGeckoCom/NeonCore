@@ -3,7 +3,7 @@ from mycroft.util.log import LOG
 
 
 def get_lang_config():
-    config = Configuration.get()["language"]
+    config = Configuration.get()
     lang_config = config.get("language", {})
     lang_config["internal"] = lang_config.get("internal") or config.get("lang", "en-us")
     lang_config["user"] = lang_config.get("user") or config.get("lang", "en-us")
