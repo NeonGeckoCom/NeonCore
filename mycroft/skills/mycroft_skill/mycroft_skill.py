@@ -43,7 +43,7 @@ from mycroft.util import (
 from mycroft.util.log import LOG
 from mycroft.util.format import pronounce_number, join_list
 from mycroft.util.parse import match_one, extract_number
-from mycroft.language import DetectorFactory, TranslatorFactory
+from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
 
 from .event_container import EventContainer, create_wrapper, get_handler_name
 from ..event_scheduler import EventSchedulerInterface
@@ -154,8 +154,7 @@ class MycroftSkill:
         self.keys = get_private_keys()
 
         # Lang support
-        self.language_config = Configuration.get()["language"]
-        self.language_config["user"] = self.language_config.get("user") or self.lang
+        self.language_config = get_lang_config()
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
 

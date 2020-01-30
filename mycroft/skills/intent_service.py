@@ -25,7 +25,7 @@ from mycroft.util.parse import normalize
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.skills.padatious_service import PadatiousService
 from mycroft.skills.intent_service_interface import open_intent_envelope
-from mycroft.language import DetectorFactory, TranslatorFactory
+from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
 
 
 class AdaptIntent(IntentBuilder):
@@ -153,7 +153,7 @@ class ContextManager:
 class IntentService:
     def __init__(self, bus):
         self.config = Configuration.get().get('context', {})
-        self.language_config = Configuration.get()["language"]
+        self.language_config = get_lang_config()
         self.engine = IntentDeterminationEngine()
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()

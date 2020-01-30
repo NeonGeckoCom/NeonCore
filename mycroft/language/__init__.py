@@ -2,11 +2,17 @@ from mycroft.configuration import Configuration
 from mycroft.util.log import LOG
 
 
+def get_lang_config():
+    config = Configuration.get()["language"]
+    lang_config = config.get("language", {})
+    lang_config["internal"] = lang_config.get("internal") or config.get("lang", "en-us")
+    lang_config["user"] = lang_config.get("user") or config.get("lang", "en-us")
+    return lang_config
+
+
 class LanguageDetector:
     def __init__(self):
-        self.config = Configuration.get()["language"]
-        if not self.config.get("internal"):
-            self.config["internal"] = Configuration.get()["lang"]
+        self.config = get_lang_config()
         self.default_language = self.config["user"].split("-")[0]
         # hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
         self.hint_language = self.config["user"].split("-")[0]
@@ -19,9 +25,7 @@ class LanguageDetector:
 
 class LanguageTranslator:
     def __init__(self):
-        self.config = Configuration.get()["language"]
-        if not self.config.get("internal"):
-            self.config["internal"] = Configuration.get()["lang"]
+        self.config = get_lang_config()
         self.boost = self.config["boost"]
         self.default_language = self.config["user"].split("-")[0]
         self.internal_language = self.config["internal"]

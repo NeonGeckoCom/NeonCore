@@ -20,7 +20,7 @@ import re
 from abc import ABCMeta, abstractmethod
 from threading import Thread
 from time import time, sleep
-from mycroft.language import DetectorFactory, TranslatorFactory
+from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
 
 import os.path
 from os.path import dirname, exists, isdir, join
@@ -175,7 +175,7 @@ class TTS(metaclass=ABCMeta):
         super(TTS, self).__init__()
         self.bus = None  # initalized in "init" step
 
-        self.language_config = Configuration.get()["language"]
+        self.language_config = get_lang_config()
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
         self.lang = lang or self.language_config.get("user", "en-us")
