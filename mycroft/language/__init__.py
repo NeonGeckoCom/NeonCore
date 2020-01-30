@@ -109,6 +109,21 @@ class AmazonTranslator(LanguageTranslator):
         return response["TranslatedText"]
 
 
+class AmazonDetector(LanguageDetector):
+    def __init__(self):
+        super().__init__()
+        self.keys = get_private_keys()["amazon"]
+        self.client = boto3.Session(aws_access_key_id=self.keys["key_id"],
+                                    aws_secret_access_key=self.keys["secret_key"],
+                                    region_name=self.keys["region"]).client('comprehend')
+
+    def detect(self, text):
+        response = self.client.detect_dominant_language(
+            Text=text
+        )
+        return response['Languages'][0]['LanguageCode']
+
+
 class TranslatorFactory:
     CLASSES = {
         "google": GoogleTranslator,
@@ -135,6 +150,7 @@ class TranslatorFactory:
 
 class DetectorFactory:
     CLASSES = {
+        "amazon": AmazonDetector,
         "google": GoogleDetector,
         "cld2": Pycld2Detector,
         "cld3": Pycld3Detector
@@ -162,9 +178,13 @@ if __name__ == "__main__":
     texts = ["My name is neon",
              "O meu nome é jarbas"]
 
+    d = AmazonDetector()
+    assert d.detect(texts[0]) == "en"
+    assert d.detect(texts[1]) == "pt"
+
     t = AmazonTranslator()
-    print(t.translate(texts[1]))
-    exit()
+    assert t.translate(texts[1]) == "My name is jarbas"
+
     t = TranslatorFactory.create()
     assert t.translate(texts[1]) == "My name is jarbas"
 
