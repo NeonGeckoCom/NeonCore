@@ -167,6 +167,7 @@ class MycroftSkill:
 
         # Lang support
         self.language_config = Configuration.get()["language"]
+        self.language_config["user"] = self.language_config.get("user") or self.lang
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
 
