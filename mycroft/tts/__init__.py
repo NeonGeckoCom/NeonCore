@@ -20,6 +20,7 @@ import re
 from abc import ABCMeta, abstractmethod
 from threading import Thread
 from time import time, sleep
+from mycroft.language import DetectorFactory, TranslatorFactory
 
 import os.path
 from os.path import dirname, exists, isdir, join
@@ -173,7 +174,12 @@ class TTS(metaclass=ABCMeta):
                  phonetic_spelling=True, ssml_tags=None):
         super(TTS, self).__init__()
         self.bus = None  # initalized in "init" step
-        self.lang = lang or 'en-us'
+
+        self.language_config = Configuration.get()["language"]
+        self.lang_detector = DetectorFactory.create()
+        self.translator = TranslatorFactory.create()
+        self.lang = lang or self.language_config.get("user", "en-us")
+
         self.config = config
         self.validator = validator
         self.phonetic_spelling = phonetic_spelling
@@ -322,6 +328,12 @@ class TTS(metaclass=ABCMeta):
                             of the utterance.
         """
         sentence = self.validate_ssml(sentence)
+
+        # multi lang support
+        detected_lang = self.lang_detector.detect(sentence)
+        LOG.debug("Detected language: {lang}".format(lang=detected_lang))
+        if detected_lang != self.language_config["user"].split("-")[0]:
+            sentence = self.translator.translate(sentence, self.language_config["user"])
 
         create_signal("isSpeaking")
         if self.phonetic_spelling:
@@ -501,7 +513,7 @@ class TTSFactory:
         }
         """
         config = Configuration.get()
-        lang = config.get("lang", "en-us")
+        lang = config.get("language", {}).get("user") or config.get("lang", "en-us")
         tts_module = config.get('tts', {}).get('module', 'mimic')
         tts_config = config.get('tts', {}).get(tts_module, {})
         tts_lang = tts_config.get('lang', lang)
