@@ -1,5 +1,6 @@
-from mycroft.configuration import Configuration
+from mycroft.configuration import Configuration, get_private_keys
 from mycroft.util.log import LOG
+import boto3
 
 
 def get_lang_config():
@@ -42,7 +43,7 @@ class Pycld2Detector(LanguageDetector):
 
     def detect(self, text):
         if self.boost:
-            return self._detect(text, hint_language=self.hint_language) or\
+            return self._detect(text, hint_language=self.hint_language) or \
                    self.default_language
         else:
             return self._detect(text) or \
@@ -89,9 +90,29 @@ class GoogleTranslator(LanguageTranslator):
         return self._translate(text, target, source)
 
 
+class AmazonTranslator(LanguageTranslator):
+    def __init__(self):
+        super().__init__()
+        self.keys = get_private_keys()["amazon"]
+        self.client = boto3.Session(aws_access_key_id=self.keys["key_id"],
+                                    aws_secret_access_key=self.keys["secret_key"],
+                                    region_name=self.keys["region"]).client('translate')
+
+    def translate(self, text, target=None, source="auto"):
+        target = target or self.internal_language
+
+        response = self.client.translate_text(
+            Text=text,
+            SourceLanguageCode="auto",
+            TargetLanguageCode=target.split("-")[0]
+        )
+        return response["TranslatedText"]
+
+
 class TranslatorFactory:
     CLASSES = {
-        "google": GoogleTranslator
+        "google": GoogleTranslator,
+        "amazon": AmazonTranslator
     }
 
     @staticmethod
@@ -141,6 +162,9 @@ if __name__ == "__main__":
     texts = ["My name is neon",
              "O meu nome é jarbas"]
 
+    t = AmazonTranslator()
+    print(t.translate(texts[1]))
+    exit()
     t = TranslatorFactory.create()
     assert t.translate(texts[1]) == "My name is jarbas"
 
