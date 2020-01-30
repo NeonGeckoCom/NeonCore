@@ -124,7 +124,6 @@ class ContextManager:
             if entity['origin'] != last or entity['origin'] == '':
                 depth += 1
             last = entity['origin']
-            print(depth)
 
         result = []
         if len(missing_entities) > 0:
@@ -328,6 +327,7 @@ class IntentService:
 
             for idx, ut in enumerate(utterances):
                 detected_lang = self.lang_detector.detect(ut)
+                LOG.debug("Detected language: {lang}".format(lang=detected_lang))
                 if detected_lang != self.language_config["internal"].split("-")[0]:
                     utterances[idx] = self.translator.translate(ut,
                                                                 self.language_config["internal"])
