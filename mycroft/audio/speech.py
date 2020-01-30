@@ -44,25 +44,21 @@ def handle_speak(event):
     Configuration.set_config_update_handlers(bus)
     global _last_stop_signal
 
+    event.context = event.context or {}
+
     # if the message is targeted and audio is not the target don't
     # don't synthezise speech
-    if (event.context and 'destination' in event.context and
-            event.context['destination'] and
-            'audio' not in event.context['destination']):
+    if 'audio' not in event.context.get('destination', []):
         return
 
     # Get conversation ID
-    if event.context and 'ident' in event.context:
-        ident = event.context['ident']
-    else:
-        ident = 'unknown'
+    event.context['ident'] = event.context.get("ident", "unknown")
 
     start = time.time()  # Time of speech request
     with lock:
         stopwatch = Stopwatch()
         stopwatch.start()
         utterance = event.data['utterance']
-        listen = event.data.get('expect_response', False)
         # This is a bit of a hack for Picroft.  The analog audio on a Pi blocks
         # for 30 seconds fairly often, so we don't want to break on periods
         # (decreasing the chance of encountering the block).  But we will
@@ -81,9 +77,8 @@ def handle_speak(event):
             chunks = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\;|\?)\s',
                               utterance)
             # Apply the listen flag to the last chunk, set the rest to False
-            chunks = [(chunks[i], listen if i == len(chunks) - 1 else False)
-                      for i in range(len(chunks))]
-            for chunk, listen in chunks:
+            chunks = [(chunks[i] if i == len(chunks) - 1 else False) for i in range(len(chunks))]
+            for chunk in chunks:
                 # Check if somthing has aborted the speech
                 if (_last_stop_signal > start or
                         check_for_signal('buttonPress')):
@@ -91,20 +86,20 @@ def handle_speak(event):
                     tts.playback.clear()
                     break
                 try:
-                    mute_and_speak(chunk, ident, listen)
+                    mute_and_speak(chunk, event)
                 except KeyboardInterrupt:
                     raise
                 except Exception:
                     LOG.error('Error in mute_and_speak', exc_info=True)
         else:
-            mute_and_speak(utterance, ident, listen)
+            mute_and_speak(utterance, event)
 
         stopwatch.stop()
-    report_timing(ident, 'speech', stopwatch, {'utterance': utterance,
+    report_timing(event.context['ident'], 'speech', stopwatch, {'utterance': utterance,
                                                'tts': tts.__class__.__name__})
 
 
-def mute_and_speak(utterance, ident, listen=False):
+def mute_and_speak(utterance, event):
     """Mute mic and start speaking the utterance using selected tts backend.
 
     Arguments:
@@ -112,6 +107,8 @@ def mute_and_speak(utterance, ident, listen=False):
         ident:      Ident tying the utterance to the source query
     """
     global tts_hash
+
+    listen = event.data.get('expect_response', False)
 
     # update TTS object if configuration has changed
     if tts_hash != hash(str(config.get('tts', ''))):
@@ -126,15 +123,15 @@ def mute_and_speak(utterance, ident, listen=False):
 
     LOG.info("Speak: " + utterance)
     try:
-        tts.execute(utterance, ident, listen)
+        tts.execute(utterance, event.context['ident'], listen, event)
     except RemoteTTSTimeoutException as e:
         LOG.error(e)
-        mimic_fallback_tts(utterance, ident)
+        mimic_fallback_tts(utterance, event.context['ident'], event)
     except Exception as e:
         LOG.error('TTS execution failed ({})'.format(repr(e)))
 
 
-def mimic_fallback_tts(utterance, ident):
+def mimic_fallback_tts(utterance, ident, event=None):
     global mimic_fallback_obj
     # fallback if connection is lost
     config = Configuration.get()
@@ -145,7 +142,7 @@ def mimic_fallback_tts(utterance, ident):
     tts = mimic_fallback_obj
     LOG.debug("Mimic fallback, utterance : " + str(utterance))
     tts.init(bus)
-    tts.execute(utterance, ident)
+    tts.execute(utterance, ident, message=event)
 
 
 def handle_stop(event):

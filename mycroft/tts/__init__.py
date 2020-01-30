@@ -315,7 +315,7 @@ class TTS(metaclass=ABCMeta):
         """
         return [sentence]
 
-    def execute(self, sentence, ident=None, listen=False):
+    def execute(self, sentence, ident=None, listen=False, message=None):
         """Convert sentence to speech, preprocessing out unsupported ssml
 
             The method caches results if possible using the hash of the
@@ -334,16 +334,16 @@ class TTS(metaclass=ABCMeta):
         # However speak messages might be sent directly to bus
         # this is here to cover that use case
 
-        message = dig_for_message()
-
         # check for user specified language
-        user_lang = message.user_data.get("lang") or self.language_config["user"]
+        if message:
+            user_lang = message.user_data.get("lang") or self.language_config["user"]
+        else:
+            user_lang = self.language_config["user"]
 
         detected_lang = self.lang_detector.detect(sentence)
         LOG.debug("Detected language: {lang}".format(lang=detected_lang))
         if detected_lang != user_lang.split("-")[0]:
             sentence = self.translator.translate(sentence, user_lang)
-
         create_signal("isSpeaking")
         if self.phonetic_spelling:
             for word in re.findall(r"[\w']+", sentence):
@@ -530,6 +530,7 @@ class TTSFactory:
             clazz = TTSFactory.CLASSES.get(tts_module)
             tts = clazz(tts_lang, tts_config)
             tts.validator.validate()
+
         except Exception as e:
             # Fallback to mimic if an error occurs while loading.
             if tts_module != 'mimic':
@@ -541,5 +542,5 @@ class TTSFactory:
             else:
                 LOG.exception('The TTS could not be loaded.')
                 raise
-
+        LOG.debug("TTS Loaded: " + tts.__class__.__name__)
         return tts
