@@ -182,3 +182,7 @@ class Message:
                 # Substitute only whole words matching the token
                 utt = re.sub(r'\b' + token.get("key", "") + r"\b", "", utt)
         return normalize(utt)
+
+    @property
+    def user_data(self):
+        return self.context.get("user", {})

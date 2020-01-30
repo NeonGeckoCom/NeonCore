@@ -1077,27 +1077,34 @@ class MycroftSkill:
             wait (bool):            set to True to block while the text
                                     is being spoken.
         """
-        original = utterance
-        detected_lang = self.lang_detector.detect(utterance)
-        LOG.debug("Detected language: {lang}".format(lang=detected_lang))
-        if detected_lang != self.language_config["user"].split("-")[0]:
-            utterance = self.translator.translate(utterance, self.language_config["user"])
 
         # registers the skill as being active
         self.enclosure.register(self.name)
+
+        message = dig_for_message()
+
+        # check for user specified language
+        # NOTE this will likely change in future
+        user_lang = message.user_data.get("lang") or self.language_config["user"]
+
+        original = utterance
+        detected_lang = self.lang_detector.detect(utterance)
+        LOG.debug("Detected language: {lang}".format(lang=detected_lang))
+        if detected_lang != user_lang.split("-")[0]:
+            utterance = self.translator.translate(utterance, user_lang)
+
         data = {'utterance': utterance,
                 'expect_response': expect_response}
-        message = dig_for_message()
-        m = message.forward("speak", data) if message else Message("speak", data)
 
         # add language metadata to context
-        m.context["utterance_data"] = {
+        message.context["utterance_data"] = {
             "detected_lang": detected_lang,
             "user_lang": self.language_config["user"],
             "was_translated": detected_lang == self.language_config["user"].split("-")[0],
             "original": original
         }
 
+        m = message.forward("speak", data) if message else Message("speak", data)
         self.bus.emit(m)
 
         if wait:
