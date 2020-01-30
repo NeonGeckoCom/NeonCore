@@ -28,7 +28,7 @@ from os.path import dirname, exists, isdir, join
 import mycroft.util
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration, get_private_keys
-from mycroft.messagebus.message import Message
+from mycroft.messagebus.message import Message, dig_for_message
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.util import (
     play_wav, play_mp3, check_for_signal, create_signal, resolve_resource_file
@@ -333,10 +333,16 @@ class TTS(metaclass=ABCMeta):
         # NOTE this is kinda optional because skills will translate
         # However speak messages might be sent directly to bus
         # this is here to cover that use case
+
+        message = dig_for_message()
+
+        # check for user specified language
+        user_lang = message.user_data.get("lang") or self.language_config["user"]
+
         detected_lang = self.lang_detector.detect(sentence)
         LOG.debug("Detected language: {lang}".format(lang=detected_lang))
-        if detected_lang != self.language_config["user"].split("-")[0]:
-            sentence = self.translator.translate(sentence, self.language_config["user"])
+        if detected_lang != user_lang.split("-")[0]:
+            sentence = self.translator.translate(sentence, user_lang)
 
         create_signal("isSpeaking")
         if self.phonetic_spelling:
