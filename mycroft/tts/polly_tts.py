@@ -2,12 +2,6 @@ import boto3
 from mycroft.tts import TTS, TTSValidator
 from mycroft.configuration import Configuration
 
-import logging
-
-logging.getLogger('botocore').setLevel(logging.CRITICAL)
-logging.getLogger('boto3').setLevel(logging.CRITICAL)
-logging.getLogger('urllib3.util.retry').setLevel(logging.CRITICAL)
-
 
 class PollyTTS(TTS):
 
@@ -27,6 +21,19 @@ class PollyTTS(TTS):
         self.key_id = self.config.get("key_id", '')
         self.key = self.config.get("secret_key", '')
         self.region = self.config.get("region", 'us-east-1')
+
+        if self.keys.get("polly"):
+            self.key_id = self.keys["polly"].get("key_id") or self.key_id
+            self.key = self.keys["polly"].get("secret_key") or self.key
+            self.region = self.keys["polly"].get("region") or self.region
+            self.voice = self.keys["polly"].get("voice") or self.voice
+        # these checks are separate in case we want to use different keys for the translate api for example
+        elif self.keys.get("amazon"):
+            self.key_id = self.keys["amazon"].get("key_id") or self.key_id
+            self.key = self.keys["amazon"].get("secret_key") or self.key
+            self.region = self.keys["amazon"].get("region") or self.region
+            self.voice = self.keys["amazon"].get("voice") or self.voice
+
         self.polly = boto3.Session(aws_access_key_id=self.key_id,
                                    aws_secret_access_key=self.key,
                                    region_name=self.region).client('polly')

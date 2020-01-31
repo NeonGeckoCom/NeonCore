@@ -37,6 +37,12 @@ from mycroft.util.json_helper import load_commented_json, merge_dict
 from mycroft.configuration.locations import SYSTEM_CONFIG, USER_CONFIG
 
 
+# set log levels from 3rd party packages here
+logging.getLogger('botocore').setLevel(logging.INFO)
+logging.getLogger('boto3').setLevel(logging.INFO)
+logging.getLogger('urllib3.util.retry').setLevel(logging.INFO)
+
+
 def getLogger(name="MYCROFT"):
     """Depreciated. Use LOG instead"""
     return logging.getLogger(name)
