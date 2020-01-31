@@ -20,6 +20,7 @@ import re
 from abc import ABCMeta, abstractmethod
 from threading import Thread
 from time import time, sleep
+from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
 
 import os.path
 from os.path import dirname, exists, isdir, join
@@ -27,7 +28,7 @@ from os.path import dirname, exists, isdir, join
 import mycroft.util
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration, get_private_keys
-from mycroft.messagebus.message import Message
+from mycroft.messagebus.message import Message, dig_for_message
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.util import (
     play_wav, play_mp3, check_for_signal, create_signal, resolve_resource_file
@@ -173,7 +174,12 @@ class TTS(metaclass=ABCMeta):
                  phonetic_spelling=True, ssml_tags=None):
         super(TTS, self).__init__()
         self.bus = None  # initalized in "init" step
-        self.lang = lang or 'en-us'
+
+        self.language_config = get_lang_config()
+        self.lang_detector = DetectorFactory.create()
+        self.translator = TranslatorFactory.create()
+        self.lang = lang or self.language_config.get("user", "en-us")
+
         self.config = config
         self.validator = validator
         self.phonetic_spelling = phonetic_spelling
@@ -309,7 +315,7 @@ class TTS(metaclass=ABCMeta):
         """
         return [sentence]
 
-    def execute(self, sentence, ident=None, listen=False):
+    def execute(self, sentence, ident=None, listen=False, message=None):
         """Convert sentence to speech, preprocessing out unsupported ssml
 
             The method caches results if possible using the hash of the
@@ -323,6 +329,21 @@ class TTS(metaclass=ABCMeta):
         """
         sentence = self.validate_ssml(sentence)
 
+        # multi lang support
+        # NOTE this is kinda optional because skills will translate
+        # However speak messages might be sent directly to bus
+        # this is here to cover that use case
+
+        # check for user specified language
+        if message:
+            user_lang = message.user_data.get("lang") or self.language_config["user"]
+        else:
+            user_lang = self.language_config["user"]
+
+        detected_lang = self.lang_detector.detect(sentence)
+        LOG.debug("Detected language: {lang}".format(lang=detected_lang))
+        if detected_lang != user_lang.split("-")[0]:
+            sentence = self.translator.translate(sentence, user_lang)
         create_signal("isSpeaking")
         if self.phonetic_spelling:
             for word in re.findall(r"[\w']+", sentence):
@@ -503,7 +524,7 @@ class TTSFactory:
         }
         """
         config = Configuration.get()
-        lang = config.get("lang", "en-us")
+        lang = config.get("language", {}).get("user") or config.get("lang", "en-us")
         tts_module = config.get('tts', {}).get('module', 'mimic')
         tts_config = config.get('tts', {}).get(tts_module, {})
         tts_lang = tts_config.get('lang', lang)
@@ -511,6 +532,7 @@ class TTSFactory:
             clazz = TTSFactory.CLASSES.get(tts_module)
             tts = clazz(tts_lang, tts_config)
             tts.validator.validate()
+
         except Exception as e:
             # Fallback to mimic if an error occurs while loading.
             if tts_module != 'mimic':
@@ -522,5 +544,5 @@ class TTSFactory:
             else:
                 LOG.exception('The TTS could not be loaded.')
                 raise
-
+        LOG.debug("TTS Loaded: " + tts.__class__.__name__)
         return tts

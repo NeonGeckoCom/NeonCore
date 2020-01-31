@@ -41,6 +41,8 @@ from mycroft.configuration.locations import SYSTEM_CONFIG, USER_CONFIG
 logging.getLogger('botocore').setLevel(logging.INFO)
 logging.getLogger('boto3').setLevel(logging.INFO)
 logging.getLogger('urllib3.util.retry').setLevel(logging.INFO)
+logging.getLogger("gtts").setLevel("INFO")
+logging.getLogger("urllib3.connectionpool").setLevel("INFO")
 
 
 def getLogger(name="MYCROFT"):

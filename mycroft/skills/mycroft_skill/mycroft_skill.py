@@ -15,7 +15,6 @@
 """Common functionality relating to the implementation of mycroft skills."""
 
 from copy import deepcopy
-import inspect
 import sys
 import re
 import traceback
@@ -34,7 +33,7 @@ from mycroft.enclosure.gui import SkillGUI
 from mycroft.configuration import Configuration, get_private_keys
 from mycroft.dialog import DialogLoader
 from mycroft.filesystem import FileSystemAccess
-from mycroft.messagebus.message import Message
+from mycroft.messagebus.message import Message, dig_for_message
 from mycroft.metrics import report_metric
 from mycroft.util import (
     resolve_resource_file,
@@ -44,6 +43,7 @@ from mycroft.util import (
 from mycroft.util.log import LOG
 from mycroft.util.format import pronounce_number, join_list
 from mycroft.util.parse import match_one, extract_number
+from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
 
 from .event_container import EventContainer, create_wrapper, get_handler_name
 from ..event_scheduler import EventSchedulerInterface
@@ -102,17 +102,6 @@ def get_non_properties(obj):
     return set(check_class(obj.__class__))
 
 
-def dig_for_message():
-    """Dig Through the stack for message."""
-    stack = inspect.stack()
-    # Limit search to 10 frames back
-    stack = stack if len(stack) < 10 else stack[:10]
-    local_vars = [frame[0].f_locals for frame in stack]
-    for l in local_vars:
-        if 'message' in l and isinstance(l['message'], Message):
-            return l['message']
-
-
 class MycroftSkill:
     """Base class for mycroft skills providing common behaviour and parameters
     to all Skill implementations.
@@ -164,6 +153,11 @@ class MycroftSkill:
 
         self.keys = get_private_keys()
 
+        # Lang support
+        self.language_config = get_lang_config()
+        self.lang_detector = DetectorFactory.create()
+        self.translator = TranslatorFactory.create()
+
     @property
     def enclosure(self):
         if self._enclosure:
@@ -210,7 +204,7 @@ class MycroftSkill:
     @property
     def lang(self):
         """Get the configured language."""
-        return self.config_core.get('lang')
+        return self.language_config.get("internal") or self.config_core.get('lang')
 
     def bind(self, bus):
         """Register messagebus emitter with skill.
@@ -1070,11 +1064,33 @@ class MycroftSkill:
             wait (bool):            set to True to block while the text
                                     is being spoken.
         """
+
         # registers the skill as being active
         self.enclosure.register(self.name)
+
+        message = dig_for_message()
+
+        # check for user specified language
+        # NOTE this will likely change in future
+        user_lang = message.user_data.get("lang") or self.language_config["user"]
+
+        original = utterance
+        detected_lang = self.lang_detector.detect(utterance)
+        LOG.debug("Detected language: {lang}".format(lang=detected_lang))
+        if detected_lang != user_lang.split("-")[0]:
+            utterance = self.translator.translate(utterance, user_lang)
+
         data = {'utterance': utterance,
                 'expect_response': expect_response}
-        message = dig_for_message()
+
+        # add language metadata to context
+        message.context["utterance_data"] = {
+            "detected_lang": detected_lang,
+            "user_lang": self.language_config["user"],
+            "was_translated": detected_lang == self.language_config["user"].split("-")[0],
+            "raw_utterance": original
+        }
+
         m = message.forward("speak", data) if message else Message("speak", data)
         self.bus.emit(m)
 
