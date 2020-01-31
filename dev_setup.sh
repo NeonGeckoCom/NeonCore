@@ -314,7 +314,7 @@ function debian_install() {
         libffi-dev libssl-dev autoconf automake bison swig libglib2.0-dev \
         portaudio19-dev mpg123 screen flac curl libicu-dev pkg-config \
         libjpeg-dev libfann-dev build-essential jq pulseaudio \
-        pulseaudio-utils"
+        pulseaudio-utils libpulse-dev"
 
     if dpkg -V libjack-jackd2-0 > /dev/null 2>&1 && [[ -z ${CI} ]] ; then
         echo "
