@@ -13,15 +13,11 @@
 # limitations under the License.
 #
 from gtts import gTTS
-from logging import getLogger
-
 from mycroft.tts import TTS, TTSValidator
 
 
 class GoogleTTS(TTS):
     def __init__(self, lang, config):
-        getLogger("gtts").setLevel("INFO")
-        getLogger("urllib3.connectionpool").setLevel("INFO")
         super(GoogleTTS, self).__init__(lang, config, GoogleTTSValidator(
             self), 'mp3')
 
