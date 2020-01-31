@@ -24,6 +24,8 @@ class BingTTS(TTS):
         from bingtts import Translator
         self.config = Configuration.get().get("tts", {}).get("bing", {})
         api = self.config.get("api_key")
+        if self.keys.get("bing"):
+            api = self.keys["bing"]["key"]
         self.bing = Translator(api)
         self.gender = self.config.get("gender", "Male")
         self.format = self.config.get("format", "riff-16khz-16bit-mono-pcm")

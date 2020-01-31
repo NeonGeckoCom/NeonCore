@@ -30,6 +30,12 @@ class WatsonTTS(RemoteTTS):
         user = self.config.get("user") or self.config.get("username")
         password = self.config.get("password")
         api_key = self.config.get("apikey")
+
+        if self.keys.get("watson"):
+            api_key = self.keys["watson"].get("key")
+            user = self.keys["watson"].get("user")
+            password = self.keys["watson"].get("password")
+
         if api_key is None:
             self.auth = HTTPBasicAuth(user, password)
         else:

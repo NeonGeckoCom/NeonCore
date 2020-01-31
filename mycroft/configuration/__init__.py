@@ -16,6 +16,10 @@ from .config import Configuration, LocalConf, RemoteConf
 from .locations import SYSTEM_CONFIG, USER_CONFIG
 
 
+def get_private_keys():
+    return Configuration.get().get("keys", {})
+
+
 # Compatibility
 class ConfigurationManager(Configuration):
     @staticmethod
