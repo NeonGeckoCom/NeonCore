@@ -13,7 +13,6 @@
 # limitations under the License.
 #
 from gtts import gTTS
-
 from mycroft.tts import TTS, TTSValidator
 
 
