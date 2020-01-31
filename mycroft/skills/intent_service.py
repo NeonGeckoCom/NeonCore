@@ -326,17 +326,19 @@ class IntentService:
             message.context["utterances_data"] = []
 
             for idx, ut in enumerate(utterances):
-                detected_lang = self.lang_detector.detect(ut)
+                original = ut
+                detected_lang = self.lang_detector.detect(original)
                 LOG.debug("Detected language: {lang}".format(lang=detected_lang))
                 if detected_lang != self.language_config["internal"].split("-")[0]:
-                    utterances[idx] = self.translator.translate(ut,
+                    utterances[idx] = self.translator.translate(original,
                                                                 self.language_config["internal"])
                 # add language metadata to context
                 message.context["utterances_data"] += [{
                     "source_lang": lang,
                     "detected_lang": detected_lang,
                     "internal": self.language_config["internal"],
-                    "was_translated": detected_lang == self.language_config["internal"].split("-")[0]
+                    "was_translated": detected_lang == self.language_config["internal"].split("-")[0],
+                    "raw_utterance": original
                 }]
 
             # normalize() changes "it's a boy" to "it is a boy", etc.

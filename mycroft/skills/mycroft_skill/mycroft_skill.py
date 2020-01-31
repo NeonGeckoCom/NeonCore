@@ -1088,7 +1088,7 @@ class MycroftSkill:
             "detected_lang": detected_lang,
             "user_lang": self.language_config["user"],
             "was_translated": detected_lang == self.language_config["user"].split("-")[0],
-            "original": original
+            "raw_utterance": original
         }
 
         m = message.forward("speak", data) if message else Message("speak", data)
