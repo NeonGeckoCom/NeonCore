@@ -43,6 +43,7 @@ from mycroft.util import (
     play_wav, play_mp3, play_ogg
 )
 from mycroft.util.log import LOG
+from jarbas_utils.lang.phonemes import get_phonemes
 
 
 class MutableStream:
@@ -240,6 +241,12 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         # The maximum audio in seconds to keep for transcribing a phrase
         # The wake word must fit in this time
         num_phonemes = 10
+        # use number of phonemes from longest hotword
+        for w in self.hotword_engines:
+            phon = get_phonemes(w).split(" ")
+            if len(phon) > num_phonemes:
+                num_phonemes = len(phon)
+
         len_phoneme = listener_config.get('phoneme_duration', 120) / 1000.0
         self.TEST_WW_SEC = num_phonemes * len_phoneme
         self.SAVED_WW_SEC = max(3, self.TEST_WW_SEC)

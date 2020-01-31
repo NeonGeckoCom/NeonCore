@@ -34,5 +34,6 @@ jarbas_utils==0.4.1
 pycld2 # optional, needed for lang detection
 pycld3 # optional, needed for lang detection
 hyper  # optional, enables http2 for google translate which makes it faster
-
 boto3
+numpy
+
