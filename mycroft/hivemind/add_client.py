@@ -1,8 +1,5 @@
 from mycroft.hivemind import add_client
-
-
 import sys
-import json
 
 
 def main():
@@ -42,8 +39,5 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except IOError:
-        print('Could not connect to websocket, no message sent')
+    main()
 
