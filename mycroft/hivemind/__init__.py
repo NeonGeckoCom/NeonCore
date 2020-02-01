@@ -1,5 +1,6 @@
 from jarbas_hive_mind import HiveMindListener
 from jarbas_hive_mind.configuration import CONFIGURATION
+from jarbas_hive_mind.database import ClientDatabase
 from jarbas_utils.log import LOG
 from os.path import exists, join
 
@@ -27,3 +28,6 @@ def start_mind(config=None, bus=None):
     listener.secure_listen(key, cert)
 
 
+def add_client(name, mail, key, admin=False):
+    db = ClientDatabase(debug=True)
+    db.add_client(name, mail, key, admin=admin)

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+SOURCE="${BASH_SOURCE[0]}"
+cd -P "$( dirname "$SOURCE" )"
+DIR="$( pwd )"
+
+# Sets var 1 to stdin if no args were given
+set -- "${1:-$(</dev/stdin)}" "${@:2}"
+# Enter the Mycroft venv
+source "$DIR/../venv-activate.sh" -q
+
+# Send a message to be spoken
+data="$@"
+output=$(python -m mycroft.hivemind.add_client $data)
