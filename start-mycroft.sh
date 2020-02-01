@@ -28,16 +28,17 @@ function help() {
     echo
     echo "Services COMMANDs:"
     echo "  all                      runs core services: bus, audio, skills, voice"
-    echo "  debug                    runs core services, then starts the CLI"
     echo "  audio                    the audio playback service"
     echo "  bus                      the messagebus service"
     echo "  skills                   the skill service"
     echo "  voice                    voice capture service"
     # echo "  wifi                     wifi setup service"
-    echo "  enclosure                mark_1 enclosure service"
+    echo "  enclosure                enclosure service"
+    echo "  hivemind                 hive mind service"
     echo
     echo "Tool COMMANDs:"
-    echo "  cli                      the Command Line Interface"
+    echo "  debug                    the Debug Command Line Interface"
+    echo "  cli                      the HiveMind Command Line Interface"
     echo "  unittest                 run mycroft-core unit tests (requires pytest)"
     echo "  skillstest               run the skill autotests for all skills (requires pytest)"
     echo
@@ -65,7 +66,9 @@ function name-to-script-path() {
         "skills")            _module="mycroft.skills" ;;
         "audio")             _module="mycroft.audio" ;;
         "voice")             _module="mycroft.client.speech" ;;
-        "cli")               _module="mycroft.client.text" ;;
+        "hivemind")          _module="mycroft.hivemind" ;;
+        "debug")             _module="mycroft.client.text" ;;
+        "cli")               _module="mycroft.hivemind.terminal" ;;
         "audiotest")         _module="mycroft.util.audio_test" ;;
         "audioaccuracytest") _module="mycroft.audio-accuracy-test" ;;
         "enclosure")         _module="mycroft.client.enclosure" ;;
@@ -210,13 +213,18 @@ case ${_opt} in
         ;;
 
     "debug")
-        launch-all
+        require-process bus
+        require-process skills
         launch-process cli
         ;;
 
     "cli")
+        require-process hivemind
+        launch-process ${_opt}
+        ;;
+
+    "hivemind")
         require-process bus
-        require-process skills
         launch-process ${_opt}
         ;;
 

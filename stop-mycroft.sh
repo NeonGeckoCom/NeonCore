@@ -31,6 +31,7 @@ function help() {
     echo "  audio     stop the audio playback service"
     echo "  skills    stop the skill service"
     echo "  voice     stop voice capture service"
+    echo "  hivemind  stop the HiveMind service"
     echo "  enclosure stop enclosure (hardware/gui interface) service"
     echo
     echo "Examples:"
@@ -114,6 +115,9 @@ case ${OPT} in
         ;;
     "enclosure")
         end-process enclosure
+        ;;
+    "hivemind")
+        end-process hivemind
         ;;
 
     *)
