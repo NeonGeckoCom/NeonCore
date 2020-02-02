@@ -119,13 +119,20 @@ class MycroftSkill:
         self.resting_name = None
         self.skill_id = ''  # will be set from the path, so guaranteed unique
         self.settings_meta = None  # set when skill is loaded in SkillLoader
+
         # Get directory of skill
+        #: Member variable containing the absolute path of the skill's root
+        #: directory. E.g. /opt/mycroft/skills/my-skill.me/
         self.root_dir = dirname(abspath(sys.modules[self.__module__].__file__))
         if use_settings:
             self.settings = Settings(self)
             self._initial_settings = deepcopy(self.settings.as_dict())
         else:
             self.settings = None
+
+        #: Set to register a callback method that will be called every time
+        #: the skills settings are updated. The referenced method should
+        #: include any logic needed to handle the updated settings.
         self.settings_change_callback = None
 
         self.gui = SkillGUI(self)
@@ -1267,7 +1274,8 @@ class MycroftSkill:
             LOG.error('Failed to stop skill: {}'.format(self.name),
                       exc_info=True)
 
-    def schedule_event(self, handler, when, data=None, name=None, context=None):
+    def schedule_event(self, handler, when, data=None, name=None,
+                       context=None):
         """Schedule a single-shot event.
 
         Arguments:
@@ -1280,9 +1288,14 @@ class MycroftSkill:
                                    NOTE: This will not warn or replace a
                                    previously scheduled event of the same
                                    name.
+            context (dict, optional): context (dict, optional): message
+                                      context to send when the handler
+                                      is called
         """
-        context = context or {"skill": self.name}
-        return self.event_scheduler.schedule_event(handler, when, data, name, context=context)
+        message = dig_for_message()
+        context = context or message.context if message else {}
+        return self.event_scheduler.schedule_event(handler, when, data, name,
+                                                   context=context)
 
     def schedule_repeating_event(self, handler, when, frequency,
                                  data=None, name=None, context=None):
@@ -1297,8 +1310,12 @@ class MycroftSkill:
             frequency (float/int):  time in seconds between calls
             data (dict, optional):  data to send when the handler is called
             name (str, optional):   reference name, must be unique
+            context (dict, optional): context (dict, optional): message
+                                      context to send when the handler
+                                      is called
         """
-        context = context or {"skill": self.name}
+        message = dig_for_message()
+        context = context or message.context if message else {}
         return self.event_scheduler.schedule_repeating_event(
             handler,
             when,
