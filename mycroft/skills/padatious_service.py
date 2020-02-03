@@ -61,8 +61,10 @@ class PadatiousService(FallbackSkill):
         self.bus.on('detach_skill', self.handle_detach_skill)
         self.bus.on('mycroft.skills.initialized', self.train)
         self.bus.on('intent.service.padatious.get', self.handle_get_padatious)
-        self.bus.on('intent.service.padatious.manifest.get', self.handle_manifest)
-        self.bus.on('intent.service.padatious.entities.manifest.get', self.handle_entity_manifest)
+        self.bus.on('intent.service.padatious.manifest.get',
+                    self.handle_manifest)
+        self.bus.on('intent.service.padatious.entities.manifest.get',
+                    self.handle_entity_manifest)
 
         # Call Padatious an an early fallback, looking for a high match intent
         self.register_fallback(self.handle_fallback,
@@ -161,7 +163,7 @@ class PadatiousService(FallbackSkill):
 
         if not intent or intent.conf < threshold:
             # Attempt to use normalized() version
-            norm = message.data.get('norm_utt', '')
+            norm = message.data.get('norm_utt', utt)
             if norm != utt:
                 LOG.debug("               alt attempt: " + norm)
                 intent = self.calc_intent(norm)
@@ -179,7 +181,10 @@ class PadatiousService(FallbackSkill):
 
     def handle_get_padatious(self, message):
         utterance = message.data["utterance"]
+        norm = message.data.get('norm_utt', utterance)
         intent = self.calc_intent(utterance)
+        if not intent and norm != utterance:
+            intent = PadatiousService.instance.calc_intent(norm)
         if intent:
             intent = intent.__dict__
         self.bus.emit(message.reply("intent.service.padatious.reply",
@@ -190,11 +195,12 @@ class PadatiousService(FallbackSkill):
                                     {"intents": self.registered_intents}))
 
     def handle_entity_manifest(self, message):
-        self.bus.emit(message.reply("intent.service.padatious.entities.manifest",
-                                    {"entities": self.registered_entities}))
+        self.bus.emit(
+            message.reply("intent.service.padatious.entities.manifest",
+                          {"entities": self.registered_entities}))
 
     # NOTE: This cache will keep a reference to this calss (PadatiousService),
     # but we can live with that since it is used as a singleton.
-    @lru_cache(maxsize=2)   # 2 catches both raw and normalized utts in cache
+    @lru_cache(maxsize=2)  # 2 catches both raw and normalized utts in cache
     def calc_intent(self, utt):
         return self.container.calc_intent(utt)
