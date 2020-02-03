@@ -797,21 +797,3 @@ class IntentApi:
         return {"adapt": adapt,
                 "padatious": padatious}
 
-
-if __name__ == "__main__":
-    from pprint import pprint
-
-    intents = IntentApi()
-    pprint(intents.get_skills())
-    pprint(intents.get_active_skills())
-    pprint(intents.get_intent("tell me a joke"))
-    pprint(intents.get_padatious_intent("tell me a joke"))
-    pprint(intents.get_intent("create a 10 minutes timer"))
-
-    pprint(intents.get_adapt_manifest())
-    pprint(intents.get_padatious_manifest())
-
-    pprint(intents.get_entities_manifest())
-    pprint(intents.get_vocab_manifest())
-    pprint(intents.get_keyword_manifest())
-    pprint(intents.get_regex_manifest())
