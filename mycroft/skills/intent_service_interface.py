@@ -32,6 +32,7 @@ class IntentServiceInterface:
     for easier interaction with the service. It wraps both the Adapt and
     Precise parts of the intent services.
     """
+
     def __init__(self, bus=None):
         self.bus = bus
         self.registered_intents = []
@@ -176,11 +177,13 @@ class IntentApi:
         self.bus.on('intent.service.padatious.reply', self._receive_data)
         self.bus.on('intent.service.adapt.reply', self._receive_data)
         self.bus.on('intent.service.intent.reply', self._receive_data)
+        self.bus.on('intent.service.active_skills.reply', self._receive_data)
         self.bus.on('intent.service.skills.reply', self._receive_data)
         self.bus.on('intent.service.padatious.manifest', self._receive_data)
         self.bus.on('intent.service.adapt.manifest', self._receive_data)
         self.bus.on('intent.service.adapt.vocab.manifest', self._receive_data)
-        self.bus.on('intent.service.padatious.entities.manifest', self._receive_data)
+        self.bus.on('intent.service.padatious.entities.manifest',
+                    self._receive_data)
         self._response = None
         self.waiting = False
 
@@ -369,7 +372,8 @@ class IntentApi:
         for ent in self._response["entities"]:
             if isfile(ent["file_name"]):
                 with open(ent["file_name"]) as f:
-                    lines = f.read().replace("(", "").replace(")", "").split("\n")
+                    lines = f.read().replace("(", "").replace(")", "")\
+                        .split("\n")
                 samples = []
                 for l in lines:
                     samples += [a.strip() for a in l.split("|") if a.strip()]
