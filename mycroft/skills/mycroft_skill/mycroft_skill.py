@@ -43,7 +43,8 @@ from mycroft.util import (
 from mycroft.util.log import LOG
 from mycroft.util.format import pronounce_number, join_list
 from mycroft.util.parse import match_one, extract_number
-from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
+from mycroft.language import DetectorFactory, TranslatorFactory, \
+    get_lang_config, get_language_dir
 
 from .event_container import EventContainer, create_wrapper, get_handler_name
 from ..event_scheduler import EventSchedulerInterface
@@ -686,7 +687,9 @@ class MycroftSkill:
         """
         if res_dirname:
             # Try the old translated directory (dialog/vocab/regex)
-            path = join(self.root_dir, res_dirname, lang, res_name)
+            root_path = get_language_dir(join(self.root_dir, res_dirname),
+                                         self.lang)
+            path = join(root_path, res_name)
             if exists(path):
                 return path
 
@@ -696,7 +699,7 @@ class MycroftSkill:
                 return path
 
         # New scheme:  search for res_name under the 'locale' folder
-        root_path = join(self.root_dir, 'locale', lang)
+        root_path = get_language_dir(join(self.root_dir, 'locale'), self.lang)
         for path, _, files in walk(root_path):
             if res_name in files:
                 return join(path, res_name)
@@ -1135,12 +1138,15 @@ class MycroftSkill:
     def init_dialog(self, root_directory):
         # If "<skill>/dialog/<lang>" exists, load from there.  Otherwise
         # load dialog from "<skill>/locale/<lang>"
-        dialog_dir = join(root_directory, 'dialog', self.lang)
+        dialog_dir = get_language_dir(join(root_directory, 'dialog'),
+                                      self.lang)
+        locale_dir = get_language_dir(join(root_directory, 'locale'),
+                                      self.lang)
+        # TODO support both? currently assumes only one of the schemes is used
         if exists(dialog_dir):
             self.dialog_renderer = DialogLoader().load(dialog_dir)
-        elif exists(join(root_directory, 'locale', self.lang)):
-            locale_path = join(root_directory, 'locale', self.lang)
-            self.dialog_renderer = DialogLoader().load(locale_path)
+        elif exists(locale_dir):
+            self.dialog_renderer = DialogLoader().load(locale_dir)
         else:
             LOG.debug('No dialog loaded')
 
@@ -1162,8 +1168,10 @@ class MycroftSkill:
             root_directory (str): root folder to use when loading files
         """
         keywords = []
-        vocab_dir = join(root_directory, 'vocab', self.lang)
-        locale_dir = join(root_directory, 'locale', self.lang)
+        vocab_dir = get_language_dir(join(root_directory, 'vocab'),
+                                     self.lang)
+        locale_dir = get_language_dir(join(root_directory, 'locale'),
+                                      self.lang)
         if exists(vocab_dir):
             keywords = load_vocabulary(vocab_dir, self.skill_id)
         elif exists(locale_dir):
@@ -1187,8 +1195,10 @@ class MycroftSkill:
             root_directory (str): root folder to use when loading files
         """
         regexes = []
-        regex_dir = join(root_directory, 'regex', self.lang)
-        locale_dir = join(root_directory, 'locale', self.lang)
+        regex_dir = get_language_dir(join(root_directory, 'regex'),
+                                     self.lang)
+        locale_dir = get_language_dir(join(root_directory, 'locale'),
+                                      self.lang)
         if exists(regex_dir):
             regexes = load_regex(regex_dir, self.skill_id)
         elif exists(locale_dir):

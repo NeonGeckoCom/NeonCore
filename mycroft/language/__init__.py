@@ -1,5 +1,6 @@
 from mycroft.configuration import Configuration, get_private_keys
 from mycroft.util.log import LOG
+import os
 import boto3
 
 
@@ -9,6 +10,31 @@ def get_lang_config():
     lang_config["internal"] = lang_config.get("internal") or config.get("lang", "en-us")
     lang_config["user"] = lang_config.get("user") or config.get("lang", "en-us")
     return lang_config
+
+
+def get_language_dir(base_path, lang="en-us"):
+    """ checks for all language variations and returns best path """
+    lang_path = os.path.join(base_path, lang)
+    # base_path/en-us
+    if os.path.isdir(lang_path):
+        return lang_path
+    if "-" in lang:
+        main = lang.split("-")[0]
+        # base_path/en
+        general_lang_path = os.path.join(base_path, main)
+        if os.path.isdir(general_lang_path):
+            return general_lang_path
+    else:
+        main = lang
+    # base_path/en-uk, base_path/en-au...
+    if os.path.isdir(base_path):
+        candidates = [os.path.join(base_path, f)
+                      for f in os.listdir(base_path) if f.startswith(main)]
+        paths = [p for p in candidates if os.path.isdir(p)]
+        # TODO how to choose best local dialect?
+        if len(paths):
+            return paths[0]
+    return os.path.join(base_path, lang)
 
 
 class LanguageDetector:
