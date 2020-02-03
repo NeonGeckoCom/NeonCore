@@ -22,7 +22,6 @@ import time
 from threading import Event
 
 import mycroft.lock
-from msm.exceptions import MsmException
 
 from mycroft import dialog
 from mycroft.api import is_paired, BackendDown, DeviceApi
@@ -240,19 +239,8 @@ def _initialize_skill_manager(bus):
     Returns:
         SkillManager instance or None if it couldn't be initialized
     """
-    try:
-        skill_manager = SkillManager(bus)
-        skill_manager.load_priority()
-    except MsmException:
-        # skill manager couldn't be created, wait for network connection and
-        # retry
-        skill_manager = None
-        LOG.info(
-            'MSM is uninitialized and requires network connection to fetch '
-            'skill information\nWill retry after internet connection is '
-            'established.'
-        )
-
+    skill_manager = SkillManager(bus)
+    skill_manager.load_priority()
     return skill_manager
 
 

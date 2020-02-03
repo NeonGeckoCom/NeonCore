@@ -22,7 +22,6 @@ from time import time
 from mycroft.configuration import Configuration
 from mycroft.messagebus import Message
 from mycroft.util.log import LOG
-from .settings import SettingsMetaUploader
 
 SKILL_MAIN_MODULE = '__init__.py'
 
@@ -174,7 +173,6 @@ class SkillLoader:
 
         self.last_loaded = time()
         self._communicate_load_status()
-        self._upload_settings_meta()
 
     def _prepare_for_load(self):
         self.load_attempted = True
@@ -275,12 +273,3 @@ class SkillLoader:
             )
             self.bus.emit(message)
             LOG.error('Skill {} failed to load'.format(self.skill_id))
-
-    def _upload_settings_meta(self):
-        if self.loaded:
-            settings_meta = SettingsMetaUploader(
-                self.skill_directory,
-                self.instance.name
-            )
-            settings_meta.upload()
-            self.instance.settings_meta = settings_meta
