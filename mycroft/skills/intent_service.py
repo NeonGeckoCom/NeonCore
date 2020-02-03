@@ -25,7 +25,10 @@ from mycroft.util.parse import normalize
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.skills.padatious_service import PadatiousService
 from mycroft.skills.intent_service_interface import open_intent_envelope
-from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
+from mycroft.language import get_lang_config
+from mycroft.text_parsing import TextParsersService
+from mycroft.util.json_helper import merge_dict
+from mycroft.util import create_daemon
 
 
 class AdaptIntent(IntentBuilder):
@@ -155,8 +158,6 @@ class IntentService:
         self.config = Configuration.get().get('context', {})
         self.language_config = get_lang_config()
         self.engine = IntentDeterminationEngine()
-        self.lang_detector = DetectorFactory.create()
-        self.translator = TranslatorFactory.create()
 
         set_active_lang(self.language_config["internal"])
 
@@ -192,6 +193,9 @@ class IntentService:
         self.waiting_for_converse = False
         self.converse_result = False
         self.converse_skill_id = ""
+
+        self.parser_service = TextParsersService(self.bus)
+        create_daemon(self.parser_service.run)
 
     def update_skill_name_dict(self, message):
         """
@@ -323,23 +327,15 @@ class IntentService:
             utterances = message.data.get('utterances', [])
 
             message.context = message.context or {}
-            message.context["utterances_data"] = []
-
-            for idx, ut in enumerate(utterances):
-                original = ut
-                detected_lang = self.lang_detector.detect(original)
-                LOG.debug("Detected language: {lang}".format(lang=detected_lang))
-                if detected_lang != self.language_config["internal"].split("-")[0]:
-                    utterances[idx] = self.translator.translate(original,
-                                                                self.language_config["internal"])
-                # add language metadata to context
-                message.context["utterances_data"] += [{
-                    "source_lang": lang,
-                    "detected_lang": detected_lang,
-                    "internal": self.language_config["internal"],
-                    "was_translated": detected_lang == self.language_config["internal"].split("-")[0],
-                    "raw_utterance": original
-                }]
+            # pipe utterance trough parsers to get extra metadata
+            # use cases: translation, emotion_data, keyword spotting etc.
+            # parsers are ordered by priority
+            # keep in mind utterance might be modified by previous parser
+            for parser in self.parser_service.parsers:
+                # mutate utterances and retrieve extra data
+                utterances, data = self.parser_service.parse(parser, utterances, lang)
+                # update message context with extra data
+                message.context = merge_dict(message.context, data)
 
             # normalize() changes "it's a boy" to "it is a boy", etc.
             norm_utterances = [normalize(u.lower(), remove_articles=False)
