@@ -91,10 +91,7 @@ class SkillManager(Thread):
 
         self._alive_status = True
 
-    def run(self):
-        """Load skills and update periodically from disk and internet."""
-        self._connected_event.wait()
-
+    def download_or_update_defaults(self):
         # if skills dir does not exist (first run) download default skills
         if self.skills_config.get("repo"):
             if not isdir(self.skills_dir):
@@ -115,6 +112,10 @@ class SkillManager(Thread):
                     LOG.error("Could not update default skills, did you change any default skill?")
                     LOG.info("If you edit a single default skill, update will fail, blacklist skill instead")
 
+    def run(self):
+        """Load skills and update periodically from disk and internet."""
+        self._connected_event.wait()
+        self.download_or_update_defaults()
         self._load_on_startup()
 
         # Scan the file folder that contains Skills.  If a Skill is updated,
