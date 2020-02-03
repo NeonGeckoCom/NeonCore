@@ -421,9 +421,11 @@ class IntentService:
         """
 
         # check for conversation time-out
-        self.active_skills = [skill for skill in self.active_skills
-                              if time.time() - skill[
-                                  1] <= self.converse_timeout * 60]
+        for skill in list(self.active_skills):
+            if time.time() - skill[1] <= self.converse_timeout * 60:
+                self.bus.emit(Message("converse.deactivate",
+                                          {"skill_id": skill[0]}))
+                self.active_skills.remove(skill)
 
         # check if any skill wants to handle utterance
         for skill in self.active_skills:

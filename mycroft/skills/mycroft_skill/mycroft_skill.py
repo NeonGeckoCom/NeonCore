@@ -248,6 +248,20 @@ class MycroftSkill:
             'mycroft.skills.settings.changed',
             self.handle_settings_change
         )
+        self.add_event("converse.deactivate", self._deactivate_skill)
+
+    def _deactivate_skill(self, message):
+        skill_id = message.data.get("skill_id")
+        if skill_id == self.skill_id:
+            self.on_deactivate()
+
+    def on_deactivate(self):
+        """
+        Invoked when the skill is removed from active skill list
+
+        This means Converse method won't be called anymore
+        """
+        pass
 
     def handle_settings_change(self, message):
         """Update settings if the remote settings changes apply to this skill.
