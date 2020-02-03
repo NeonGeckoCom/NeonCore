@@ -44,7 +44,7 @@ def load_parser(parser_descriptor, parser_name,
         parser_name:       name for parser
 
     Returns:
-        Trigger: the loaded parser or None on failure
+        Parser: the loaded parser or None on failure
     """
     BLACKLISTED_PARSERS = BLACKLISTED_PARSERS or []
     path = parser_descriptor["path"]
@@ -99,7 +99,7 @@ class TextParsersService(Thread):
         self.bus = bus
 
     def run(self):
-        # Scan the file folder that contains Parsers.  If a Trigger is
+        # Scan the file folder that contains Parsers.  If a Parser is
         # updated, unload the existing version from memory and reload from
         # the disk.
         while not self._stop_event.is_set():
@@ -173,12 +173,12 @@ class TextParsersService(Thread):
         # check if parser was modified
         elif parser.get("instance") and modified > last_mod:
 
-            LOG.debug("Reloading Trigger: " + basename(parser_path))
+            LOG.debug("Reloading Parser: " + basename(parser_path))
             # removing listeners and stopping threads
             try:
                 parser["instance"].default_shutdown()
             except Exception:
-                LOG.exception("An error occured while shutting down {}"
+                LOG.exception("An error occurred while shutting down {}"
                               .format(parser["instance"].name))
 
             if DEBUG:
