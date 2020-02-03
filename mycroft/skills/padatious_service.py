@@ -60,6 +60,7 @@ class PadatiousService(FallbackSkill):
         self.bus.on('detach_intent', self.handle_detach_intent)
         self.bus.on('detach_skill', self.handle_detach_skill)
         self.bus.on('mycroft.skills.initialized', self.train)
+        self.bus.on('intent.service.padatious.get', self.handle_get_padatious)
 
         # Call Padatious an an early fallback, looking for a high match intent
         self.register_fallback(self.handle_fallback,
@@ -171,6 +172,14 @@ class PadatiousService(FallbackSkill):
 
     def handle_fallback_last_chance(self, message):
         return self.handle_fallback(message, 0.5)
+
+    def handle_get_padatious(self, message):
+        utterance = message.data["utterance"]
+        intent = self.calc_intent(utterance)
+        if intent:
+            intent = intent.__dict__
+        self.bus.emit(message.reply("intent.service.padatious.reply",
+                                    {"intent": intent}))
 
     # NOTE: This cache will keep a reference to this calss (PadatiousService),
     # but we can live with that since it is used as a singleton.

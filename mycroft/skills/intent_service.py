@@ -28,6 +28,7 @@ from mycroft.skills.intent_service_interface import open_intent_envelope
 from mycroft.language import get_lang_config
 from mycroft.text_parsing import TextParsersService
 from mycroft.util.json_helper import merge_dict
+from mycroft.messagebus.client import MessageBusClient
 from mycroft.util import create_daemon
 
 
@@ -196,6 +197,12 @@ class IntentService:
 
         self.parser_service = TextParsersService(self.bus)
         create_daemon(self.parser_service.run)
+
+        # Intents API
+        self.bus.on('intent.service.adapt.get', self.handle_get_adapt)
+        self.bus.on('intent.service.intent.get', self.handle_get_intent)
+        self.bus.on('intent.service.skills.get', self.handle_get_skills)
+        self.bus.on('intent.service.active_skills.get', self.handle_get_active_skills)
 
     def update_skill_name_dict(self, message):
         """
@@ -537,3 +544,126 @@ class IntentService:
     def handle_clear_context(self, message):
         """ Clears all keywords from context """
         self.context_manager.clear_context()
+
+    def handle_get_adapt(self, message):
+        utterance = message.data["utterance"]
+        intent = self._adapt_intent_match([utterance], [utterance],
+                                          self.language_config["internal"])
+        self.bus.emit(message.reply("intent.service.adapt.reply",
+                                    {"intent": intent}))
+
+    def handle_get_intent(self, message):
+        utterance = message.data["utterance"]
+        intent = self._adapt_intent_match([utterance], [utterance],
+                                          self.language_config["internal"])
+        # Adapt intent's handler is used unless
+        # Padatious is REALLY sure it was directed at it instead.
+        padatious_intent = PadatiousService.instance.calc_intent(utterance)
+        if padatious_intent and padatious_intent.conf >= 0.95:
+            intent = padatious_intent.__dict__
+        self.bus.emit(message.reply("intent.service.intent.reply",
+                                    {"intent": intent}))
+
+    def handle_get_skills(self, message):
+        self.bus.emit(message.reply("intent.service.skills.reply",
+                                    {"skills": self.skill_names}))
+
+    def handle_get_active_skills(self, message):
+        self.bus.emit(message.reply("intent.service.skills.reply",
+                                    {"skills": [s[0] for s in self.active_skills]}))
+
+
+class IntentApi:
+    """
+    NOTE: works only in internal language, you need to manually translate otherwise
+    """
+    def __init__(self, bus=None, timeout=5):
+        if bus is None:
+            bus = MessageBusClient()
+            create_daemon(bus.run_forever)
+        self.bus = bus
+        self.timeout = timeout
+        self.bus.on('intent.service.padatious.reply', self._receive_data)
+        self.bus.on('intent.service.adapt.reply', self._receive_data)
+        self.bus.on('intent.service.intent.reply', self._receive_data)
+        self.bus.on('intent.service.skills.reply', self._receive_data)
+        self._response = None
+        self.waiting = False
+
+    def _receive_data(self, message):
+        self.waiting = False
+        self._response = message.data
+
+    def get_adapt_intent(self, utterance):
+        start = time.time()
+        self._response = None
+        self.waiting = True
+        self.bus.emit(Message("intent.service.adapt.get",
+                              {"utterance": utterance},
+                              context={"destination": "intent_service",
+                                       "source": "intent_api"}))
+        while self.waiting and time.time() - start <= self.timeout:
+            time.sleep(0.3)
+        if time.time() - start > self.timeout:
+            LOG.error("Intent Service timed out!")
+            return None
+        return self._response["intent"]
+
+    def get_padatious_intent(self, utterance):
+        start = time.time()
+        self._response = None
+        self.waiting = True
+        self.bus.emit(Message("intent.service.padatious.get",
+                              {"utterance": utterance},
+                              context={"destination": "intent_service",
+                                       "source": "intent_api"}))
+        while self.waiting and time.time() - start <= self.timeout:
+            time.sleep(0.3)
+        if time.time() - start > self.timeout:
+            LOG.error("Intent Service timed out!")
+            return None
+        return self._response["intent"]
+
+    def get_intent(self, utterance):
+        start = time.time()
+        self._response = None
+        self.waiting = True
+        self.bus.emit(Message("intent.service.intent.get",
+                              {"utterance": utterance},
+                              context={"destination": "intent_service",
+                                       "source": "intent_api"}))
+        while self.waiting and time.time() - start <= self.timeout:
+            time.sleep(0.3)
+        if time.time() - start > self.timeout:
+            LOG.error("Intent Service timed out!")
+            return None
+        return self._response["intent"]
+
+    def get_skills(self):
+        start = time.time()
+        self._response = None
+        self.waiting = True
+        self.bus.emit(Message("intent.service.skills.get",
+                              context={"destination": "intent_service",
+                                       "source": "intent_api"}))
+        while self.waiting and time.time() - start <= self.timeout:
+            time.sleep(0.3)
+        if time.time() - start > self.timeout:
+            LOG.error("Intent Service timed out!")
+            return None
+        return self._response["skills"]
+
+    def get_active_skills(self):
+        start = time.time()
+        self._response = None
+        self.waiting = True
+        self.bus.emit(Message("intent.service.active_skills.get",
+                              context={"destination": "intent_service",
+                                       "source": "intent_api"}))
+        while self.waiting and time.time() - start <= self.timeout:
+            time.sleep(0.3)
+        if time.time() - start > self.timeout:
+            LOG.error("Intent Service timed out!")
+            return None
+        return self._response["skills"]
+
