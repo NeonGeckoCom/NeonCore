@@ -17,13 +17,15 @@ import os
 from glob import glob
 from threading import Thread, Event
 from time import sleep
-from os.path import expanduser, join
+from os.path import expanduser, join, isdir
 
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
-from .skill_loader import SkillLoader
+from mycroft.skills.skill_loader import SkillLoader
+
+import git
 
 SKILL_MAIN_MODULE = '__init__.py'
 
@@ -92,6 +94,27 @@ class SkillManager(Thread):
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self._connected_event.wait()
+
+        # if skills dir does not exist (first run) download default skills
+        if self.skills_config.get("repo"):
+            if not isdir(self.skills_dir):
+                LOG.info("Downloading default skills")
+                try:
+                    git.Repo.clone_from(self.skills_config.get("repo"), self.skills_dir)
+                except Exception as e:
+                    LOG.exception(e)
+                    LOG.error("Could not download default skills!")
+            else:
+                LOG.info("Attempting skills update")
+                try:
+                    # git pull
+                    g = git.cmd.Git(self.skills_dir)
+                    g.pull()
+                except Exception as e:
+                    LOG.exception(e)
+                    LOG.error("Could not update default skills, did you change any default skill?")
+                    LOG.info("If you edit a single default skill, update will fail, blacklist skill instead")
+
         self._load_on_startup()
 
         # Scan the file folder that contains Skills.  If a Skill is updated,
@@ -118,6 +141,7 @@ class SkillManager(Thread):
 
     def _reload_modified_skills(self):
         """Handle reload of recently changed skill(s)"""
+        reload_occured = False
         for skill_dir in self._get_skill_directories():
             try:
                 skill_loader = self.skill_loaders.get(skill_dir)
