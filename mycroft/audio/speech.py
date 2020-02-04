@@ -31,8 +31,28 @@ tts = None
 tts_hash = None
 lock = Lock()
 mimic_fallback_obj = None
+speak_muted = False
 
 _last_stop_signal = 0
+
+
+def handle_unmute_tts(event):
+    """ enable tts execution """
+    global speak_muted
+    speak_muted = False
+    bus.emit(Message("mycroft.tts.mute_status", {"muted": speak_muted}))
+
+
+def handle_mute_tts(event):
+    """ disable tts execution """
+    global speak_muted
+    speak_muted = True
+    bus.emit(Message("mycroft.tts.mute_status", {"muted": speak_muted}))
+
+
+def handle_mute_status(event):
+    """ emit tts mute status to bus """
+    bus.emit(Message("mycroft.tts.mute_status", {"muted": speak_muted}))
 
 
 def handle_speak(event):
@@ -106,7 +126,12 @@ def mute_and_speak(utterance, event):
         utterance:  The sentence to be spoken
         ident:      Ident tying the utterance to the source query
     """
-    global tts_hash
+    global tts_hash, speak_muted
+
+    LOG.info("Speak: " + utterance)
+    if speak_muted:
+        LOG.warning("Tried to speak, but TTS is muted!")
+        return
 
     listen = event.data.get('expect_response', False)
 
@@ -121,7 +146,7 @@ def mute_and_speak(utterance, event):
         tts.init(bus)
         tts_hash = hash(str(config.get('tts', '')))
 
-    LOG.info("Speak: " + utterance)
+
     try:
         tts.execute(utterance, event.context['ident'], listen, event)
     except RemoteTTSTimeoutException as e:
@@ -175,6 +200,9 @@ def init(messagebus):
     bus.on('mycroft.stop', handle_stop)
     bus.on('mycroft.audio.speech.stop', handle_stop)
     bus.on('speak', handle_speak)
+    bus.on('mycroft.tts.mute', handle_mute_tts)
+    bus.on('mycroft.tts.unmute', handle_unmute_tts)
+    bus.on('mycroft.tts.mute_status.request', handle_mute_status)
 
     tts = TTSFactory.create()
     tts.init(bus)
