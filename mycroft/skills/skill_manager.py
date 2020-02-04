@@ -16,22 +16,21 @@
 import os
 from glob import glob
 from threading import Thread, Event
-from time import sleep, time
+from time import sleep
+from os.path import expanduser, join, isdir
 
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
-from .msm_wrapper import create_msm as msm_creator, build_msm_config
-from .settings import SkillSettingsDownloader
-from .skill_loader import SkillLoader
-from .skill_updater import SkillUpdater
+from mycroft.skills.skill_loader import SkillLoader
+
+import git
 
 SKILL_MAIN_MODULE = '__init__.py'
 
 
 class SkillManager(Thread):
-    _msm = None
 
     def __init__(self, bus):
         """Constructor
@@ -44,14 +43,12 @@ class SkillManager(Thread):
         self._stop_event = Event()
         self._connected_event = Event()
         self.config = Configuration.get()
+        self.skills_dir = expanduser(self.config["skills"]["directory"])
 
         self.skill_loaders = {}
         self.enclosure = EnclosureAPI(bus)
         self.initial_load_complete = False
-        self.num_install_retries = 0
-        self.settings_downloader = SkillSettingsDownloader(self.bus)
         self._define_message_bus_events()
-        self.skill_updater = SkillUpdater()
         self.daemon = True
 
         # Statuses
@@ -70,60 +67,23 @@ class SkillManager(Thread):
         )
 
         # Update upon request
-        self.bus.on('skillmanager.update', self.schedule_now)
         self.bus.on('skillmanager.list', self.send_skill_list)
         self.bus.on('skillmanager.deactivate', self.deactivate_skill)
         self.bus.on('skillmanager.keep', self.deactivate_except)
         self.bus.on('skillmanager.activate', self.activate_skill)
-        self.bus.on('mycroft.paired', self.handle_paired)
         self.bus.on('mycroft.skills.is_alive', self.is_alive)
         self.bus.on('mycroft.skills.all_loaded', self.is_all_loaded)
-        self.bus.on(
-            'mycroft.skills.settings.update',
-            self.settings_downloader.download
-        )
 
     @property
     def skills_config(self):
         return self.config['skills']
 
-    @property
-    def msm(self):
-        if self._msm is None:
-            msm_config = build_msm_config(self.config)
-            self._msm = msm_creator(msm_config)
-
-        return self._msm
-
-    @staticmethod
-    def create_msm():
-        LOG.debug('instantiating msm via static method...')
-        msm_config = build_msm_config(Configuration.get())
-        msm_instance = msm_creator(msm_config)
-
-        return msm_instance
-
-    def schedule_now(self, _):
-        self.skill_updater.next_download = time() - 1
-
-    def handle_paired(self, _):
-        """Trigger upload of skills manifest after pairing."""
-        self.skill_updater.post_manifest(reload_skills_manifest=True)
-
     def load_priority(self):
-        skills = {skill.name: skill for skill in self.msm.all_skills}
         priority_skills = self.skills_config.get("priority_skills", [])
         for skill_name in priority_skills:
-            skill = skills.get(skill_name)
-            if skill is not None:
-                if not skill.is_local:
-                    try:
-                        self.msm.install(skill)
-                    except Exception:
-                        log_msg = 'Downloading priority skill: {} failed'
-                        LOG.exception(log_msg.format(skill_name))
-                        continue
-                self._load_skill(skill.path)
+            path = join(self.skills_dir, skill_name)
+            if path is not None:
+                self._load_skill(path)
             else:
                 LOG.error(
                     'Priority skill {} can\'t be found'.format(skill_name)
@@ -131,15 +91,32 @@ class SkillManager(Thread):
 
         self._alive_status = True
 
+    def download_or_update_defaults(self):
+        # if skills dir does not exist (first run) download default skills
+        if self.skills_config.get("repo"):
+            if not isdir(self.skills_dir):
+                LOG.info("Downloading default skills")
+                try:
+                    git.Repo.clone_from(self.skills_config.get("repo"), self.skills_dir)
+                except Exception as e:
+                    LOG.exception(e)
+                    LOG.error("Could not download default skills!")
+            else:
+                LOG.info("Attempting skills update")
+                try:
+                    # git pull
+                    g = git.cmd.Git(self.skills_dir)
+                    g.pull()
+                except Exception as e:
+                    LOG.exception(e)
+                    LOG.error("Could not update default skills, did you change any default skill?")
+                    LOG.info("If you edit a single default skill, update will fail, blacklist skill instead")
+
     def run(self):
         """Load skills and update periodically from disk and internet."""
-        self._remove_git_locks()
         self._connected_event.wait()
+        self.download_or_update_defaults()
         self._load_on_startup()
-
-        # Update sync backend and skills.
-        self.skill_updater.post_manifest(reload_skills_manifest=True)
-        self.settings_downloader.download()
 
         # Scan the file folder that contains Skills.  If a Skill is updated,
         # unload the existing version from memory and reload from the disk.
@@ -148,19 +125,12 @@ class SkillManager(Thread):
                 self._reload_modified_skills()
                 self._load_new_skills()
                 self._unload_removed_skills()
-                self._update_skills()
                 sleep(2)  # Pause briefly before beginning next scan
             except Exception:
                 LOG.exception('Something really unexpected has occured '
                               'and the skill manager loop safety harness was '
                               'hit.')
                 sleep(30)
-
-    def _remove_git_locks(self):
-        """If git gets killed from an abrupt shutdown it leaves lock files."""
-        for i in glob(os.path.join(self.msm.skills_dir, '*/.git/index.lock')):
-            LOG.warning('Found and removed git lock file: ' + i)
-            os.remove(i)
 
     def _load_on_startup(self):
         """Handle initial skill load."""
@@ -183,10 +153,6 @@ class SkillManager(Thread):
                 LOG.exception('Unhandled exception occured while '
                               'reloading {}'.format(skill_dir))
 
-        if reload_occured:
-            # If a reload occured a skill gid may have changed.
-            self.skill_updater.post_manifest(reload_skills_manifest=True)
-
     def _load_new_skills(self):
         """Handle load of skills installed since startup."""
         for skill_dir in self._get_skill_directories():
@@ -203,7 +169,7 @@ class SkillManager(Thread):
             self.skill_loaders[skill_directory] = skill_loader
 
     def _get_skill_directories(self):
-        skill_glob = glob(os.path.join(self.msm.skills_dir, '*/'))
+        skill_glob = glob(os.path.join(self.skills_dir, '*/'))
 
         skill_directories = []
         for skill_dir in skill_glob:
@@ -231,15 +197,6 @@ class SkillManager(Thread):
             except Exception:
                 LOG.exception('Failed to shutdown skill ' + skill.id)
             del self.skill_loaders[skill_dir]
-
-    def _update_skills(self):
-        """Update skills once an hour if update is enabled"""
-        do_skill_update = (
-            time() >= self.skill_updater.next_download and
-            self.skills_config["auto_update"]
-        )
-        if do_skill_update:
-            self.skill_updater.update_skills()
 
     def is_alive(self, message=None):
         """Respond to is_alive status request."""
@@ -308,8 +265,6 @@ class SkillManager(Thread):
     def stop(self):
         """Tell the manager to shutdown."""
         self._stop_event.set()
-        self.settings_downloader.stop_downloading()
-
         # Do a clean shutdown of all skills
         for skill_loader in self.skill_loaders.values():
             if skill_loader.instance is not None:
