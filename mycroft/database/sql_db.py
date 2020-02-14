@@ -32,6 +32,16 @@ class _User(Base):
     face_encoding = Column(String)
     face_sample = Column(String)
     data = Column(Text)  # saved as json string
+    preferences = Column(Text)  # saved as json string
+    auth = Column(Text)  # saved as json string
+
+    # bellow are only to facilitate sql queries
+    # those should be translated/injected in proper place at
+    # data/preferences/auth dicts when reading/returning data
+    key = Column(String)
+    hive = Column(String)
+    phone = Column(String)
+    # TODO location
 
 
 class SQLUserDatabase:
@@ -86,6 +96,14 @@ class SQLUserDatabase:
         _user.face_sample = user.face_sample
         _user.face_encoding = user.face_encoding
         _user.data = json.dumps(user.data)
+        _user.preferences = json.dumps(user.preferences)
+        _user.auth = json.dumps(user.auth)
+        # TODO location
+
+        # sql query helper
+        _user.phone = user.data.get("phone")
+        _user.key = user.auth.get("key")
+        _user.hive = user.auth.get("HiveMind")
 
     def total_users(self):
         return self.session.query(_User).count()
