@@ -20,7 +20,8 @@ import re
 from abc import ABCMeta, abstractmethod
 from threading import Thread
 from time import time, sleep
-from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
+from mycroft.language import DetectorFactory, TranslatorFactory,\
+    get_lang_config
 
 import os.path
 from os.path import dirname, exists, isdir, join
@@ -28,12 +29,13 @@ from os.path import dirname, exists, isdir, join
 import mycroft.util
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration, get_private_keys
-from mycroft.messagebus.message import Message, dig_for_message
+from mycroft.messagebus.message import Message
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.util import (
     play_wav, play_mp3, check_for_signal, create_signal, resolve_resource_file
 )
 from mycroft.util.log import LOG
+from mycroft.database import match_user
 from queue import Queue, Empty
 
 
@@ -335,8 +337,11 @@ class TTS(metaclass=ABCMeta):
         # this is here to cover that use case
 
         # check for user specified language
+        user = None
         if message:
-            user_lang = message.user_data.get("lang") or self.language_config["user"]
+            user = match_user(message.user_data)
+        if user:
+            user_lang = user.data.get("lang") or self.language_config["user"]
         else:
             user_lang = self.language_config["user"]
 

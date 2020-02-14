@@ -45,7 +45,7 @@ from mycroft.util.format import pronounce_number, join_list
 from mycroft.util.parse import match_one, extract_number
 from mycroft.language import DetectorFactory, TranslatorFactory, \
     get_lang_config, get_language_dir
-
+from mycroft.database import match_user
 from .event_container import EventContainer, create_wrapper, get_handler_name
 from ..event_scheduler import EventSchedulerInterface
 from ..intent_service_interface import IntentServiceInterface
@@ -1088,8 +1088,13 @@ class MycroftSkill:
         message = dig_for_message()
 
         # check for user specified language
-        # NOTE this will likely change in future
-        user_lang = message.user_data.get("lang") or self.language_config["user"]
+        user = None
+        if message:
+            user = match_user(message.user_data)
+        if user:
+            user_lang = user.data.get("lang") or self.language_config["user"]
+        else:
+            user_lang = self.language_config["user"]
 
         original = utterance
         detected_lang = self.lang_detector.detect(utterance)
