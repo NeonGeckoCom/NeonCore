@@ -31,6 +31,9 @@ class AudioParsersService(ModuleLoaderService):
 
 
 class AudioParser:
+    # audio chunks are AudioData objects,
+    # read https://github.com/Uberi/speech_recognition/blob/master/speech_recognition/__init__.py#L325
+
     def __init__(self, name="test_parser", priority=50):
         self.name = name
         self.bus = None
