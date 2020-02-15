@@ -4,7 +4,7 @@
 # check https://github.com/OpenJarbas/simple_NER
 
 from simple_NER.annotators.keyword_ner import KeywordNER
-from mycroft.text_parsing.modules import TextParser
+from mycroft.processing_modules.text import TextParser
 
 
 class EntityTagger(TextParser):

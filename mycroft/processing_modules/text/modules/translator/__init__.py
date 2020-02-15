@@ -1,4 +1,4 @@
-from mycroft.text_parsing.modules import TextParser
+from mycroft.processing_modules.text import TextParser
 from mycroft.util.log import LOG
 from mycroft.language import DetectorFactory, TranslatorFactory, get_lang_config
 
