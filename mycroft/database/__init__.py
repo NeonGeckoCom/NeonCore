@@ -1,20 +1,49 @@
 from mycroft.configuration import Configuration
 from mycroft.util.log import LOG
+from mycroft.database.models import User
 
 
 DATABASE_PATH = Configuration.get()["database"]["path"]
 
 if "sql" not in DATABASE_PATH.split(":/")[0]:
     from mycroft.database.json_db import JsonUserDatabase
-    UserDatabase = JsonUserDatabase
+    _clazz = JsonUserDatabase
 else:
     # this is here mostly to support remote databases
     try:
         from mycroft.database.sql import SQLUserDatabase
-        UserDatabase = SQLUserDatabase
+        _clazz = SQLUserDatabase
     except ImportError:
         LOG.error("Run pip install sqlalchemy")
         raise
+
+
+class UserDatabase(_clazz):
+    # backend agnostic database with caching
+    _user_cache = {}
+
+    def get_user_by_id(self, user_id):
+        # caching to save database queries
+        if user_id in self._user_cache:
+            return self._user_cache[user_id]
+        user = super().get_user_by_id(user_id)
+        if user:
+            UserDatabase._user_cache[user_id] = user
+        return user
+
+    def update_user(self, user):
+        updated = super().update_user(user)
+        # save updated value in cache
+        if updated:
+            UserDatabase._user_cache[user.user_id] = user
+        return updated
+
+    def delete_user(self, user_id):
+        deleted = super().delete_user(user_id)
+        # update cache
+        if deleted:
+            UserDatabase._user_cache[user_id] = User(user_id, "Deleted_user")
+        return deleted
 
 
 def match_user(query_data, min_conf=0.85):
