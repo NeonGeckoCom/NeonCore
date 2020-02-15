@@ -32,7 +32,6 @@ from mycroft.util.log import LOG
 from mycroft.util import find_input_device
 from queue import Queue, Empty
 import json
-from copy import deepcopy
 
 
 MAX_MIC_RESTARTS = 20
@@ -83,7 +82,8 @@ class AudioProducer(Thread):
                     audio = self.recognizer.listen(source, self.emitter,
                                                    self.stream_handler)
                     if audio is not None:
-                        self.queue.put((AUDIO_DATA, audio))
+                        context = self.recognizer.audio_consumers.get_context()
+                        self.queue.put((AUDIO_DATA, audio, context))
                     else:
                         LOG.warning("Audio contains no data.")
                 except IOError as e:
@@ -151,14 +151,14 @@ class AudioConsumer(Thread):
         if message is None:
             return
 
-        tag, data = message
+        tag, data, context = message
 
         if tag == AUDIO_DATA:
             if data is not None:
                 if self.state.sleeping:
                     self.wake_up(data)
                 else:
-                    self.process(data)
+                    self.process(data, context)
         elif tag == STREAM_START:
             self.stt.stream_start()
         elif tag == STREAM_DATA:
@@ -182,7 +182,8 @@ class AudioConsumer(Thread):
                 audio.sample_rate * audio.sample_width)
 
     # TODO: Localization
-    def process(self, audio):
+    def process(self, audio, context = None):
+        context = context or {}
         SessionManager.touch()
         if self._audio_length(audio) < self.MIN_AUDIO_SIZE:
             LOG.warning("Audio too short to be processed")
@@ -197,7 +198,8 @@ class AudioConsumer(Thread):
                     'utterances': [transcription],
                     'lang': self.stt.lang,
                     'session': SessionManager.get().session_id,
-                    'ident': ident
+                    'ident': ident,
+                    "data": context
                 }
                 self.emitter.emit("recognizer_loop:utterance", payload)
                 self.metrics.attr('utterances', [transcription])
@@ -279,6 +281,9 @@ class RecognizerLoop(EventEmitter):
         super(RecognizerLoop, self).__init__()
         self.mute_calls = 0
         self._load_config()
+
+    def bind(self, parsers_service):
+        self.responsive_recognizer.bind(parsers_service)
 
     def _load_config(self):
         """Load configuration parameters from configuration."""

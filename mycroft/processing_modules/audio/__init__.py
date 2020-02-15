@@ -1,5 +1,7 @@
 from os.path import join, dirname
 from mycroft.processing_modules import ModuleLoaderService
+from mycroft.util.json_helper import merge_dict
+from speech_recognition import AudioData
 
 
 class AudioParsersService(ModuleLoaderService):
@@ -9,22 +11,23 @@ class AudioParsersService(ModuleLoaderService):
         super(AudioParsersService, self).__init__(bus, parsers_dir)
 
     def feed_audio(self, chunk):
-        for parser in self.loaded_modules:
-            instance = self.loaded_modules[parser].get("instance")
-            if instance:
-                instance.on_audio(chunk)
+        for instance in self.modules:
+            instance.on_audio(chunk)
 
     def feed_hotword(self, chunk):
-        for parser in self.loaded_modules:
-            instance = self.loaded_modules[parser].get("instance")
-            if instance:
-                instance.on_hotword(chunk)
+        for instance in self.modules:
+            instance.on_hotword(chunk)
 
     def feed_speech(self, chunk):
-        for parser in self.loaded_modules:
-            instance = self.loaded_modules[parser].get("instance")
-            if instance:
-                instance.on_speech(chunk)
+        for instance in self.modules:
+            instance.on_speech(chunk)
+
+    def get_context(self):
+        context = {}
+        for instance in self.modules:
+            data = instance.on_speech_end()
+            context = merge_dict(context, data)
+        return context
 
 
 class AudioParser:
@@ -43,16 +46,29 @@ class AudioParser:
 
     def on_audio(self, audio_data):
         """ Take any action you want, audio_data is a non-speech chunk """
-        pass
+        assert isinstance(audio_data, AudioData)
 
     def on_hotword(self, audio_data):
-        """ Take any action you want, audio_data is a full wake/hotword """
-        pass
+        """ Take any action you want, audio_data is a full wake/hotword
+        Common action would be to prepare to received speech chunks
+        NOTE: this might be a hotword or a wakeword, listening is not assured
+        """
+        assert isinstance(audio_data, AudioData)
 
     def on_speech(self, audio_data):
         """ Take any action you want, audio_data is a speech chunk (NOT a
-        full utterance) this is during recording """
-        pass
+        full utterance) this is during recording
+
+         You can do streaming predictions or save the audio_data"""
+        assert isinstance(audio_data, AudioData)
+
+    def on_speech_end(self):
+        """ return any additional message context to be passed in
+        recognize_loop:utterance message, usually a streaming prediction
+
+         Optionally make the prediction here with saved chunks (extra latency
+         """
+        return {}
 
     def default_shutdown(self):
         """ perform any shutdown actions """

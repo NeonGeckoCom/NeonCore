@@ -252,6 +252,10 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         self.SAVED_WW_SEC = max(3, self.TEST_WW_SEC)
 
         self._account_id = None
+        self.audio_consumers = None
+
+    def bind(self, audio_consumers):
+        self.audio_consumers = audio_consumers
 
     @property
     def account_id(self):
@@ -352,6 +356,10 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                 chunk = ww_frames.popleft()
             else:
                 chunk = self.record_sound_chunk(source)
+
+            self.audio_consumers.feed_speech(self._create_audio_data(chunk,
+                                                                     source))
+
             byte_data += chunk
             num_chunks += 1
 
@@ -549,7 +557,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                     if test_size < len(byte_data) else byte_data
                 audio_data = chopped + silence
                 said_hot_word = False
-                for hotword in self.check_for_hotwords(audio_data, bus):
+                for hotword in self.check_for_hotwords(audio_data, source):
                     said_hot_word = True
                     engine = self.hotword_engines[hotword]["engine"]
                     sound = self.hotword_engines[hotword]["sound"]
@@ -623,12 +631,18 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                     # serial detections
                     byte_data = silence
 
-    def check_for_hotwords(self, audio_data, bus):
+    def check_for_hotwords(self, byte_data, source):
         # check hot word
+        found = False
+        audio_data = self._create_audio_data(byte_data, source)
         for hotword in self.hotword_engines:
             engine = self.hotword_engines[hotword]["engine"]
-            if engine.found_wake_word(audio_data):
+            if engine.found_wake_word(byte_data):
+                self.audio_consumers.feed_hotwords(audio_data)
+                found = True
                 yield hotword
+        if not found:
+            self.audio_consumers.feed_audio(audio_data)
 
     @staticmethod
     def _create_audio_data(raw_data, source):
@@ -689,6 +703,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
         frame_data = self._record_phrase(source, sec_per_buffer, stream)
         audio_data = self._create_audio_data(frame_data, source)
+
         bus.emit("recognizer_loop:record_end")
         if self.save_utterances:
             LOG.info("Recording utterance")
