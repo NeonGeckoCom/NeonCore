@@ -18,10 +18,20 @@ class SkillAuth(TextParser):
         data = {"blocked_utterances": []}
         if user is None or not user.is_admin:
             for idx, utterance in enumerate(utterances):
+                blocked = False
                 skill = self.intents.get_skill(utterance, lang)
+                # global blacklist
                 if skill in self.admin_skills:
                     utterances[idx] = "say not authorized to perform this " \
                                       "action"
+                    blocked = True
+                # per user blacklist
+                if user is not None:
+                    if skill in user.blacklisted_skills:
+                        blocked = True
+                        utterances[idx] = "say not authorized to perform this " \
+                                          "action"
+                if blocked:
                     data["blocked_utterances"].append(utterance)
 
         # return utterances + data
