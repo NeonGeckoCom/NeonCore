@@ -59,11 +59,13 @@ class FileConsumer(Thread):
         if not file:
             error = "No file provided for transcription"
             self.bus.emit(
-                Message("stt.error", {"error": error}))
+                message.reply("recognizer_loop:server_error",
+                              {"error": error}))
         elif not exists(file):
             error = "Invalid file path provided for transcription"
             self.bus.emit(
-                Message("stt.error", {"error": error}))
+                message.reply("recognizer_loop:server_error",
+                              {"error": error}))
         else:
             audio = read_wave_file(file)
             transcript = self.stt.execute(audio).lower().strip()
@@ -76,11 +78,11 @@ class FileConsumer(Thread):
         if not file:
             error = "No file provided for transcription"
             self.bus.emit(
-                Message("recognizer_loop:server_error", {"error": error}))
+                message.reply("stt.error", {"error": error}))
         elif not exists(file):
             error = "Invalid file path provided for transcription"
             self.bus.emit(
-                Message("recognizer_loop:server_error", {"error": error}))
+                message.reply("stt.error", {"error": error}))
         else:
             audio = read_wave_file(file)
             transcript = self.stt.execute(audio).lower().strip()
