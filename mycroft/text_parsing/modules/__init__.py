@@ -13,8 +13,10 @@ class TextParser:
         """ perform any initialization actions """
         pass
 
-    def parse(self, utterances, lang="en-us"):
-        """ parse utterances , return modified utterances + dict to be merged into message context """
+    def parse(self, utterances, user, lang="en-us"):
+        """ parse utterances ,
+        return modified utterances + dict to be merged into message context
+         """
         return utterances, {}
 
     def default_shutdown(self):

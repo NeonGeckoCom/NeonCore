@@ -136,12 +136,12 @@ class TextParsersService(Thread):
         parsers = sorted(parsers, key=lambda kw: kw[1])
         return [p[0] for p in parsers]
 
-    def parse(self, parser, utterances=None, lang="en-us"):
+    def parse(self, parser, utterances=None, user=None, lang="en-us"):
         utterances = utterances or []
         if parser in self.loaded_parsers:
             instance = self.loaded_parsers[parser].get("instance")
             if instance:
-                return instance.parse(utterances, lang)
+                return instance.parse(utterances, user, lang)
         return utterances, {}
 
     def _load_parser(self, parser_path):

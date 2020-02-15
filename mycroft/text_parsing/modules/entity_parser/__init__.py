@@ -12,7 +12,7 @@ class EntityTagger(TextParser):
         super().__init__(name, priority)
         self.rake = KeywordNER()
 
-    def parse(self, utterances, lang="en-us"):
+    def parse(self, utterances, user, lang="en-us"):
         keywords = []
         for utterance in utterances:
             # extract keywords

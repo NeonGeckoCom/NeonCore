@@ -346,7 +346,10 @@ class IntentService:
             # keep in mind utterance might be modified by previous parser
             for parser in self.parser_service.parsers:
                 # mutate utterances and retrieve extra data
-                utterances, data = self.parser_service.parse(parser, utterances, lang)
+                utterances, data = self.parser_service.parse(parser,
+                                                             utterances,
+                                                             message.user,
+                                                             lang)
                 # update message context with extra data
                 message.context = merge_dict(message.context, data)
 

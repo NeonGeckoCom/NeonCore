@@ -10,7 +10,7 @@ class UtteranceTranslator(TextParser):
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
 
-    def parse(self, utterances, lang="en-us"):
+    def parse(self, utterances, user, lang="en-us"):
         metadata = []
         for idx, ut in enumerate(utterances):
             original = ut
