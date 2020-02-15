@@ -182,10 +182,6 @@ class User:
         return self.auth.get("blacklisted_skills", [])
 
     @property
-    def blacklisted_skills(self):
-        return self.auth.get("blacklisted_skills", [])
-
-    @property
     def age(self):
         # returns a datetime.timedelta object
         bday = self.data.get("birthday") or \
