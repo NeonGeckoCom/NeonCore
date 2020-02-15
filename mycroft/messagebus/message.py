@@ -17,6 +17,7 @@ import re
 import inspect
 
 from mycroft.util.parse import normalize
+from mycroft.database import match_user
 
 
 class Message:
@@ -187,6 +188,10 @@ class Message:
     @property
     def user_data(self):
         return self.context.get("user", {})
+
+    @property
+    def user(self):
+        return match_user(self.user_data)
 
 
 def dig_for_message():
