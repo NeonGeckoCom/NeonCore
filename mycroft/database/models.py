@@ -4,25 +4,34 @@ These classes will be used all over the mycroft code base
 """
 import json
 import datetime
+from jarbas_utils.location import geolocate, reverse_geolocate, get_timezone
 from dateutil.tz import gettz, tzlocal
 
 
 class Location:
-    def __init__(self, name, lat, lon):
-        self.name = name  # a human name, can be a city or something like "home"
+    def __init__(self, lat=38.971669, lon=-95.23525):
         self.latitude = lat
         self.longitude = lon
+        # everything is automatically derived from lat/lon
+        # this ensures location is not ambiguous
         self._address = None
-        self._timezone_code = None #
-        # everything else is derived from lat/lon
+        self._timezone_code = None
+        self._city = None
+        self._state = None
+        self._country = None
+        self._country_code = None
+
+    @property
+    def timezone_code(self):
+        if self._timezone_code is None:
+            self._timezone_code = get_timezone(self.latitude, self.longitude)
+        return self._timezone_code
 
     @property
     def timezone(self):
-        if self._timezone_code:
-            return gettz(self._timezone_code)
-        # TODO geolocation
-        from_lat_lon = tzlocal()
-        return from_lat_lon or tzlocal()
+        if self.timezone_code:
+            return gettz(self.timezone_code)
+        return tzlocal()
 
     @property
     def current_time(self):
@@ -30,24 +39,84 @@ class Location:
 
     @property
     def address(self):
-        return self._address or self.reverse_geolocate()
+        if not self._address:
+            if not self._city or not self._country:
+                self._reverse_geolocate()
+            self._address = self._city
+            if self._state:
+                self._address += ", " + self._state
+            if self._country:
+                self._address += ", " + self._country
+        return self._address
 
-    def reverse_geolocate(self):
-        # TODO geolocation
-        return "address from lat/lon"
+    @property
+    def city(self):
+        if not self._city:
+            self._reverse_geolocate()
+        return self._city
+
+    @property
+    def state(self):
+        if not self._state:
+            self._reverse_geolocate()
+        return self._state
+
+    @property
+    def country(self):
+        if not self._country:
+            self._reverse_geolocate()
+        return self._country
+
+    @property
+    def country_code(self):
+        if not self._country_code:
+            self._reverse_geolocate()
+        return self._country_code
+
+    def _reverse_geolocate(self):
+        data = reverse_geolocate(self.latitude, self.longitude)
+        self.from_dict(data)
+        return self
+
+    def from_address(self, address):
+        data = geolocate(address)
+        self.from_dict(data)
+        self._address = address
+        return self
 
     def from_dict(self, data):
         if isinstance(data, str):
             data = json.loads(data)
-        self.name = data["name"]
-        self.latitude = data["latitude"]
-        self.longitude = data["longitude"]
-        self._address = data.get("address") or self._address
-        self._timezone_code = data.get("timezone_code") or self._timezone_code
+        self.latitude = data["coordinate"]["latitude"]
+        self.longitude = data["coordinate"]["longitude"]
+        self._city = data["city"]["name"]
+        self._state = data["city"]["state"].get("name")
+        self._country = data["city"]["state"]["country"]["name"]
+        self._timezone_code = data.get("timezone", {}).get("name")
+        self._address = data.get("address")
         return self
 
     def as_dict(self):
-        return self.__dict__
+        return {
+            "city": {
+                "name": self.city,
+                "state": {
+                    "name": self.state,
+                    "country": {
+                        "code": self.country_code,
+                        "name": self.country
+                    }
+                }
+            },
+            "coordinate": {
+                "latitude": self.latitude,
+                "longitude": self.longitude
+            },
+            "timezone": {
+                "name": self.timezone_code
+            },
+            "address": self.address
+        }
 
 
 class User:
@@ -78,11 +147,13 @@ class User:
     @property
     def age(self):
         # returns a datetime.timedelta object
-        bday = self.data.get("birthday") or self.data.get("bday")
+        bday = self.data.get("birthday") or \
+               self.data.get("dob") or \
+               self.data.get("bday")
         if not bday:
             age = self.data.get("age")
             if age:
-                return datetime.timedelta(days=365*age)
+                return datetime.timedelta(days=365 * age)
             return None  # None means unknown
         y, m, d = bday.splt("/")
         now = datetime.datetime.now()
@@ -93,12 +164,17 @@ class User:
     def from_dict(self, data):
         if isinstance(data, str):
             data = json.loads(data)
+        if data.get("location") is not None:
+            self.location = Location().from_dict(data["location"])
         for key in data:
             self.__setattr__(key, data[key])
         return self
 
     def as_dict(self):
-        return self.__dict__
+        data = self.__dict__
+        if self.location:
+            data["location"] = self.location.as_dict()
+        return data
 
     def update_from_dict(self, data):
         if isinstance(data, str):
@@ -106,3 +182,14 @@ class User:
         for key in data:
             if data.get(key) is not None:
                 self.__setattr__(key, data[key])
+
+
+if __name__ == "__main__":
+    from pprint import pprint
+    loc = Location()
+    pprint(loc.as_dict())
+
+    # useful properties
+    print(loc.timezone)  # timezone object
+    print(loc.current_time)  # timezone aware datetime object
+
