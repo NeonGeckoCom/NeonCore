@@ -34,6 +34,7 @@ class _User(Base):
     data = Column(Text)  # saved as json string
     preferences = Column(Text)  # saved as json string
     auth = Column(Text)  # saved as json string
+    location = Column(Text)  # saved as json string
 
     # bellow are only to facilitate sql queries
     # those should be translated/injected in proper place at
@@ -41,7 +42,6 @@ class _User(Base):
     key = Column(String)
     hive = Column(String)
     phone = Column(String)
-    # TODO location
 
 
 class SQLUserDatabase:
@@ -98,7 +98,8 @@ class SQLUserDatabase:
         _user.data = json.dumps(user.data)
         _user.preferences = json.dumps(user.preferences)
         _user.auth = json.dumps(user.auth)
-        # TODO location
+        if user.location:
+            _user.location = json.dumps(user.location.as_dict())
 
         # sql query helper
         _user.phone = user.data.get("phone")

@@ -141,8 +141,45 @@ class User:
         # arbitrary user data, you can store anything here
         # things like nicknames, TTS/STT preferences and so on
         self.data = {}
+
+        # user.data = {
+        #     "first_name": "Jon",
+        #     "middle_name": "Something",
+        #     "last_name": "Doe",
+        #     "nicknames": ["Dude", "FuriousBadger"],
+        #     "birthday": "YYYY/MM/DD",
+        #     "about": "very nice user, likes cookies",
+        #     "phone": "666",
+        #     "avatar": "human.jpg"
+        # }
+
         self.preferences = {}
+
+        # user.preferences = {
+        #     "name": "Master",
+        #     "units": "metric",
+        #     "date_format": "DD/MM/YYYY",
+        #     "time_format": 24,
+        #     "tts": {"gender": "female", "voice": "Joanna"},
+        #     "stt": {"lang": "en", "region": "US"},
+        #     "brands": {"favorite": [], "ignored": []},
+        #     "synonyms": {"a": "means b"}
+        # }
+
         self.auth = {}
+
+        # user.auth = {
+        #     "phone_verified": False,
+        #     "email_verified": True,
+        #     "key": "SecretUsedForAuthentication",
+        #     "secret_phrase": "Tell me your secret phrase vocal interaction / password recovery",
+        #     "HiveMind": "api_key",
+        #     "blacklisted_skills": []
+        # }
+
+    @property
+    def blacklisted_skills(self):
+        return self.auth.get("blacklisted_skills", [])
 
     @property
     def age(self):
