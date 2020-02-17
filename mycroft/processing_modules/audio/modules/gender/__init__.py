@@ -6,6 +6,7 @@ import time
 try:
     from voice_gender import GenderClassifier
 except ImportError:
+    # NOTE this is just for testing, accuracy for this SUCKS
     LOG.error("Run pip install voice_gender")
     raise
 
@@ -19,7 +20,7 @@ class Gender(AudioParser):
         self._audio = audio_data
 
     def on_speech(self, audio_data):
-        self._audio.frame_data += audio_data
+        self._audio.frame_data += audio_data.frame_data
 
     def on_speech_end(self):
         wav_data = self._audio.get_wav_data()
@@ -29,3 +30,7 @@ class Gender(AudioParser):
         gender = GenderClassifier.predict(temp)
         self._audio = None
         return {"user": {"gender": gender}}
+
+
+def create_module():
+    return Gender()

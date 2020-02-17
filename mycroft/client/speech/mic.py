@@ -638,7 +638,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         for hotword in self.hotword_engines:
             engine = self.hotword_engines[hotword]["engine"]
             if engine.found_wake_word(byte_data):
-                self.audio_consumers.feed_hotwords(audio_data)
+                self.audio_consumers.feed_hotword(audio_data)
                 found = True
                 yield hotword
         if not found:
@@ -690,16 +690,6 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
         LOG.debug("Recording...")
         bus.emit("recognizer_loop:record_begin")
-
-        # If enabled, play a wave file with a short sound to audibly
-        # indicate recording has begun.
-        if self.config.get('confirm_listening'):
-            audio_file = resolve_resource_file(
-                self.config.get('sounds').get('start_listening'))
-            if audio_file:
-                source.mute()
-                play_wav(audio_file).wait()
-                source.unmute()
 
         frame_data = self._record_phrase(source, sec_per_buffer, stream)
         audio_data = self._create_audio_data(frame_data, source)

@@ -236,6 +236,7 @@ def main():
     create_daemon(bus.run_forever)
 
     service = AudioParsersService(bus)
+    service.start()
     loop.bind(service)
 
     create_daemon(loop.run)

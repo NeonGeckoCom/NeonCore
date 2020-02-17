@@ -11,20 +11,24 @@ class AudioParsersService(ModuleLoaderService):
         super(AudioParsersService, self).__init__(bus, parsers_dir)
 
     def feed_audio(self, chunk):
-        for instance in self.modules:
+        for module in self.modules:
+            instance = self.get_module(module)
             instance.on_audio(chunk)
 
     def feed_hotword(self, chunk):
-        for instance in self.modules:
+        for module in self.modules:
+            instance = self.get_module(module)
             instance.on_hotword(chunk)
 
     def feed_speech(self, chunk):
-        for instance in self.modules:
+        for module in self.modules:
+            instance = self.get_module(module)
             instance.on_speech(chunk)
 
     def get_context(self):
         context = {}
-        for instance in self.modules:
+        for module in self.modules:
+            instance = self.get_module(module)
             data = instance.on_speech_end()
             context = merge_dict(context, data)
         return context

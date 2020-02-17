@@ -32,7 +32,7 @@ class UtteranceTranslator(TextParser):
         return utterances, {"translation_data": metadata}
 
 
-def create_parser():
+def create_module():
     return UtteranceTranslator()
 
 

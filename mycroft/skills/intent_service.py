@@ -28,7 +28,6 @@ from mycroft.skills.intent_service_interface import open_intent_envelope
 from mycroft.language import get_lang_config
 from mycroft.processing_modules.text import TextParsersService
 from mycroft.util.json_helper import merge_dict
-from mycroft.util import create_daemon
 
 
 class AdaptIntent(IntentBuilder):
@@ -196,7 +195,7 @@ class IntentService:
         self.converse_skill_id = ""
 
         self.parser_service = TextParsersService(self.bus)
-        create_daemon(self.parser_service.run)
+        self.parser_service.start()
 
         # Intents API
         self.registered_intents = []

@@ -135,6 +135,9 @@ class ModuleLoaderService(Thread):
         modules = sorted(modules, key=lambda kw: kw[1])
         return [p[0] for p in modules]
 
+    def get_module(self, module):
+        return self.loaded_modules[module].get("instance")
+
     def _load_module(self, module_path):
         """
             Check if unloaded module or changed module needs reloading

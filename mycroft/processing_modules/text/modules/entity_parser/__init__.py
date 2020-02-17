@@ -26,7 +26,7 @@ class EntityTagger(TextParser):
         return utterances, {"keywords": keywords}
 
 
-def create_parser():
+def create_module():
     return EntityTagger()
 
 
