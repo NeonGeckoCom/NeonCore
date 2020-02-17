@@ -33,7 +33,7 @@ from mycroft.util import resolve_resource_file
 
 
 RECOGNIZER_DIR = join(abspath(dirname(__file__)), "recognizer")
-INIT_TIMEOUT = 10  # In seconds
+INIT_TIMEOUT = 60  # In seconds
 
 
 class TriggerReload(Exception):
@@ -210,6 +210,7 @@ class PreciseHotword(HotWordEngine):
         url = url.format(arch=platform.machine())
         if not url.endswith('.tar.gz'):
             url = requests.get(url).text.strip()
+
         if install_package(
                 url, self.folder,
                 on_download=self.on_download, on_complete=self.on_complete
