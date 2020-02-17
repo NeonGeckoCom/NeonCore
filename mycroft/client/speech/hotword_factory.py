@@ -29,6 +29,8 @@ from petact import install_package
 
 from mycroft.configuration import Configuration, LocalConf, USER_CONFIG
 from mycroft.util.log import LOG
+from mycroft.util import resolve_resource_file
+
 
 RECOGNIZER_DIR = join(abspath(dirname(__file__)), "recognizer")
 INIT_TIMEOUT = 10  # In seconds
@@ -152,7 +154,11 @@ class PreciseHotword(HotWordEngine):
 
         local_model = self.config.get('local_model_file')
         if local_model:
-            self.precise_model = expanduser(local_model)
+            local_model = resolve_resource_file("precise_models/" + local_model)
+            if local_model:
+                self.precise_model = local_model
+            else:
+                self.precise_model = expanduser(local_model)
         else:
             self.precise_model = self.install_model(
                 precise_config['model_url'], key_phrase.replace(' ', '-')
@@ -175,7 +181,7 @@ class PreciseHotword(HotWordEngine):
         self.runner.start()
 
     def update_precise(self, precise_config):
-        """Continously try to download precise until successful"""
+        """Continuously try to download precise until successful"""
         precise_exe = None
         while not precise_exe:
             try:

@@ -317,7 +317,8 @@ class RecognizerLoop(EventEmitter):
             sound = data.get("sound")
             utterance = data.get("utterance")
             listen = data.get("listen", False)
-            engine = HotWordFactory.create_hotword(word, lang=self.lang)
+            engine = HotWordFactory.create_hotword(word, lang=self.lang,
+                                                   loop=self)
 
             self.hotword_engines[word] = {"engine": engine,
                                           "sound": sound,
