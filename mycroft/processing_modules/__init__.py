@@ -43,10 +43,10 @@ class ModuleLoaderService(Thread):
         self.has_loaded = False
         self.bus = bus
         self.modules_dir = modules_dir
+        self.blacklist = []
 
     @staticmethod
-    def load_module(module_descriptor, module_name,
-                    BLACKLISTED_PARSERS=None, bus=None):
+    def load_module(module_descriptor, module_name, blacklist=None, bus=None):
         """ Load module from module descriptor.
 
         Args:
@@ -56,13 +56,13 @@ class ModuleLoaderService(Thread):
         Returns:
             Parser: the loaded module or None on failure
         """
-        BLACKLISTED_PARSERS = BLACKLISTED_PARSERS or []
+        blacklist = blacklist or []
         path = module_descriptor["path"]
         name = basename(path)
         LOG.info("ATTEMPTING TO LOAD PARSER: {} with ID {}".format(
             name, module_name
         ))
-        if name in BLACKLISTED_PARSERS or path in BLACKLISTED_PARSERS:
+        if name in blacklist or path in blacklist:
             LOG.info("PARSER IS BLACKLISTED " + name)
             return None
         main_file = join(path, MainModule + '.py')
@@ -188,7 +188,9 @@ class ModuleLoaderService(Thread):
 
         module["loaded"] = True
         desc = self.create_module_descriptor(module_path)
-        module["instance"] = self.load_module(desc, module["id"], bus=self.bus)
+        module["instance"] = self.load_module(desc, module["id"],
+                                              blacklist=self.blacklist,
+                                              bus=self.bus)
         module["last_modified"] = modified
         if module['instance'] is not None:
             return True
