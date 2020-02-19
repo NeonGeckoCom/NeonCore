@@ -25,13 +25,13 @@ class AudioParsersService(ModuleLoaderService):
             instance = self.get_module(module)
             instance.on_speech(chunk)
 
-    def get_context(self):
+    def get_context(self, audio_data):
         context = {}
         for module in self.modules:
             instance = self.get_module(module)
-            data = instance.on_speech_end()
+            audio_data, data = instance.on_speech_end(audio_data)
             context = merge_dict(context, data)
-        return context
+        return audio_data, context
 
 
 class AudioParser:
@@ -69,13 +69,13 @@ class AudioParser:
          You can do streaming predictions or save the audio_data"""
         assert isinstance(audio_data, AudioData)
 
-    def on_speech_end(self):
+    def on_speech_end(self, audio_data):
         """ return any additional message context to be passed in
         recognize_loop:utterance message, usually a streaming prediction
 
          Optionally make the prediction here with saved chunks (extra latency
          """
-        return {}
+        return audio_data, {}
 
     def default_shutdown(self):
         """ perform any shutdown actions """

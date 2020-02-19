@@ -14,22 +14,14 @@ except ImportError:
 class Gender(AudioParser):
     def __init__(self):
         super().__init__("gender", 10)
-        self._audio = None
 
-    def on_hotword(self, audio_data):
-        self._audio = audio_data
-
-    def on_speech(self, audio_data):
-        self._audio.frame_data += audio_data.frame_data
-
-    def on_speech_end(self):
-        wav_data = self._audio.get_wav_data()
+    def on_speech_end(self, audio_data):
+        wav_data = audio_data.get_wav_data()
         temp = join(tempfile.gettempdir(), str(time.time()) + ".wav")
         with open(temp, "wb") as f:
             f.write(wav_data)
         gender = GenderClassifier.predict(temp)
-        self._audio = None
-        return {"user": {"gender": gender}}
+        return audio_data, {"user": {"gender": gender}}
 
 
 def create_module():

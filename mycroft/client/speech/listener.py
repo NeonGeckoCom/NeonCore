@@ -82,7 +82,8 @@ class AudioProducer(Thread):
                     audio = self.recognizer.listen(source, self.emitter,
                                                    self.stream_handler)
                     if audio is not None:
-                        context = self.recognizer.audio_consumers.get_context()
+                        audio, context = \
+                            self.recognizer.audio_consumers.get_context(audio)
                         self.queue.put((AUDIO_DATA, audio, context))
                     else:
                         LOG.warning("Audio contains no data.")
