@@ -9,7 +9,10 @@ from speech_recognition import AudioData
 class AudioNormalizer(AudioParser):
     def __init__(self):
         super().__init__("audio_normalizer", 1)
-        self.thresh = 10  # silence_threshold in dB
+        # silence_threshold in dB
+        self.thresh = self.config.get("threshold", 10)
+        # final volume  in dB
+        self.final_db = self.config.get("final_volume", -18.0)
 
     def trim_silence(self, audio_data):
         if isinstance(audio_data, AudioData):
@@ -18,6 +21,7 @@ class AudioNormalizer(AudioParser):
                 sample_width=audio_data.sample_width,
                 frame_rate=audio_data.sample_rate,
                 channels=1
+
             )
         assert isinstance(audio_data, AudioSegment)
         start_trim = self.detect_leading_silence(audio_data,
@@ -28,8 +32,8 @@ class AudioNormalizer(AudioParser):
         trimmed = audio_data[start_trim:-end_trim]
         if len(trimmed) >= 0.15 * len(audio_data):
             audio_data = trimmed
-        if audio_data.dBFS != -18.0:
-            change_needed = -18.0 - audio_data.dBFS
+        if audio_data.dBFS != self.final_db:
+            change_needed = self.final_db - audio_data.dBFS
             audio_data = audio_data.apply_gain(change_needed)
 
         filename = join(tempfile.gettempdir(), str(time.time()) + ".wav")

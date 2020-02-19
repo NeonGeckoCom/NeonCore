@@ -45,6 +45,8 @@ class AudioParser:
         self.name = name
         self.bus = None
         self.priority = priority
+        self.config = Configuration.get().\
+            get("audio_parsers", {}).get( self.name, {})
 
     def bind(self, bus):
         """ attach messagebus """
