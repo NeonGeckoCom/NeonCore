@@ -64,12 +64,16 @@ class AudioParser:
         """ Take any action you want, audio_data is a full wake/hotword
         Common action would be to prepare to received speech chunks
         NOTE: this might be a hotword or a wakeword, listening is not assured
+        NOTE: file consumer will not call this, it is NOT safe to assume
+        this is always called before on_speech
         """
         assert isinstance(audio_data, AudioData)
 
     def on_speech(self, audio_data):
         """ Take any action you want, audio_data is a speech chunk (NOT a
-        full utterance) this is during recording
+        full utterance) during recording
+
+         NOTE: file consumer might send a full utterance
 
          You can do streaming predictions or save the audio_data"""
         assert isinstance(audio_data, AudioData)
