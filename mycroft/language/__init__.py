@@ -49,6 +49,9 @@ class LanguageDetector:
         # assume default language
         return self.default_language
 
+    def detect_probs(self, text):
+        return {self.detect(text): 1}
+
 
 class LanguageTranslator:
     def __init__(self):
@@ -75,6 +78,17 @@ class Pycld2Detector(LanguageDetector):
             return self._detect(text) or \
                    self.default_language
 
+    def detect_probs(self, text):
+        if self.boost:
+            data = self._detect(text, return_multiple=True, return_dict=True,
+                                hint_language=self.hint_language)
+        else:
+            data = self._detect(text, return_multiple=True, return_dict=True)
+        langs = {}
+        for lang in data:
+            langs[lang["lang_code"]] = lang["conf"]
+        return langs
+
 
 class Pycld3Detector(LanguageDetector):
     def __init__(self):
@@ -90,6 +104,17 @@ class Pycld3Detector(LanguageDetector):
             return self._detect(text) or \
                    self.default_language
 
+    def detect_probs(self, text):
+        if self.boost:
+            data = self._detect(text, return_multiple=True, return_dict=True,
+                                hint_language=self.hint_language)
+        else:
+            data = self._detect(text, return_multiple=True, return_dict=True)
+        langs = {}
+        for lang in data:
+            langs[lang["lang_code"]] = lang["conf"]
+        return langs
+
 
 class GoogleDetector(LanguageDetector):
     def __init__(self):
@@ -101,6 +126,48 @@ class GoogleDetector(LanguageDetector):
 
     def detect(self, text):
         return self._detect(text) or self.default_language
+
+    def detect_probs(self, text):
+        lang = self._detect(text, True)
+        return {lang["lang_code"]: lang["conf"]}
+
+
+class FastLangDetector(LanguageDetector):
+    def __init__(self):
+        super().__init__()
+        try:
+            from fastlang import fastlang
+        except ImportError:
+            LOG.error("Run pip install fastlang")
+            raise
+        self._detect = fastlang
+
+    def detect(self, text):
+        return self._detect(text)["lang"]
+
+    def detect_probs(self, text):
+        return self._detect(text)["probabilities"]
+
+
+class LangDetectDetector(LanguageDetector):
+    def __init__(self):
+        super().__init__()
+        try:
+            from langdetect import detect, detect_langs
+        except ImportError:
+            LOG.error("Run pip install langdetect")
+            raise
+        self._detect = detect
+        self._detect_prob = detect_langs
+
+    def detect(self, text):
+        return self._detect(text)
+
+    def detect_probs(self, text):
+        langs = {}
+        for lang in self._detect_prob(text):
+            langs[lang.lang] = lang.prob
+        return langs
 
 
 class GoogleTranslator(LanguageTranslator):
@@ -149,6 +216,15 @@ class AmazonDetector(LanguageDetector):
         )
         return response['Languages'][0]['LanguageCode']
 
+    def detect_probs(self, text):
+        response = self.client.detect_dominant_language(
+            Text=text
+        )
+        langs = {}
+        for lang in response["Languages"]:
+            langs[lang["LanguageCode"]] = lang["Score"]
+        return langs
+
 
 class TranslatorFactory:
     CLASSES = {
@@ -179,13 +255,15 @@ class DetectorFactory:
         "amazon": AmazonDetector,
         "google": GoogleDetector,
         "cld2": Pycld2Detector,
-        "cld3": Pycld3Detector
+        "cld3": Pycld3Detector,
+        "fastlang": FastLangDetector,
+        "detect": LangDetectDetector
     }
 
     @staticmethod
     def create(module=None):
         config = Configuration.get().get("language", {})
-        module = module or config.get("detection_module", "cld3")
+        module = module or config.get("detection_module", "fastlang")
         try:
             clazz = DetectorFactory.CLASSES.get(module)
             return clazz()
@@ -194,8 +272,8 @@ class DetectorFactory:
             # default.
             LOG.exception('The selected language detector backend could not be loaded, '
                           'falling back to default...')
-            if module != 'cld3':
-                return Pycld3Detector()
+            if module != 'fastlang':
+                return FastLangDetector()
             else:
                 raise
 
@@ -204,6 +282,14 @@ if __name__ == "__main__":
     texts = ["My name is neon",
              "O meu nome é jarbas"]
 
+    d = LangDetectDetector()
+    assert d.detect(texts[0]) == "en"
+    assert d.detect(texts[1]) == "pt"
+
+    d = FastLangDetector()
+    assert d.detect(texts[0]) == "en"
+    assert d.detect(texts[1]) == "pt"
+
     d = AmazonDetector()
     assert d.detect(texts[0]) == "en"
     assert d.detect(texts[1]) == "pt"
@@ -211,18 +297,18 @@ if __name__ == "__main__":
     t = AmazonTranslator()
     assert t.translate(texts[1]) == "My name is jarbas"
 
-    t = TranslatorFactory.create()
+    t = GoogleTranslator()
     assert t.translate(texts[1]) == "My name is jarbas"
 
-    d = DetectorFactory.create()
+    d = GoogleDetector()
     assert d.detect(texts[0]) == "en"
     assert d.detect(texts[1]) == "pt"
 
-    d = DetectorFactory.create("cld3")
+    d = Pycld2Detector()
     assert d.detect(texts[0]) == "en"
     assert d.detect(texts[1]) == "pt"
 
-    d = DetectorFactory.create("google")
+    d = Pycld3Detector()
     assert d.detect(texts[0]) == "en"
     assert d.detect(texts[1]) == "pt"
 

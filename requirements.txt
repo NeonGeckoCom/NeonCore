@@ -30,8 +30,10 @@ petact==0.1.2
 
 
 jarbas_utils==0.4.1
-pycld2 # optional, needed for lang detection
-pycld3 # optional, needed for lang detection
+fastlang
+#langdetect #  optional, lang detection module
+#pycld2 # optional, lang detection module
+#pycld3 # optional, lang detection module
 hyper  # optional, enables http2 for google translate which makes it faster
 boto3
 numpy
