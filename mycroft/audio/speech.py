@@ -96,8 +96,6 @@ def handle_speak(event):
             utterance = re.sub(r'\b([A-za-z][\.])(\s+)', r'\g<1>', utterance)
             chunks = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\;|\?)\s',
                               utterance)
-            # Apply the listen flag to the last chunk, set the rest to False
-            chunks = [(chunks[i] if i == len(chunks) - 1 else False) for i in range(len(chunks))]
             for chunk in chunks:
                 # Check if somthing has aborted the speech
                 if (_last_stop_signal > start or
@@ -127,7 +125,6 @@ def mute_and_speak(utterance, event):
         ident:      Ident tying the utterance to the source query
     """
     global tts_hash, speak_muted
-
     LOG.info("Speak: " + utterance)
     if speak_muted:
         LOG.warning("Tried to speak, but TTS is muted!")

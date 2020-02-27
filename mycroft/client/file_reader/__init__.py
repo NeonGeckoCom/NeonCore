@@ -49,7 +49,7 @@ class FileConsumer(Thread):
                 self.parsers_service.feed_speech(audio)
                 audio, context = self.parsers_service.get_context(audio)
                 context = merge_dict(context,
-                                     {"source": "wav_client",
+                                     {"source": "audio",
                                       "destination": "skills"})
                 text = self.stt.execute(audio).lower().strip()
                 self.bus.emit(
