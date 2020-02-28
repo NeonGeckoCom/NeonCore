@@ -16,6 +16,7 @@ import json
 import time
 import traceback
 from threading import Event
+import ssl
 
 from websocket import (
     WebSocketApp,
@@ -203,7 +204,13 @@ class MessageBusClient:
 
     def run_forever(self):
         self.started_running = True
-        self.client.run_forever()
+        if self.config.allow_self_signed:
+            self.client.run_forever(sslopt={
+                "cert_reqs": ssl.CERT_NONE,
+                "check_hostname": False,
+                "ssl_version": ssl.PROTOCOL_TLSv1})
+        else:
+            self.client.run_forever()
 
     def close(self):
         self.client.close()

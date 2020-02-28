@@ -24,7 +24,8 @@ from mycroft.util.log import LOG
 
 MessageBusConfig = namedtuple(
     'MessageBusConfig',
-    ['host', 'port', 'route', 'ssl']
+    ['host', 'port', 'route', 'ssl', 'allow_self_signed', 'ssl_cert',
+     'ssl_key']
 )
 
 
@@ -32,7 +33,6 @@ def load_message_bus_config(**overrides):
     """Load the bits of device configuration needed to run the message bus."""
     LOG.info('Loading message bus configs')
     config = Configuration.get()
-
     try:
         websocket_configs = config['websocket']
     except KeyError as ke:
@@ -43,7 +43,11 @@ def load_message_bus_config(**overrides):
             host=overrides.get('host') or websocket_configs.get('host'),
             port=overrides.get('port') or websocket_configs.get('port'),
             route=overrides.get('route') or websocket_configs.get('route'),
-            ssl=overrides.get('ssl') or config.get('ssl')
+            ssl=overrides.get('ssl') or websocket_configs.get('ssl'),
+            allow_self_signed=overrides.get("allow_self_signed") or
+                              websocket_configs.get("allow_self_signed", False),
+            ssl_cert=overrides.get("ssl_cert") or websocket_configs.get("ssl_cert"),
+            ssl_key=overrides.get("ssl_key") or websocket_configs.get("ssl_key")
         )
         if not all([mb_config.host, mb_config.port, mb_config.route]):
             error_msg = 'Missing one or more websocket configs'

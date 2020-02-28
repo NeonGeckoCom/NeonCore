@@ -19,7 +19,7 @@ processes. It implements a websocket server so can also be used by external
 systems to integrate with the Mycroft system.
 """
 import sys
-
+from os.path import expanduser
 from tornado import autoreload, web, ioloop
 
 from mycroft.lock import Lock  # creates/supports PID locking file
@@ -49,7 +49,25 @@ def main():
     config = load_message_bus_config()
     routes = [(config.route, MessageBusEventHandler)]
     application = web.Application(routes, debug=True)
-    application.listen(config.port, config.host)
+
+    ssl_options = None
+    if config.ssl:
+        cert = expanduser(config.ssl_cert)
+        key = expanduser(config.ssl_key)
+        if not key or not cert:
+            LOG.error("ssl keys dont exist, falling back to unsecured socket")
+
+        else:
+            LOG.info("using ssl key at " + key)
+            LOG.info("using ssl certificate at " + cert)
+            ssl_options = {"certfile": cert, "keyfile": key}
+    if ssl_options:
+        LOG.info("wss connection started")
+        application.listen(config.port, config.host, ssl_options=ssl_options)
+    else:
+        LOG.info("ws connection started")
+        application.listen(config.port, config.host)
+
     create_daemon(ioloop.IOLoop.instance().start)
     LOG.info('Message bus service started!')
     wait_for_exit_signal()
