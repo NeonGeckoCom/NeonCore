@@ -19,7 +19,7 @@ processes. It implements a websocket server so can also be used by external
 systems to integrate with the Mycroft system.
 """
 import sys
-from os.path import expanduser
+from os.path import expanduser, isfile
 from tornado import autoreload, web, ioloop
 
 from mycroft.lock import Lock  # creates/supports PID locking file
@@ -54,9 +54,8 @@ def main():
     if config.ssl:
         cert = expanduser(config.ssl_cert)
         key = expanduser(config.ssl_key)
-        if not key or not cert:
+        if not isfile(key) or not isfile(cert):
             LOG.error("ssl keys dont exist, falling back to unsecured socket")
-
         else:
             LOG.info("using ssl key at " + key)
             LOG.info("using ssl certificate at " + cert)
