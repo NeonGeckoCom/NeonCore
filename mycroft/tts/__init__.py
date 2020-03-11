@@ -492,7 +492,7 @@ class TTSFactory:
     from mycroft.tts.spdsay_tts import SpdSay
     from mycroft.tts.bing_tts import BingTTS
     from mycroft.tts.ibm_tts import WatsonTTS
-    from mycroft.tts.responsive_voice_tts import ResponsiveVoice
+    from mycroft.tts.responsive_voice_tts import ResponsiveVoiceTTS
     from mycroft.tts.mimic2_tts import Mimic2
     from mycroft.tts.yandex_tts import YandexTTS
     from mycroft.tts.polly_tts import PollyTTS
@@ -507,7 +507,7 @@ class TTSFactory:
         "spdsay": SpdSay,
         "watson": WatsonTTS,
         "bing": BingTTS,
-        "responsive_voice": ResponsiveVoice,
+        "responsive_voice": ResponsiveVoiceTTS,
         "yandex": YandexTTS,
         "polly": PollyTTS
     }
