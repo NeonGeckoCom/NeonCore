@@ -25,11 +25,15 @@ from mycroft.messagebus.message import Message
 from mycroft.util import create_daemon, wait_for_exit_signal, \
     reset_sigint_handler, create_echo_function
 from mycroft.util.log import LOG
+from mycroft.util.json_helper import merge_dict
+from mycroft.processing_modules.audio import AudioParsersService
+
 
 bus = None  # Mycroft messagebus connection
 lock = Lock()
 loop = None
 config = None
+service = None
 
 
 def handle_record_begin():
@@ -72,6 +76,9 @@ def handle_utterance(event):
     context = {'client_name': 'mycroft_listener',
                'source': 'audio',
                'destination': ["skills"]}
+    if "data" in event:
+        data = event.pop("data")
+        context = merge_dict(context, data)
     if 'ident' in event:
         ident = event.pop('ident')
         context['ident'] = ident
@@ -193,6 +200,7 @@ def main():
     global bus
     global loop
     global config
+    global service
     reset_sigint_handler()
     PIDLock("voice")
     bus = MessageBusClient()  # Mycroft messagebus, see mycroft.messagebus
@@ -226,6 +234,11 @@ def main():
     bus.on('message', create_echo_function('VOICE'))
 
     create_daemon(bus.run_forever)
+
+    service = AudioParsersService(bus)
+    service.start()
+    loop.bind(service)
+
     create_daemon(loop.run)
 
     wait_for_exit_signal()

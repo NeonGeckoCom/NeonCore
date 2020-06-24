@@ -37,6 +37,7 @@ fastlang
 hyper  # optional, enables http2 for google translate which makes it faster
 boto3
 numpy
+pydub
 
 imutils
 opencv-python

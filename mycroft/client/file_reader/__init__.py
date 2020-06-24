@@ -1,13 +1,10 @@
-import sys
-
-from threading import Thread, Lock, Event
+from threading import Thread, Event
 
 from os.path import exists
 from mycroft.stt import STTFactory
-from mycroft.configuration import Configuration
 from mycroft.util.log import LOG
-from mycroft.messagebus import MessageBusClient
 from mycroft.messagebus.message import Message
+from mycroft.util.json_helper import merge_dict
 import speech_recognition as sr
 import time
 from os import remove
@@ -36,6 +33,10 @@ class FileConsumer(Thread):
         self.bus.on("stt.request", self.handle_external_request)
         self.bus.on("recognizer_loop:server_utterance",
                     self.handle_server_request)
+        self.parsers_service = None
+
+    def bind(self, audio_parsers):
+        self.parsers_service = audio_parsers
 
     def run(self):
         """
@@ -44,12 +45,17 @@ class FileConsumer(Thread):
         while not self.stop_event.is_set():
             if exists(self.path):
                 audio = read_wave_file(self.path)
+
+                self.parsers_service.feed_speech(audio)
+                audio, context = self.parsers_service.get_context(audio)
+                context = merge_dict(context,
+                                     {"source": "audio",
+                                      "destination": "skills"})
                 text = self.stt.execute(audio).lower().strip()
                 self.bus.emit(
                     Message("recognizer_loop:utterance",
                             {"utterances": [text]},
-                            {"source": "wav_client",
-                             "destination": "skills"}))
+                            context))
                 remove(self.path)
             time.sleep(0.5)
 
@@ -68,9 +74,14 @@ class FileConsumer(Thread):
                               {"error": error}))
         else:
             audio = read_wave_file(file)
+            self.parsers_service.feed_speech(audio)
+            audio, context = self.parsers_service.get_context(audio)
+            context = merge_dict(context, message.context)
             transcript = self.stt.execute(audio).lower().strip()
-            self.bus.emit(message.reply("recognizer_loop:utterance",
-                                        {"utterances": [transcript]}))
+            message = message.reply("recognizer_loop:utterance",
+                                    {"utterances": [transcript]})
+            message.context = context
+            self.bus.emit(message)
 
     def handle_external_request(self, message):
         """ Standalone request, transcription is returned but NOT processed """
@@ -85,37 +96,15 @@ class FileConsumer(Thread):
                 message.reply("stt.error", {"error": error}))
         else:
             audio = read_wave_file(file)
+            self.parsers_service.feed_speech(audio)
+            audio, context = self.parsers_service.get_context(audio)
+            context = merge_dict(context, message.context)
             transcript = self.stt.execute(audio).lower().strip()
-            self.bus.emit(message.reply("stt.reply",
-                                        {"transcription": transcript}))
+            message = message.reply("stt.reply",
+                                    {"transcription": transcript})
+            message.context = context
+            self.bus.emit(message)
 
     def stop(self):
         self.stop_event.set()
 
-
-def main():
-    ws = MessageBusClient()
-    config = Configuration.get()
-
-    def connect():
-        ws.run_forever()
-
-    event_thread = Thread(target=connect)
-    event_thread.setDaemon(True)
-    event_thread.start()
-    config = config.get("wav_client",
-                        {"path": "/tmp/mycroft_in.wav"})
-    try:
-        file_consumer = FileConsumer(file_location=config["path"], bus=ws)
-        file_consumer.start()
-        while True:
-            time.sleep(100)
-    except KeyboardInterrupt as e:
-        LOG.exception(e)
-        file_consumer.stop()
-        file_consumer.join()
-        sys.exit()
-
-
-if __name__ == "__main__":
-    main()
