@@ -44,4 +44,4 @@ opencv-python
 opencv-contrib-python
 
 # text parser modules
-RAKEkeywords
+RAKEkeywords>=0.2.0
