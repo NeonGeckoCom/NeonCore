@@ -43,7 +43,7 @@ from mycroft.util import (
     play_wav, play_mp3, play_ogg
 )
 from mycroft.util.log import LOG
-from jarbas_utils.lang.phonemes import get_phonemes
+from ovos_utils.lang.phonemes import get_phonemes
 
 
 class MutableStream:
