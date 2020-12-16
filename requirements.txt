@@ -34,7 +34,7 @@ fastlang
 #langdetect #  optional, lang detection module
 #pycld2 # optional, lang detection module
 #pycld3 # optional, lang detection module
-hyper  # optional, enables http2 for google translate which makes it faster
+
 boto3
 numpy
 pydub
