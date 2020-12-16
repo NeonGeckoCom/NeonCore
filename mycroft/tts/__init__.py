@@ -34,6 +34,7 @@ from mycroft.util import (
     play_wav, play_mp3, check_for_signal, create_signal, resolve_resource_file
 )
 from mycroft.util.log import LOG
+from mycroft.util.plugins import load_plugin
 from queue import Queue, Empty
 
 
@@ -41,15 +42,7 @@ _TTS_ENV = deepcopy(os.environ)
 _TTS_ENV['PULSE_PROP'] = 'media.role=phone'
 
 
-def send_playback_metric(stopwatch, ident):
-    """Send playback metrics in a background thread."""
-
-    def do_send(stopwatch, ident):
-        report_timing(ident, 'speech_playback', stopwatch)
-
-    t = Thread(target=do_send, args=(stopwatch, ident))
-    t.daemon = True
-    t.start()
+EMPTY_PLAYBACK_QUEUE_TUPLE = (None, None, None, None, None)
 
 
 class PlaybackThread(Thread):
@@ -62,6 +55,8 @@ class PlaybackThread(Thread):
         self.queue = queue
         self._terminated = False
         self._processing_queue = False
+        self.enclosure = None
+        self.p = None
         # Check if the tts shall have a ducking role set
         if Configuration.get().get('tts', {}).get('pulse_duck'):
             self.pulse_env = _TTS_ENV
@@ -111,12 +106,12 @@ class PlaybackThread(Thread):
                         self.p = play_wav(data, environment=self.pulse_env)
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data, environment=self.pulse_env)
-
                     if visemes:
                         self.show_visemes(visemes)
-                    self.p.communicate()
-                    self.p.wait()
-                send_playback_metric(stopwatch, ident)
+                    if self.p:
+                        self.p.communicate()
+                        self.p.wait()
+                report_timing(ident, 'speech_playback', stopwatch)
 
                 if self.queue.empty():
                     self.tts.end_audio(listen)
@@ -200,7 +195,7 @@ class TTS(metaclass=ABCMeta):
 
     def load_spellings(self):
         """Load phonetic spellings of words as dictionary"""
-        path = join('text', self.lang, 'phonetic_spellings.txt')
+        path = join('text', self.lang.lower(), 'phonetic_spellings.txt')
         spellings_file = resolve_resource_file(path)
         if not spellings_file:
             return {}
@@ -345,6 +340,15 @@ class TTS(metaclass=ABCMeta):
         if detected_lang != user_lang.split("-")[0]:
             sentence = self.translator.translate(sentence, user_lang)
         create_signal("isSpeaking")
+        try:
+            self._execute(sentence, ident, listen)
+        except Exception:
+            # If an error occurs end the audio sequence through an empty entry
+            self.queue.put(EMPTY_PLAYBACK_QUEUE_TUPLE)
+            # Re-raise to allow the Exception to be handled externally as well.
+            raise
+
+    def _execute(self, sentence, ident, listen):
         if self.phonetic_spelling:
             for word in re.findall(r"[\w']+", sentence):
                 if word.lower() in self.spellings:
@@ -483,6 +487,15 @@ class TTSValidator(metaclass=ABCMeta):
         pass
 
 
+def load_tts_plugin(module_name):
+    """Wrapper function for loading tts plugin.
+
+    Arguments:
+        (str) Mycroft tts module name from config
+    """
+    return load_plugin('mycroft.plugin.tts', module_name)
+
+
 class TTSFactory:
     from mycroft.tts.espeak_tts import ESpeak
     from mycroft.tts.fa_tts import FATTS
@@ -529,20 +542,26 @@ class TTSFactory:
         tts_config = config.get('tts', {}).get(tts_module, {})
         tts_lang = tts_config.get('lang', lang)
         try:
-            clazz = TTSFactory.CLASSES.get(tts_module)
+            if tts_module in TTSFactory.CLASSES:
+                clazz = TTSFactory.CLASSES[tts_module]
+            else:
+                clazz = load_tts_plugin(tts_module)
+                LOG.info('Loaded plugin {}'.format(tts_module))
+            if clazz is None:
+                raise ValueError('TTS module not found')
+
             tts = clazz(tts_lang, tts_config)
             tts.validator.validate()
-
         except Exception as e:
             # Fallback to mimic if an error occurs while loading.
             if tts_module != 'mimic':
                 LOG.exception('The selected TTS backend couldn\'t be loaded. '
                               'Falling back to Mimic')
-                from mycroft.tts.mimic_tts import Mimic
-                tts = Mimic(tts_lang, tts_config)
+                clazz = TTSFactory.CLASSES.get('mimic')
+                tts = clazz(tts_lang, tts_config)
                 tts.validator.validate()
             else:
                 LOG.exception('The TTS could not be loaded.')
                 raise
-        LOG.debug("TTS Loaded: " + tts.__class__.__name__)
+
         return tts

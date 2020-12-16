@@ -30,6 +30,7 @@ from petact import install_package
 from mycroft.configuration import Configuration, LocalConf, USER_CONFIG
 from mycroft.util.log import LOG
 from mycroft.util import resolve_resource_file
+from mycroft.util.plugins import load_plugin
 
 
 RECOGNIZER_DIR = join(abspath(dirname(__file__)), "recognizer")
@@ -308,6 +309,15 @@ class SnowboyHotWord(HotWordEngine):
         return wake_word == 1
 
 
+def load_wake_word_plugin(module_name):
+    """Wrapper function for loading wake word plugin.
+
+    Arguments:
+        (str) Mycroft wake word module name from config
+    """
+    return load_plugin('mycroft.plugin.wake_word', module_name)
+
+
 class HotWordFactory:
     CLASSES = {
         "pocketsphinx": PocketsphinxHotWord,
@@ -324,7 +334,12 @@ class HotWordFactory:
         def initialize():
             nonlocal instance, complete
             try:
-                clazz = HotWordFactory.CLASSES[module]
+                if module in HotWordFactory.CLASSES:
+                    clazz = HotWordFactory.CLASSES[module]
+                else:
+                    clazz = load_wake_word_plugin(module)
+                    LOG.info('Loaded the Wake Word plugin {}'.format(module))
+
                 instance = clazz(hotword, config, lang=lang)
             except TriggerReload:
                 complete.set()
