@@ -42,3 +42,6 @@ pydub
 imutils
 opencv-python
 opencv-contrib-python
+
+# text parser modules
+RAKEkeywords
