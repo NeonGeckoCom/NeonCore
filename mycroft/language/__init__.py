@@ -173,8 +173,8 @@ class LangDetectDetector(LanguageDetector):
 class GoogleTranslator(LanguageTranslator):
     def __init__(self):
         super().__init__()
-        from jarbas_utils.lang.translate import translate_text
-        self._translate = translate_text
+        from ovos_utils.lang.translate import translate_google
+        self._translate = translate_google
 
     def translate(self, text, target=None, source=None):
         if self.boost and not source:

@@ -29,7 +29,7 @@ precise-runner==0.2.1
 petact==0.1.2
 
 
-jarbas_utils==0.4.1
+ovos_utils>=0.0.2
 fastlang
 #langdetect #  optional, lang detection module
 #pycld2 # optional, lang detection module
