@@ -23,6 +23,7 @@ from threading import Thread
 from mycroft.api import STTApi, HTTPError
 from mycroft.configuration import Configuration, get_private_keys
 from mycroft.util.log import LOG
+from mycroft.util.plugins import load_plugin
 
 
 class STT(metaclass=ABCMeta):
@@ -518,6 +519,15 @@ class GoVivaceSTT(TokenSTT):
         return response.json()["result"]["hypotheses"][0]["transcript"]
 
 
+def load_stt_plugin(module_name):
+    """Wrapper function for loading stt plugin.
+
+    Arguments:
+        (str) Mycroft stt module name from config
+    """
+    return load_plugin('mycroft.plugin.stt', module_name)
+
+
 class STTFactory:
     CLASSES = {
         "mycroft": MycroftSTT,
@@ -542,7 +552,11 @@ class STTFactory:
         try:
             config = Configuration.get().get("stt", {})
             module = config.get("module", "mycroft")
-            clazz = STTFactory.CLASSES.get(module)
+            if module in STTFactory.CLASSES:
+                clazz = STTFactory.CLASSES[module]
+            else:
+                load_stt_plugin(module)
+                LOG.info('Loaded the STT plugin {}'.format(module))
             return clazz()
         except Exception as e:
             # The STT backend failed to start. Report it and fall back to
