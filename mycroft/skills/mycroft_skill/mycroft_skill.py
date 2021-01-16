@@ -60,6 +60,7 @@ from ..skill_data import (
     read_value_file,
     read_translated_file
 )
+from padatious import IntentContainer
 
 
 def simple_trace(stack_trace):
@@ -159,6 +160,13 @@ class MycroftSkill:
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
 
+        # conversational intents
+        intent_cache = join(self.file_system.path, "intent_cache")
+        self.intent_parser = IntentContainer(intent_cache)
+        if "min_intent_conf" not in self.settings:
+            self.settings["min_intent_conf"] = 0.6
+        self.converse_intents = {}
+
     @property
     def enclosure(self):
         if self._enclosure:
@@ -221,6 +229,7 @@ class MycroftSkill:
             self.event_scheduler.set_id(self.skill_id)
             self._enclosure = EnclosureAPI(bus, self.name)
             self._register_system_event_handlers()
+            self.train_internal_intents()
             # Initialize the SkillGui
             self.gui.setup_default_handlers()
 
@@ -251,6 +260,39 @@ class MycroftSkill:
         )
         self.add_event("converse.deactivated", self._deactivate_skill)
         self.add_event("converse.activated", self._activate_skill)
+
+    def register_converse_intent(self, intent_file, handler):
+        """ converse padatious intents """
+        name = '{}.converse:{}'.format(self.skill_id, intent_file)
+        filename = self.find_resource(intent_file, 'vocab')
+        if not filename:
+            raise FileNotFoundError('Unable to find "{}"'.format(intent_file))
+        self.intent_parser.load_intent(name, filename)
+        self.converse_intents[name] = self.create_event_wrapper(handler)
+
+    def train_internal_intents(self):
+        """ train internal padatious parser """
+        self.intent_parser.train(single_thread=True)
+
+    def handle_internal_intents(self, message):
+        """ called before converse method
+        this gives active skills a chance to parse their own intents and
+        consume the utterance, see conversational_intent decorator for usage
+        """
+        best_match = None
+        best_score = 0
+        for utt in message.data['utterances']:
+            match = self.intent_parser.calc_intent(utt)
+            if match and match.conf > best_score:
+                best_match = match
+                best_score = match.conf
+
+        if best_score < self.settings["min_intent_conf"]:
+            return False
+        # call handler for intent
+        message = message.forward(best_match.name, best_match.matches)
+        self.converse_intents[best_match.name](message)
+        return True
 
     def _deactivate_skill(self, message):
         skill_id = message.data.get("skill_id")
@@ -696,6 +738,10 @@ class MycroftSkill:
                 for intent_file in getattr(method, 'intent_files'):
                     self.register_intent_file(intent_file, method)
 
+            if hasattr(method, 'converse_intents'):
+                for intent_file in getattr(method, 'converse_intents'):
+                    self.register_converse_intent(intent_file, method)
+
     def translate(self, text, data=None):
         """Load a translatable single string resource
 
@@ -836,17 +882,7 @@ class MycroftSkill:
         filename = self.find_resource(name, 'dialog')
         return read_translated_file(filename, data)
 
-    def add_event(self, name, handler, handler_info=None, once=False):
-        """Create event handler for executing intent or other event.
-
-        Arguments:
-            name (string): IntentParser name
-            handler (func): Method to call
-            handler_info (string): Base message when reporting skill event
-                                   handler status on messagebus.
-            once (bool, optional): Event handler will be removed after it has
-                                   been run once.
-        """
+    def create_event_wrapper(self, handler, handler_info=None):
         skill_data = {'name': get_handler_name(handler)}
 
         def on_error(e):
@@ -877,8 +913,21 @@ class MycroftSkill:
                 msg_type = handler_info + '.complete'
                 self.bus.emit(message.forward(msg_type, skill_data))
 
-        wrapper = create_wrapper(handler, self.skill_id, on_start, on_end,
-                                 on_error)
+        return create_wrapper(handler, self.skill_id, on_start, on_end,
+                              on_error)
+
+    def add_event(self, name, handler, handler_info=None, once=False):
+        """Create event handler for executing intent or other event.
+
+        Arguments:
+            name (string): IntentParser name
+            handler (func): Method to call
+            handler_info (string): Base message when reporting skill event
+                                   handler status on messagebus.
+            once (bool, optional): Event handler will be removed after it has
+                                   been run once.
+        """
+        wrapper = self.create_event_wrapper(handler, handler_info)
         return self.events.add(name, wrapper, once)
 
     def remove_event(self, name):
@@ -958,6 +1007,7 @@ class MycroftSkill:
         self.intent_service.register_padatious_intent(name, filename)
         if handler:
             self.add_event(name, handler, 'mycroft.skill.handler')
+
 
     def register_entity_file(self, entity_file):
         """Register an Entity file with the intent service.
