@@ -22,7 +22,7 @@ padatious==0.4.8
 fann2==1.0.7
 precise-runner==0.2.1
 petact==0.1.2
-
+rapidfuzz
 
 ovos_utils>=0.0.5
 fastlang

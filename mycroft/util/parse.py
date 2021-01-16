@@ -47,9 +47,13 @@ from mycroft.util.lang.parse_da import normalize_da
 from mycroft.util.lang.parse_nl import extractnumber_nl
 from mycroft.util.lang.parse_nl import extract_datetime_nl
 from mycroft.util.lang.parse_nl import normalize_nl
-
-
-from .log import LOG
+from mycroft.util.log import LOG
+from enum import IntEnum, auto
+try:
+    # optional requirement
+    import rapidfuzz
+except ImportError:
+    rapidfuzz = None
 
 
 def _log_unsupported_language(language, supported_languages):
@@ -68,16 +72,57 @@ def _log_unsupported_language(language, supported_languages):
                 .format(language=language, supported=supported))
 
 
-def fuzzy_match(x, against):
+class MatchStrategy(IntEnum):
+    SIMPLE_RATIO = auto()
+    RATIO = auto()
+    PARTIAL_RATIO = auto()
+    TOKEN_SORT_RATIO = auto()
+    TOKEN_SET_RATIO = auto()
+    PARTIAL_TOKEN_RATIO = auto()
+    PARTIAL_TOKEN_SORT_RATIO = auto()
+    PARTIAL_TOKEN_SET_RATIO = auto()
+    QUICK_LEV_RATIO = auto()
+
+
+def _validate_matching_strategy(strategy):
+    if rapidfuzz is None and strategy != MatchStrategy.SIMPLE_RATIO:
+        LOG.error("rapidfuzz is not installed, "
+                  "falling back to SequenceMatcher for all match strategies")
+        LOG.warning("pip install rapidfuzz")
+        return MatchStrategy.SIMPLE_RATIO
+    return strategy
+
+
+def fuzzy_match(x, against, strategy=MatchStrategy.SIMPLE_RATIO):
     """Perform a 'fuzzy' comparison between two strings.
     Returns:
         float: match percentage -- 1.0 for perfect match,
                down to 0.0 for no match at all.
     """
-    return SequenceMatcher(None, x, against).ratio()
+    strategy = _validate_matching_strategy(strategy)
+    if strategy == MatchStrategy.RATIO:
+        score = rapidfuzz.fuzz.ratio(x, against) / 100
+    elif strategy == MatchStrategy.PARTIAL_RATIO:
+        score = rapidfuzz.fuzz.partial_ratio(x, against) / 100
+    elif strategy == MatchStrategy.TOKEN_SORT_RATIO:
+        score = rapidfuzz.fuzz.token_sort_ratio(x, against) / 100
+    elif strategy == MatchStrategy.TOKEN_SET_RATIO:
+        score = rapidfuzz.fuzz.token_set_ratio(x, against) / 100
+    elif strategy == MatchStrategy.PARTIAL_TOKEN_SORT_RATIO:
+        score = rapidfuzz.fuzz.partial_token_sort_ratio(x, against) / 100
+    elif strategy == MatchStrategy.PARTIAL_TOKEN_SET_RATIO:
+        score = rapidfuzz.fuzz.partial_token_set_ratio(x, against) / 100
+    elif strategy == MatchStrategy.PARTIAL_TOKEN_RATIO:
+        score = rapidfuzz.fuzz.partial_token_ratio(x, against) / 100
+    elif strategy == MatchStrategy.QUICK_LEV_RATIO:
+        score = rapidfuzz.fuzz.quick_lev_ratio(x, against) / 100
+    else:
+        score = SequenceMatcher(None, x, against).ratio()
+
+    return score
 
 
-def match_one(query, choices):
+def match_one(query, choices, match_func=None, strategy=MatchStrategy.SIMPLE_RATIO):
     """
         Find best match from a list or dictionary given an input
 
@@ -87,23 +132,37 @@ def match_one(query, choices):
 
         Returns: tuple with best match, score
     """
+    return match_all(query, choices, match_func, strategy)[0]
+
+
+def match_all(query, choices, match_func=None, strategy=MatchStrategy.SIMPLE_RATIO):
+    """
+        match scores from a list or dictionary given an input
+
+        Arguments:
+            query:   string to test
+            choices: list or dictionary of choices
+
+        Returns: list of tuples (match, score)
+    """
+    strategy = _validate_matching_strategy(strategy)
+    match_func = match_func or fuzzy_match
     if isinstance(choices, dict):
         _choices = list(choices.keys())
     elif isinstance(choices, list):
         _choices = choices
     else:
         raise ValueError('a list or dict of choices must be provided')
+    matches = []
+    for c in _choices:
+        if isinstance(choices, dict):
+            matches.append((choices[c], match_func(query, c, strategy)))
+        else:
+            matches.append((c, match_func(query, c, strategy)))
 
-    best = (_choices[0], fuzzy_match(query, _choices[0]))
-    for c in _choices[1:]:
-        score = fuzzy_match(query, c)
-        if score > best[1]:
-            best = (c, score)
+    # TODO solve ties
 
-    if isinstance(choices, dict):
-        return (choices[best[0]], best[1])
-    else:
-        return best
+    return sorted(matches, key=lambda k: k[1], reverse=True)
 
 
 def extract_numbers(text, short_scale=True, ordinals=False, lang=None):
