@@ -249,18 +249,32 @@ class MycroftSkill:
             'mycroft.skills.settings.changed',
             self.handle_settings_change
         )
-        self.add_event("converse.deactivate", self._deactivate_skill)
+        self.add_event("converse.deactivated", self._deactivate_skill)
+        self.add_event("converse.activated", self._activate_skill)
 
     def _deactivate_skill(self, message):
         skill_id = message.data.get("skill_id")
         if skill_id == self.skill_id:
-            self.on_deactivate()
+            self.handle_skill_deactivated()
 
-    def on_deactivate(self):
+    def _activate_skill(self, message):
+        skill_id = message.data.get("skill_id")
+        if skill_id == self.skill_id:
+            self.handle_skill_activated()
+
+    def handle_skill_deactivated(self):
         """
         Invoked when the skill is removed from active skill list
 
         This means Converse method won't be called anymore
+        """
+        pass
+
+    def handle_skill_activated(self):
+        """
+        Invoked when the skill is added to active skill list
+
+        This means Converse method will be called from now on
         """
         pass
 

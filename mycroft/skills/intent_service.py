@@ -274,6 +274,8 @@ class IntentService:
         self.remove_active_skill(skill_id)
         # add skill with timestamp to start of skill_list
         self.active_skills.insert(0, [skill_id, time.time()])
+        self.bus.emit(Message("converse.activated",
+                              {"skill_id": skill_id}))
 
     def update_context(self, intent):
         """ Updates context with keyword from the intent.
@@ -432,7 +434,7 @@ class IntentService:
         # check for conversation time-out
         for skill in list(self.active_skills):
             if time.time() - skill[1] <= self.converse_timeout * 60:
-                self.bus.emit(Message("converse.deactivate",
+                self.bus.emit(Message("converse.deactivated",
                                           {"skill_id": skill[0]}))
                 self.active_skills.remove(skill)
 
