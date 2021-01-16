@@ -178,16 +178,11 @@ class IntentService:
         self.bus.on('add_context', self.handle_add_context)
         self.bus.on('remove_context', self.handle_remove_context)
         self.bus.on('clear_context', self.handle_clear_context)
-        # Converse method
-        self.bus.on('skill.converse.response', self.handle_converse_response)
-        self.bus.on('skill.converse.error', self.handle_converse_error)
         self.bus.on('mycroft.speech.recognition.unknown', self.reset_converse)
         self.bus.on('mycroft.skills.loaded', self.update_skill_name_dict)
 
-        def add_active_skill_handler(message):
-            self.add_active_skill(message.data['skill_id'])
+        self._setup_converse_handlers()
 
-        self.bus.on('active_skill_request', add_active_skill_handler)
         self.active_skills = []  # [skill_id , timestamp]
         self.converse_timeout = 5  # minutes to prune active_skills
         self.waiting_for_converse = False
@@ -208,6 +203,23 @@ class IntentService:
         self.bus.on('intent.service.adapt.manifest.get', self.handle_manifest)
         self.bus.on('intent.service.adapt.vocab.manifest.get',
                     self.handle_vocab_manifest)
+
+    def _setup_converse_handlers(self):
+        self.bus.on('skill.converse.response', self.handle_converse_response)
+        self.bus.on('skill.converse.error', self.handle_converse_error)
+        self.bus.on('skill.converse.activate_skill',
+                    self.handle_activate_skill)
+        self.bus.on('skill.converse.deactivate_skill',
+                    self.handle_deactivate_skill)
+        # backwards compat
+        self.bus.on('active_skill_request',
+                    self.handle_activate_skill)
+
+    def handle_activate_skill(self, message):
+        self.add_active_skill(message.data['skill_id'])
+
+    def handle_deactivate_skill(self, message):
+        self.remove_active_skill(message.data['skill_id'])
 
     def update_skill_name_dict(self, message):
         """

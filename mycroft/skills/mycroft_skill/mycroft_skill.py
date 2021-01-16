@@ -598,14 +598,28 @@ class MycroftSkill:
         """
         DeviceApi().send_email(title, body, basename(self.root_dir))
 
-    def make_active(self):
+    def activate_skill(self):
         """Bump skill to active_skill list in intent_service.
 
         This enables converse method to be called even without skill being
         used in last 5 minutes.
         """
-        self.bus.emit(Message('active_skill_request',
+        self.bus.emit(Message('skill.converse.activate_skill',
                               {'skill_id': self.skill_id}))
+
+    def deactivate_skill(self):
+        """Remove skill from active_skill list in intent_service.
+
+        This disables converse method from being called
+        """
+        self.bus.emit(Message('skill.converse.deactivate_skill',
+                              {'skill_id': self.skill_id}))
+
+    def make_active(self):
+        # backwards compat
+        self.log.warning("make_active() has been deprecated, please use "
+                         "activate_skill()")
+        self.activate_skill()
 
     def _handle_collect_resting(self, _=None):
         """Handler for collect resting screen messages.
