@@ -28,7 +28,6 @@ padaos==0.1.9
 precise-runner==0.2.1
 petact==0.1.2
 
-vlc
 
 ovos_utils>=0.0.2
 fastlang
