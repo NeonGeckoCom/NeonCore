@@ -33,21 +33,31 @@ class AbortQuestion(AbortEvent):
 
 
 def killable_intent(msg="mycroft.skills.abort_execution",
-                    callback=None, react_to_stop=True):
-    return killable_event(msg, AbortIntent, callback, react_to_stop)
+                    callback=None, react_to_stop=True, call_stop=True):
+    return killable_event(msg, AbortIntent, callback, react_to_stop, call_stop)
 
 
 def killable_event(msg="mycroft.skills.abort_execution", exc=AbortEvent,
-                   callback=None, react_to_stop=False):
+                   callback=None, react_to_stop=False, call_stop=False):
 
     # Begin wrapper
     def create_killable(func):
 
         @wraps(func)
         def call_function(*args, **kwargs):
+            skill = args[0]
             t = create_killable_daemon(func, args, kwargs, autostart=False)
 
             def abort(_):
+                if call_stop:
+                    # call stop on parent skill
+                    skill.stop()
+
+                # ensure no orphan get_response daemons
+                # this is the only killable daemon that core itself will
+                # create, users should also account for this condition with
+                # callbacks if using the decorator for other purposes
+                skill._response = None
                 try:
                     while t.is_alive():
                         t.raise_exc(exc)
@@ -62,11 +72,11 @@ def killable_event(msg="mycroft.skills.abort_execution", exc=AbortEvent,
                         callback(args[0])
                     else:
                         callback()
-            bus = args[0].bus
-            args[0]._threads.append(t)
-            bus.once(msg, abort)
+            # save reference to threads so they can be killed later
+            skill._threads.append(t)
+            skill.bus.once(msg, abort)
             if react_to_stop:
-                bus.once(args[0].skill_id + ".stop", abort)
+                skill.bus.once(args[0].skill_id + ".stop", abort)
             t.start()
             return t
 

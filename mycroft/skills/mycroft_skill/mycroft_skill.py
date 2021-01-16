@@ -413,6 +413,9 @@ class MycroftSkill:
         start = time.time()
         while time.time() - start <= 15 and not converse.finished:
             time.sleep(0.1)
+            if self._response is not False:
+                converse.response = self._response
+                converse.finished = True  # overrided externally
         return converse.response
 
     def _handle_killed_wait_response(self):
@@ -508,6 +511,10 @@ class MycroftSkill:
         """
         num_fails = 0
         while True:
+            if self._response is not False:
+                # usually None when aborted externally (is None)
+                # also allows overriding returned result from other events
+                return self._response
             response = self.__get_response()
 
             if response is None:
