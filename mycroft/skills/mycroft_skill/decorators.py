@@ -13,6 +13,66 @@
 # limitations under the License.
 #
 """Decorators for use with MycroftSkill methods"""
+from functools import wraps
+import threading
+from inspect import signature
+import time
+from mycroft.util import create_killable_daemon
+
+
+class AbortEvent(StopIteration):
+    """ abort bus event handler """
+
+
+class AbortIntent(AbortEvent):
+    """ abort intent parsing """
+
+
+class AbortQuestion(AbortEvent):
+    """ gracefully abort get_response queries """
+
+
+def killable_intent(msg="mycroft.skills.abort_execution",
+                    callback=None, react_to_stop=True):
+    return killable_event(msg, AbortIntent, callback, react_to_stop)
+
+
+def killable_event(msg="mycroft.skills.abort_execution", exc=AbortEvent,
+                   callback=None, react_to_stop=False):
+
+    # Begin wrapper
+    def create_killable(func):
+
+        @wraps(func)
+        def call_function(*args, **kwargs):
+            t = create_killable_daemon(func, args, kwargs, autostart=False)
+
+            def abort(_):
+                try:
+                    while t.is_alive():
+                        t.raise_exc(exc)
+                        time.sleep(0.1)
+                except threading.ThreadError:
+                    pass  # already killed
+                except AssertionError:
+                    pass  # could not determine thread id ?
+                if callback is not None:
+                    if len(signature(callback).parameters) == 1:
+                        # class method, needs self
+                        callback(args[0])
+                    else:
+                        callback()
+            bus = args[0].bus
+            args[0]._threads.append(t)
+            bus.once(msg, abort)
+            if react_to_stop:
+                bus.once(args[0].skill_id + ".stop", abort)
+            t.start()
+            return t
+
+        return call_function
+
+    return create_killable
 
 
 def intent_handler(intent_parser):

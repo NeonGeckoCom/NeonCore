@@ -23,7 +23,7 @@ fann2==1.0.7
 precise-runner==0.2.1
 petact==0.1.2
 rapidfuzz
-
+kthread
 ovos_utils>=0.0.5
 fastlang
 langdetect #  optional, lang detection module
