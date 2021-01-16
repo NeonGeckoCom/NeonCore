@@ -186,3 +186,40 @@ def get(phrase, lang=None, context=None):
     if not context:
         context = {}
     return stache.render("template", context)
+
+
+def get_all(phrase, lang=None, context=None):
+    """
+    Looks up a resource file for the given phrase.  If no file
+    is found, the requested phrase is returned as the string.
+    This will use the default language for translations.
+    Args:
+        phrase (str): resource phrase to retrieve/translate
+        lang (str): the language to use
+        context (dict): values to be inserted into the string
+    Returns:
+        [str]: Array of all the versions of the phrase
+    """
+    if not lang:
+        from mycroft.configuration import Configuration
+        lang = Configuration.get().get("lang")
+
+    filename = "text/" + lang.lower() + "/" + phrase + ".dialog"
+    template = resolve_resource_file(filename)
+    if template:
+        stache = MustacheDialogRenderer()
+        stache.load_template_file(phrase, template)
+        if phrase in stache.templates:
+            if not context:
+                context = {}
+
+            # Render all templates...
+            result = []
+            for i in range(0, len(stache.templates[phrase])):
+                result.append(stache.render("template", context, i))
+            return result
+
+    # Use the given phrase as the template content.  Useful for
+    # short phrase or single-words that can be enhanced and
+    # translated later.  No rendering happens, though.
+    return [phrase.replace('.',' ')]
