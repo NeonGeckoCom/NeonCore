@@ -249,18 +249,32 @@ class MycroftSkill:
             'mycroft.skills.settings.changed',
             self.handle_settings_change
         )
-        self.add_event("converse.deactivate", self._deactivate_skill)
+        self.add_event("converse.deactivated", self._deactivate_skill)
+        self.add_event("converse.activated", self._activate_skill)
 
     def _deactivate_skill(self, message):
         skill_id = message.data.get("skill_id")
         if skill_id == self.skill_id:
-            self.on_deactivate()
+            self.handle_skill_deactivated()
 
-    def on_deactivate(self):
+    def _activate_skill(self, message):
+        skill_id = message.data.get("skill_id")
+        if skill_id == self.skill_id:
+            self.handle_skill_activated()
+
+    def handle_skill_deactivated(self):
         """
         Invoked when the skill is removed from active skill list
 
         This means Converse method won't be called anymore
+        """
+        pass
+
+    def handle_skill_activated(self):
+        """
+        Invoked when the skill is added to active skill list
+
+        This means Converse method will be called from now on
         """
         pass
 
@@ -584,14 +598,28 @@ class MycroftSkill:
         """
         DeviceApi().send_email(title, body, basename(self.root_dir))
 
-    def make_active(self):
+    def activate_skill(self):
         """Bump skill to active_skill list in intent_service.
 
         This enables converse method to be called even without skill being
         used in last 5 minutes.
         """
-        self.bus.emit(Message('active_skill_request',
+        self.bus.emit(Message('skill.converse.activate_skill',
                               {'skill_id': self.skill_id}))
+
+    def deactivate_skill(self):
+        """Remove skill from active_skill list in intent_service.
+
+        This disables converse method from being called
+        """
+        self.bus.emit(Message('skill.converse.deactivate_skill',
+                              {'skill_id': self.skill_id}))
+
+    def make_active(self):
+        # backwards compat
+        self.log.warning("make_active() has been deprecated, please use "
+                         "activate_skill()")
+        self.activate_skill()
 
     def _handle_collect_resting(self, _=None):
         """Handler for collect resting screen messages.
