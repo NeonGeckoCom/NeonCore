@@ -582,6 +582,23 @@ class MycroftSkill:
         else:
             return False
 
+    def remove_voc(self, utt, voc_filename, lang=None):
+        """ removes any entry in .voc file from the utterance """
+        lang = lang or self.lang
+        cache_key = lang + voc_filename
+
+        if cache_key not in self.voc_match_cache:
+            # this will load .voc file to cache
+            self.voc_match(utt, voc_filename, lang)
+
+        if utt:
+            # Check for matches against complete words
+            for i in self.voc_match_cache[cache_key]:
+                # Substitute only whole words matching the token
+                utt = re.sub(r'\b' + i + r"\b", "", utt)
+
+        return utt
+
     def report_metric(self, name, data):
         """Report a skill metric to the Mycroft servers.
 
