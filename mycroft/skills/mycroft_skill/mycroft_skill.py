@@ -22,7 +22,7 @@ from itertools import chain
 from os import walk
 from os.path import join, abspath, dirname, basename, exists
 from threading import Event, Timer
-
+import time
 from adapt.intent import Intent, IntentBuilder
 
 from mycroft import dialog
@@ -45,12 +45,14 @@ from mycroft.util.format import pronounce_number, join_list
 from mycroft.util.parse import match_one, extract_number
 from mycroft.language import DetectorFactory, TranslatorFactory, \
     get_lang_config, get_language_dir
-
-from .event_container import EventContainer, create_wrapper, get_handler_name
-from ..event_scheduler import EventSchedulerInterface
-from ..intent_service_interface import IntentServiceInterface
-from ..settings import get_local_settings, save_settings, Settings
-from ..skill_data import (
+from mycroft.skills.mycroft_skill.decorators import AbortEvent, \
+    AbortQuestion, killable_event
+from mycroft.skills.mycroft_skill.event_container import EventContainer, \
+    create_wrapper, get_handler_name
+from mycroft.skills.event_scheduler import EventSchedulerInterface
+from mycroft.skills.intent_service_interface import IntentServiceInterface
+from mycroft.skills.settings import get_local_settings, save_settings, Settings
+from mycroft.skills.skill_data import (
     load_vocabulary,
     load_regex,
     to_alnum,
@@ -166,6 +168,9 @@ class MycroftSkill:
         if "min_intent_conf" not in self.settings:
             self.settings["min_intent_conf"] = 0.6
         self.converse_intents = {}
+
+        self._threads = []
+        self._original_converse = self.converse
 
     @property
     def enclosure(self):
@@ -392,21 +397,32 @@ class MycroftSkill:
         Returns:
             str: user's response or None on a timeout
         """
-        event = Event()
-
         def converse(utterances, lang=None):
             converse.response = utterances[0] if utterances else None
-            event.set()
+            converse.finished = True
             return True
 
         # install a temporary conversation handler
         self.make_active()
+        converse.finished = False
         converse.response = None
-        default_converse = self.converse
         self.converse = converse
-        event.wait(15)  # 10 for listener, 5 for SST, then timeout
-        self.converse = default_converse
+
+        # 10 for listener, 5 for SST, then timeout
+        # NOTE a threading event is not used otherwise we can't raise the
+        # AbortEvent exception to kill the thread
+        start = time.time()
+        while time.time() - start <= 15 and not converse.finished:
+            time.sleep(0.1)
+            if self._response is not False:
+                converse.response = self._response
+                converse.finished = True  # was overrided externally
+        self.converse = self._original_converse
         return converse.response
+
+    def _handle_killed_wait_response(self):
+        self._response = None
+        self.converse = self._original_converse
 
     def get_response(self, dialog='', data=None, validator=None,
                      on_fail=None, num_retries=-1):
@@ -476,26 +492,52 @@ class MycroftSkill:
             on_fail (callable): function handling retries
 
         """
+        self._response = False
+        self._real_wait_response(is_cancel, validator, on_fail, num_retries)
+        while self._response is False:
+            time.sleep(0.1)
+        return self._response
+
+    @killable_event("mycroft.skills.abort_question", exc=AbortQuestion,
+                    callback=_handle_killed_wait_response)
+    def _real_wait_response(self, is_cancel, validator, on_fail, num_retries):
+        """Loop until a valid response is received from the user or the retry
+        limit is reached.
+
+        Arguments:
+            is_cancel (callable): function checking cancel criteria
+            validator (callbale): function checking for a valid response
+            on_fail (callable): function handling retries
+
+        """
         num_fails = 0
         while True:
+            if self._response is not False:
+                # usually None when aborted externally (is None)
+                # also allows overriding returned result from other events
+                return self._response
             response = self.__get_response()
 
             if response is None:
                 # if nothing said, prompt one more time
                 num_none_fails = 1 if num_retries < 0 else num_retries
                 if num_fails >= num_none_fails:
-                    return None
+                    self._response = None
+                    return
             else:
                 if validator(response):
-                    return response
+                    self._response = response
+                    return
 
                 # catch user saying 'cancel'
                 if is_cancel(response):
-                    return None
+                    self._response = None
+                    return
 
             num_fails += 1
-            if 0 < num_retries < num_fails:
-                return None
+            if 0 < num_retries < num_fails or self._response is not False:
+                self._response = None
+                return
 
             line = on_fail(response)
             if line:
@@ -887,12 +929,15 @@ class MycroftSkill:
 
         def on_error(e):
             """Speak and log the error."""
-            # Convert "MyFancySkill" to "My Fancy Skill" for speaking
-            handler_name = camel_case_split(self.name)
-            msg_data = {'skill': handler_name}
-            msg = dialog.get('skill.error', self.lang, msg_data)
-            self.speak(msg)
-            LOG.exception(msg)
+            if not isinstance(e, AbortEvent):
+                # Convert "MyFancySkill" to "My Fancy Skill" for speaking
+                handler_name = camel_case_split(self.name)
+                msg_data = {'skill': handler_name}
+                msg = dialog.get('skill.error', self.lang, msg_data)
+                self.speak(msg)
+                LOG.exception(msg)
+            else:
+                LOG.info("Skill execution aborted")
             # append exception information in message
             skill_data['exception'] = repr(e)
 
@@ -1323,6 +1368,8 @@ class MycroftSkill:
         """Handler for the "mycroft.stop" signal. Runs the user defined
         `stop()` method.
         """
+        # abort any running killable intent
+        self.bus.emit(Message(self.skill_id + ".stop"))
 
         def __stop_timeout():
             # The self.stop() call took more than 100ms, assume it handled Stop
@@ -1358,6 +1405,13 @@ class MycroftSkill:
 
         Shuts down known entities and calls skill specific shutdown method.
         """
+        # kill any running kthreads from decorators
+        for t in self._threads:
+            try:
+                t.kill()
+            except:
+                pass
+
         try:
             self.shutdown()
         except Exception as e:
