@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+from copy import copy
 import time
 from adapt.context import ContextManagerFrame
 from adapt.engine import IntentDeterminationEngine
@@ -185,9 +186,6 @@ class IntentService:
 
         self.active_skills = []  # [skill_id , timestamp]
         self.converse_timeout = 5  # minutes to prune active_skills
-        self.waiting_for_converse = False
-        self.converse_result = False
-        self.converse_skill_id = ""
 
         self.parser_service = TextParsersService(self.bus)
         self.parser_service.start()
@@ -243,37 +241,24 @@ class IntentService:
         """Let skills know there was a problem with speech recognition"""
         lang = message.data.get('lang', "en-us")
         set_active_lang(lang)
-        for skill in self.active_skills:
-            self.do_converse(None, skill[0], lang)
+        for skill in copy(self.active_skills):
+            self.do_converse(None, skill[0], lang, message)
 
-    def do_converse(self, utterances, skill_id, lang):
-        self.waiting_for_converse = True
-        self.converse_result = False
-        self.converse_skill_id = skill_id
-        self.bus.emit(Message("skill.converse.request", {
+    def do_converse(self, utterances, skill_id, lang, message):
+        converse_msg = (message.reply("skill.converse.request", {
             "skill_id": skill_id, "utterances": utterances, "lang": lang}))
-        start_time = time.time()
-        t = 0
-        while self.waiting_for_converse and t < 5:
-            t = time.time() - start_time
-            time.sleep(0.1)
-        self.waiting_for_converse = False
-        self.converse_skill_id = ""
-        return self.converse_result
+        result = self.bus.wait_for_response(converse_msg,
+                                            'skill.converse.response')
+        if result and 'error' in result.data:
+            self.handle_converse_error(result)
+            return False
+        else:
+            return result.data.get('result', False)
 
     def handle_converse_error(self, message):
         skill_id = message.data["skill_id"]
         if message.data["error"] == "skill id does not exist":
             self.remove_active_skill(skill_id)
-        if skill_id == self.converse_skill_id:
-            self.converse_result = False
-            self.waiting_for_converse = False
-
-    def handle_converse_response(self, message):
-        skill_id = message.data["skill_id"]
-        if skill_id == self.converse_skill_id:
-            self.converse_result = message.data.get("result", False)
-            self.waiting_for_converse = False
 
     def remove_active_skill(self, skill_id):
         for skill in self.active_skills:
@@ -378,7 +363,7 @@ class IntentService:
             padatious_intent = None
             with stopwatch:
                 # Give active skills an opportunity to handle the utterance
-                converse = self._converse(combined, lang)
+                converse = self._converse(combined, lang, message)
 
                 if not converse:
                     # No conversation, use intent system to handle utterance
@@ -432,12 +417,13 @@ class IntentService:
         except Exception as e:
             LOG.exception(e)
 
-    def _converse(self, utterances, lang):
+    def _converse(self, utterances, lang, message):
         """ Give active skills a chance at the utterance
 
         Args:
             utterances (list):  list of utterances
             lang (string):      4 letter ISO language code
+            message (Message):  message to use to generate reply
 
         Returns:
             bool: True if converse handled it, False if  no skill processes it
@@ -452,7 +438,7 @@ class IntentService:
 
         # check if any skill wants to handle utterance
         for skill in self.active_skills:
-            if self.do_converse(utterances, skill[0], lang):
+            if self.do_converse(utterances, skill[0], lang, message):
                 # update timestamp, or there will be a timeout where
                 # intent stops conversing whether its being used or not
                 self.add_active_skill(skill[0])

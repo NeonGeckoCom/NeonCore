@@ -46,6 +46,22 @@ def intent_file_handler(intent_file):
     return real_decorator
 
 
+def conversational_intent(intent_file):
+    """Decorator for adding a method as an converse intent handler.
+    NOTE: only padatious supported, not adapt
+    """
+
+    def real_decorator(func):
+        # Store the intent_file inside the function
+        # This will be used later to train intents
+        if not hasattr(func, 'converse_intents'):
+            func.converse_intents = []
+        func.converse_intents.append(intent_file)
+        return func
+
+    return real_decorator
+
+
 def resting_screen_handler(name):
     """Decorator for adding a method as an resting screen handler.
 
