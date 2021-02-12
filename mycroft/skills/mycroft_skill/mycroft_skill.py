@@ -170,6 +170,7 @@ class MycroftSkill:
         self.converse_intents = {}
 
         self._threads = []
+        self._original_converse = self.converse
 
     @property
     def enclosure(self):
@@ -405,7 +406,7 @@ class MycroftSkill:
         self.make_active()
         converse.finished = False
         converse.response = None
-        self.converse = converse # restored after returning from method
+        self.converse = converse
 
         # 10 for listener, 5 for SST, then timeout
         # NOTE a threading event is not used otherwise we can't raise the
@@ -415,11 +416,13 @@ class MycroftSkill:
             time.sleep(0.1)
             if self._response is not False:
                 converse.response = self._response
-                converse.finished = True  # overrided externally
+                converse.finished = True  # was overrided externally
+        self.converse = self._original_converse
         return converse.response
 
     def _handle_killed_wait_response(self):
         self._response = None
+        self.converse = self._original_converse
 
     def get_response(self, dialog='', data=None, validator=None,
                      on_fail=None, num_retries=-1):
@@ -490,11 +493,9 @@ class MycroftSkill:
 
         """
         self._response = False
-        default_converse = self.converse  # backup original method
         self._real_wait_response(is_cancel, validator, on_fail, num_retries)
         while self._response is False:
             time.sleep(0.1)
-        self.converse = default_converse  # restore original method
         return self._response
 
     @killable_event("mycroft.skills.abort_question", exc=AbortQuestion,
@@ -534,7 +535,7 @@ class MycroftSkill:
                     return
 
             num_fails += 1
-            if 0 < num_retries < num_fails:
+            if 0 < num_retries < num_fails or self._response is not False:
                 self._response = None
                 return
 
