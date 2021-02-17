@@ -203,7 +203,6 @@ class IntentService:
                     self.handle_vocab_manifest)
 
     def _setup_converse_handlers(self):
-        self.bus.on('skill.converse.response', self.handle_converse_response)
         self.bus.on('skill.converse.error', self.handle_converse_error)
         self.bus.on('skill.converse.activate_skill',
                     self.handle_activate_skill)
