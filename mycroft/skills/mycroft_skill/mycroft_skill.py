@@ -46,6 +46,8 @@ from mycroft.util.parse import match_one, extract_number
 from mycroft.language import DetectorFactory, TranslatorFactory, \
     get_lang_config, get_language_dir
 
+from NGI.utilities.configHelper import NGIConfig
+
 from .event_container import EventContainer, create_wrapper, get_handler_name
 from ..event_scheduler import EventSchedulerInterface
 from ..intent_service_interface import IntentServiceInterface
@@ -131,6 +133,11 @@ class MycroftSkill:
 
         self.gui = SkillGUI(self)
 
+        self.user_config = NGIConfig("ngi_user_info")
+        self.local_config = NGIConfig("ngi_local_conf")
+        self.configuration_available = self.local_config.content
+        self.user_info_available = self.user_config.content
+
         self._bus = None
         self._enclosure = None
         self.bind(bus)
@@ -206,6 +213,239 @@ class MycroftSkill:
     def lang(self):
         """Get the configured language."""
         return self.language_config.get("internal") or self.config_core.get('lang')
+
+    def preference_brands(self, message=None) -> dict:
+        """
+        Returns a brands dictionary for the user
+        Equivalent to self.user_info_available["speech"] for non-server use
+        """
+        try:
+            nick = self.get_utterance_user(message)
+            if self.server:
+                if not message or nick == "server":
+                    LOG.warning("No message given!")
+                    return self.user_info_available['brands']
+
+                if message.context.get("nick_profiles"):
+                    # LOG.debug("Message Contains Profile Data")
+                    # LOG.debug(f'profiles={message.context.get("nick_profiles")}')
+                    return message.context["nick_profiles"][nick]["brands"]
+                else:
+                    LOG.error(f"Unable to get user settings! message={message.data}")
+            else:
+                return self.user_info_available['brands']
+        except Exception as x:
+            LOG.error(x)
+            LOG.error(f"context={message.context}")
+        return {'ignored_brands': {},
+                'favorite_brands': {},
+                'specially_requested': {}}
+
+    def preference_user(self, message=None) -> dict:
+        """
+        Returns the user dictionary with name, email
+        Equivalent to self.user_info_available["user"] for non-server use
+        """
+        try:
+            nick = self.get_utterance_user(message)
+            if self.server:
+                if not message or nick == "server":
+                    LOG.warning("No message given!")
+                    return self.user_info_available['user']
+                if message.context.get("nick_profiles"):
+                    # LOG.debug("Message Contains Profile Data")
+                    # LOG.debug(f'profiles={message.context.get("nick_profiles")}')
+                    return message.context["nick_profiles"][nick]["user"]
+                else:
+                    LOG.error(f"Unable to get user settings! message={message.data}")
+            else:
+                return self.user_info_available['user']
+        except Exception as x:
+            LOG.error(x)
+            LOG.error(f"context={message.context}")
+        return {'first_name': '',
+                'middle_name': '',
+                'last_name': '',
+                'preferred_name': '',
+                'full_name': '',
+                'dob': 'YYYY/MM/DD',
+                'age': '',
+                'email': '',
+                'username': '',
+                'password': '',
+                'picture': '',
+                'about': '',
+                'phone': '',
+                'email_verified': False,
+                'phone_verified': False
+                }
+
+    def preference_location(self, message=None) -> dict:
+        """
+        Get the JSON data structure holding location information.
+        Equivalent to self.user_info_available["location"] for non-server use
+        """
+        try:
+            nick = self.get_utterance_user(message)
+            if self.server:
+                if not message or nick == "server":
+                    LOG.warning("No message given!")
+                    return self.user_info_available['location']
+                if message.context.get("nick_profiles"):
+                    # LOG.debug("Message Contains Profile Data")
+                    # LOG.debug(f'profiles={message.context.get("nick_profiles")}')
+                    return message.context["nick_profiles"][nick]["location"]
+                else:
+                    LOG.error(f"Unable to get user settings! message={message.data}")
+            else:
+                return self.user_info_available['location']
+        except Exception as x:
+            LOG.error(x)
+            LOG.error(f"context={message.context}")
+        return {'lat': 47.4799078,
+                'lng': -122.2034496,
+                'city': 'Renton',
+                'state': 'Washington',
+                'country': 'USA',
+                'tz': 'America/Los_Angeles',
+                'utc': -8.0
+                }
+
+    def preference_unit(self, message=None) -> dict:
+        """
+        Returns the units dictionary that contains time, date, measure formatting preferences
+        Equivalent to self.user_info_available["units"] for non-server use
+        """
+        try:
+            nick = self.get_utterance_user(message)
+            if self.server:
+                # LOG.debug(message)
+                if not message or nick == "server":
+                    LOG.warning("No message given!")
+                    return self.user_info_available['units']
+
+                if message.context.get("nick_profiles"):
+                    # LOG.debug("Message Contains Profile Data")
+                    # LOG.debug(f'profiles={message.context.get("nick_profiles")}')
+                    return message.context["nick_profiles"][nick]["units"]
+                else:
+                    LOG.error(f"Unable to get user settings! message={message.data}")
+            else:
+                return self.user_info_available['units']
+        except Exception as x:
+            LOG.error(x)
+            LOG.error(f"context={message.context}")
+        return {'time': 12,
+                'date': 'MDY',
+                'measure': 'imperial'
+                }
+
+    def preference_speech(self, message=None) -> dict:
+        """
+        Returns the speech dictionary that contains language and spoken response preferences
+        Equivalent to self.user_info_available["speech"] for non-server use
+        """
+        try:
+            nick = self.get_utterance_user(message)
+            if self.server:
+                if not message or nick == "server":
+                    LOG.warning("No message given!")
+                    return self.user_info_available['speech']
+
+                if message.context.get("nick_profiles"):
+                    # LOG.debug("Message Contains Profile Data")
+                    # LOG.debug(f'profiles={message.context.get("nick_profiles")}')
+                    return message.context["nick_profiles"][nick]["speech"]
+                else:
+                    LOG.error(f"Unable to get user settings! message={message.data}")
+            else:
+                return self.user_info_available['speech']
+        except Exception as x:
+            LOG.error(x)
+            LOG.error(f"context={message.context}")
+        return {'stt_language': 'en',
+                'stt_region': 'US',
+                'alt_languages': ['en'],
+                'tts_language': "en-us",
+                'tts_gender': 'female',
+                'neon_voice': 'Joanna',
+                'secondary_tts_language': '',
+                'secondary_tts_gender': '',
+                'secondary_neon_voice': '',
+                'speed_multiplier': 1.0,
+                'synonyms': {}
+                }
+
+    def preference_skill(self, message=None) -> dict:
+        """
+        Returns the skill settings configuration
+        Equivalent to self.settings for non-server
+        :param message: Message associated with request
+        :return: dict of skill preferences
+        """
+        nick = self.get_utterance_user(message)
+        if self.server and nick != "server":
+            try:
+                skill = self.skill_id
+                LOG.info(f"Get server prefs for skill={skill}")
+                user_overrides = message.context["nick_profiles"][nick]["skills"].get("skill_id")
+                merged_settings = {**self.settings, **user_overrides}
+                if user_overrides != merged_settings:
+                    self.update_skill_settings(merged_settings, message)
+                return merged_settings
+            except Exception as e:
+                LOG.error(e)
+                LOG.error(f"context={message.context}")
+        return self.settings
+
+    def update_profile(self, new_preferences: dict, message: Message = None):
+        """
+        Updates a user profile with the passed new_preferences
+        :param new_preferences: dict of updated preference values. Should follow {section: {key: val}} format
+        :param message: Message associated with request
+        """
+        if self.server:
+            flac_filename = message.context["flac_filename"]
+            nick = self.get_utterance_user(message)
+            new_skills_prefs = new_preferences.pop("skills")
+            combined_changes = {k: v for dic in new_preferences.values() for k, v in dic.items()}
+            if new_skills_prefs:
+                for key, val in new_skills_prefs:
+                    val["skill_id"] = key
+                combined_changes["skill_settings"] = new_skills_prefs.values
+                new_preferences["skills"] = new_skills_prefs
+            # merged = {**self.build_user_dict(message), **combined_changes}
+            self.socket_emit_to_server("update profile", ["skill", combined_changes, flac_filename])
+            # self.socket_io_emit(event="update profile", kind="skill", flac_filename=flac_filename, message=merged)
+            self.bus.emit(Message("neon.remove_cache_entry", {"nick": nick}))
+            old_preferences = message.context["nick_profiles"][nick]
+            message.context["nick_profiles"][nick] = {**old_preferences, **new_preferences}
+        else:
+            for section, settings in new_preferences:
+                # section in user, brands, units, etc.
+                for key, val in settings:
+                    self.user_config.update_yaml_file(section, key, val, True)
+
+            self.user_config.update_yaml_file(final=True)
+            modified = ["ngi_user_info"]
+            self.bus.emit(Message('check.yml.updates',
+                                  {"modified": modified},
+                                  {"origin": self.skill_id}))
+
+    def update_skill_settings(self, new_preferences: dict, message: Message = None, skill_global=False):
+        """
+        Updates skill settings with the passed new_preferences
+        :param new_preferences: dict of updated preference values. {key: val}
+        :param message: Message associated with request
+        :param skill_global: Boolean to indicate these are global/non-user-specific variables
+        """
+        if self.server and not skill_global:
+            self.update_profile({"skills": {self.skill_id: new_preferences}}, message)
+        else:
+            for key, val in new_preferences:
+                self.settings[key] = val
+                self.ngi_settings.update_yaml_file(key, value=val, multiple=True)
+            self.ngi_settings.update_yaml_file(final=True)
 
     def bind(self, bus):
         """Register messagebus emitter with skill.
@@ -537,6 +777,21 @@ class MycroftSkill:
             else:
                 resp = match
         return resp
+
+    def get_utterance_user(self, message):
+        """
+        Get the user associated with the message
+        :param message: message object to evaluate
+        :return: user associated with request; 'local' if not specified
+        """
+        # if not message:
+        #     return "local"
+        if message.context.get("nick"):
+            return message.context.get("nick")
+        elif self.server:
+            return "server"
+        else:
+            return self.user_info_available['user'].get("username", "local")
 
     def voc_match(self, utt, voc_filename, lang=None, exact=False):
         """Determine if the given utterance contains the vocabulary provided.
