@@ -129,7 +129,7 @@ class SkillsStore:
                 return entry
             else:
                 return store_skill
-        elif "." in skill and len(skill.split(".")) == 2:
+        elif "." in skill:
             return self.osm.search_skills_by_id(skill)
         return None
 
