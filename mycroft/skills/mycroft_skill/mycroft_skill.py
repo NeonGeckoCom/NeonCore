@@ -62,6 +62,7 @@ from mycroft.skills.skill_data import (
     read_value_file,
     read_translated_file
 )
+from mycroft.skills.mycroft_skill.compatibility import OldNeonCompatibilitySkill
 from padatious import IntentContainer
 
 
@@ -106,7 +107,9 @@ def get_non_properties(obj):
     return set(check_class(obj.__class__))
 
 
-class MycroftSkill:
+class MycroftSkill(OldNeonCompatibilitySkill):
+    # TODO deprecate subclassing from OldNeon, this is a temporary
+    #  compatibility layer to avoid syntax errors
     """Base class for mycroft skills providing common behaviour and parameters
     to all Skill implementations.
 
