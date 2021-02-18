@@ -644,11 +644,37 @@ class ApertiumTranslator(LanguageTranslator):
         return r["responseData"]["translatedText"]
 
 
+class LibreTranslateTranslator(LanguageTranslator):
+    def __init__(self):
+        super().__init__()
+        self._translate = self.libretranslate
+        # host it yourself https://github.com/uav4geo/LibreTranslate
+        self.url = "https://libretranslate.com/translate"
+
+    def translate(self, text, target=None, source=None):
+        if self.boost and not source:
+            source = self.default_language
+        target = target or self.internal_language
+        return self.libretranslate(text, target, source)
+
+    def libretranslate(self, text,  target=None, source=None,  url=None):
+        if self.boost and not source:
+            source = self.default_language
+        target = target or self.internal_language
+        r = requests.post(url, params={"q": text,
+                                       "source": source.split("-")[0],
+                                       "target": target.split("-")[0]}).json()
+        if r.get("error"):
+            return None
+        return r["translatedText"]
+
+
 class TranslatorFactory:
     CLASSES = {
         "google": GoogleTranslator,
         "amazon": AmazonTranslator,
-        "apertium": ApertiumTranslator
+        "apertium": ApertiumTranslator,
+        "libretranslate": LibreTranslateTranslator
     }
 
     @staticmethod
