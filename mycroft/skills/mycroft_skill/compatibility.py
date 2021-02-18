@@ -12,8 +12,7 @@ class OldNeonCompatibilitySkill:
         Returns a brands dictionary for the user
         Equivalent to self.user_info_available["speech"] for non-server use
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("preference_brands")
         return {'ignored_brands': {},
                 'favorite_brands': {},
                 'specially_requested': {}}
@@ -23,8 +22,7 @@ class OldNeonCompatibilitySkill:
         Returns the user dictionary with name, email
         Equivalent to self.user_info_available["user"] for non-server use
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("preference_user")
         return {'first_name': '',
                 'middle_name': '',
                 'last_name': '',
@@ -47,8 +45,7 @@ class OldNeonCompatibilitySkill:
         Get the JSON data structure holding location information.
         Equivalent to self.user_info_available["location"] for non-server use
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("preference_location")
         return {'lat': 47.4799078,
                 'lng': -122.2034496,
                 'city': 'Renton',
@@ -63,8 +60,7 @@ class OldNeonCompatibilitySkill:
         Returns the units dictionary that contains time, date, measure formatting preferences
         Equivalent to self.user_info_available["units"] for non-server use
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("preference_unit")
         return {'time': 12,
                 'date': 'MDY',
                 'measure': 'imperial'
@@ -75,8 +71,7 @@ class OldNeonCompatibilitySkill:
         Returns the speech dictionary that contains language and spoken response preferences
         Equivalent to self.user_info_available["speech"] for non-server use
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("preference_speech")
         return {'stt_language': 'en',
                 'stt_region': 'US',
                 'alt_languages': ['en'],
@@ -97,8 +92,7 @@ class OldNeonCompatibilitySkill:
         :param message: Message associated with request
         :return: dict of skill preferences
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("preference_skill")
         return {}
 
     def update_profile(self, *args, **kwargs):
@@ -107,8 +101,7 @@ class OldNeonCompatibilitySkill:
         :param new_preferences: dict of updated preference values. Should follow {section: {key: val}} format
         :param message: Message associated with request
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("update_profile")
 
     def update_skill_settings(self, *args, **kwargs):
         """
@@ -117,8 +110,7 @@ class OldNeonCompatibilitySkill:
         :param message: Message associated with request
         :param skill_global: Boolean to indicate these are global/non-user-specific variables
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("update_skill_settings")
 
     def get_utterance_user(self, *args, **kwargs):
         """
@@ -126,6 +118,9 @@ class OldNeonCompatibilitySkill:
         :param message: message object to evaluate
         :return: user associated with request; 'local' if not specified
         """
-        func_name = self.preference_brands.__name__
-        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
+        self._log_deprecated("get_utterance_user")
         return "local"
+
+    @staticmethod
+    def _log_deprecated(func_name):
+        LOG.warning(f"MycroftSkill.{func_name} has been deprecated!")
