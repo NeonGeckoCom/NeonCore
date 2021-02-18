@@ -647,17 +647,11 @@ class ApertiumTranslator(LanguageTranslator):
 class LibreTranslateTranslator(LanguageTranslator):
     def __init__(self):
         super().__init__()
-        self._translate = self.libretranslate
         # host it yourself https://github.com/uav4geo/LibreTranslate
-        self.url = "https://libretranslate.com/translate"
+        self.url = self.config.get("libretranslate_host") or \
+                   "https://libretranslate.com/translate"
 
-    def translate(self, text, target=None, source=None):
-        if self.boost and not source:
-            source = self.default_language
-        target = target or self.internal_language
-        return self.libretranslate(text, target, source)
-
-    def libretranslate(self, text,  target=None, source=None,  url=None):
+    def translate(self, text,  target=None, source=None,  url=None):
         if self.boost and not source:
             source = self.default_language
         target = target or self.internal_language
