@@ -4,6 +4,8 @@ from ovos_skills_manager.skill_entry import SkillEntry
 from mycroft.configuration import Configuration
 from mycroft.messagebus import get_messagebus
 from mycroft.skills.event_scheduler import EventSchedulerInterface
+from mycroft.util import connected
+from mycroft.util.log import LOG
 from os.path import expanduser
 from datetime import datetime, timedelta
 
@@ -43,10 +45,28 @@ class SkillsStore:
                                                 name="default_skills.update")
 
     def handle_update(self, message):
-        self.install_default_skills(update=True)
+        try:
+            self.install_default_skills(update=True)
+        except Exception as e:
+            if connected():
+                # if there is internet log the error
+                LOG.exception(e)
+                LOG.error("skills update failed")
+            else:
+                # if no internet just skip this update
+                LOG.error("no internet, skipped skills update")
 
     def handle_sync_appstores(self, message):
-        self.osm.sync_appstores()
+        try:
+            self.osm.sync_appstores()
+        except Exception as e:
+            if connected():
+                # if there is internet log the error
+                LOG.exception(e)
+                LOG.error("appstore sync failed")
+            else:
+                # if no internet just skip this update
+                LOG.error("no internet, skipped appstore sync")
 
     def shutdown(self):
         self.scheduler.shutdown()

@@ -23,6 +23,7 @@ from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
+from mycroft.util import connected
 from mycroft.skills.skill_loader import SkillLoader
 from mycroft.skills.skill_store import SkillsStore
 
@@ -94,10 +95,19 @@ class SkillManager(Thread):
 
     def download_or_update_defaults(self):
         # on launch only install if missing, updates handled separately
-        # if disabled in .conf this does nothing
+        # if osm is disabled in .conf this does nothing
         if self.config["auto_update"]:
-            self.skill_downloader.install_default_skills()
-
+            try:
+                self.skill_downloader.install_default_skills()
+            except Exception as e:
+                if connected():
+                    # if there is internet log the error
+                    LOG.exception(e)
+                    LOG.error("default skills installation failed")
+                else:
+                    # if no internet just skip this update
+                    LOG.error("no internet, skipped default skills installation")
+            
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self._connected_event.wait()
