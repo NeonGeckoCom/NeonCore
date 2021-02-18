@@ -655,9 +655,10 @@ class LibreTranslateTranslator(LanguageTranslator):
         if self.boost and not source:
             source = self.default_language
         target = target or self.internal_language
-        r = requests.post(url, params={"q": text,
-                                       "source": source.split("-")[0],
-                                       "target": target.split("-")[0]}).json()
+        r = requests.post(self.url,
+                          params={"q": text,
+                                  "source": source.split("-")[0],
+                                  "target": target.split("-")[0]}).json()
         if r.get("error"):
             return None
         return r["translatedText"]
