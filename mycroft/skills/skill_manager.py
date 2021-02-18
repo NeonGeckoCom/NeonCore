@@ -93,8 +93,10 @@ class SkillManager(Thread):
         self._alive_status = True
 
     def download_or_update_defaults(self):
-        # TODO update vs install only option in .conf
-        self.skill_downloader.install_default_skills(update=False)
+        # on launch only install if missing, updates handled separately
+        # if disabled in .conf this does nothing
+        if self.config["auto_update"]:
+            self.skill_downloader.install_default_skills()
 
     def run(self):
         """Load skills and update periodically from disk and internet."""

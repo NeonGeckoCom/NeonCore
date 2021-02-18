@@ -20,10 +20,11 @@ class SkillsStore:
         self.bus = bus or get_messagebus()
         self.scheduler = EventSchedulerInterface("OSM", sched_id="osm",
                                                  bus=self.bus)
-        if self.config.get("auto_update_interval"):
-            self.schedule_update()
-        if self.config.get("appstore_sync_interval"):
-            self.schedule_sync()
+        if not self.disabled or not self.config["auto_update"]:
+            if self.config.get("auto_update_interval"):
+                self.schedule_update()
+            if self.config.get("appstore_sync_interval"):
+                self.schedule_sync()
 
     def schedule_sync(self):
         # every X hours
@@ -179,9 +180,7 @@ class SkillsStore:
         self.deauthenticate_neon()
         return updated
 
-    def install_default_skills(self, update=None):
-        if update is None:
-            update = self.config["auto_update"]
+    def install_default_skills(self, update=False):
         skills = []
         if self.disabled:
             return skills
