@@ -23,9 +23,9 @@ from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
+from mycroft.util import connected
 from mycroft.skills.skill_loader import SkillLoader
-
-import git
+from mycroft.skills.skill_store import SkillsStore
 
 SKILL_MAIN_MODULE = '__init__.py'
 
@@ -44,6 +44,8 @@ class SkillManager(Thread):
         self._connected_event = Event()
         self.config = Configuration.get()
         self.skills_dir = expanduser(self.config["skills"]["directory"])
+        self.skill_downloader = SkillsStore(bus=self.bus)
+        self.skill_downloader.skills_dir = self.skills_dir
 
         self.skill_loaders = {}
         self.enclosure = EnclosureAPI(bus)
@@ -92,26 +94,20 @@ class SkillManager(Thread):
         self._alive_status = True
 
     def download_or_update_defaults(self):
-        # if skills dir does not exist (first run) download default skills
-        if self.skills_config.get("repo"):
-            if not isdir(self.skills_dir):
-                LOG.info("Downloading default skills")
-                try:
-                    git.Repo.clone_from(self.skills_config.get("repo"), self.skills_dir)
-                except Exception as e:
+        # on launch only install if missing, updates handled separately
+        # if osm is disabled in .conf this does nothing
+        if self.config["auto_update"]:
+            try:
+                self.skill_downloader.install_default_skills()
+            except Exception as e:
+                if connected():
+                    # if there is internet log the error
                     LOG.exception(e)
-                    LOG.error("Could not download default skills!")
-            else:
-                LOG.info("Attempting skills update")
-                try:
-                    # git pull
-                    g = git.cmd.Git(self.skills_dir)
-                    g.pull()
-                except Exception as e:
-                    LOG.exception(e)
-                    LOG.error("Could not update default skills, did you change any default skill?")
-                    LOG.info("If you edit a single default skill, update will fail, blacklist skill instead")
-
+                    LOG.error("default skills installation failed")
+                else:
+                    # if no internet just skip this update
+                    LOG.error("no internet, skipped default skills installation")
+            
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self._connected_event.wait()

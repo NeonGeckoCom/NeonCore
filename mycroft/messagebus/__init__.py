@@ -15,3 +15,11 @@ from .client.client import MessageBusClient
 from .message import Message
 from .send_func import send
 from .service.event_handler import MessageBusEventHandler
+from mycroft.util import create_daemon
+
+
+def get_messagebus(running=True):
+    bus = MessageBusClient()
+    if running:
+        create_daemon(bus.run_forever)
+    return bus
