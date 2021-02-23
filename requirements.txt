@@ -29,22 +29,7 @@ kthread
 ovos_utils>=0.0.5
 ovos-skills-manager>=0.0.2
 
-# wake word plugins
-## https://github.com/HelloChatterbox/dummy_wakeword_plugin
-chatterbox-wake-word-plugin-dummy
-## https://github.com/JarbasLingua/jarbas-wakeword-plugin-pocketsphinx
-jarbas-wake-word-plugin-pocketsphinx
-## https://github.com/JarbasLingua/jarbas-wake-word-plugin-precise
-jarbas-wake-word-plugin-precise
 
-
-# stt plugins
-## https://github.com/JarbasLingua/jarbas-stt-plugin-chromium
-jarbas-stt-plugin-chromium
-google-api-python-client==1.6.4
-
-# tts plugins
-boto3
 
 # vision stuff
 numpy
