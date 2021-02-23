@@ -26,10 +26,6 @@ rapidfuzz
 kthread
 ovos_utils>=0.0.5
 ovos-skills-manager>=0.0.2
-fastlang
-langdetect #  optional, lang detection module
-pycld2 # optional, lang detection module
-pycld3 # optional, lang detection module
 
 boto3
 numpy

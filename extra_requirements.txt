@@ -1,0 +1,7 @@
+# these are optional installs for additional features / alternative engines
+# they might be needed to run unittests, but are optional for end user installs
+google_trans_new # optional, lang detection/translation module
+langdetect #  optional, lang detection module
+pycld2 # optional, lang detection module
+pycld3 # optional, lang detection module
+fastlang  # optional, lang detection module
