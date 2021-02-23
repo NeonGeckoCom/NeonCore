@@ -1,3 +1,26 @@
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
+#
+# Copyright 2008-2021 Neongecko.com Inc. | All Rights Reserved
+#
+# Notice of License - Duplicating this Notice of License near the start of any file containing
+# a derivative of this software is a condition of license for this software.
+# Friendly Licensing:
+# No charge, open source royalty free use of the Neon AI software source and object is offered for
+# educational users, noncommercial enthusiasts, Public Benefit Corporations (and LLCs) and
+# Social Purpose Corporations (and LLCs). Developers can contact developers@neon.ai
+# For commercial licensing, distribution of derivative works or redistribution please contact licenses@neon.ai
+# Distributed on an "AS IS” basis without warranties or conditions of any kind, either express or implied.
+# Trademarks of Neongecko: Neon AI(TM), Neon Assist (TM), Neon Communicator(TM), Klat(TM)
+# Authors: Guy Daniels, Daniel McKnight, Regina Bloomstine, Elon Gasper, Richard Leeds
+#
+# Specialized conversational reconveyance options from Conversation Processing Intelligence Corp.
+# US Patents 2008-2021: US7424516, US20140161250, US20140177813, US8638908, US8068604, US8553852, US10530923, US10530924
+# China Patent: CN102017585  -  Europe Patent: EU2156652  -  Patents Pending
+#
+# This software is an enhanced derivation of the Mycroft Project which is licensed under the
+# Apache software Foundation software license 2.0 https://www.apache.org/licenses/LICENSE-2.0
+# Changes Copyright 2008-2021 Neongecko.com Inc. | All Rights Reserved
+#
 # Copyright 2017 Mycroft AI Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,8 +63,9 @@ from mycroft.util import (
     check_for_signal,
     get_ipc_directory,
     resolve_resource_file,
-    play_wav, play_mp3, play_ogg
+    play_wav, play_mp3, play_ogg, create_signal
 )
+from mycroft.audio import is_speaking
 from mycroft.util.log import LOG
 from ovos_utils.lang.phonemes import get_phonemes
 
@@ -72,12 +96,13 @@ class MutableStream:
             self.wrapped_stream.start_stream()
 
     def read(self, size, of_exc=False):
-        """Read data from stream.
+        """
+            Read data from stream.
 
-        Arguments:
-            size (int): Number of bytes to read
-            of_exc (bool): flag determining if the audio producer thread
-                           should throw IOError at overflows.
+            Arguments:
+                size (int): Number of bytes to read
+                of_exc (bool): flag determining if the audio producer thread
+                               should throw IOError at overflows.
 
         Returns:
             (bytes) Data read from device
@@ -187,6 +212,12 @@ def get_silence(num_bytes):
 
 
 class ResponsiveRecognizer(speech_recognition.Recognizer):
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
+
+    def __enter__(self):
+        pass
+
     # Padding of silence when feeding to pocketsphinx
     SILENCE_SEC = 0.01
 
@@ -196,13 +227,13 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
 
     # The minimum seconds of silence required at the end
     # before a phrase will be considered complete
-    MIN_SILENCE_AT_END = 0.25
+    MIN_SILENCE_AT_END = 1.0
 
     # The maximum seconds a phrase can be recorded,
     # provided there is noise the entire time
     RECORDING_TIMEOUT = 10.0
 
-    # The maximum time it will continue to record silence
+    # The maximum seconds it will continue to record silence
     # when not enough noise has been detected
     RECORDING_TIMEOUT_WITH_SILENCE = 3.0
 
@@ -217,7 +248,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         self.upload_disabled = listener_config['wake_word_upload']['disable']
 
         self.overflow_exc = listener_config.get('overflow_exception', False)
-
+        self.use_wake_word = listener_config.get('wake_word_enabled', True)
         speech_recognition.Recognizer.__init__(self)
         self.audio = pyaudio.PyAudio()
         self.multiplier = listener_config.get('multiplier')
@@ -432,7 +463,10 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                 LOG.debug("Button Pressed, wakeword not needed")
                 return True
 
-        return False
+        if self.use_wake_word:
+            return False
+        else:
+            return True
 
     def stop(self):
         """
@@ -494,6 +528,7 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         test_size = self.sec_to_bytes(self.TEST_WW_SEC, source)
 
         said_wake_word = False
+        sound = None
 
         # Rolling buffer to track the audio energy (loudness) heard on
         # the source recently.  An average audio energy is maintained
@@ -565,21 +600,6 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                     listen = self.hotword_engines[hotword]["listen"]
 
                     LOG.debug("Hot Word: " + hotword)
-                    # If enabled, play a wave file with a short sound to audibly
-                    # indicate hotword was detected.
-                    if sound:
-                        try:
-                            audio_file = resolve_resource_file(sound)
-                            source.mute()
-                            if audio_file.endswith(".wav"):
-                                play_wav(audio_file).wait()
-                            elif audio_file.endswith(".mp3"):
-                                play_mp3(audio_file).wait()
-                            elif audio_file.endswith(".ogg"):
-                                play_ogg(audio_file).wait()
-                            source.unmute()
-                        except Exception as e:
-                            LOG.warning(e)
 
                     # Hot Word succeeded
                     payload = {
@@ -630,6 +650,23 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
                     # reset bytearray to store wake word audio in, else many
                     # serial detections
                     byte_data = silence
+
+                # If enabled, play a wave file with a short sound to audibly
+                # indicate hotword was detected.
+                if sound:
+                    try:
+                        audio_file = resolve_resource_file(sound)
+                        source.mute()
+                        if audio_file.endswith(".wav"):
+                            play_wav(audio_file).wait()
+                        elif audio_file.endswith(".mp3"):
+                            play_mp3(audio_file).wait()
+                        elif audio_file.endswith(".ogg"):
+                            play_ogg(audio_file).wait()
+                        source.unmute()
+                        LOG.debug("audio playback done")
+                    except Exception as x:
+                        LOG.error(x)
 
     def check_for_hotwords(self, byte_data, source):
         # check hot word
@@ -682,19 +719,42 @@ class ResponsiveRecognizer(speech_recognition.Recognizer):
         #       speech is detected, but there is no code to actually do that.
         self.adjust_for_ambient_noise(source, 1.0)
 
-        LOG.debug("Waiting for wake word...")
-        self._wait_until_wake_word(source, sec_per_buffer, bus)
-        self._listen_triggered = False
-        if self._stop_signaled:
-            return
+        # If skipping wake words, just pass audio to our streaming STT
 
-        LOG.debug("Recording...")
-        bus.emit("recognizer_loop:record_begin")
+        if stream and not self.use_wake_word:
+            stream.stream_start()
+            create_signal("CORE_streamToSTT")
+            frame_data = get_silence(source.SAMPLE_WIDTH)
+            LOG.debug("Stream starting!")
+            while check_for_signal("CORE_streamToSTT", -1):
+                # Pass audio until STT tells us to stop (this is called again immediately)
+                chunk = self.record_sound_chunk(source)
+                if not is_speaking():
+                    # Filter out Neon speech
+                    stream.stream_chunk(chunk)
+                    frame_data += chunk
+            LOG.debug("stream ended!")
+        # If using wake words, wait until the wake_word is detected and then record the following phrase
+        else:
+            LOG.debug("Waiting for wake word...")
+            self._wait_until_wake_word(source, sec_per_buffer, bus)
+            LOG.debug("Waited")
+            self._listen_triggered = False
+            LOG.debug("Trigger Reset")
+            if self._stop_signaled:
+                return
 
-        frame_data = self._record_phrase(source, sec_per_buffer, stream)
+            LOG.debug("Recording...")
+            bus.emit("recognizer_loop:record_begin")
+
+            frame_data = self._record_phrase(source, sec_per_buffer, stream)
+
+            bus.emit("recognizer_loop:record_end")
+
+        # After the phrase is complete, save the audio frame_data and return it
         audio_data = self._create_audio_data(frame_data, source)
-
         bus.emit("recognizer_loop:record_end")
+
         if self.save_utterances:
             LOG.info("Recording utterance")
             stamp = str(datetime.datetime.now())
