@@ -27,8 +27,6 @@ kthread
 ovos_utils>=0.0.5
 ovos-skills-manager>=0.0.2
 
-fastlang
-
 boto3
 numpy
 pydub
