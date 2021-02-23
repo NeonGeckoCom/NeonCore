@@ -497,31 +497,13 @@ def load_tts_plugin(module_name):
 
 
 class TTSFactory:
-    from mycroft.tts.espeak_tts import ESpeak
-    from mycroft.tts.fa_tts import FATTS
-    from mycroft.tts.google_tts import GoogleTTS
-    from mycroft.tts.mary_tts import MaryTTS
     from mycroft.tts.mimic_tts import Mimic
-    from mycroft.tts.spdsay_tts import SpdSay
-    from mycroft.tts.bing_tts import BingTTS
-    from mycroft.tts.ibm_tts import WatsonTTS
-    from mycroft.tts.responsive_voice_tts import ResponsiveVoiceTTS
     from mycroft.tts.mimic2_tts import Mimic2
-    from mycroft.tts.yandex_tts import YandexTTS
     from mycroft.tts.polly_tts import PollyTTS
 
     CLASSES = {
         "mimic": Mimic,
         "mimic2": Mimic2,
-        "google": GoogleTTS,
-        "marytts": MaryTTS,
-        "fatts": FATTS,
-        "espeak": ESpeak,
-        "spdsay": SpdSay,
-        "watson": WatsonTTS,
-        "bing": BingTTS,
-        "responsive_voice": ResponsiveVoiceTTS,
-        "yandex": YandexTTS,
         "polly": PollyTTS
     }
 
