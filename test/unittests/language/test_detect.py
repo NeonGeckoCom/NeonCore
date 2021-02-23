@@ -16,7 +16,17 @@
 #
 import unittest
 from mycroft.language import Pycld2Detector, Pycld3Detector, \
-    FastLangDetector, LangDetectDetector, GoogleDetector
+    FastLangDetector, LangDetectDetector, GoogleDetector, \
+    LibreTranslateDetector
+
+
+class TestLibreTranslate(unittest.TestCase):
+    def test_detect(self):
+        d = LibreTranslateDetector()
+        self.assertEqual(d.detect("My name is Neon"), "en")
+        self.assertEqual(d.detect("O meu nome é Jarbas"), "pt")
+        self.assertEqual(d.detect("O meu nome é neon"), "pt")
+        self.assertNotEqual(d.detect("My name is jarbas"), "en")
 
 
 class TestGoogle(unittest.TestCase):
