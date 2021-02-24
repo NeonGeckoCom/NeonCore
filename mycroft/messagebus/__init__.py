@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from mycroft.messagebus.client.client import MessageBusClient
-from mycroft.messagebus.message import Message
+from mycroft_bus_client import MessageBusClient, Message
 from mycroft.messagebus.service.event_handler import MessageBusEventHandler
 from mycroft.util import create_daemon
 from mycroft.util.json_helper import merge_dict
