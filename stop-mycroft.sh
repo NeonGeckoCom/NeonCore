@@ -98,7 +98,7 @@ case ${OPT} in
         end-process skills
         end-process audio
         end-process speech
-        end-process enclosure
+        end-process gui
         ;;
     "bus")
         end-process messagebus.service
@@ -112,8 +112,8 @@ case ${OPT} in
     "voice")
         end-process speech
         ;;
-    "enclosure")
-        end-process enclosure
+    "gui")
+        end-process gui
         ;;
 
     *)

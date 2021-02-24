@@ -57,7 +57,7 @@ class DevicePrimer(object):
     """
     def __init__(self, message_bus_client, config):
         self.bus = message_bus_client
-        self.platform = config['enclosure'].get("platform", "unknown")
+        self.platform = "generic"
         self.enclosure = EnclosureAPI(self.bus)
         self.is_paired = False
         self.backend_down = False

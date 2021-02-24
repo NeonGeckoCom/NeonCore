@@ -252,14 +252,6 @@ class DeviceApi(Api):
         platform = "unknown"
         platform_build = ""
 
-        # load just the local configs to get platform info
-        config = Configuration.get([SYSTEM_CONFIG,
-                                    USER_CONFIG],
-                                   cache=False)
-        if "enclosure" in config:
-            platform = config.get("enclosure").get("platform", "unknown")
-            platform_build = config.get("enclosure").get("platform_build", "")
-
         return self.request({
             "method": "POST",
             "path": "/activate",
