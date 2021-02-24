@@ -33,12 +33,12 @@ So it is common to have '' as the active skill.
 """
 
 import json
-from threading import Thread, Timer
+from threading import Timer
 
 import os
 
 from mycroft.messagebus import get_messagebus
-from mycroft.util import get_ipc_directory, wait_for_exit_signal
+from mycroft.util import get_ipc_directory
 from mycroft.util.log import LOG
 
 
