@@ -60,7 +60,6 @@ def handle_speak(event):
 
     Parse sentences and invoke text to speech service.
     """
-    config = Configuration.get()
     Configuration.set_config_update_handlers(bus)
     global _last_stop_signal
 
@@ -74,47 +73,14 @@ def handle_speak(event):
     # Get conversation ID
     event.context['ident'] = event.context.get("ident", "unknown")
 
-    start = time.time()  # Time of speech request
     with lock:
         stopwatch = Stopwatch()
         stopwatch.start()
         utterance = event.data['utterance']
-        # This is a bit of a hack for Picroft.  The analog audio on a Pi blocks
-        # for 30 seconds fairly often, so we don't want to break on periods
-        # (decreasing the chance of encountering the block).  But we will
-        # keep the split for non-Picroft installs since it give user feedback
-        # faster on longer phrases.
-        #
-        # TODO: Remove or make an option?  This is really a hack, anyway,
-        # so we likely will want to get rid of this when not running on Mimic
-        if (config.get('enclosure', {}).get('platform') != "picroft" and
-                len(re.findall('<[^>]*>', utterance)) == 0):
-            # Remove any whitespace present after the period,
-            # if a character (only alpha) ends with a period
-            # ex: A. Lincoln -> A.Lincoln
-            # so that we don't split at the period
-            utterance = re.sub(r'\b([A-za-z][\.])(\s+)', r'\g<1>', utterance)
-            chunks = re.split(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\;|\?)\s',
-                              utterance)
-            for chunk in chunks:
-                # Check if somthing has aborted the speech
-                if (_last_stop_signal > start or
-                        check_for_signal('buttonPress')):
-                    # Clear any newly queued speech
-                    tts.playback.clear()
-                    break
-                try:
-                    mute_and_speak(chunk, event)
-                except KeyboardInterrupt:
-                    raise
-                except Exception:
-                    LOG.error('Error in mute_and_speak', exc_info=True)
-        else:
-            mute_and_speak(utterance, event)
-
+        mute_and_speak(utterance, event)
         stopwatch.stop()
-    report_timing(event.context['ident'], 'speech', stopwatch, {'utterance': utterance,
-                                               'tts': tts.__class__.__name__})
+    report_timing(event.context['ident'], 'speech', stopwatch,
+                  {'utterance': utterance, 'tts': tts.__class__.__name__})
 
 
 def mute_and_speak(utterance, event):
