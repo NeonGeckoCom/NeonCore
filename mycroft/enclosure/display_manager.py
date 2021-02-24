@@ -180,5 +180,3 @@ def init_display_manager_bus_connection():
     bus.on('recognizer_loop:audio_output_end', set_delay)
     bus.on('recognizer_loop:audio_output_start', set_remove_flag)
     bus.on('recognizer_loop:record_begin', set_wakeword_skill)
-
-    wait_for_exit_signal()
