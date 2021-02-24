@@ -18,6 +18,7 @@ from glob import glob
 from threading import Thread, Event
 from time import sleep
 from os.path import expanduser, join, isdir
+from inspect import signature
 
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration
@@ -293,8 +294,18 @@ class SkillManager(Thread):
                     intents = skill_loader.instance.handle_internal_intents
                     handled = intents(message)
                     if not handled:
-                        handled = skill_loader.instance.converse(utterances,
-                                                                 lang)
+                        converse_method = skill_loader.instance.converse
+                        # new common style, 1 arg
+                        if len(signature(converse_method).parameters) == 1:
+                            handled = skill_loader.instance.converse(message)
+                        # old mycroft style, 2 args
+                        elif len(signature(converse_method).parameters) == 2:
+                            handled = skill_loader.instance.converse(utterances,
+                                                                     lang)
+                        # unrecognized signature
+                        else:
+                            raise ValueError("Arguments don't match function signature")
+
                     self._emit_converse_response(handled, message, skill_loader)
                 except Exception:
                     error_message = 'exception in converse method'

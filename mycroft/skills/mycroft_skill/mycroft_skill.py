@@ -372,7 +372,7 @@ class MycroftSkill(OldNeonCompatibilitySkill):
         """
         return None
 
-    def converse(self, utterances, lang=None):
+    def converse(self, message):
         """Handle conversation.
 
         This method gets a peek at utterances before the normal intent
@@ -382,12 +382,8 @@ class MycroftSkill(OldNeonCompatibilitySkill):
         indicate that the utterance has been handled.
 
         Arguments:
-            utterances (list): The utterances from the user.  If there are
-                               multiple utterances, consider them all to be
-                               transcription possibilities.  Commonly, the
-                               first entry is the user utt and the second
-                               is normalized() version of the first utterance
-            lang:       language the utterance is in, None for default
+            message (Message): The messagebus Message containing the
+                               utterances, language and context
 
         Returns:
             bool: True if an utterance was handled, otherwise False
@@ -400,7 +396,8 @@ class MycroftSkill(OldNeonCompatibilitySkill):
         Returns:
             str: user's response or None on a timeout
         """
-        def converse(utterances, lang=None):
+        def converse(message):
+            utterances = message.data["utterances"]
             converse.response = utterances[0] if utterances else None
             converse.finished = True
             return True
