@@ -16,12 +16,18 @@ from mycroft.messagebus.service.event_handler import MessageBusEventHandler
 from mycroft.util import create_daemon
 from mycroft.util.json_helper import merge_dict
 import json
+from threading import Event
 
 
 def get_messagebus(running=True):
     bus = MessageBusClient()
     if running:
+        bus_connected = Event()
+        # Set the bus connected event when connection is established
+        bus.once('open', bus_connected.set)
         create_daemon(bus.run_forever)
+        # Wait for connection
+        bus_connected.wait()
     return bus
 
 
