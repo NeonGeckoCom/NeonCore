@@ -298,14 +298,10 @@ class SkillManager(Thread):
                         # new common style, 1 arg
                         if len(signature(converse_method).parameters) == 1:
                             handled = skill_loader.instance.converse(message)
-                        # mycroft style, 2 args
+                        # old mycroft style, 2 args
                         elif len(signature(converse_method).parameters) == 2:
                             handled = skill_loader.instance.converse(utterances,
                                                                      lang)
-                        # old neon style, 3 args
-                        elif len(signature(converse_method).parameters) == 3:
-                            handled = skill_loader.instance.converse(utterances,
-                                                                     lang, message)
                         # unrecognized signature
                         else:
                             raise ValueError("Arguments don't match function signature")

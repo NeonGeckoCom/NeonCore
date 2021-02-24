@@ -372,7 +372,7 @@ class MycroftSkill(OldNeonCompatibilitySkill):
         """
         return None
 
-    def converse(self, message=None):
+    def converse(self, message):
         """Handle conversation.
 
         This method gets a peek at utterances before the normal intent
@@ -396,7 +396,8 @@ class MycroftSkill(OldNeonCompatibilitySkill):
         Returns:
             str: user's response or None on a timeout
         """
-        def converse(utterances, lang=None):
+        def converse(message):
+            utterances = message.data["utterances"]
             converse.response = utterances[0] if utterances else None
             converse.finished = True
             return True
