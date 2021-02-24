@@ -14,9 +14,21 @@
 #
 """ Interface for interacting with the Mycroft gui qml viewer. """
 from os.path import join
+import asyncio
+
+from collections import namedtuple
+from threading import Lock
 
 from mycroft.configuration import Configuration
+from mycroft.util import create_daemon
+from mycroft.util.log import LOG
+
+import tornado.web
+import json
+from tornado import ioloop
+from tornado.websocket import WebSocketHandler
 from mycroft.messagebus.message import Message
+from mycroft.messagebus import get_messagebus
 from mycroft.util import resolve_resource_file
 
 
@@ -276,36 +288,6 @@ class SkillGUI:
         self.clear()
         self.skill = None
 
-# Copyright 2017 Mycroft AI Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-import asyncio
-
-from collections import namedtuple
-from threading import Lock
-
-from mycroft.configuration import Configuration
-from mycroft.messagebus.client import MessageBusClient
-from mycroft.util import create_daemon
-from mycroft.util.log import LOG
-
-import tornado.web
-import json
-from tornado import autoreload, ioloop
-from tornado.websocket import WebSocketHandler
-from mycroft.messagebus.message import Message
-
 
 Namespace = namedtuple('Namespace', ['name', 'pages'])
 write_lock = Lock()
@@ -340,7 +322,7 @@ def _get_page_data(message):
 class GUIManager:
     def __init__(self, bus=None):
         # Establish Enclosure's websocket connection to the messagebus
-        self.bus = bus or MessageBusClient()
+        self.bus = bus or get_messagebus()
 
         config = Configuration.get()
 

@@ -19,7 +19,7 @@ from os.path import exists, isfile
 from adapt.intent import Intent
 
 from mycroft.messagebus.message import Message
-from mycroft.messagebus.client import MessageBusClient
+from mycroft.messagebus import get_messagebus
 from mycroft.util import create_daemon
 from mycroft.util.log import LOG
 
@@ -168,10 +168,7 @@ class IntentQueryApi:
     """
 
     def __init__(self, bus=None, timeout=5):
-        if bus is None:
-            bus = MessageBusClient()
-            create_daemon(bus.run_forever)
-        self.bus = bus
+        self.bus = bus or get_messagebus()
         self.timeout = timeout
 
     def get_adapt_intent(self, utterance, lang="en-us"):

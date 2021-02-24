@@ -37,8 +37,8 @@ from threading import Thread, Timer
 
 import os
 
-from mycroft.messagebus.client import MessageBusClient
-from mycroft.util import get_ipc_directory
+from mycroft.messagebus import get_messagebus
+from mycroft.util import get_ipc_directory, wait_for_exit_signal
 from mycroft.util.log import LOG
 
 
@@ -167,9 +167,6 @@ def init_display_manager_bus_connection():
     def set_remove_flag(event=None):
         should_remove[0] = False
 
-    def connect():
-        bus.run_forever()
-
     def remove_wake_word():
         data = _read_data()
         if "active_skill" in data and data["active_skill"] == "wakeword":
@@ -179,11 +176,9 @@ def init_display_manager_bus_connection():
         display_manager.set_active("wakeword")
         Timer(10, remove_wake_word).start()
 
-    bus = MessageBusClient()
+    bus = get_messagebus()
     bus.on('recognizer_loop:audio_output_end', set_delay)
     bus.on('recognizer_loop:audio_output_start', set_remove_flag)
     bus.on('recognizer_loop:record_begin', set_wakeword_skill)
 
-    event_thread = Thread(target=connect)
-    event_thread.setDaemon(True)
-    event_thread.start()
+    wait_for_exit_signal()
