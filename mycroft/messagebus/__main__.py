@@ -2,7 +2,8 @@
 import traceback
 from time import sleep
 from mycroft.util.log import LOG
-from mycroft.messagebus.client import MessageBusClient
+from mycroft.messagebus import get_messagebus
+from mycroft.util import wait_for_exit_signal
 
 
 def on_message(message):
@@ -11,9 +12,9 @@ def on_message(message):
 
 def main():
     sleep(0.5)
-    client = MessageBusClient()
+    client = get_messagebus()
     client.on("message", on_message)
-    client.run_forever()
+    wait_for_exit_signal()
 
 
 if __name__ == '__main__':

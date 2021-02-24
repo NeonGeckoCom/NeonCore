@@ -1,6 +1,6 @@
 import time
 from mycroft.messagebus.message import Message
-from mycroft.messagebus.client import MessageBusClient
+from mycroft.messagebus import get_messagebus
 from os.path import abspath
 
 
@@ -137,9 +137,8 @@ class DisplayService:
 
 if __name__ == "__main__":
     from time import sleep
-    from mycroft.util import create_daemon
-    bus = MessageBusClient()
-    create_daemon(bus.run_forever)
+
+    bus = get_messagebus()
 
     display = DisplayService(bus)
     display.set_fullscreen(False)
