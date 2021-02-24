@@ -14,8 +14,7 @@
 #
 import sys
 import json
-
-from .send_func import send
+from mycroft.messagebus import send_message
 
 
 def main():
@@ -48,7 +47,7 @@ def main():
               "'{\"utterance\" : \"hello\"}'")
         exit()
 
-    send(message_to_send, data_to_send)
+    send_message(message_to_send, data_to_send)
 
 
 if __name__ == '__main__':
