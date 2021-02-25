@@ -637,7 +637,8 @@ class ApertiumTranslator(LanguageTranslator):
         if source:
             lang_pair = source + "|" + target
         r = requests.get(self.url,
-                         params={"q": text, "langpair": lang_pair}).json()
+                         params={"q": text, "langpair": lang_pair,
+                                 "markUnknown": "no"}).json()
         if r.get("status", "") == "error":
             LOG.error(r["explanation"])
             return None
