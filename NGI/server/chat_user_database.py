@@ -16,113 +16,21 @@
 # Specialized conversational reconveyance options from Conversation Processing Intelligence Corp.
 # US Patents 2008-2021: US7424516, US20140161250, US20140177813, US8638908, US8068604, US8553852, US10530923, US10530924
 # China Patent: CN102017585  -  Europe Patent: EU2156652  -  Patents Pending
-from typing import Optional
 
-from mycroft.util.log import LOG
-import os
 import json
-from NGI.utilities.configHelper import NGIConfig as ngiConf
-# from NGI.utilities.utilHelper import LookupHelpers
-from neon_utils.location_utils import *
-from time import time
-
 import mysql.connector
 from mysql.connector import Error
+from time import time
+from neon_utils.location_utils import *
 
-
-def neon_should_respond(message):
-    """
-    Determines if Neon should respond to an utterance passed from the chat server
-    :param message: Message object associated with utterance
-    :return boolean to respond or not
-    """
-    if not message.context.get("klat_data"):
-        LOG.warning("Server function called on non-server")
-        return True
-    # filename = message.context.get("flac_filename", message.data.get("flac_filename"))
-    # if filename:
-    #     title = str(get_chat_conversation_title(filename))
-    # else:
-    #     title = None
-    title = message.context.get("klat_data", {}).get("title")
-    # LOG.debug(f"title={title}")
-    # LOG.debug(f">>>data={message.data}")
-    utterance = message.data.get("utterances", [""])[0].lower()
-    if utterance.startswith("@") and not utterance.startswith("@neon"):
-        # @user that isn't Neon
-        return False
-    elif message.data.get("Neon") or message.data.get("neon"):
-        # User Said "Neon"
-        return True
-    elif "neon" in utterance:
-        # String "neon" in the utterance
-        return True
-    elif "neon" in str(message.data.get("utterance")).lower():
-        # String "neon" in the utterance
-        LOG.warning("utterance passed instead of utterances")
-        return True
-    elif message.context.get("neon_should_respond", False):
-        # Explicit execute line
-        return True
-    elif not title:
-        LOG.error("null conversation title!")
-        return True
-    elif not title.startswith("!PRIVATE:"):
-        # Public Conversation
-        LOG.debug("DM: Public Conversation")
-        return False
-    elif title.startswith("!PRIVATE:"):
-        # Private Conversation
-        if ',' in title:
-            users = title.split(':')[1].split(',')
-            for idx, val in enumerate(users):
-                users[idx] = val.strip()
-            if len(users) == 2 and "Neon" in users:
-                # Private with Neon
-                # LOG.debug("DM: Private Conversation with Neon")
-                return True
-            else:
-                # Private with Other Users
-                LOG.debug("DM: Private Conversation with Others")
-                return False
-        else:
-            # Solo Private
-            # LOG.debug("DM: Private Conversation")
-            return True
-
-
-def get_chat_nickname_from_filename(filename):
-    LOG.warning(f"This method is depreciated. Please get nick from message.context['klat_data']")
-    filename = os.path.basename(filename)
-    LOG.info(filename)
-    file_parts = filename.split('-')
-    LOG.info(f"nick =  {str(file_parts[3])}")
-    return file_parts[3]
-
-
-def get_response_filename(path: str) -> Optional[str]:
-    """
-    Gets the appropriate destination path for a server response.
-    :param path: Desired output path
-    :return: Validated output path to use
-    """
-    x = 1
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    new_path = path
-    while os.path.exists(new_path):
-        parts = str(os.path.basename(new_path)).split('-')
-        parts[0] = 'sid' + str(x)
-        new_file_name = '-'.join(parts)
-        new_path = os.path.join(os.path.dirname(new_path), new_file_name)
-        x = x + 1
-    return new_path
+from NGI.utilities.configHelper import NGIConfig as ngiConf
+from mycroft.messagebus import MessageBusClient
+from mycroft.util import LOG, create_daemon
 
 
 class ChatUser:
     def __init__(self, nickname, dicts_requested=('user', 'brands', 'speech', 'units', 'location'),
                  cache_locations=None):
-        # TODO: This should probably use one self param per dict (user, brands, speech, units, location, skills DM
-
         if cache_locations is None:
             cache_locations = dict()
         start_time = time()
@@ -341,3 +249,130 @@ class ChatUser:
                 self.connection.close()
                 LOG.debug("get_chat_user_info time: " + str(time() - start_time))
                 LOG.debug("MySQL connection is closed")
+
+
+class KlatUserDatabase:
+    """
+    Class to hold profile data for Klat users
+    """
+    def __init__(self):
+        self.active_chat_users = {}
+
+        bus = MessageBusClient()
+        bus.on('neon.remove_cache_entry', self.remove_cached_profile)
+        create_daemon(bus.run_forever)
+
+    def get_profile(self, nick: str) -> dict:
+        return self.active_chat_users.get(nick)
+
+    @staticmethod
+    def _build_entry_for_nick(nick: str) -> dict:
+        """
+        Builds a ChatUser object for the passed nick and loads those preferences into a user dict for use in Neon Core.
+        :param nick: Klat nick to lookup
+        :return: Dict of user preferences
+        """
+        chat_user = ChatUser(nick)
+        try:
+            LOG.debug(chat_user)
+            user_profile_settings = {
+                "brands": {
+                    'ignored_brands': chat_user.brands_ignored,
+                    'favorite_brands': chat_user.brands_favorite,
+                    'specially_requested': chat_user.brands_requested,
+                },
+                "user": {
+                    'first_name': chat_user.first_name,
+                    'middle_name': chat_user.middle_name,
+                    'last_name': chat_user.last_name,
+                    'preferred_name': chat_user.nick,
+                    'full_name': " ".join([name for name in (chat_user.first_name,
+                                                             chat_user.middle_name,
+                                                             chat_user.last_name) if name]),
+                    'dob': chat_user.birthday,
+                    'age': chat_user.age,
+                    'email': chat_user.email,
+                    'username': nick,
+                    'password': chat_user.password,
+                    'picture': chat_user.avatar,
+                    'about': chat_user.about,
+                    'phone': chat_user.phone,
+                    'email_verified': chat_user.email_verified,
+                    'phone_verified': chat_user.phone_verified
+                },
+                "location": {
+                    'lat': chat_user.location_lat,
+                    'lng': chat_user.location_long,
+                    'city': chat_user.location_city,
+                    'state': chat_user.location_state,
+                    'country': chat_user.location_country,
+                    'tz': chat_user.location_tz,
+                    'utc': chat_user.location_utc
+                },
+                "units": {
+                    'time': chat_user.time_format,
+                    'date': chat_user.date_format,
+                    'measure': chat_user.unit_measure
+                },
+                "speech": {
+                 'stt_language': chat_user.stt_language,
+                 'stt_region': chat_user.stt_region,
+                 'alt_languages': ['en'],
+                 'tts_language': chat_user.tts_language,
+                 'tts_gender': chat_user.tts_gender,
+                 'neon_voice': chat_user.ai_speech_voice,
+                 'secondary_tts_language': chat_user.tts_secondary_language,
+                 'secondary_tts_gender': chat_user.tts_secondary_gender,
+                 'secondary_neon_voice': '',
+                 'speed_multiplier': chat_user.speech_rate
+                 # 'synonyms': chat_user.synonyms
+                },
+                "skills": {i.get("skill_id"): i for i in chat_user.skill_settings}
+            }
+        except Exception as e:
+            LOG.error(e)
+            user_profile_settings = None
+        return user_profile_settings
+
+    def update_profile_for_nick(self, nick: str):
+        """
+        Called to get a user from the remote database and save their profile locally in active_chat_users
+        :param nick: Klat nick to load
+        """
+        if nick not in self.active_chat_users:
+            self.active_chat_users[nick] = self._build_entry_for_nick(nick)
+
+    def get_nick_profiles(self, nicks: list) -> dict:
+        """
+        Ensures the passed list of user nicks are in active_chat_users and returns a dict of preferences for each nick
+        :param nicks: list of nicks in conversation
+        :return: dict of nicks: preferences
+        """
+        # nicks = self._get_nicks_for_shout_conversation(filename)
+        # LOG.info('shout_id = '+str(shout_id))
+        if not isinstance(nicks, list):
+            raise TypeError("Expected list of nicks")
+        nicks_in_conversation = dict()
+        for nickname in nicks:
+            if nickname == "neon":
+                LOG.debug("Ignoring neon")
+            elif nickname not in self.active_chat_users:
+                self.update_profile_for_nick(nickname)
+            nicks_in_conversation[nickname] = self.active_chat_users[nickname]
+            LOG.info(nicks_in_conversation[nickname])
+        return nicks_in_conversation
+
+    def remove_cached_profile(self, message):
+        """
+        Handler to remove a cached nick profile when a profile is updated.
+        This may be called when a skill or external source changes a user profile
+        :param message: Message associated with request
+        """
+        # LOG.debug(f"DM: remove_cache_entry called message={message.data}")
+        # LOG.debug(message.data)
+        nick = message.data.get("nick", "")  # This IS data, not context
+        if not nick:
+            LOG.error("Invalid remove cache entry request")
+            return
+        LOG.debug(f"Removing cached nick: {nick}")
+        self.active_chat_users.pop(nick)

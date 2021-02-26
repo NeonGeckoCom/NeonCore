@@ -38,7 +38,7 @@ from NGI.server.email_utils import write_out_email_attachments, send_ai_email
 from NGI.utilities.configHelper import NGIConfig
 # from NGI.utilities.lookupUtils import *
 # from NGI.utilities.utilHelper import return_close_values as search_string
-from NGI.utilities.chat_user_util import get_chat_nickname_from_filename, get_response_filename
+# from NGI.server.server_parse_utils import get_chat_nickname_from_filename, get_response_filename
 from mycroft import Message
 # from mycroft.device import get_ip_address
 from neon_utils.net_utils import get_ip_address
@@ -315,6 +315,14 @@ def handle_script_upload(message):
     The plaintext script as well as compiled version are handled here.
     :param message: message associated with upload event
     """
+    # TODO: This is depreciated once nick is added to messages DM
+    def get_chat_nickname_from_filename(filename):
+        filename = os.path.basename(filename)
+        LOG.info(filename)
+        file_parts = filename.split('-')
+        LOG.info(f"nick =  {str(file_parts[3])}")
+        return file_parts[3]
+
     file_text = message.data.get("nctText")
     flac_file = message.data.get("filename")
     output_path = os.path.join(LOCAL_CONFIG["dirVars"]["skillsDir"], "custom-conversation.neon", "script_txt")
@@ -506,10 +514,28 @@ def handle_mobile_request(message):
         #                            'nick': sender}))
 
 
-def handle_chat_user_response(message):
+def handle_klat_response(message):
     """
-    Messagebus handler for "recognizer_loop:chatUser_response". Handles responses from Neon and sends them to Klat
+    Messagebus handler for "klat.response". Handles responses from Neon and sends them to Klat
     """
+
+    def get_response_filename(path: str) -> Optional[str]:
+        """
+        Gets the appropriate destination path for a server response.
+        :param path: Desired output path
+        :return: Validated output path to use
+        """
+        x = 1
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        new_path = path
+        while os.path.exists(new_path):
+            parts = str(os.path.basename(new_path)).split('-')
+            parts[0] = 'sid' + str(x)
+            new_file_name = '-'.join(parts)
+            new_path = os.path.join(os.path.dirname(new_path), new_file_name)
+            x = x + 1
+        return new_path
+
     LOG.info(message.data)
     responses = message.data["responses"]
     request_id = message.context["klat_data"]["request_id"]
@@ -808,13 +834,13 @@ def main():
     bus.on('get_location', handle_get_location)
     bus.on("css.emit", handle_css_emit)
     # bus.on('neon.update_cache', handle_cache_update)
-    bus.on('nct_file_update', handle_script_upload)
     bus.on("neon.mobile_request", handle_mobile_request)
     bus.on("neon.metric", handle_metric)
-    bus.on("recognizer_loop:chatUser_response", handle_chat_user_response)
+    bus.on("klat.response", handle_klat_response)
 
     # Klat Server Originated
     bus.on("klat.shout", handle_shout)
+    bus.on('nct_file_update', handle_script_upload)
 
     logging.getLogger("socketIO-client").setLevel(logging.WARNING)
     logging.getLogger("github.Requester").setLevel(logging.WARNING)
@@ -834,7 +860,6 @@ def main():
 
     start_time = time.time()
     if isfile(loc_cache):
-        LOG.debug("DM: cache exists")
         with open(loc_cache, 'rb') as cached_locations:
             try:
                 locations = pickle.load(cached_locations)
