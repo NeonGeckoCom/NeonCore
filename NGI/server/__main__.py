@@ -17,6 +17,8 @@
 # US Patents 2008-2021: US7424516, US20140161250, US20140177813, US8638908, US8068604, US8553852, US10530923, US10530924
 # China Patent: CN102017585  -  Europe Patent: EU2156652  -  Patents Pending
 
+# import glob
+import os
 import logging
 import pickle
 import shutil
@@ -27,21 +29,21 @@ import github
 
 from os.path import isfile
 from pprint import pformat
-from threading import Thread
+from threading import Thread  # , Lock
 from typing import Optional
 from pydub import AudioSegment
 from socketIO_client import SocketIO
-from neon_utils.net_utils import get_ip_address
+
 from NGI.server.email_utils import write_out_email_attachments, send_ai_email
 from NGI.utilities.configHelper import NGIConfig
-
-# TODO: Move these to neon-utils package DM
-from NGI.utilities.lookupUtils import *
-from NGI.utilities.utilHelper import return_close_values as search_string
-
-# TODO: Depreciate these parser methods DM
+# from NGI.utilities.lookupUtils import *
+# from NGI.utilities.utilHelper import return_close_values as search_string
 from NGI.utilities.chat_user_util import get_chat_nickname_from_filename, get_response_filename
 from mycroft import Message
+# from mycroft.device import get_ip_address
+from neon_utils.net_utils import get_ip_address
+from neon_utils.location_utils import *
+from neon_utils.search_utils import search_convo_dict
 from mycroft.messagebus import MessageBusClient
 from mycroft.util import LOG, reset_sigint_handler, create_daemon, wait_for_exit_signal, check_for_signal, deepcopy
 from mycroft.lock import Lock as PIDLock
@@ -351,8 +353,6 @@ def handle_script_upload(message):
                 backup_file = os.path.join(output_path, "backup",
                                            f"{file_basename}_{time.strftime('%Y-%m-%d--%H_%M')}")
                 shutil.move(output_file, backup_file)
-        # else:
-        #     old_script, old_name, old_author = None, None, None
     except Exception as e:
         LOG.error(e)
         os.remove(output_file)
@@ -419,7 +419,7 @@ def handle_mobile_request(message):
         sender = data[0]
         search = data[1]
         LOG.debug(f"{sender} wants a domain about {search} in {len(DOM_DICT)} domains")
-        results = search_string(DOM_DICT, search, 8)
+        results = search_convo_dict(DOM_DICT, search, 8)
         LOG.debug(results)
         # css.emit("mobile request from neon", "domain search results", results, sender)
         css.emit("mobile request from neon", "search results", results, sender)
@@ -428,7 +428,7 @@ def handle_mobile_request(message):
         sender = data[0]
         search = data[1]
         LOG.debug(f"{sender} wants a conversation about {search} in {len(CON_DICT)} conversations")
-        temp_results = search_string(CON_DICT, search, 8, False)
+        temp_results = search_convo_dict(CON_DICT, search, 8, False)
         LOG.debug(temp_results)
         results = dict()
         for result in temp_results:
@@ -445,7 +445,7 @@ def handle_mobile_request(message):
         sender = data[0]
         search = data[1]
         LOG.debug(f"{sender} wants a shout about {search} in {len(MSG_DICT)} shouts")
-        temp_results = search_string(MSG_DICT, search, 8, False)
+        temp_results = search_convo_dict(MSG_DICT, search, 8, False)
         LOG.debug(temp_results)
         results = dict()
         for result in temp_results:
@@ -468,7 +468,8 @@ def handle_mobile_request(message):
         css.emit("mobile request from neon", "domain list", DOM_LIST, data)
     elif kind == "get scripts list":
         LOG.debug(f"DM: Get Scripts List! {data}")
-        available = get_scripts_list()
+        response = bus.wait_for_response(message.forward("neon.get_scripts"))
+        available = response.data.get("available_scripts")  # TODO: This needs to be tested
         LOG.debug(f"DM: {available}")
         css.emit("mobile request from neon", "scripts list", available, data)
     elif kind == "send email":
@@ -510,8 +511,8 @@ def handle_chat_user_response(message):
     Messagebus handler for "recognizer_loop:chatUser_response". Handles responses from Neon and sends them to Klat
     """
     LOG.info(message.data)
-    responses = message.data["responses"]  # TODO: This should be standard cached audio; server-specificity happens here
-    # TODO: Need to include 'flac_filename' to move files too, but cached audio should be generic
+    responses = message.data["responses"]
+    request_id = message.context["klat_data"]["request_id"]
     LOG.debug(responses)
     if message.data.get("speaker"):
         utt_from = message.data["speaker"].get("name", "Neon")
@@ -521,69 +522,66 @@ def handle_chat_user_response(message):
     sudo_password = ''
 
     server_ip = get_ip_address()
-    LOG.debug(f"server IP = {server_ip}")
+    # LOG.debug(f"server IP = {server_ip}")
     for server, password in list(NGIConfig("ngi_auth_vars").content['servers'].items()):
         if server in server_ip:
             sudo_password = password
 
-    for resp in responses.keys():
-        LOG.debug(resp)
-        lang = resp
-        response_data = responses[resp]
+    for lang in responses.keys():
+        # LOG.debug(lang)
+        response_data = responses[lang]
         try:
-            LOG.debug(f"data={message.data}")
+            # LOG.debug(f"data={message.data}")
             if message.data and message.data.get("speaker").get("override_user", False):
-                LOG.debug(lang)
-                lang = f"00_{lang}"
+                # LOG.debug(lang)
+                lang = f"00_{lang}"  # This is handled on the chat server as going to all users, regarless of user lang
         except Exception as e:
             LOG.error(e)
 
-        LOG.debug(f"{lang} = {response_data}")
-        wav_files = [response_data.get("male", None), response_data.get("female", None)]
+        # LOG.debug(f"{lang} = {response_data}")
+        response_audio_files = [response_data.get("male", None), response_data.get("female", None)]
 
-        gender = 'both'
-        if wav_files[0] is None:
+        if response_audio_files[0] is None:
             gender = 'female'
+        elif response_audio_files[1] is None:
+            gender = 'male'
         else:
-            if wav_files[1] is None:
-                gender = 'male'
+            gender = 'both'
 
-        LOG.debug(wav_files)
+        LOG.debug(response_audio_files)
         sentence = response_data.get("sentence")
         LOG.debug(sentence)
 
         for i in (0, 1):
-            if wav_files[i]:
-                wav_file = wav_files[i]
-                LOG.debug(f"Processing: {wav_file}")
-                path_to_check = '/var/www/html/klatchat/app/files/chat_audio/' + os.path.basename(wav_file)
+            if response_audio_files[i]:
+                neon_response_audio = response_audio_files[i]
+                # LOG.debug(f"Processing: {neon_response_audio}")
+                file_ext = os.path.splitext(neon_response_audio)[1]
+                path_to_check = f'/var/www/html/klatchat/app/files/chat_audio/{request_id}{file_ext}'
                 try:
-                    path_to_check = get_response_filename(path_to_check)
-                    if os.path.isfile(wav_file):
-                        command = 'mv ' + wav_file + ' ' + path_to_check
-                        LOG.debug('>>>>>>_handle_chatUser_response, command = ' + command)
+                    response_filename = get_response_filename(path_to_check)
+                    LOG.debug(f"write audio response to: {response_filename}")
+                    if os.path.isfile(neon_response_audio):
+                        command = f'cp {neon_response_audio} {response_filename}'
                         p = subprocess.call('echo %s|sudo -S %s' % (sudo_password, command), shell=True)
-                        LOG.debug('>>>>>>_handle_chatUser_response, response = ' + str(p))
-                        command = 'chown root:root ' + path_to_check
-                        LOG.debug('>>>>>>_handle_chatUser_response, command 2 = ' + command)
+                        command = f'chown root:root {response_filename}'
                         q = subprocess.call('echo %s|sudo -S %s' % (sudo_password, command), shell=True)
-                        LOG.debug('>>>>>>_handle_chatUser_response, response 2 = ' + str(q))
-
-                        new_filename = os.path.basename(path_to_check)
-                        wav_files[i] = new_filename
+                        LOG.debug(f"copy_status={p} | chown_status={q}")
+                        new_filename = os.path.basename(response_filename)
+                        response_audio_files[i] = new_filename
                     else:
-                        # TODO: This occurs for every admin test DM
-                        LOG.warning(f"{wav_file} doesn't exist! Maybe it was already moved?")
-                        wav_files[i] = None
+                        LOG.warning(f"{neon_response_audio} doesn't exist!")
+                        response_audio_files[i] = None
                 except Exception as e:
-                    LOG.error('''error == ''' + str(e))
-        LOG.debug(wav_files)
+                    LOG.error(f"error == {e}")
+        # LOG.debug(response_audio_files)
 
-        LOG.debug(f"emitting: {sentence} | lang={lang} | gender={gender}")
+        # LOG.debug(f"emitting: {sentence} | lang={lang} | gender={gender}")
+        # LOG.debug(f"audio_files: {response_audio_files}")
         bus.emit(Message("css.emit", {"event": "mycroft response",
-                                      "data": [sentence, wav_files, lang, None, utt_from, gender]}))
+                                      "data": [sentence, response_audio_files, lang, None, utt_from, gender]}))
 
-        LOG.debug(f"data|context={message.data}|{message.context}")
+        # LOG.debug(f"data|context={message.data}|{message.context}")
 
         if message.context["cc_data"].get("signal_to_check", ""):
             LOG.info(f'clear signal: {message.context["cc_data"]["signal_to_check"]}')
@@ -654,7 +652,6 @@ def handle_check_release(message):
     shared_repo = "NeonGeckoCom/neon-shared-core"
     repo_branch = "dev"  # TODO: This should be variable or later default to master
     try:
-        logging.getLogger("github.Requester").setLevel(logging.WARNING)
         gh = github.Github(login_or_token=NGIConfig("ngi_auth_vars").content.get("git", {}).get("token"))
         repo = gh.get_repo(shared_repo)
         branch = repo.get_branch(repo_branch)
@@ -766,11 +763,11 @@ def handle_shout(message):
 
     if audio_file and os.path.exists(audio_file):
         LOG.debug(audio_file)
-        LOG.debug(os.path.isfile(audio_file))
+        # LOG.debug(os.path.isfile(audio_file))
         song = AudioSegment.from_file(audio_file)
         if need_transcription:
-            LOG.info(song.dBFS)
-            LOG.info(song.duration_seconds)
+            # LOG.info(song.dBFS)
+            # LOG.info(song.duration_seconds)
             # TODO: Read params from config DM
             minimum_level = -25.0
             minimum_length = 2.0
@@ -785,7 +782,7 @@ def handle_shout(message):
                 LOG.info('audio loud or long enough to use.')
     else:
         audio_file = None
-    # LOG.debug(f"Handling utterance with audio: {audio_path}")
+    # LOG.debug(f"Handling utterance with audio: {audio_file}")
     msg = Message("recognizer_loop:klat_utterance", {"raw_audio": audio_file,
                                                      "shout_text": text, "need_transcription": need_transcription,
                                                      "cid_nicks": cid_nicks, "nano": nano, "user": nick,
@@ -820,6 +817,8 @@ def main():
     bus.on("klat.shout", handle_shout)
 
     logging.getLogger("socketIO-client").setLevel(logging.WARNING)
+    logging.getLogger("github.Requester").setLevel(logging.WARNING)
+    logging.getLogger("pydub.converter").setLevel(logging.WARNING)
     logging.basicConfig()
     css.on("connect", on_connect)
     css.on("disconnect", on_disconnect)

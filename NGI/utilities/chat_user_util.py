@@ -19,11 +19,11 @@
 from typing import Optional
 
 from mycroft.util.log import LOG
-from mycroft.device import device  # TODO: This can probably be depreciated and config value used instead
 import os
 import json
-from NGI.utilities.configHelper import NGIConfig
-from NGI.utilities.utilHelper import LookupHelpers
+from NGI.utilities.configHelper import NGIConfig as ngiConf
+# from NGI.utilities.utilHelper import LookupHelpers
+from neon_utils.location_utils import *
 from time import time
 
 import mysql.connector
@@ -92,12 +92,7 @@ def neon_should_respond(message):
 
 
 def get_chat_nickname_from_filename(filename):
-    # TODO: Script upload only gets filename, need to update Klat emit to depreciate this method DM
     LOG.warning(f"This method is depreciated. Please get nick from message.context['klat_data']")
-    if not device == "server":
-        LOG.warning("Server function called on non-server")
-        return None
-    # LOG.info(filename)
     filename = os.path.basename(filename)
     LOG.info(filename)
     file_parts = filename.split('-')
@@ -111,30 +106,23 @@ def get_response_filename(path: str) -> Optional[str]:
     :param path: Desired output path
     :return: Validated output path to use
     """
-    if not device == "server":
-        LOG.warning("Server function called on non-server")
-        return None
     x = 1
     os.makedirs(os.path.dirname(path), exist_ok=True)
     new_path = path
     while os.path.exists(new_path):
-        LOG.debug(f"{new_path} already exists!")
         parts = str(os.path.basename(new_path)).split('-')
         parts[0] = 'sid' + str(x)
         new_file_name = '-'.join(parts)
-        if not os.path.splitext(new_file_name)[1]:
-            new_path = os.path.join(os.path.dirname(new_path), new_file_name + ".wav")
-        else:
-            new_path = os.path.join(os.path.dirname(new_path), new_file_name)
+        new_path = os.path.join(os.path.dirname(new_path), new_file_name)
         x = x + 1
-
-    LOG.debug(f"new|input = {new_path} | {path}")
     return new_path
 
 
 class ChatUser:
     def __init__(self, nickname, dicts_requested=('user', 'brands', 'speech', 'units', 'location'),
                  cache_locations=None):
+        # TODO: This should probably use one self param per dict (user, brands, speech, units, location, skills DM
+
         if cache_locations is None:
             cache_locations = dict()
         start_time = time()
@@ -160,11 +148,7 @@ class ChatUser:
         self.location_state = 'Washington'
         self.location_country = 'USA'
         self.cache_locations = cache_locations
-        # self.connectStr = ngi_conf().configuration_available["authVars"]["chatDbConnect"]
-        # LOG.debug('connectstr = ' + self.connectStr)
-        # self.user_config = ngiConf("ngi_user_info").content
-        # self.local_config = ngiConf("ngi_local_conf").content
-        self.config = NGIConfig("ngi_auth_vars").content  # TODO: These secrets should be encrypted on disk DM
+        self.config = ngiConf("ngi_auth_vars").content
         LOG.debug("config init time: " + str(time() - start_time))
         self.host = self.config['chatUserDbConnection']['host']
         self.database = self.config['chatUserDbConnection']['database']
@@ -215,7 +199,7 @@ class ChatUser:
                         (not self.location_lat and self.location_city):
                     LOG.debug("GBD: >>>Updating default lat/lng!")
                     # TODO: Reverse dict lookup cache
-                    self.location_lat, self.location_long = LookupHelpers.get_coordinates(
+                    self.location_lat, self.location_long = get_coordinates(
                         {'city': self.location_city,
                          'state': self.location_state,
                          'country': self.location_country})
@@ -231,7 +215,7 @@ class ChatUser:
                         self.location_country = loc_data["country"]
                     else:
                         self.location_city, _, self.location_state, self.location_country = \
-                            LookupHelpers.get_location(self.location_lat, self.location_long)
+                            get_location(self.location_lat, self.location_long)
                         self.cache_locations[f"{self.location_lat}, {self.location_long}"] = {
                             "city": self.location_city, "state": self.location_state, "country": self.location_country}
                     self.updated_profile = True
@@ -245,13 +229,12 @@ class ChatUser:
                     self.location_state = 'Washington'
                     self.location_country = 'USA'
 
-                if not self.location_tz:
-                    self.location_tz, self.location_utc = LookupHelpers.get_timezone(self.location_lat,
-                                                                                     self.location_long)
+                if not self.location_tz or not self.location_utc:
+                    self.location_tz, self.location_utc = get_timezone(self.location_lat, self.location_long)
                     self.updated_profile = True
-                elif not self.location_utc and self.location_tz:
-                    self.location_utc = LookupHelpers.get_offset(self.location_tz)
-                    self.updated_profile = True
+                # elif not self.location_utc and self.location_tz:
+                #     self.location_utc = get_offset(self.location_tz)
+                #     self.updated_profile = True
                 LOG.debug(">>>Profile tz, utc: " + str(self.location_tz) + ' ' + str(self.location_utc))
             except Exception as e:
                 LOG.error(e)
@@ -344,7 +327,7 @@ class ChatUser:
                         self.phone = row[33]
                         # self.synonyms = json.loads(row[34])
                         LOG.info(row[35])
-                        self.skill_settings = json.loads(row[35].strip('"'))
+                        self.skill_settings = json.loads(row[35].strip('"')) if row[35] else {}
                         LOG.info(self.skill_settings)
 
         except Error as e:
