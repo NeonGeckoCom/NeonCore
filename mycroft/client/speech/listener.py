@@ -1,3 +1,26 @@
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
+#
+# Copyright 2008-2021 Neongecko.com Inc. | All Rights Reserved
+#
+# Notice of License - Duplicating this Notice of License near the start of any file containing
+# a derivative of this software is a condition of license for this software.
+# Friendly Licensing:
+# No charge, open source royalty free use of the Neon AI software source and object is offered for
+# educational users, noncommercial enthusiasts, Public Benefit Corporations (and LLCs) and
+# Social Purpose Corporations (and LLCs). Developers can contact developers@neon.ai
+# For commercial licensing, distribution of derivative works or redistribution please contact licenses@neon.ai
+# Distributed on an "AS IS” basis without warranties or conditions of any kind, either express or implied.
+# Trademarks of Neongecko: Neon AI(TM), Neon Assist (TM), Neon Communicator(TM), Klat(TM)
+# Authors: Guy Daniels, Daniel McKnight, Regina Bloomstine, Elon Gasper, Richard Leeds
+#
+# Specialized conversational reconveyance options from Conversation Processing Intelligence Corp.
+# US Patents 2008-2021: US7424516, US20140161250, US20140177813, US8638908, US8068604, US8553852, US10530923, US10530924
+# China Patent: CN102017585  -  Europe Patent: EU2156652  -  Patents Pending
+#
+# This software is an enhanced derivation of the Mycroft Project which is licensed under the
+# Apache software Foundation software license 2.0 https://www.apache.org/licenses/LICENSE-2.0
+# Changes Copyright 2008-2021 Neongecko.com Inc. | All Rights Reserved
+#
 # Copyright 2017 Mycroft AI Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,36 +67,57 @@ STREAM_STOP = 3
 
 
 class AudioStreamHandler(object):
-    def __init__(self, queue):
-        self.queue = queue
+    """
+    Handles audio stream routing for StreamingSTT classes. The wakeword recognizer will call sream_start when a wake
+    word is detected, then call stream_chunk with all audio chunks captured before calling stream_stop after meeting
+    recording length or silence thresholds.
+    """
+
+    def __init__(self, stream_queue):
+        self.queue = stream_queue
 
     def stream_start(self):
-        self.queue.put((STREAM_START, None))
+        """
+        Add an item to the queue to notify STT we are opening an audio stream.
+        """
+        self.queue.put((STREAM_START, None, None))
 
     def stream_chunk(self, chunk):
-        self.queue.put((STREAM_DATA, chunk))
+        """
+        Add an audio chunk to the queue for STT to process
+        :param chunk: audio chunk from mic to be processed
+        """
+        self.queue.put((STREAM_DATA, chunk, None))
 
     def stream_stop(self):
-        self.queue.put((STREAM_STOP, None))
+        """
+        Add an item to the queue to notify STT the audio stream is ended and to generate the transcription.
+        """
+        self.queue.put((STREAM_STOP, None, None))
 
 
 class AudioProducer(Thread):
-    """AudioProducer
+    """
+    AudioProducer
     Given a mic and a recognizer implementation, continuously listens to the
     mic for potential speech chunks and pushes them onto the queue.
     """
 
-    def __init__(self, state, queue, mic, recognizer, emitter, stream_handler):
+    def __init__(self, state, producer_queue, mic, recognizer, emitter, stream_handler):
         super(AudioProducer, self).__init__()
         self.daemon = True
         self.state = state
-        self.queue = queue
+        self.queue = producer_queue
         self.mic = mic
         self.recognizer = recognizer
         self.emitter = emitter
         self.stream_handler = stream_handler
 
     def run(self):
+        """
+        This is the mic is passed into the recognizer for WW recognition or continuous STT streaming. Audio chunks
+        for STT are generated here and passed to AudioConsumer when a phrase is completed.
+        """
         restart_attempts = 0
         with self.mic as source:
             self.recognizer.adjust_for_ambient_noise(source)
@@ -116,25 +160,29 @@ class AudioProducer(Thread):
                         self.stream_handler.stream_stop()
 
     def stop(self):
-        """Stop producer thread."""
+        """
+            Stop producer thread.
+        """
         self.state.running = False
         self.recognizer.stop()
 
 
 class AudioConsumer(Thread):
-    """AudioConsumer
+    """
+    AudioConsumer
     Consumes AudioData chunks off the queue
     """
 
     # In seconds, the minimum audio size to be sent to remote STT
     MIN_AUDIO_SIZE = 0.5
 
-    def __init__(self, state, queue, emitter, stt, wakeup_recognizer):
+    def __init__(self, state, consumer_queue, emitter, stt, wakeup_recognizer):
         super(AudioConsumer, self).__init__()
         self.daemon = True
-        self.queue = queue
+        self.queue = consumer_queue
         self.state = state
         self.emitter = emitter
+        self.config = emitter.config
         self.stt = stt
         self.wakeup_recognizer = wakeup_recognizer
         self.metrics = MetricsAggregator()
@@ -171,6 +219,10 @@ class AudioConsumer(Thread):
 
     # TODO: Localization
     def wake_up(self, audio):
+        """
+        Handles wakeup from sleeping state
+        :param audio: (AudioData) object associted with wakeup phrase
+        """
         if self.wakeup_recognizer.found_wake_word(audio.frame_data):
             SessionManager.touch()
             self.state.sleeping = False
@@ -183,50 +235,61 @@ class AudioConsumer(Thread):
                 audio.sample_rate * audio.sample_width)
 
     # TODO: Localization
-    def process(self, audio, context = None):
+    def process(self, audio, context=None):
+        """
+        Handles audio from AudioConsumer after it has been passed through the audio processing modules
+        :param audio: (AudioData) raw audio data object
+        :param context: (dict) context extracted by processing modules
+        """
         context = context or {}
         SessionManager.touch()
         if self._audio_length(audio) < self.MIN_AUDIO_SIZE:
-            LOG.warning("Audio too short to be processed")
+            LOG.info("Audio too short to be processed")
         else:
             stopwatch = Stopwatch()
             with stopwatch:
-                transcription = self.transcribe(audio)
-            if transcription:
-                ident = str(stopwatch.timestamp) + str(hash(transcription))
+                transcriptions = self.transcribe(audio)
+            if transcriptions and transcriptions[0]:
+                ident = str(stopwatch.timestamp) + str(hash(transcriptions[0]))
                 # STT succeeded, send the transcribed speech on for processing
                 payload = {
-                    'utterances': [transcription],
+                    'utterances': transcriptions,
                     'lang': self.stt.lang,
                     'session': SessionManager.get().session_id,
                     'ident': ident,
                     "data": context
                 }
                 self.emitter.emit("recognizer_loop:utterance", payload)
-                self.metrics.attr('utterances', [transcription])
+                self.metrics.attr('utterances', transcriptions)
 
                 # Report timing metrics
                 report_timing(ident, 'stt', stopwatch,
-                              {'transcription': transcription,
+                              {'transcription': transcriptions[0],
                                'stt': self.stt.__class__.__name__})
-            else:
-                ident = str(stopwatch.timestamp)
+            # else:
+            #     ident = str(stopwatch.timestamp)
 
     def transcribe(self, audio):
+        """
+        Accepts input audio and returns a list of transcript candidates (in original input language)
+        :param audio: (AudioData) input audio object
+        :return: list of transcription candidates
+        """
         def send_unknown_intent():
             """ Send message that nothing was transcribed. """
-            self.emitter.emit('recognizer_loop:speech.recognition.unknown')
+            if self.config["wake_word_enabled"]:  # Don't capture ambient noise
+                self.emitter.emit('recognizer_loop:speech.recognition.unknown')
 
         try:
             # Invoke the STT engine on the audio clip
-            text = self.stt.execute(audio)
-            if text is not None:
-                text = text.lower().strip()
-                LOG.debug("STT: " + text)
-            else:
+            transcripts = self.stt.execute(audio)  # This is the STT return here (incl streams)
+            LOG.debug(transcripts)
+            if isinstance(transcripts, str):
+                transcripts = [transcripts]
+            if transcripts is None or len(transcripts) == 1 and not transcripts[0]:
                 send_unknown_intent()
                 LOG.info('no words were transcribed')
-            return text
+            return transcripts
         except sr.RequestError as e:
             LOG.error("Could not request Speech Recognition {0}".format(e))
         except ConnectionError as e:
@@ -280,6 +343,9 @@ class RecognizerLoop(EventEmitter):
 
     def __init__(self):
         super(RecognizerLoop, self).__init__()
+        self.producer = None
+        self.consumer = None
+
         self.mute_calls = 0
         self._load_config()
 
@@ -287,7 +353,9 @@ class RecognizerLoop(EventEmitter):
         self.responsive_recognizer.bind(parsers_service)
 
     def _load_config(self):
-        """Load configuration parameters from configuration."""
+        """
+        Load configuration parameters from configuration
+        """
         config = Configuration.get()
         self.config_core = config
         self._config_hash = recognizer_conf_hash(config)
@@ -360,13 +428,17 @@ class RecognizerLoop(EventEmitter):
         self.consumer.join()
 
     def mute(self):
-        """Mute microphone and increase number of requests to mute."""
+        """
+        Mute microphone and increase number of requests to mute
+        """
         self.mute_calls += 1
         if self.microphone:
             self.microphone.mute()
 
     def unmute(self):
-        """Unmute mic if as many unmute calls as mute calls have been received.
+        """
+        Unmute mic if as many unmute calls as mute calls have been
+        received.
         """
         if self.mute_calls > 0:
             self.mute_calls -= 1
@@ -376,7 +448,9 @@ class RecognizerLoop(EventEmitter):
             self.mute_calls = 0
 
     def force_unmute(self):
-        """Completely unmute mic regardless of the number of calls to mute."""
+        """
+        Completely unmute mic regardless of the number of calls to mute.
+        """
         self.mute_calls = 0
         self.unmute()
 
@@ -399,7 +473,8 @@ class RecognizerLoop(EventEmitter):
         """
         try:
             self.start_async()
-        except Exception:
+        except Exception as x:
+            LOG.error(x)
             LOG.exception('Starting producer/consumer threads for listener '
                           'failed.')
             return
@@ -422,7 +497,9 @@ class RecognizerLoop(EventEmitter):
                 raise
 
     def reload(self):
-        """Reload configuration and restart consumer and producer."""
+        """
+            Reload configuration and restart consumer and producer
+        """
         self.stop()
         for hw in self.hotword_engines:
             try:
