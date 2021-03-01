@@ -22,7 +22,7 @@ from itertools import chain
 from os import walk
 from os.path import join, abspath, dirname, basename, exists
 from threading import Event, Timer
-
+import time
 from adapt.intent import Intent, IntentBuilder
 
 from mycroft import dialog
@@ -45,12 +45,14 @@ from mycroft.util.format import pronounce_number, join_list
 from mycroft.util.parse import match_one, extract_number
 from mycroft.language import DetectorFactory, TranslatorFactory, \
     get_lang_config, get_language_dir
-
-from .event_container import EventContainer, create_wrapper, get_handler_name
-from ..event_scheduler import EventSchedulerInterface
-from ..intent_service_interface import IntentServiceInterface
-from ..settings import get_local_settings, save_settings, Settings
-from ..skill_data import (
+from mycroft.skills.mycroft_skill.decorators import AbortEvent, \
+    AbortQuestion, killable_event
+from mycroft.skills.mycroft_skill.event_container import EventContainer, \
+    create_wrapper, get_handler_name
+from mycroft.skills.event_scheduler import EventSchedulerInterface
+from mycroft.skills.intent_service_interface import IntentServiceInterface
+from mycroft.skills.settings import get_local_settings, save_settings, Settings
+from mycroft.skills.skill_data import (
     load_vocabulary,
     load_regex,
     to_alnum,
@@ -60,6 +62,8 @@ from ..skill_data import (
     read_value_file,
     read_translated_file
 )
+from mycroft.skills.mycroft_skill.compatibility import OldNeonCompatibilitySkill
+from padatious import IntentContainer
 
 
 def simple_trace(stack_trace):
@@ -103,7 +107,9 @@ def get_non_properties(obj):
     return set(check_class(obj.__class__))
 
 
-class MycroftSkill:
+class MycroftSkill(OldNeonCompatibilitySkill):
+    # TODO deprecate subclassing from OldNeon, this is a temporary
+    #  compatibility layer to avoid syntax errors
     """Base class for mycroft skills providing common behaviour and parameters
     to all Skill implementations.
 
@@ -158,6 +164,16 @@ class MycroftSkill:
         self.language_config = get_lang_config()
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
+
+        # conversational intents
+        intent_cache = join(self.file_system.path, "intent_cache")
+        self.intent_parser = IntentContainer(intent_cache)
+        if "min_intent_conf" not in self.settings:
+            self.settings["min_intent_conf"] = 0.6
+        self.converse_intents = {}
+
+        self._threads = []
+        self._original_converse = self.converse
 
     @property
     def enclosure(self):
@@ -221,6 +237,7 @@ class MycroftSkill:
             self.event_scheduler.set_id(self.skill_id)
             self._enclosure = EnclosureAPI(bus, self.name)
             self._register_system_event_handlers()
+            self.train_internal_intents()
             # Initialize the SkillGui
             self.gui.setup_default_handlers()
 
@@ -251,6 +268,39 @@ class MycroftSkill:
         )
         self.add_event("converse.deactivated", self._deactivate_skill)
         self.add_event("converse.activated", self._activate_skill)
+
+    def register_converse_intent(self, intent_file, handler):
+        """ converse padatious intents """
+        name = '{}.converse:{}'.format(self.skill_id, intent_file)
+        filename = self.find_resource(intent_file, 'vocab')
+        if not filename:
+            raise FileNotFoundError('Unable to find "{}"'.format(intent_file))
+        self.intent_parser.load_intent(name, filename)
+        self.converse_intents[name] = self.create_event_wrapper(handler)
+
+    def train_internal_intents(self):
+        """ train internal padatious parser """
+        self.intent_parser.train(single_thread=True)
+
+    def handle_internal_intents(self, message):
+        """ called before converse method
+        this gives active skills a chance to parse their own intents and
+        consume the utterance, see conversational_intent decorator for usage
+        """
+        best_match = None
+        best_score = 0
+        for utt in message.data['utterances']:
+            match = self.intent_parser.calc_intent(utt)
+            if match and match.conf > best_score:
+                best_match = match
+                best_score = match.conf
+
+        if best_score < self.settings["min_intent_conf"]:
+            return False
+        # call handler for intent
+        message = message.forward(best_match.name, best_match.matches)
+        self.converse_intents[best_match.name](message)
+        return True
 
     def _deactivate_skill(self, message):
         skill_id = message.data.get("skill_id")
@@ -322,7 +372,7 @@ class MycroftSkill:
         """
         return None
 
-    def converse(self, utterances, lang=None):
+    def converse(self, message):
         """Handle conversation.
 
         This method gets a peek at utterances before the normal intent
@@ -332,12 +382,8 @@ class MycroftSkill:
         indicate that the utterance has been handled.
 
         Arguments:
-            utterances (list): The utterances from the user.  If there are
-                               multiple utterances, consider them all to be
-                               transcription possibilities.  Commonly, the
-                               first entry is the user utt and the second
-                               is normalized() version of the first utterance
-            lang:       language the utterance is in, None for default
+            message (Message): The messagebus Message containing the
+                               utterances, language and context
 
         Returns:
             bool: True if an utterance was handled, otherwise False
@@ -350,21 +396,33 @@ class MycroftSkill:
         Returns:
             str: user's response or None on a timeout
         """
-        event = Event()
-
-        def converse(utterances, lang=None):
+        def converse(message):
+            utterances = message.data["utterances"]
             converse.response = utterances[0] if utterances else None
-            event.set()
+            converse.finished = True
             return True
 
         # install a temporary conversation handler
         self.make_active()
+        converse.finished = False
         converse.response = None
-        default_converse = self.converse
         self.converse = converse
-        event.wait(15)  # 10 for listener, 5 for SST, then timeout
-        self.converse = default_converse
+
+        # 10 for listener, 5 for SST, then timeout
+        # NOTE a threading event is not used otherwise we can't raise the
+        # AbortEvent exception to kill the thread
+        start = time.time()
+        while time.time() - start <= 15 and not converse.finished:
+            time.sleep(0.1)
+            if self._response is not False:
+                converse.response = self._response
+                converse.finished = True  # was overrided externally
+        self.converse = self._original_converse
         return converse.response
+
+    def _handle_killed_wait_response(self):
+        self._response = None
+        self.converse = self._original_converse
 
     def get_response(self, dialog='', data=None, validator=None,
                      on_fail=None, num_retries=-1):
@@ -434,26 +492,52 @@ class MycroftSkill:
             on_fail (callable): function handling retries
 
         """
+        self._response = False
+        self._real_wait_response(is_cancel, validator, on_fail, num_retries)
+        while self._response is False:
+            time.sleep(0.1)
+        return self._response
+
+    @killable_event("mycroft.skills.abort_question", exc=AbortQuestion,
+                    callback=_handle_killed_wait_response)
+    def _real_wait_response(self, is_cancel, validator, on_fail, num_retries):
+        """Loop until a valid response is received from the user or the retry
+        limit is reached.
+
+        Arguments:
+            is_cancel (callable): function checking cancel criteria
+            validator (callbale): function checking for a valid response
+            on_fail (callable): function handling retries
+
+        """
         num_fails = 0
         while True:
+            if self._response is not False:
+                # usually None when aborted externally (is None)
+                # also allows overriding returned result from other events
+                return self._response
             response = self.__get_response()
 
             if response is None:
                 # if nothing said, prompt one more time
                 num_none_fails = 1 if num_retries < 0 else num_retries
                 if num_fails >= num_none_fails:
-                    return None
+                    self._response = None
+                    return
             else:
                 if validator(response):
-                    return response
+                    self._response = response
+                    return
 
                 # catch user saying 'cancel'
                 if is_cancel(response):
-                    return None
+                    self._response = None
+                    return
 
             num_fails += 1
-            if 0 < num_retries < num_fails:
-                return None
+            if 0 < num_retries < num_fails or self._response is not False:
+                self._response = None
+                return
 
             line = on_fail(response)
             if line:
@@ -696,6 +780,10 @@ class MycroftSkill:
                 for intent_file in getattr(method, 'intent_files'):
                     self.register_intent_file(intent_file, method)
 
+            if hasattr(method, 'converse_intents'):
+                for intent_file in getattr(method, 'converse_intents'):
+                    self.register_converse_intent(intent_file, method)
+
     def translate(self, text, data=None):
         """Load a translatable single string resource
 
@@ -836,27 +924,20 @@ class MycroftSkill:
         filename = self.find_resource(name, 'dialog')
         return read_translated_file(filename, data)
 
-    def add_event(self, name, handler, handler_info=None, once=False):
-        """Create event handler for executing intent or other event.
-
-        Arguments:
-            name (string): IntentParser name
-            handler (func): Method to call
-            handler_info (string): Base message when reporting skill event
-                                   handler status on messagebus.
-            once (bool, optional): Event handler will be removed after it has
-                                   been run once.
-        """
+    def create_event_wrapper(self, handler, handler_info=None):
         skill_data = {'name': get_handler_name(handler)}
 
         def on_error(e):
             """Speak and log the error."""
-            # Convert "MyFancySkill" to "My Fancy Skill" for speaking
-            handler_name = camel_case_split(self.name)
-            msg_data = {'skill': handler_name}
-            msg = dialog.get('skill.error', self.lang, msg_data)
-            self.speak(msg)
-            LOG.exception(msg)
+            if not isinstance(e, AbortEvent):
+                # Convert "MyFancySkill" to "My Fancy Skill" for speaking
+                handler_name = camel_case_split(self.name)
+                msg_data = {'skill': handler_name}
+                msg = dialog.get('skill.error', self.lang, msg_data)
+                self.speak(msg)
+                LOG.exception(msg)
+            else:
+                LOG.info("Skill execution aborted")
             # append exception information in message
             skill_data['exception'] = repr(e)
 
@@ -877,8 +958,21 @@ class MycroftSkill:
                 msg_type = handler_info + '.complete'
                 self.bus.emit(message.forward(msg_type, skill_data))
 
-        wrapper = create_wrapper(handler, self.skill_id, on_start, on_end,
-                                 on_error)
+        return create_wrapper(handler, self.skill_id, on_start, on_end,
+                              on_error)
+
+    def add_event(self, name, handler, handler_info=None, once=False):
+        """Create event handler for executing intent or other event.
+
+        Arguments:
+            name (string): IntentParser name
+            handler (func): Method to call
+            handler_info (string): Base message when reporting skill event
+                                   handler status on messagebus.
+            once (bool, optional): Event handler will be removed after it has
+                                   been run once.
+        """
+        wrapper = self.create_event_wrapper(handler, handler_info)
         return self.events.add(name, wrapper, once)
 
     def remove_event(self, name):
@@ -958,6 +1052,7 @@ class MycroftSkill:
         self.intent_service.register_padatious_intent(name, filename)
         if handler:
             self.add_event(name, handler, 'mycroft.skill.handler')
+
 
     def register_entity_file(self, entity_file):
         """Register an Entity file with the intent service.
@@ -1273,6 +1368,8 @@ class MycroftSkill:
         """Handler for the "mycroft.stop" signal. Runs the user defined
         `stop()` method.
         """
+        # abort any running killable intent
+        self.bus.emit(Message(self.skill_id + ".stop"))
 
         def __stop_timeout():
             # The self.stop() call took more than 100ms, assume it handled Stop
@@ -1308,6 +1405,13 @@ class MycroftSkill:
 
         Shuts down known entities and calls skill specific shutdown method.
         """
+        # kill any running kthreads from decorators
+        for t in self._threads:
+            try:
+                t.kill()
+            except:
+                pass
+
         try:
             self.shutdown()
         except Exception as e:

@@ -34,7 +34,7 @@ function help() {
     echo "  skills                   the skill service"
     echo "  voice                    voice capture service"
     # echo "  wifi                     wifi setup service"
-    echo "  enclosure                mark_1 enclosure service"
+    echo "  gui                      gui connection listener"
     echo
     echo "Tool COMMANDs:"
     echo "  cli                      the Command Line Interface"
@@ -68,7 +68,7 @@ function name-to-script-path() {
         "cli")               _module="mycroft.client.text" ;;
         "audiotest")         _module="mycroft.util.audio_test" ;;
         "audioaccuracytest") _module="mycroft.audio-accuracy-test" ;;
-        "enclosure")         _module="mycroft.client.enclosure" ;;
+        "gui")               _module="mycroft.enclosure" ;;
 
         *)
             echo "Error: Unknown name '${1}'"
@@ -146,7 +146,7 @@ function launch-all() {
     launch-background skills
     launch-background audio
     launch-background voice
-    launch-background enclosure
+    launch-background gui
 }
 
 function check-dependencies() {

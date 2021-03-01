@@ -20,7 +20,7 @@ from mycroft.client.speech.listener import RecognizerLoop
 from mycroft.configuration import Configuration
 from mycroft.identity import IdentityManager
 from mycroft.lock import Lock as PIDLock  # Create/Support PID locking file
-from mycroft.messagebus.client import MessageBusClient
+from mycroft.messagebus import get_messagebus
 from mycroft.messagebus.message import Message
 from mycroft.util import create_daemon, wait_for_exit_signal, \
     reset_sigint_handler, create_echo_function
@@ -203,7 +203,7 @@ def main():
     global service
     reset_sigint_handler()
     PIDLock("voice")
-    bus = MessageBusClient()  # Mycroft messagebus, see mycroft.messagebus
+    bus = get_messagebus()  # Mycroft messagebus, see mycroft.messagebus
     Configuration.set_config_update_handlers(bus)
     config = Configuration.get()
 
@@ -232,8 +232,6 @@ def main():
     bus.on('recognizer_loop:audio_output_end', handle_audio_end)
     bus.on('mycroft.stop', handle_stop)
     bus.on('message', create_echo_function('VOICE'))
-
-    create_daemon(bus.run_forever)
 
     service = AudioParsersService(bus)
     service.start()

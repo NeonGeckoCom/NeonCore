@@ -18,14 +18,15 @@ from glob import glob
 from threading import Thread, Event
 from time import sleep
 from os.path import expanduser, join, isdir
+from inspect import signature
 
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
+from mycroft.util import connected
 from mycroft.skills.skill_loader import SkillLoader
-
-import git
+from mycroft.skills.skill_store import SkillsStore
 
 SKILL_MAIN_MODULE = '__init__.py'
 
@@ -44,6 +45,8 @@ class SkillManager(Thread):
         self._connected_event = Event()
         self.config = Configuration.get()
         self.skills_dir = expanduser(self.config["skills"]["directory"])
+        self.skill_downloader = SkillsStore(bus=self.bus)
+        self.skill_downloader.skills_dir = self.skills_dir
 
         self.skill_loaders = {}
         self.enclosure = EnclosureAPI(bus)
@@ -92,26 +95,20 @@ class SkillManager(Thread):
         self._alive_status = True
 
     def download_or_update_defaults(self):
-        # if skills dir does not exist (first run) download default skills
-        if self.skills_config.get("repo"):
-            if not isdir(self.skills_dir):
-                LOG.info("Downloading default skills")
-                try:
-                    git.Repo.clone_from(self.skills_config.get("repo"), self.skills_dir)
-                except Exception as e:
+        # on launch only install if missing, updates handled separately
+        # if osm is disabled in .conf this does nothing
+        if self.config["auto_update"]:
+            try:
+                self.skill_downloader.install_default_skills()
+            except Exception as e:
+                if connected():
+                    # if there is internet log the error
                     LOG.exception(e)
-                    LOG.error("Could not download default skills!")
-            else:
-                LOG.info("Attempting skills update")
-                try:
-                    # git pull
-                    g = git.cmd.Git(self.skills_dir)
-                    g.pull()
-                except Exception as e:
-                    LOG.exception(e)
-                    LOG.error("Could not update default skills, did you change any default skill?")
-                    LOG.info("If you edit a single default skill, update will fail, blacklist skill instead")
-
+                    LOG.error("default skills installation failed")
+                else:
+                    # if no internet just skip this update
+                    LOG.error("no internet, skipped default skills installation")
+            
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self._connected_event.wait()
@@ -292,7 +289,24 @@ class SkillManager(Thread):
                     self._emit_converse_error(message, skill_id, error_message)
                     break
                 try:
-                    self._emit_converse_response(message, skill_loader)
+                    utterances = message.data['utterances']
+                    lang = message.data['lang']
+                    intents = skill_loader.instance.handle_internal_intents
+                    handled = intents(message)
+                    if not handled:
+                        converse_method = skill_loader.instance.converse
+                        # new common style, 1 arg
+                        if len(signature(converse_method).parameters) == 1:
+                            handled = skill_loader.instance.converse(message)
+                        # old mycroft style, 2 args
+                        elif len(signature(converse_method).parameters) == 2:
+                            handled = skill_loader.instance.converse(utterances,
+                                                                     lang)
+                        # unrecognized signature
+                        else:
+                            raise ValueError("Arguments don't match function signature")
+
+                    self._emit_converse_response(handled, message, skill_loader)
                 except Exception:
                     error_message = 'exception in converse method'
                     LOG.exception(error_message)
@@ -305,16 +319,17 @@ class SkillManager(Thread):
             self._emit_converse_error(message, skill_id, error_message)
 
     def _emit_converse_error(self, message, skill_id, error_msg):
-        reply = message.reply(
-            'skill.converse.error',
-            data=dict(skill_id=skill_id, error=error_msg)
-        )
+        """Emit a message reporting the error back to the intent service."""
+        reply = message.reply('skill.converse.response',
+                              data=dict(skill_id=skill_id, error=error_msg))
+        self.bus.emit(reply)
+        # Also emit the old error message to keep compatibility and for any
+        # listener on the bus
+        reply = message.reply('skill.converse.error',
+                              data=dict(skill_id=skill_id, error=error_msg))
         self.bus.emit(reply)
 
-    def _emit_converse_response(self, message, skill_loader):
-        utterances = message.data['utterances']
-        lang = message.data['lang']
-        result = skill_loader.instance.converse(utterances, lang)
+    def _emit_converse_response(self, result, message, skill_loader):
         reply = message.reply(
             'skill.converse.response',
             data=dict(skill_id=skill_loader.skill_id, result=result)

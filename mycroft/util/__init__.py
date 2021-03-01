@@ -29,6 +29,7 @@ from threading import Thread
 from time import sleep
 from urllib.request import urlopen
 from urllib.error import URLError
+import kthread
 
 import pyaudio
 import psutil
@@ -471,11 +472,21 @@ def reset_sigint_handler():
     sig.signal(sig.SIGINT, sig.default_int_handler)
 
 
-def create_daemon(target, args=(), kwargs=None):
+def create_killable_daemon(target, args=(), kwargs=None, autostart=True):
+    """Helper to quickly create and start a thread with daemon = True"""
+    t = kthread.KThread(target=target, args=args, kwargs=kwargs)
+    t.daemon = True
+    if autostart:
+        t.start()
+    return t
+
+
+def create_daemon(target, args=(), kwargs=None, autostart=True):
     """Helper to quickly create and start a thread with daemon = True"""
     t = Thread(target=target, args=args, kwargs=kwargs)
     t.daemon = True
-    t.start()
+    if autostart:
+        t.start()
     return t
 
 

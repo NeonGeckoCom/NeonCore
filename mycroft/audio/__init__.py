@@ -41,9 +41,9 @@ def wait_while_speaking():
 def stop_speaking():
     # TODO: Less hacky approach to this once Audio Manager is implemented
     # Skills should only be able to stop speech they've initiated
-    from mycroft.messagebus.send import send
+    from mycroft.messagebus import send_message
     create_signal('stoppingTTS')
-    send('mycroft.audio.speech.stop')
+    send_message('mycroft.audio.speech.stop')
 
     # Block until stopped
     while check_for_signal("isSpeaking", -1):

@@ -1,17 +1,15 @@
 import sys
 from mycroft.configuration import Configuration
 from mycroft.util.log import LOG
-from mycroft.util import create_daemon
-from mycroft.messagebus import MessageBusClient
+from mycroft.messagebus import get_messagebus
 import time
 from mycroft.client.file_reader import FileConsumer
 from mycroft.processing_modules.audio import AudioParsersService
 
 
 if __name__ == "__main__":
-    ws = MessageBusClient()
+    ws = get_messagebus()
     config = Configuration.get()
-    create_daemon(ws.run_forever)
 
     service = AudioParsersService(ws)
     service.start()

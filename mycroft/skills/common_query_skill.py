@@ -97,19 +97,12 @@ class CommonQuerySkill(MycroftSkill, ABC):
         if consumed_pct > 1.0:
             consumed_pct = 1.0
 
-        # Add bonus if match has visuals and the device supports them.
-        platform = self.config_core.get('enclosure', {}).get('platform')
-        if is_CQSVisualMatchLevel(level) and handles_visuals(platform):
-            bonus = 0.1
-        else:
-            bonus = 0
-
         if int(level) == int(CQSMatchLevel.EXACT):
-            return 0.9 + (consumed_pct / 10) + bonus
+            return 0.9 + (consumed_pct / 10)
         elif int(level) == int(CQSMatchLevel.CATEGORY):
-            return 0.6 + (consumed_pct / 10) + bonus
+            return 0.6 + (consumed_pct / 10)
         elif int(level) == int(CQSMatchLevel.GENERAL):
-            return 0.5 + (consumed_pct / 10) + bonus
+            return 0.5 + (consumed_pct / 10)
         else:
             return 0.0  # should never happen
 

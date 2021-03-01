@@ -28,7 +28,7 @@ from mycroft.api import is_paired, BackendDown, DeviceApi
 from mycroft.audio import wait_while_speaking
 from mycroft.enclosure.api import EnclosureAPI
 from mycroft.configuration import Configuration
-from mycroft.messagebus.client import MessageBusClient
+from mycroft.messagebus import get_messagebus
 from mycroft.messagebus.message import Message
 from mycroft.util import (
     connected,
@@ -57,7 +57,7 @@ class DevicePrimer(object):
     """
     def __init__(self, message_bus_client, config):
         self.bus = message_bus_client
-        self.platform = config['enclosure'].get("platform", "unknown")
+        self.platform = "generic"
         self.enclosure = EnclosureAPI(self.bus)
         self.is_paired = False
         self.backend_down = False
@@ -181,7 +181,7 @@ def main():
     set_active_lang(config.get('lang', 'en-us'))
 
     # Connect this process to the Mycroft message bus
-    bus = _start_message_bus_client()
+    bus = get_messagebus()
     _register_intent_services(bus)
     event_scheduler = EventScheduler(bus)
     skill_manager = _initialize_skill_manager(bus)
@@ -197,23 +197,6 @@ def main():
 
     wait_for_exit_signal()
     shutdown(skill_manager, event_scheduler)
-
-
-def _start_message_bus_client():
-    """Start the bus client daemon and wait for connection."""
-    bus = MessageBusClient()
-    Configuration.set_config_update_handlers(bus)
-    bus_connected = Event()
-    bus.on('message', create_echo_function('SKILLS'))
-    # Set the bus connected event when connection is established
-    bus.once('open', bus_connected.set)
-    create_daemon(bus.run_forever)
-
-    # Wait for connection
-    bus_connected.wait()
-    LOG.info('Connected to messagebus')
-
-    return bus
 
 
 def _register_intent_services(bus):

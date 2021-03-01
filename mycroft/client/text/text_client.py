@@ -28,7 +28,7 @@ import textwrap
 import json
 import mycroft.version
 from threading import Thread, Lock
-from mycroft.messagebus.client import MessageBusClient
+from mycroft.messagebus import get_messagebus
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
 from mycroft.configuration import Configuration
@@ -160,7 +160,7 @@ def connect_to_mycroft():
     """
     global bus
     global config
-    bus = connect_to_messagebus()
+    bus = get_messagebus()
     config = load_mycroft_config(bus)
 
 
@@ -1434,17 +1434,3 @@ def simple_cli():
         LOG.exception(e)
         event_thread.exit()
         sys.exit()
-
-
-def connect_to_messagebus():
-    """ Connect to the mycroft messagebus and launch a thread handling the
-        connection.
-
-        Returns: WebsocketClient
-    """
-    bus = MessageBusClient()  # Mycroft messagebus connection
-
-    event_thread = Thread(target=connect, args=[bus])
-    event_thread.setDaemon(True)
-    event_thread.start()
-    return bus
