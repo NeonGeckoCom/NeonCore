@@ -23,3 +23,6 @@ google-api-python-client==1.6.4
 
 # tts plugins
 boto3
+
+# cli client
+git+https://github.com/NeonJarbas/debug_cli
