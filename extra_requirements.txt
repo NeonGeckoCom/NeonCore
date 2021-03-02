@@ -25,3 +25,6 @@ google-cloud-speech
 
 # tts plugins
 boto3
+
+# cli client
+git+https://github.com/NeonJarbas/debug_cli
