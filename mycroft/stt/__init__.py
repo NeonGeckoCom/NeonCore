@@ -146,15 +146,16 @@ class StreamThread(Thread, metaclass=ABCMeta):
 
 class StreamingSTT(STT, metaclass=ABCMeta):
     """
-        ABC class for threaded streaming STT implemenations.
+        ABC class for threaded streaming STT implementations.
     """
 
-    def __init__(self):
+    def __init__(self, results_event=None):
         super().__init__()
         self.queue = None
         self.stream = None
         self.has_result = False
         self.can_stream = True
+        self.results_event = results_event
 
     def stream_start(self, language=None):
         """
