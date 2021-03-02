@@ -331,12 +331,19 @@ class IntentService:
         Args:
             message (Message): The messagebus data
         """
+        self.bus.emit(message.response(data={}, context={}))  # Notify speech module that this is being handled
         try:
             # Get language of the utterance
             lang = message.data.get('lang', self.language_config["user"])
             utterances = message.data.get('utterances', [])
 
             message.context = message.context or {}
+            # Add or init timing data
+            if not message.context.get("timing"):
+                LOG.warning("No timing data available at intent service")
+                message.context["timing"] = {}
+            message.context["timing"]["transcribed"] = message.context.get("timing", {}).get("transcribed", time.time())
+
             # pipe utterance trough parsers to get extra metadata
             # use cases: translation, emotion_data, keyword spotting etc.
             # parsers are ordered by priority

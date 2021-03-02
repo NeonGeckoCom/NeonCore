@@ -1,3 +1,26 @@
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
+#
+# Copyright 2008-2021 Neongecko.com Inc. | All Rights Reserved
+#
+# Notice of License - Duplicating this Notice of License near the start of any file containing
+# a derivative of this software is a condition of license for this software.
+# Friendly Licensing:
+# No charge, open source royalty free use of the Neon AI software source and object is offered for
+# educational users, noncommercial enthusiasts, Public Benefit Corporations (and LLCs) and
+# Social Purpose Corporations (and LLCs). Developers can contact developers@neon.ai
+# For commercial licensing, distribution of derivative works or redistribution please contact licenses@neon.ai
+# Distributed on an "AS IS” basis without warranties or conditions of any kind, either express or implied.
+# Trademarks of Neongecko: Neon AI(TM), Neon Assist (TM), Neon Communicator(TM), Klat(TM)
+# Authors: Guy Daniels, Daniel McKnight, Regina Bloomstine, Elon Gasper, Richard Leeds
+#
+# Specialized conversational reconveyance options from Conversation Processing Intelligence Corp.
+# US Patents 2008-2021: US7424516, US20140161250, US20140177813, US8638908, US8068604, US8553852, US10530923, US10530924
+# China Patent: CN102017585  -  Europe Patent: EU2156652  -  Patents Pending
+#
+# This software is an enhanced derivation of the Mycroft Project which is licensed under the
+# Apache software Foundation software license 2.0 https://www.apache.org/licenses/LICENSE-2.0
+# Changes Copyright 2008-2021 Neongecko.com Inc. | All Rights Reserved
+#
 # Copyright 2017 Mycroft AI Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +35,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import time
+
 from threading import Lock
 
 from mycroft import dialog
@@ -34,6 +59,7 @@ lock = Lock()
 loop = None
 config = None
 service = None
+SKILLS_PENDING = list()
 
 
 def handle_record_begin():
@@ -75,14 +101,62 @@ def handle_utterance(event):
     LOG.info("Utterance: " + str(event['utterances']))
     context = {'client_name': 'mycroft_listener',
                'source': 'audio',
-               'destination': ["skills"]}
+               'destination': ["skills"],
+               "timing": event.pop("timing", {})}
     if "data" in event:
         data = event.pop("data")
         context = merge_dict(context, data)
     if 'ident' in event:
         ident = event.pop('ident')
         context['ident'] = ident
-    bus.emit(Message('recognizer_loop:utterance', event, context))
+
+    _emit_utterance_to_skills(Message('recognizer_loop:utterance', event, context))
+
+
+def _emit_utterance_to_skills(message_to_emit: Message):
+    """
+    Emits a message containing a user utterance to skills for intent processing and checks that it is received by the
+    skills module.
+    """
+
+    # Emit single intent request
+    _add_pending_intent(message_to_emit.context['ident'])
+    bus.emit(message_to_emit)
+
+    # Allow time for skills to receive this event (generally about 1s, outliers @ 5-6s)
+    time.sleep(10)
+    check_skill_confirmed(message_to_emit.context['ident'], message_to_emit.data)
+
+
+def _add_pending_intent(ident):
+    global SKILLS_PENDING
+    if ident in SKILLS_PENDING:
+        LOG.warning(f"Duplicate ident requested add to pending: {ident}")
+    else:
+        SKILLS_PENDING.append(ident)
+
+
+def check_skill_confirmed(ident, event):
+    global SKILLS_PENDING
+    if not ident:
+        LOG.warning(f"Tried to check no ident event={event}")
+    elif ident in SKILLS_PENDING:
+        LOG.error(f"Skills didn't handle: {ident}")
+        LOG.error(f"SKILLS_PENDING={SKILLS_PENDING}")
+        # TODO: Restart Skills Service DM
+    else:
+        LOG.debug(f"Skills handled {ident}")
+
+
+def handle_skills_confirmation(message):
+    global SKILLS_PENDING
+    ident = message.context.get("ident")
+    LOG.debug(f"Skills handled {ident}")
+    if ident not in SKILLS_PENDING:
+        LOG.warning(f"{ident} not pending! {message.data}")
+    else:
+        SKILLS_PENDING.remove(ident)
+        LOG.debug(f"SKILLS_PENDING={SKILLS_PENDING}")
 
 
 def handle_hotword(event):
@@ -232,6 +306,8 @@ def main():
     bus.on('recognizer_loop:audio_output_end', handle_audio_end)
     bus.on('mycroft.stop', handle_stop)
     bus.on('message', create_echo_function('VOICE'))
+
+    bus.on("recognizer_loop:utterance.response", handle_skills_confirmation)
 
     service = AudioParsersService(bus)
     service.start()

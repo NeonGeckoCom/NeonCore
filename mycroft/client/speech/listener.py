@@ -186,12 +186,14 @@ class AudioConsumer(Thread):
     def process(self, audio, context = None):
         context = context or {}
         SessionManager.touch()
+        heard_time = time.time()
         if self._audio_length(audio) < self.MIN_AUDIO_SIZE:
             LOG.warning("Audio too short to be processed")
         else:
             stopwatch = Stopwatch()
             with stopwatch:
                 transcription = self.transcribe(audio)
+            transcribed_time = time.time()
             if transcription:
                 ident = str(stopwatch.timestamp) + str(hash(transcription))
                 # STT succeeded, send the transcribed speech on for processing
@@ -200,7 +202,9 @@ class AudioConsumer(Thread):
                     'lang': self.stt.lang,
                     'session': SessionManager.get().session_id,
                     'ident': ident,
-                    "data": context
+                    "data": context,
+                    "timing": {"start": heard_time,
+                               "transcribed": transcribed_time}
                 }
                 self.emitter.emit("recognizer_loop:utterance", payload)
                 self.metrics.attr('utterances', [transcription])
