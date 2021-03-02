@@ -310,6 +310,71 @@ class TTS(metaclass=ABCMeta):
         """
         return [sentence]
 
+    def _get_requested_tts_languages(self, message) -> list:
+        """
+        Builds a list of the requested TTS for a given spoken response
+        :param message: Message associated with request
+        :return: List of TTS dict data
+        """
+        profiles = message.context.get("nick_profiles")
+        tts_requested = []
+        tts_name = "Neon"  # This is used for chat interfaces when Neon is another user
+        # Get all of our language parameters
+        try:
+            # If speaker data is present, use it
+            if message.data.get("speaker"):
+                speaker = message.data.get("speaker")
+                tts_requested.append({"speaker": speaker["name"],
+                                      "language": speaker["language"],
+                                      "gender": speaker["gender"],
+                                      "voice": speaker.get("voice")
+                                      })
+                LOG.debug(f">>> speaker={speaker}")
+            # General server response, use profile data
+            elif profiles:
+                nick = message.context["username"]
+                LOG.debug(f">>> profiles={profiles}")
+                user_config = profiles[nick]["speech"]
+
+                tts_requested.append({"speaker": tts_name,
+                                      "language": user_config["tts_language"],
+                                      "gender": user_config["tts_gender"],
+                                      "voice": user_config["neon_voice"]
+                                      })
+
+                if user_config["secondary_tts_language"]:
+                    tts_requested.append({"speaker": tts_name,
+                                          "language": user_config["secondary_tts_language"],
+                                          "gender": user_config["secondary_tts_gender"],
+                                          "voice": user_config["secondary_neon_voice"]
+                                          })
+
+            # General non-server response, use user configuration
+            else:
+                if not message.user_data.get("lang"):
+                    tts_requested.append({"speaker": tts_name,
+                                          "language": self.language_config["user"]
+                                          })
+                else:
+                    message.user_data.get("lang")
+                    tts_requested.append({"speaker": tts_name,
+                                          "language": message.user_data["tts_language"],
+                                          "gender": message.user_data["tts_gender"],
+                                          "voice": message.user_data["neon_voice"]
+                                          })
+
+                    if message.user_data["secondary_tts_language"] and \
+                            message.user_data["secondary_tts_language"] != message.user_data["primary_tts_language"]:
+                        tts_requested.append({"speaker": tts_name,
+                                              "language": message.user_data["secondary_tts_language"],
+                                              "gender": message.user_data["secondary_tts_gender"],
+                                              "voice": message.user_data["secondary_neon_voice"]
+                                              })
+        except Exception as e:
+            LOG.error(e)
+        # TODO: Associate voice with cache here somehow? (would be a per-TTS engine set) DM
+        return tts_requested
+
     def execute(self, sentence, ident=None, listen=False, message=None):
         """Convert sentence to speech, preprocessing out unsupported ssml
 
@@ -321,32 +386,40 @@ class TTS(metaclass=ABCMeta):
                 ident:      Id reference to current interaction
                 listen:     True if listen should be triggered at the end
                             of the utterance.
+                message:    Message associated with request
         """
         sentence = self.validate_ssml(sentence)
 
         # multi lang support
-        # NOTE this is kinda optional because skills will translate
+        # NOTE this is kinda optional because skills will translate (IF language resources are available)
         # However speak messages might be sent directly to bus
         # this is here to cover that use case
 
         # check for user specified language
         if message:
-            user_lang = message.user_data.get("lang") or self.language_config["user"]
+            tts_requested = self._get_requested_tts_languages(message)
+            # user_lang = message.user_data.get("lang") or self.language_config["user"]
         else:
-            user_lang = self.language_config["user"]
+            tts_requested = [{"speaker": "Neon",
+                              "language": self.language_config["user"]
+                              }]
+            # user_lang = self.language_config["user"]
 
         detected_lang = self.lang_detector.detect(sentence)
         LOG.debug("Detected language: {lang}".format(lang=detected_lang))
-        if detected_lang != user_lang.split("-")[0]:
-            sentence = self.translator.translate(sentence, user_lang)
-        create_signal("isSpeaking")
-        try:
-            self._execute(sentence, ident, listen)
-        except Exception:
-            # If an error occurs end the audio sequence through an empty entry
-            self.queue.put(EMPTY_PLAYBACK_QUEUE_TUPLE)
-            # Re-raise to allow the Exception to be handled externally as well.
-            raise
+
+        for tts_request in tts_requested:
+            output_lang = tts_request["language"]
+            if detected_lang != output_lang.split("-")[0]:
+                sentence = self.translator.translate(sentence, output_lang)
+            create_signal("isSpeaking")
+            try:
+                self._execute(sentence, ident, listen)  # TODO: Pass gender and voice here (or just pass dict) DM
+            except Exception:
+                # If an error occurs end the audio sequence through an empty entry
+                self.queue.put(EMPTY_PLAYBACK_QUEUE_TUPLE)
+                # Re-raise to allow the Exception to be handled externally as well.
+                raise
 
     def _execute(self, sentence, ident, listen):
         if self.phonetic_spelling:
