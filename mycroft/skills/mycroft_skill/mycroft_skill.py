@@ -1250,10 +1250,14 @@ class MycroftSkill(OldNeonCompatibilitySkill):
             "was_translated": detected_lang == self.language_config["user"].split("-")[0],
             "raw_utterance": original
         }
-        message.context.get("timing", {})["speech_start"] = time.time()
 
-        m = message.forward("speak", data) if message else Message("speak", data)
-        self.bus.emit(m)
+        message_to_speech = message.forward("speak", data) if message else Message("speak", data)
+
+        if not message_to_speech.context.get("timing"):
+            message_to_speech.context["timing"] = {}
+        message_to_speech.context["timing"]["speech_start"] = time.time()
+
+        self.bus.emit(message_to_speech)
 
         if wait:
             wait_while_speaking()
