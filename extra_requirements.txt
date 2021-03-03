@@ -20,6 +20,8 @@ jarbas-wake-word-plugin-precise
 ## https://github.com/JarbasLingua/jarbas-stt-plugin-chromium
 jarbas-stt-plugin-chromium
 google-api-python-client==1.6.4
+deepspeech
+google-cloud-speech
 
 # tts plugins
 boto3
