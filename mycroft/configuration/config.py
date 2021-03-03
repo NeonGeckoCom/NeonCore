@@ -22,9 +22,8 @@ from requests import RequestException
 
 from mycroft.util.json_helper import load_commented_json, merge_dict
 from mycroft.util.log import LOG
-
-from .locations import (DEFAULT_CONFIG, SYSTEM_CONFIG, USER_CONFIG,
-                        WEB_CONFIG_CACHE)
+from NGI.utilities.configHelper import NGIConfig
+from mycroft.configuration.locations import (DEFAULT_CONFIG, SYSTEM_CONFIG, USER_CONFIG, WEB_CONFIG_CACHE)
 
 
 def is_remote_list(values):
@@ -178,6 +177,7 @@ class RemoteConf(LocalConf):
 class Configuration:
     __config = {}  # Cached config
     __patch = {}  # Patch config that skills can update to override config
+    __neon = {}
 
     @staticmethod
     def get(configs=None, cache=True):
@@ -189,6 +189,16 @@ class Configuration:
                 configs (list): List of configuration dicts
                 cache (boolean): True if the result should be cached
         """
+        if "ngi_local_conf" in configs:
+            ngi_local = NGIConfig("ngi_local_conf")
+            Configuration.__neon["local"] = ngi_local
+        if "ngi_user_info" in configs:
+            ngi_user = NGIConfig("ngi_user_info")
+            Configuration.__neon["user"] = ngi_user
+        if "ngi_auth_vars" in configs:
+            ngi_auth = NGIConfig("ngi_auth_vars")
+            Configuration.__neon["auth"] = ngi_auth
+
         if Configuration.__config:
             return Configuration.__config
         else:
@@ -220,6 +230,8 @@ class Configuration:
         for c in configs:
             merge_dict(base, c)
 
+        for config_name, config_obj in Configuration.__neon:
+            base[config_name] = config_obj.content
         # copy into cache
         if cache:
             Configuration.__config.clear()

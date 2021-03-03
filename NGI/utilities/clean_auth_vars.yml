@@ -1,0 +1,14 @@
+servers: {}
+
+emails:
+  mail: ''
+  pass: ''
+  host: ''
+  port: ''
+
+chatUserDbConnection:
+  host: ''
+  database: ''
+  user: ''
+  password: ''
+  charset: ''

@@ -1,0 +1,140 @@
+prefFlags:
+  codeSource: ${codeSource}
+  devMode: ${devMode}
+  autoStart: ${autoStart}
+  autoUpdate: ${autoUpdate}
+  # Flag if gui is installed locally
+  localGui: ${installGui}
+  # Flag if enclosure service should run to generate gui events
+  guiEvents: ${guiEvents}
+  notifyRelease: true
+  showDemo: true
+  optDiags: false
+  metrics: false
+
+remoteVars:
+  coreGit: ${coreGit}
+  coreBranch: ${coreBranch}
+  skillsGit: ${skillsGit}
+  skillsBranch: ${skillsBranch}
+  guiGit: ${guiGit}
+  guiBranch: ${guiBranch}
+  remoteUser: ${remoteUser}
+  remoteHost: ${remoteHost}
+  remoteCore: ${remoteCore}
+  remoteSkills: ${remoteSkills}
+  emailUpload: ${emailUpload}
+  attachmentUpload: ${attachmentUpload}
+  url: https://api.mycroft.ai
+  ver: v1
+
+devVars:
+  devName: ${devName}
+  devType: ${devType}
+  # generic, server, pi, neonK, neonX, neonPi, neonAlpha, neonU
+  version: ${version}
+  installUser: ${installUser}
+  likesLastUpdate: ${likesLastUpdate}
+  caffeineUpdate: ''
+  touchDev: ${touchDev}
+  micDev: ${micDev}
+  camDev: 0
+  soundDev: ${soundDev}
+  clapThreshold: 10.0e10
+  defaultVolume: 60
+  defaultMicVolume: 100
+  ccUpdates: {}
+
+gnome:
+  favApps:
+  appFolders: "['accessories', 'office', 'Neongecko']"
+
+dirVars:
+  coreDir: ${coreDir}
+  rootDir: ${rootDir}
+  skillsDir: ${skillsDir}
+  ngiDir: ${ngiDir}
+  guiDir: ${guiDir}
+  tempDir: ${tempDir}
+  docsDir: ${docsDir}
+  diagsDir: ${diagsDir}
+  cacheDir: ${cacheDir}
+  ipcDir: /tmp/neon/ipc
+  # Changes to ipcDir must also be made in NGI/utilities/configHelper
+  scriptsDir: ${coreDir}/scripts
+  musicDir: ${ngiDir}/Music/NeonGecko
+  videoDir: ${ngiDir}/Videos/NeonGecko
+  picsDir: ${ngiDir}/Pictures/NeonGecko
+  signalDir: ${ngiDir}/signal
+  logsDir: ${diagsDir}/logs
+  repoDir: /home/${installUser}/.neon/skills-repo
+  padatiousDir: /home/${installUser}/.neon/intent_cache
+
+fileVars:
+  sshKey: ${sshKey}
+  notify: ${coreDir}/mycroft/res/snd/loaded.wav
+  startListening: ${coreDir}/mycroft/res/snd/start_listening.wav
+  endListening: ${coreDir}/mycroft/res/snd/end_listening.wav
+
+authVars:
+  waID: ${waID}
+  chatDbConnect: ${chatDbConnect}
+  serverConnect: ${serverConnect}
+
+homeControl:
+  openhabHost: ${openhabHost}
+  openhabPort: ${openhabPort}
+  openhabConf: ${openhabConf}
+
+audioService:
+  defaultBackend: "local"
+
+padatious:
+  intent_cache: /home/${installUser}/.neon/intent_cache
+  train_delay: 4
+  single_thread: false
+
+websocket:
+  host: "0.0.0.0"
+  port: 8181
+  route: "/core"
+  ssl: false
+
+gui:
+  # Host information for the gui server
+  lang: en-us
+  enclosure: generic
+  host: 0.0.0.0
+  port: 18181
+  route: /gui
+  ssl: false
+  resource_root: https://0000.us/klatchat/app/files/neon_qml
+
+
+ttsOpts: {None: '', 'Chinese, Mandarin': zh-ZH, Danish: da-DK, Dutch: nl-NL, 'English, Australian': en-AU,
+          'English, British': en-GB, 'English, Indian': en-IN, 'English, US': en-US, 'English, Welsh': en-GB-WLS,
+          French: fr-FR, 'French, Canadian': fr-CA, Hindi: hi-IN, German: de-DE, Icelandic: is-IS,
+          Italian: it-IT, Japanese: ja-JP, Korean: ko-KR, Norwegian: nb-NO, Polish: pl-PL,
+          'Portuguese, Brazilian': pt-BR, 'Portuguese, European': pt-PT, Romanian: ro-RO,
+          Russian: ru-RU, 'Spanish, European': es-ES, 'Spanish, Mexican': es-MX, 'Spanish, US': es-US,
+          Swedish: sv-SE, Turkish: tr-TR, Welsh: cy-GB}
+
+sttOpts: {Deutsch (Deutschland): de-DE, English (United States): en-US, Español (España): es-ES,
+          Español (México): es-MX, Français (Canada): fr-CA, Français (France): fr-FR,
+          Italiano (Italia): it-IT, Português (Portugal): pt-PT}
+
+sttSpokenOpts: {Afrikaans: af-ZA, Amharic: am-ET, Armenian: hy-AM, Azerbaijani: az-AZ,
+                Indonesian: id-ID, Malay: ms-MY, Bengali: bn-BD, Catalan: ca-ES, Czech: cs-CZ, Danish: da-DK,
+                German: de-DE, 'English, British': en-GB, 'English, American': en-US, Spanish: es-ES,
+                'Spanish, American': es-US, 'Spanish, Mexican': es-MX, Basque: eu-ES, Filipino: fil-PH,
+                'French, Canadian': fr-CA, French: fr-FR, Galician: gl-ES, Georgian: ka-GE, Gujarati: gu-IN,
+                Croatian: hr-HR, Zulu: zu-ZA, Icelandic: is-IS, Italian: it-IT, Javanese: jv-ID,
+                Kannada: kn-IN, Khmer: km-KH, Lao: lo-LA, Latvian: lv-LV, Lithuanian: lt-LT, Hungarian: hu-HU,
+                Malayalam: ml-IN, Marathi: mr-IN, Dutch: nl-NL, Nepali: ne-NP, Norwegian Bokmål: nb-NO,
+                Polish: pl-PL, 'Portuguese, Brazilian': pt-BR, Portuguese: pt-PT, Romanian: ro-RO,
+                Sinhala: si-LK, Slovak: sk-SK, Slovenian: sl-SI, Sundanese: su-ID, Swahili: sw-TZ,
+                Finnish: fi-FI, Swedish: sv-SE, Tamil: ta-IN, Telugu: te-IN, Vietnamese: vi-VN,
+                Turkish: tr-TR, Urdu: ur-PK, Greek: el-GR, Bulgarian: bg-BG, Russian: ru-RU, Serbian: sr-RS,
+                Ukrainian: uk-UA, Hebrew: he-IL, Arabic: ar-IL, Persian: fa-IR, Hindi: hi-IN, Thai: th-TH,
+                Korean: ko-KR, Taiwanese: zh-TW, 'Chinese, Cantonese': yue-Hant-HK, Japanese: ja-JP,
+                'Chinese, Mandarin': zh}

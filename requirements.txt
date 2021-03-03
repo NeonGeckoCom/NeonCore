@@ -29,6 +29,9 @@ kthread
 ovos_utils>=0.0.5
 ovos-skills-manager>=0.0.2
 
+# Neon Config
+ruamel.yaml
+filelock
 
 
 # vision stuff
