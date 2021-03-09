@@ -1,7 +1,5 @@
 # mycroft inherited stuff
 requests==2.20.0
-PyAudio==0.2.11
-SpeechRecognition==3.8.1
 tornado==6.0.3
 requests-futures==0.9.5
 pyalsaaudio==0.8.2
@@ -22,14 +20,14 @@ fann2==1.0.7
 precise-runner==0.2.1
 petact==0.1.2
 
+# speech client
+git+https://github.com/NeonJarbas/neon_speech
+
 # utils
-pydub
 rapidfuzz
 kthread
-ovos_utils>=0.0.5
+ovos_utils>=0.0.6
 ovos-skills-manager>=0.0.2
-
-
 
 # vision stuff
 numpy
