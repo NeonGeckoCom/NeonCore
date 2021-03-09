@@ -23,6 +23,7 @@ from os import walk
 from os.path import join, abspath, dirname, basename, exists
 from threading import Event, Timer
 import time
+from enum import Enum
 from adapt.intent import Intent, IntentBuilder
 
 from mycroft import dialog
@@ -64,6 +65,11 @@ from mycroft.skills.skill_data import (
 )
 from mycroft.skills.mycroft_skill.compatibility import OldNeonCompatibilitySkill
 from padatious import IntentContainer
+
+
+class UserReply(str, Enum):
+    YES = "yes"
+    NO = "no"
 
 
 def simple_trace(stack_trace):
@@ -561,11 +567,29 @@ class MycroftSkill(OldNeonCompatibilitySkill):
         resp = self.get_response(dialog=prompt, data=data)
 
         if self.voc_match(resp, 'yes'):
-            return 'yes'
+            return UserReply.YES
         elif self.voc_match(resp, 'no'):
-            return 'no'
+            return UserReply.NO
         else:
             return resp
+
+    def ask_confirm(self, dialog, data=None):
+        """Read prompt and wait for a yes/no answer
+        This automatically deals with translation and common variants,
+        such as 'yeah', 'sure', etc.
+        Args:
+              dialog (str): a dialog id or string to read
+              data (dict): response data
+        Returns:
+              bool: True if 'yes', False if 'no', None for all other
+                    responses or no response
+        """
+        resp = self.ask_yesno(dialog, data=data)
+        if resp == UserReply.YES:
+            return True
+        elif resp == UserReply.NO:
+            return False
+        return None
 
     def ask_selection(self, options, dialog='',
                       data=None, min_conf=0.65, numeric=False):
