@@ -362,6 +362,17 @@ class IntentService:
             # normalized version following.
             combined = utterances + list(set(norm_utterances) -
                                          set(utterances))
+            # filter empty utterances
+            combined = [u for u in combined if u.strip()]
+            if len(combined) == 0:
+                # STT filters those, but some parser module might do it to
+                # abort intent execution
+                LOG.debug("Received empty utterance!!")
+                reply = message.reply('intent_aborted',
+                                      {'utterances': message.data.get('utterances', []),
+                                       'lang': lang})
+                self.bus.emit(reply)
+                return
             LOG.debug("Utterances: {}".format(combined))
 
             stopwatch = Stopwatch()
