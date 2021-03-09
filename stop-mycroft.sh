@@ -41,7 +41,7 @@ function help() {
 }
 
 function process-running() {
-    if [[ $( pgrep -f "python3 -m mycroft.*${1}" ) ]] ; then
+    if [[ $( pgrep -f "python3 -m *${1}" ) ]] ; then
         return 0
     else
         return 1
@@ -51,7 +51,7 @@ function process-running() {
 function end-process() {
     if process-running $1 ; then
         # Find the process by name, only returning the oldest if it has children
-        pid=$( pgrep -o -f "python3 -m mycroft.*${1}" )
+        pid=$( pgrep -o -f "python3 -m *${1}" )
         echo -n "Stopping $1 (${pid})..."
         kill -SIGINT ${pid}
 
@@ -68,7 +68,7 @@ function end-process() {
 
         if process-running $1 ; then
             echo "failed to stop."
-            pid=$( pgrep -o -f "python3 -m mycroft.*${1}" )            
+            pid=$( pgrep -o -f "python3 -m *${1}" )
             echo -n "  Killing $1 (${pid})..."
             kill -9 ${pid}
             echo "killed."
@@ -94,28 +94,23 @@ case ${OPT} in
         ;&
     "")
         echo "Stopping all mycroft-core services"
-        end-process messagebus.service
-        end-process skills
-        end-process audio
-        end-process speech
-        end-process gui
+        end-process mycroft.messagebus.service
+        end-process mycroft.skills
+        end-process mycroft.audio
+        end-process neon_speech
         ;;
     "bus")
-        end-process messagebus.service
+        end-process mycroft.messagebus.service
         ;;
     "audio")
-        end-process audio
+        end-process mycroft.audio
         ;;
     "skills")
-        end-process skills
+        end-process mycroft.skills
         ;;
     "voice")
-        end-process speech
+        end-process neon_speech
         ;;
-    "gui")
-        end-process gui
-        ;;
-
     *)
         help
         ;;

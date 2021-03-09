@@ -64,10 +64,9 @@ function name-to-script-path() {
         "bus")               _module="mycroft.messagebus.service" ;;
         "skills")            _module="mycroft.skills" ;;
         "audio")             _module="mycroft.audio" ;;
-        "voice")             _module="mycroft.client.speech" ;;
-        "cli")               _module="mycroft.client.text" ;;
+        "voice")             _module="neon_speech" ;;
+        "cli")               _module="neon_cli" ;;
         "audiotest")         _module="mycroft.util.audio_test" ;;
-        "audioaccuracytest") _module="mycroft.audio-accuracy-test" ;;
         "gui")               _module="mycroft.enclosure" ;;
 
         *)
@@ -218,35 +217,6 @@ case ${_opt} in
         require-process bus
         require-process skills
         launch-process ${_opt}
-        ;;
-
-    # TODO: Restore support for Wifi Setup on a Picroft, etc.
-    # "wifi")
-    #    launch-background ${_opt}
-    #    ;;
-    "unittest")
-        source-venv
-        pytest test/unittests/ --cov=mycroft "$@"
-        ;;
-    "singleunittest")
-        source-venv
-        pytest "$@"
-        ;;
-    "skillstest")
-        source-venv
-        pytest test/integrationtests/skills/discover_tests.py "$@"
-        ;;
-    "audiotest")
-        launch-process ${_opt}
-        ;;
-    "audioaccuracytest")
-        launch-process ${_opt}
-        ;;
-    "sdkdoc")
-        source-venv
-        cd doc
-        make ${_params}
-        cd ..
         ;;
     "enclosure")
         launch-background ${_opt}
