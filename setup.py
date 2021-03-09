@@ -62,15 +62,13 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'mycroft-speech-client=mycroft.client.speech.__main__:main',
             'mycroft-messagebus=mycroft.messagebus.service.__main__:main',
             'mycroft-bus-monitor=mycroft.messagebus.__main__:main',
             'mycroft-skills=mycroft.skills.__main__:main',
             'mycroft-audio=mycroft.audio.__main__:main',
             'mycroft-echo-observer=mycroft.messagebus.client.ws:echo',
             'mycroft-audio-test=mycroft.util.audio_test:main',
-            'mycroft-gui-listener=mycroft.enclosure.__main__:main',
-            'mycroft-cli-client=mycroft.client.text.__main__:main'
+            'mycroft-gui-listener=mycroft.enclosure.__main__:main'
         ]
     }
 )
