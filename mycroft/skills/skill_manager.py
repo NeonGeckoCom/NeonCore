@@ -16,7 +16,7 @@
 import os
 from glob import glob
 from threading import Thread, Event
-from time import sleep
+from time import sleep, time
 from os.path import expanduser, join, isdir
 from inspect import signature
 
@@ -289,6 +289,7 @@ class SkillManager(Thread):
                     self._emit_converse_error(message, skill_id, error_message)
                     break
                 try:
+                    message.context.get("timing", {})["processed"] = time()
                     utterances = message.data['utterances']
                     lang = message.data['lang']
                     intents = skill_loader.instance.handle_internal_intents
