@@ -92,13 +92,15 @@ class PlaybackThread(Thread):
         listening.
         """
         while not self._terminated:
+            listen = False
+            ident = None
             try:
                 (snd_type, data,
                  visemes, ident, listen) = self.queue.get(timeout=2)
                 self.blink(0.5)
                 if not self._processing_queue:
                     self._processing_queue = True
-                    self.tts.begin_audio()
+                    self.tts.begin_audio(ident)
 
                 stopwatch = Stopwatch()
                 with stopwatch:
@@ -114,7 +116,7 @@ class PlaybackThread(Thread):
                 report_timing(ident, 'speech_playback', stopwatch)
 
                 if self.queue.empty():
-                    self.tts.end_audio(listen)
+                    self.tts.end_audio(listen, ident)
                     self._processing_queue = False
                 self.blink(0.2)
             except Empty:
@@ -122,7 +124,7 @@ class PlaybackThread(Thread):
             except Exception as e:
                 LOG.exception(e)
                 if self._processing_queue:
-                    self.tts.end_audio(listen)
+                    self.tts.end_audio(listen, ident)
                     self._processing_queue = False
 
     def show_visemes(self, pairs):
@@ -208,12 +210,12 @@ class TTS(metaclass=ABCMeta):
             LOG.exception('Failed to load phonetic spellings.')
             return {}
 
-    def begin_audio(self):
+    def begin_audio(self, ident=None):
         """Helper function for child classes to call in execute()"""
         # Create signals informing start of speech
-        self.bus.emit(Message("recognizer_loop:audio_output_start"))
+        self.bus.emit(Message("recognizer_loop:audio_output_start", context={"ident": ident}))
 
-    def end_audio(self, listen=False):
+    def end_audio(self, listen=False, ident=None):
         """Helper function for child classes to call in execute().
 
         Sends the recognizer_loop:audio_output_end message (indicating
@@ -225,7 +227,7 @@ class TTS(metaclass=ABCMeta):
             listen (bool): indication if listening trigger should be sent.
         """
 
-        self.bus.emit(Message("recognizer_loop:audio_output_end"))
+        self.bus.emit(Message("recognizer_loop:audio_output_end", context={"ident": ident}))
         if listen:
             self.bus.emit(Message('mycroft.mic.listen'))
         # Clean the cache as needed
