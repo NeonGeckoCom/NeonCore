@@ -1,0 +1,61 @@
+user:
+  first_name: ''
+  middle_name: ''
+  last_name: ''
+  preferred_name: ''
+  full_name: ''
+  dob: YYYY/MM/DD
+  age: ''
+  email: ''
+  username: ''
+  password: ''
+  picture: ''
+  about: ''
+  phone: ''
+  phone_verified: False
+  email_verified: False
+brands:
+  ignored_brands: {}
+  favorite_brands: {}
+  specially_requested: {}
+speech:
+  stt_language: en
+  stt_region: US
+  alt_languages: ['en']
+  tts_language: en-us
+  tts_gender: female
+  neon_voice: ''
+  secondary_tts_language: ''
+  secondary_tts_gender: male
+  secondary_neon_voice: ''
+  speed_multiplier: 1.0
+units:
+  time: 12
+  # 12, 24
+  date: MDY
+  # MDY, YMD, YDM
+  measure: imperial
+  # imperial, metric
+interface:
+# True, False
+  display_neon_brain: True
+  clap_commands_enabled: False
+  blink_commands_enabled: False
+  wake_words_enabled: False
+  random_dialog_enabled: False
+  confirm_listening: True
+  mute_on_listen: False
+  # True=Muted, False=lowered vol
+  use_hesitation: False
+  camera_preview: False
+  blink_scalar: 0.6
+  blink_frames: 2
+  gui_remote: ''
+location:
+  lat: '47.4799078'
+  lng: '-122.2034496'
+  city: Renton
+  state: Washington
+  country: United States
+  tz: America/Los_Angeles
+  utc: '-8.0'

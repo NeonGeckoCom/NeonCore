@@ -22,7 +22,7 @@ from requests import RequestException
 
 from mycroft.util.json_helper import load_commented_json, merge_dict
 from mycroft.util.log import LOG
-from NGI.utilities.configHelper import NGIConfig
+from neon_utils.configuration_utils import NGIConfig
 from mycroft.configuration.locations import (DEFAULT_CONFIG, SYSTEM_CONFIG, USER_CONFIG, WEB_CONFIG_CACHE)
 
 
@@ -189,20 +189,41 @@ class Configuration:
                 configs (list): List of configuration dicts
                 cache (boolean): True if the result should be cached
         """
-        if "ngi_local_conf" in configs:
-            ngi_local = NGIConfig("ngi_local_conf")
-            Configuration.__neon["local"] = ngi_local
-        if "ngi_user_info" in configs:
-            ngi_user = NGIConfig("ngi_user_info")
-            Configuration.__neon["user"] = ngi_user
-        if "ngi_auth_vars" in configs:
-            ngi_auth = NGIConfig("ngi_auth_vars")
-            Configuration.__neon["auth"] = ngi_auth
+        ngi_local = NGIConfig("ngi_local_conf").make_equal_by_keys(NGIConfig("default_local_conf").content)
+        Configuration.__neon["local"] = ngi_local
+        ngi_user = NGIConfig("ngi_user_info").make_equal_by_keys(NGIConfig("default_user_info").content)
+        Configuration.__neon["user"] = ngi_user
+        ngi_auth = NGIConfig("ngi_auth_vars")
+        Configuration.__neon["auth"] = ngi_auth
 
+        # TODO: Only do this once? this could get computationally expensive to always rebuild config DM
         if Configuration.__config:
-            return Configuration.__config
+            mycroft_config = Configuration.__config
         else:
-            return Configuration.load_config_stack(configs, cache)
+            mycroft_config = Configuration.load_config_stack(configs, cache)
+
+        mycroft_keys = mycroft_config.pop("keys")
+
+        date_format = mycroft_config.pop("date_format")
+        mycroft_location = mycroft_config.pop("location")
+        unit = mycroft_config.pop("system_unit")
+        time_format = mycroft_config.pop("time_format")  # half'?
+        mycroft_user = {"units": {"time": 12 if time_format == 'half' else 24,
+                                  "date": date_format,
+                                  "measure": unit},
+                        "location": {"lat": mycroft_location["coordinate"].get("latitude"),
+                                     "lng": mycroft_location["coordinate"].get("longitude"),
+                                     "city": mycroft_location["city"].get("name"),
+                                     "state": mycroft_location["city"].get("state", {}).get("name"),
+                                     "country": mycroft_location["city"].get("state", {}).get("country",
+                                                                                              {}).get("name"),
+                                     "tz": mycroft_location["timezone"].get("code")}}
+        user_config = ngi_user.update_keys(mycroft_user)
+        auth_config = ngi_auth.update_keys(mycroft_keys)
+        local_config = ngi_local.update_keys(mycroft_config)
+        local_config["keys"] = auth_config
+        local_config["user"] = user_config  # TODO: This should probably be depreciated? DM
+        return local_config
 
     @staticmethod
     def load_config_stack(configs=None, cache=False):

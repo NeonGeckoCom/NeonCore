@@ -1,10 +1,7 @@
 prefFlags:
-  codeSource: ${codeSource}
   devMode: ${devMode}
   autoStart: ${autoStart}
   autoUpdate: ${autoUpdate}
-  # Flag if gui is installed locally
-  localGui: ${installGui}
   # Flag if enclosure service should run to generate gui events
   guiEvents: ${guiEvents}
   notifyRelease: true
@@ -21,8 +18,6 @@ remoteVars:
   guiBranch: ${guiBranch}
   remoteUser: ${remoteUser}
   remoteHost: ${remoteHost}
-  remoteCore: ${remoteCore}
-  remoteSkills: ${remoteSkills}
   emailUpload: ${emailUpload}
   attachmentUpload: ${attachmentUpload}
   url: https://api.mycroft.ai
@@ -34,8 +29,6 @@ devVars:
   # generic, server, pi, neonK, neonX, neonPi, neonAlpha, neonU
   version: ${version}
   installUser: ${installUser}
-  likesLastUpdate: ${likesLastUpdate}
-  caffeineUpdate: ''
   touchDev: ${touchDev}
   micDev: ${micDev}
   camDev: 0
@@ -43,11 +36,6 @@ devVars:
   clapThreshold: 10.0e10
   defaultVolume: 60
   defaultMicVolume: 100
-  ccUpdates: {}
-
-gnome:
-  favApps:
-  appFolders: "['accessories', 'office', 'Neongecko']"
 
 dirVars:
   coreDir: ${coreDir}
@@ -55,36 +43,21 @@ dirVars:
   skillsDir: ${skillsDir}
   ngiDir: ${ngiDir}
   guiDir: ${guiDir}
-  tempDir: ${tempDir}
   docsDir: ${docsDir}
   diagsDir: ${diagsDir}
   cacheDir: ${cacheDir}
-  ipcDir: /tmp/neon/ipc
-  # Changes to ipcDir must also be made in NGI/utilities/configHelper
+  # This cacheDir should be persistent
   scriptsDir: ${coreDir}/scripts
   musicDir: ${ngiDir}/Music/NeonGecko
   videoDir: ${ngiDir}/Videos/NeonGecko
   picsDir: ${ngiDir}/Pictures/NeonGecko
   signalDir: ${ngiDir}/signal
   logsDir: ${diagsDir}/logs
-  repoDir: /home/${installUser}/.neon/skills-repo
-  padatiousDir: /home/${installUser}/.neon/intent_cache
 
 fileVars:
-  sshKey: ${sshKey}
   notify: ${coreDir}/mycroft/res/snd/loaded.wav
   startListening: ${coreDir}/mycroft/res/snd/start_listening.wav
   endListening: ${coreDir}/mycroft/res/snd/end_listening.wav
-
-authVars:
-  waID: ${waID}
-  chatDbConnect: ${chatDbConnect}
-  serverConnect: ${serverConnect}
-
-homeControl:
-  openhabHost: ${openhabHost}
-  openhabPort: ${openhabPort}
-  openhabConf: ${openhabConf}
 
 audioService:
   defaultBackend: "local"
@@ -110,7 +83,23 @@ gui:
   ssl: false
   resource_root: https://0000.us/klatchat/app/files/neon_qml
 
+hotwords:
+  hey neon:
+    lang: en-us
+    listen: true
+    module: jarbas_pocketsphinx_ww_plug
+    phonemes: HH EY . N IY AA N .
+    sound: snd/start_listening.wav
+    threshold: 1e-20
+    sample_rate: 16000
 
+device:
+  mac: 00:00:00:00:00:00
+  ip4: 127.0.0.1
+  ip6: ::1
+  ver: ''
+
+# Below should all be depreciated from here
 ttsOpts: {None: '', 'Chinese, Mandarin': zh-ZH, Danish: da-DK, Dutch: nl-NL, 'English, Australian': en-AU,
           'English, British': en-GB, 'English, Indian': en-IN, 'English, US': en-US, 'English, Welsh': en-GB-WLS,
           French: fr-FR, 'French, Canadian': fr-CA, Hindi: hi-IN, German: de-DE, Icelandic: is-IS,
