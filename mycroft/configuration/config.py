@@ -278,6 +278,9 @@ class Configuration:
             handler for configuration.updated, triggers an update
             of cached config.
         """
+        if message.data.get("modified"):
+            LOG.info(f"Updated: {message.data['modified']}")
+            LOG.info(message.context.get("origin"))
         Configuration.load_config_stack(cache=True)
 
     @staticmethod
