@@ -337,6 +337,12 @@ class IntentService:
             utterances = message.data.get('utterances', [])
 
             message.context = message.context or {}
+            # Add or init timing data
+            if not message.context.get("timing"):
+                LOG.warning("No timing data available at intent service")
+                message.context["timing"] = {}
+            message.context["timing"]["transcribed"] = message.context.get("timing", {}).get("transcribed", time.time())
+
             # pipe utterance trough parsers to get extra metadata
             # use cases: translation, emotion_data, keyword spotting etc.
             # parsers are ordered by priority
@@ -374,7 +380,7 @@ class IntentService:
             with stopwatch:
                 # Give active skills an opportunity to handle the utterance
                 converse = self._converse(combined, lang, message)
-
+                message.context["timing"]["check_converse"] = stopwatch.time
                 if not converse:
                     # No conversation, use intent system to handle utterance
                     intent = self._adapt_intent_match(utterances,
