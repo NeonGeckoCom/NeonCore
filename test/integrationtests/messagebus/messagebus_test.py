@@ -23,7 +23,7 @@ import unittest
 from subprocess import Popen, call
 from threading import Thread
 
-from mycroft.messagebus.client import MessageBusClient
+from neon_core.messagebus import get_messagebus
 from mycroft.messagebus.message import Message
 
 
@@ -45,8 +45,8 @@ class TestMessagebusMethods(unittest.TestCase):
         # start the mycroft service. and get the pid of the script.
         self.pid = Popen(["python", "mycroft/messagebus/service/main.py"]).pid
         # Create the two web clients
-        self.ws1 = MessageBusClient()
-        self.ws2 = MessageBusClient()
+        self.ws1 = get_messagebus(running=False)
+        self.ws2 = get_messagebus(running=False)
         # init the flags for handler's
         self.handle1 = False
         self.handle2 = False

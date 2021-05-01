@@ -49,10 +49,10 @@ def required(requirements_file):
 
 
 setup(
-    name='mycroft-core',
+    name='neon-core',
     version=get_version(),
     license='Apache-2.0',
-    author='Mycroft A.I.',
+    author='NeonGecko',
     author_email='devs@mycroft.ai',
     url='https://github.com/MycroftAI/mycroft-core',
     description='Mycroft Core',
