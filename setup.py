@@ -49,13 +49,13 @@ def required(requirements_file):
 
 
 setup(
-    name='mycroft-core',
+    name='neon-core',
     version=get_version(),
-    license='Apache-2.0',
-    author='Mycroft A.I.',
-    author_email='devs@mycroft.ai',
-    url='https://github.com/MycroftAI/mycroft-core',
-    description='Mycroft Core',
+    license='NeonAI License v1.0',
+    author='Neongecko',
+    author_email='developers@neon.ai',
+    url='https://github.com/NeonGeckoCom/NeonCore',
+    description='Neon Core',
     install_requires=required('requirements.txt'),
     packages=find_packages(include=['mycroft*']),
     include_package_data=True,
