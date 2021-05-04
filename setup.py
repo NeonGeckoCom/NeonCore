@@ -18,6 +18,28 @@ import os.path
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 
+def get_version():
+    """ Find the version of mycroft-core"""
+    version = None
+    version_file = os.path.join(BASEDIR, 'mycroft', 'version', '__init__.py')
+    major, minor, build = (None, None, None)
+    with open(version_file) as f:
+        for line in f:
+            if 'CORE_VERSION_MAJOR' in line:
+                major = line.split('=')[1].strip()
+            elif 'CORE_VERSION_MINOR' in line:
+                minor = line.split('=')[1].strip()
+            elif 'CORE_VERSION_BUILD' in line:
+                build = line.split('=')[1].strip()
+
+            if ((major and minor and build) or
+                    '# END_VERSION_BLOCK' in line):
+                break
+    version = '.'.join([major, minor, build])
+
+    return version
+
+
 def required(requirements_file):
     """ Read requirements file and remove comments and empty lines. """
     with open(os.path.join(BASEDIR, requirements_file), 'r') as f:
