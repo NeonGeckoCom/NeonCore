@@ -50,12 +50,12 @@ def required(requirements_file):
 
 setup(
     name='neon-core',
-    version="2021.5.6a12",
-    license='Apache-2.0',
-    author='NeonGecko',
-    author_email='devs@mycroft.ai',
-    url='https://github.com/MycroftAI/mycroft-core',
-    description='NeonCore',
+    version=get_version(),
+    license='NeonAI License v1.0',
+    author='Neongecko',
+    author_email='developers@neon.ai',
+    url='https://github.com/NeonGeckoCom/NeonCore',
+    description='Neon Core',
     install_requires=required('requirements.txt'),
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*', 'res/text/*/*.voc', 'res/text/*/*.dialog',
