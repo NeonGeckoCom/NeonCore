@@ -21,10 +21,10 @@ precise-runner==0.2.1
 petact==0.1.2
 
 # speech client
-git+https://github.com/NeonJarbas/neon_speech
+neon_speech @ git+https://github.com/NeonJarbas/neon_speech
 
 # audio client
-git+https://github.com/neongeckocom/neon_audio
+neon_audio @ git+https://github.com/neongeckocom/neon_audio
 
 
 # utils
