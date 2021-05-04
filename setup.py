@@ -68,7 +68,9 @@ setup(
             'mycroft-audio=mycroft.audio.__main__:main',
             'mycroft-echo-observer=mycroft.messagebus.client.ws:echo',
             'mycroft-audio-test=mycroft.util.audio_test:main',
-            'mycroft-gui-listener=mycroft.enclosure.__main__:main'
+            'mycroft-gui-listener=mycroft.enclosure.__main__:main',
+            'neon-start=mycroft.run_neon:start_neon',
+            'neon-stop=mycroft.run_neon:stop_neon'
         ]
     }
 )
