@@ -18,6 +18,28 @@ import os.path
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 
+def get_version():
+    """ Find the version of mycroft-core"""
+    version = None
+    version_file = os.path.join(BASEDIR, 'mycroft', 'version', '__init__.py')
+    major, minor, build = (None, None, None)
+    with open(version_file) as f:
+        for line in f:
+            if 'CORE_VERSION_MAJOR' in line:
+                major = line.split('=')[1].strip()
+            elif 'CORE_VERSION_MINOR' in line:
+                minor = line.split('=')[1].strip()
+            elif 'CORE_VERSION_BUILD' in line:
+                build = line.split('=')[1].strip()
+
+            if ((major and minor and build) or
+                    '# END_VERSION_BLOCK' in line):
+                break
+    version = '.'.join([major, minor, build])
+
+    return version
+
+
 def required(requirements_file):
     """ Read requirements file and remove comments and empty lines. """
     with open(os.path.join(BASEDIR, requirements_file), 'r') as f:
@@ -27,24 +49,28 @@ def required(requirements_file):
 
 
 setup(
-    name='neon-core',
-    version="2021.5.6a12",
+    name='mycroft-core',
+    version=get_version(),
     license='Apache-2.0',
-    author='NeonGecko',
+    author='Mycroft A.I.',
     author_email='devs@mycroft.ai',
     url='https://github.com/MycroftAI/mycroft-core',
-    description='NeonCore',
+    description='Mycroft Core',
     install_requires=required('requirements.txt'),
-    packages=find_packages(include=['neon_core*']),
-    package_data={'': ['*.voc', '*.dialog', '*.qml', '*.mp3', '*.wav']},
+    packages=find_packages(include=['mycroft*']),
     include_package_data=True,
+
     entry_points={
         'console_scripts': [
-            'neon-messagebus=neon_core.messagebus.service.__main__:main',
-            'neon-bus-monitor=neon_core.messagebus.__main__:main',
-            'neon-skills=neon_core.skills.__main__:main',
-            'neon-audio=neon_core.audio.__main__:main',
-            'neon-gui-listener=neon_core.enclosure.__main__:main'
+            'mycroft-messagebus=mycroft.messagebus.service.__main__:main',
+            'mycroft-bus-monitor=mycroft.messagebus.__main__:main',
+            'mycroft-skills=mycroft.skills.__main__:main',
+            'mycroft-audio=mycroft.audio.__main__:main',
+            'mycroft-echo-observer=mycroft.messagebus.client.ws:echo',
+            'mycroft-audio-test=mycroft.util.audio_test:main',
+            'mycroft-gui-listener=mycroft.enclosure.__main__:main',
+            'neon-start=mycroft.run_neon:start_neon',
+            'neon-stop=mycroft.run_neon:stop_neon'
         ]
     }
 )
