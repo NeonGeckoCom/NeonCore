@@ -20,9 +20,9 @@ from neon_core.language import DetectorFactory, TranslatorFactory, \
     get_lang_config, get_language_dir
 from neon_core.configuration import get_private_keys
 from neon_core.dialog import load_dialogs
-from neon_core.skills.neon_skill.compatibility import OldNeonCompatibilitySkill
 from neon_core.skills.neon_skill.decorators import AbortEvent, \
     AbortQuestion, killable_event
+from mycroft.skills import MycroftSkill
 
 
 class UserReply(str, Enum):
@@ -55,7 +55,7 @@ def get_non_properties(obj):
     return set(check_class(obj.__class__))
 
 
-class NeonSkill(OldNeonCompatibilitySkill):
+class NeonSkill(MycroftSkill):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.keys = get_private_keys()

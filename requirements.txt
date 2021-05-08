@@ -1,6 +1,9 @@
+# mycroft
 HolmesV[all]>=2021.5.6a4
 mock_msm
-# speech client
+
+# neon stuff
+git+https://github.com/NeonGeckoCom/neon-skill-utils
 #git+https://github.com/NeonJarbas/neon_speech
 
 # utils
