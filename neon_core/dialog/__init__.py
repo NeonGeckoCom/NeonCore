@@ -49,7 +49,8 @@ def get(phrase, lang=None, context=None):
 
     if not lang:
         from neon_core.configuration import Configuration
-        lang = Configuration.get().get('lang')
+        conf = Configuration.get()
+        lang = conf.get("internal_lang") or conf.get("lang")
 
     filename = join('text', lang.lower(), phrase + '.dialog')
     template = resolve_resource_file(filename)
@@ -78,7 +79,8 @@ def get_all(phrase, lang=None, context=None):
     """
     if not lang:
         from mycroft.configuration import Configuration
-        lang = Configuration.get().get("lang")
+        conf = Configuration.get()
+        lang = conf.get("internal_lang") or conf.get("lang")
 
     filename = "text/" + lang.lower() + "/" + phrase + ".dialog"
     template = resolve_resource_file(filename)
@@ -98,4 +100,4 @@ def get_all(phrase, lang=None, context=None):
     # Use the given phrase as the template content.  Useful for
     # short phrase or single-words that can be enhanced and
     # translated later.  No rendering happens, though.
-    return [phrase.replace('.',' ')]
+    return [phrase.replace('.', ' ')]

@@ -1,5 +1,4 @@
-mycroft-lib[all]==2021.4.2a14
-mycroft-lib[lingua_nostra]==2021.4.2a14
+HolmesV[all]>=2021.5.6a4
 mock_msm
 # speech client
 #git+https://github.com/NeonJarbas/neon_speech
