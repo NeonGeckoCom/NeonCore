@@ -12,7 +12,6 @@ from mycroft.util import camel_case_split
 from mycroft.util.log import LOG
 from mycroft.skills.mycroft_skill.event_container import create_wrapper, \
     get_handler_name
-from mycroft.skills.mycroft_skill import MycroftSkill
 from mycroft.skills.settings import save_settings
 from mycroft.skills.skill_data import load_vocabulary, load_regex
 from padatious import IntentContainer
@@ -20,9 +19,10 @@ from padatious import IntentContainer
 from neon_core.language import DetectorFactory, TranslatorFactory, \
     get_lang_config, get_language_dir
 from neon_core.configuration import get_private_keys
-from neon_core.dialog import DialogLoader
-from neon_core.skills.mycroft_skill.decorators import AbortEvent, \
+from neon_core.dialog import load_dialogs
+from neon_core.skills.decorators import AbortEvent, \
     AbortQuestion, killable_event
+from mycroft.skills import MycroftSkill
 
 
 class UserReply(str, Enum):
@@ -483,9 +483,9 @@ class NeonSkill(MycroftSkill):
                                       self.lang)
         # TODO support both? currently assumes only one of the schemes is used
         if exists(dialog_dir):
-            self.dialog_renderer = DialogLoader().load(dialog_dir)
+            self.dialog_renderer = load_dialogs(dialog_dir)
         elif exists(locale_dir):
-            self.dialog_renderer = DialogLoader().load(locale_dir)
+            self.dialog_renderer = load_dialogs(locale_dir)
         else:
             LOG.debug('No dialog loaded')
 

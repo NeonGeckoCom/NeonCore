@@ -30,7 +30,7 @@ import time
 from mycroft.messagebus import Message
 from mycroft.skills.mycroft_skill.decorators import intent_handler, \
     intent_file_handler, resting_screen_handler, skill_api_method
-from neon_core.util import create_killable_daemon
+from ovos_utils import create_killable_daemon
 
 
 class AbortEvent(StopIteration):
