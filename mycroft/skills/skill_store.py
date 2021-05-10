@@ -152,9 +152,9 @@ class SkillsStore:
         neon = self.osm.get_appstore("neon")
         neon_token = self.config.get("neon_token")
         if neon_token:
-            neon.authenticate(neon_token)
+            neon.authenticate(neon_token, False)
         else:
-            neon.authenticate()
+            neon.authenticate(bootstrap=False)
 
     def deauthenticate_neon(self):
         neon = self.osm.get_appstore("neon")
