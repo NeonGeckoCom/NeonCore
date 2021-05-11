@@ -62,13 +62,13 @@ setup(
 
     entry_points={
         'console_scripts': [
-            'mycroft-messagebus=mycroft.messagebus.service.__main__:main',
-            'mycroft-bus-monitor=mycroft.messagebus.__main__:main',
-            'mycroft-skills=mycroft.skills.__main__:main',
-            'mycroft-audio=mycroft.audio.__main__:main',
-            'mycroft-echo-observer=mycroft.messagebus.client.ws:echo',
-            'mycroft-audio-test=mycroft.util.audio_test:main',
-            'mycroft-gui-listener=mycroft.enclosure.__main__:main',
+            'neon-messagebus=mycroft.messagebus.service.__main__:main',
+            'neon-bus-monitor=mycroft.messagebus.__main__:main',
+            'neon-skills=mycroft.skills.__main__:main',
+            'neon-audio=mycroft.audio.__main__:main',  # TODO: Remove when #74 merged and audio extracted from core
+            'neon-echo-observer=mycroft.messagebus.client.ws:echo',
+            'neon-audio-test=mycroft.util.audio_test:main',
+            'neon-gui-listener=mycroft.enclosure.__main__:main',
             'neon-start=mycroft.run_neon:start_neon',
             'neon-stop=mycroft.run_neon:stop_neon'
         ]
