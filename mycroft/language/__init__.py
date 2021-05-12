@@ -25,10 +25,10 @@
 from mycroft.configuration import Configuration, get_private_keys
 from ovos_plugin_manager.language import load_lang_detect_plugin, \
     load_tx_plugin
-from mycroft.util.log import LOG
 import os
 
 
+# TODO deprecate this? was only used by cld3 detector
 def langcode2name(lang_code):
     LANGUAGES = (('ABKHAZIAN', 'ab'),
                  ('AFAR', 'aa'),
@@ -379,199 +379,6 @@ def get_language_dir(base_path, lang="en-us"):
     return os.path.join(base_path, lang)
 
 
-class LanguageDetector:
-    def __init__(self):
-        self.config = get_lang_config()
-        self.default_language = self.config["user"].split("-")[0]
-        # hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
-        self.hint_language = self.config["user"].split("-")[0]
-        self.boost = self.config["boost"]
-
-    def detect(self, text):
-        # assume default language
-        return self.default_language
-
-    def detect_probs(self, text):
-        return {self.detect(text): 1}
-
-
-class LanguageTranslator:
-    def __init__(self):
-        self.config = get_lang_config()
-        self.boost = self.config["boost"]
-        self.default_language = self.config["user"].split("-")[0]
-        self.internal_language = self.config["internal"]
-
-    def translate(self, text, target=None, source=None):
-        return text
-
-
-class Pycld2Detector(LanguageDetector):
-    def __init__(self):
-        super().__init__()
-        import pycld2
-        self.cld2 = pycld2
-
-    def cl2_detect(self, text, return_multiple=False, return_dict=False,
-                   hint_language=None, filter_unreliable=False):
-        """
-        :param text:
-        :param return_multiple bool if True return a list of all languages detected, else the top language
-        :param return_dict: bool  if True returns all data, E.g.,  pt -> {'lang': 'Portuguese', 'lang_code': 'pt', 'conf': 0.96}
-        :param hint_language: str  E.g., 'ITALIAN' or 'it' boosts Italian
-        :return:
-        """
-        isReliable, textBytesFound, details = self.cld2.detect(
-            text, hintLanguage=hint_language)
-        languages = []
-
-        # filter unreliable predictions
-        if not isReliable and filter_unreliable:
-            return None
-
-        # select first language only
-        if not return_multiple:
-            details = [details[0]]
-
-        for name, code, score, _ in details:
-            if code == "un":
-                continue
-            if return_dict:
-                languages.append({"lang": name.lower().capitalize(),
-                                  "lang_code": code, "conf": score / 100})
-            else:
-                languages.append(code)
-
-        # return top language only
-        if not return_multiple:
-            if not len(languages):
-                return None
-            return languages[0]
-        return languages
-
-    def detect(self, text):
-        if self.boost:
-            return self.cl2_detect(text, hint_language=self.hint_language) or \
-                   self.default_language
-        else:
-            return self.cl2_detect(text) or self.default_language
-
-    def detect_probs(self, text):
-        if self.boost:
-            data = self.cl2_detect(text, return_multiple=True,
-                                   return_dict=True,
-                                   hint_language=self.hint_language)
-        else:
-            data = self.cl2_detect(text, return_multiple=True,
-                                   return_dict=True)
-        langs = {}
-        for lang in data:
-            langs[lang["lang_code"]] = lang["conf"]
-        return langs
-
-
-class Pycld3Detector(LanguageDetector):
-    def __init__(self):
-        super().__init__()
-        import cld3
-        self.cld3 = cld3
-
-    def cld3_detect(self, text, return_multiple=False, return_dict=False,
-                    hint_language=None, filter_unreliable=False):
-        languages = []
-        if return_multiple or hint_language:
-            preds = sorted(self.cld3.get_frequent_languages(text, num_langs=5),
-                           key=lambda i: i.probability, reverse=True)
-            for pred in preds:
-                if filter_unreliable and not pred.is_reliable:
-                    continue
-                if return_dict:
-                    languages += [{"lang_code": pred.language,
-                                   "lang": langcode2name(pred.language),
-                                   "conf": pred.probability}]
-                else:
-                    languages.append(pred.language)
-
-                if hint_language and hint_language == pred.language:
-                    languages = [languages[-1]]
-                    break
-        else:
-            pred = self.cld3.get_language(text)
-            if filter_unreliable and not pred.is_reliable:
-                pass
-            elif return_dict:
-                languages = [{"lang_code": pred.language,
-                              "lang": langcode2name(pred.language),
-                              "conf": pred.probability}]
-            else:
-                languages = [pred.language]
-
-        # return top language only
-        if not return_multiple:
-            if not len(languages):
-                return None
-            return languages[0]
-        return languages
-
-    def detect(self, text):
-        if self.boost:
-            return self.cld3_detect(text, hint_language=self.hint_language) or \
-                   self.default_language
-        else:
-            return self.cld3_detect(text) or self.default_language
-
-    def detect_probs(self, text):
-        if self.boost:
-            data = self.cld3_detect(text, return_multiple=True,
-                                    return_dict=True,
-                                    hint_language=self.hint_language)
-        else:
-            data = self.cld3_detect(text, return_multiple=True,
-                                    return_dict=True)
-        langs = {}
-        for lang in data:
-            langs[lang["lang_code"]] = lang["conf"]
-        return langs
-
-
-class FastLangDetector(LanguageDetector):
-    def __init__(self):
-        super().__init__()
-        try:
-            from fastlang import fastlang
-        except ImportError:
-            LOG.error("Run pip install fastlang")
-            raise
-        self._detect = fastlang
-
-    def detect(self, text):
-        return self._detect(text)["lang"]
-
-    def detect_probs(self, text):
-        return self._detect(text)["probabilities"]
-
-
-class LangDetectDetector(LanguageDetector):
-    def __init__(self):
-        super().__init__()
-        try:
-            from langdetect import detect, detect_langs
-        except ImportError:
-            LOG.error("Run pip install langdetect")
-            raise
-        self._detect = detect
-        self._detect_prob = detect_langs
-
-    def detect(self, text):
-        return self._detect(text)
-
-    def detect_probs(self, text):
-        langs = {}
-        for lang in self._detect_prob(text):
-            langs[lang.lang] = lang.prob
-        return langs
-
-
 class TranslatorFactory:
     CLASSES = {}
 
@@ -593,12 +400,7 @@ class TranslatorFactory:
 
 
 class DetectorFactory:
-    CLASSES = {
-        "cld2": Pycld2Detector,
-        "cld3": Pycld3Detector,
-        "fastlang": FastLangDetector,
-        "detect": LangDetectDetector
-    }
+    CLASSES = {}
 
     @staticmethod
     def create(module=None):
