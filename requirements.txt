@@ -1,5 +1,5 @@
 # mycroft
-HolmesV[all]>=2021.5.6a4
+HolmesV[all]>=2021.5.6a9
 mock_msm
 
 # neon stuff

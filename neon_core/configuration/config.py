@@ -32,7 +32,7 @@ class Configuration(_Configuration):
         Configuration.set_config_update_handlers(bus)
 
     @staticmethod
-    def load_config_stack(configs=None, cache=True):
+    def load_config_stack(configs=None, cache=True, remote=False):
         """
             load a stack of config dicts into a single dict
 
