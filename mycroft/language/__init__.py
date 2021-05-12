@@ -23,10 +23,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from mycroft.configuration import Configuration, get_private_keys
-from ovos_plugin_manager.language import load_lang_detect_plugin, load_tx_plugin
+from ovos_plugin_manager.language import load_lang_detect_plugin, \
+    load_tx_plugin
 from mycroft.util.log import LOG
 import os
-import requests
 import boto3
 
 
@@ -348,8 +348,10 @@ def langcode2name(lang_code):
 def get_lang_config():
     config = Configuration.get()
     lang_config = config.get("language", {})
-    lang_config["internal"] = lang_config.get("internal") or config.get("lang", "en-us")
-    lang_config["user"] = lang_config.get("user") or config.get("lang", "en-us")
+    lang_config["internal"] = lang_config.get("internal") or config.get("lang",
+                                                                        "en-us")
+    lang_config["user"] = lang_config.get("user") or config.get("lang",
+                                                                "en-us")
     return lang_config
 
 
@@ -533,21 +535,6 @@ class Pycld3Detector(LanguageDetector):
         return langs
 
 
-class GoogleDetector(LanguageDetector):
-    def __init__(self):
-        super().__init__()
-        from google_trans_new import google_translator
-        self.translator = google_translator()
-
-    def detect(self, text):
-        tx = self.translator.detect(text)
-        return tx[0] or self.default_language
-
-    def detect_probs(self, text):
-        tx = self.translator.detect(text)
-        return {"lang_code": tx[0], "lang": tx[1]}
-
-
 class FastLangDetector(LanguageDetector):
     def __init__(self):
         super().__init__()
@@ -586,31 +573,15 @@ class LangDetectDetector(LanguageDetector):
         return langs
 
 
-class GoogleTranslator(LanguageTranslator):
-    def __init__(self):
-        super().__init__()
-        from google_trans_new import google_translator
-        self.translator = google_translator()
-
-    def translate(self, text, target=None, source=None):
-        if self.boost and not source:
-            source = self.default_language
-        target = target or self.internal_language
-        if source:
-            tx = self.translator.translate(text, lang_src=source.split("-")[0],
-                                           lang_tgt=target.split("-")[0])
-        else:
-            tx = self.translator.translate(text, lang_tgt=target.split("-")[0])
-        return tx.strip()
-
-
 class AmazonTranslator(LanguageTranslator):
     def __init__(self):
         super().__init__()
         self.keys = get_private_keys()["amazon"]
         self.client = boto3.Session(aws_access_key_id=self.keys["key_id"],
-                                    aws_secret_access_key=self.keys["secret_key"],
-                                    region_name=self.keys["region"]).client('translate')
+                                    aws_secret_access_key=self.keys[
+                                        "secret_key"],
+                                    region_name=self.keys["region"]).client(
+            'translate')
 
     def translate(self, text, target=None, source="auto"):
         target = target or self.internal_language
@@ -628,8 +599,10 @@ class AmazonDetector(LanguageDetector):
         super().__init__()
         self.keys = get_private_keys()["amazon"]
         self.client = boto3.Session(aws_access_key_id=self.keys["key_id"],
-                                    aws_secret_access_key=self.keys["secret_key"],
-                                    region_name=self.keys["region"]).client('comprehend')
+                                    aws_secret_access_key=self.keys[
+                                        "secret_key"],
+                                    region_name=self.keys["region"]).client(
+            'comprehend')
 
     def detect(self, text):
         response = self.client.detect_dominant_language(
@@ -647,66 +620,30 @@ class AmazonDetector(LanguageDetector):
         return langs
 
 
-class ApertiumTranslator(LanguageTranslator):
-    def __init__(self):
-        super().__init__()
-        # host it yourself https://github.com/apertium/apertium
-        self.url = self.config.get("apertium_host") or \
-                   "https://www.apertium.org/apy/translate"
-
-    def translate(self, text, target=None, source=None, url=None):
-        if self.boost and not source:
-            source = self.default_language
-        target = target or self.internal_language
-        lang_pair = target
-        if source:
-            lang_pair = source + "|" + target
-        r = requests.get(self.url,
-                         params={"q": text, "langpair": lang_pair,
-                                 "markUnknown": "no"}).json()
-        if r.get("status", "") == "error":
-            LOG.error(r["explanation"])
-            return None
-        return r["responseData"]["translatedText"]
-
-
 class TranslatorFactory:
     CLASSES = {
-        "google": GoogleTranslator,
-        "amazon": AmazonTranslator,
-        "apertium": ApertiumTranslator
+        "amazon": AmazonTranslator
     }
 
     @staticmethod
     def create(module=None):
         config = Configuration.get().get("language", {})
         module = module or config.get("translation_module", "google")
+        if module not in DetectorFactory.CLASSES:
+            # plugin!
+            clazz = load_tx_plugin(module)
+        else:
+            clazz = TranslatorFactory.CLASSES.get(module)
         try:
-            if module not in DetectorFactory.CLASSES:
-                # plugin!
-                clazz = load_tx_plugin(module)
-            else:
-                clazz = TranslatorFactory.CLASSES.get(module)
-            try:
-                # old style, TODO deprecate once everything is a plugin
-                return clazz()
-            except:
-                return clazz(config)
-        except Exception as e:
-            # The translate backend failed to start. Report it and fall back to
-            # default.
-            LOG.exception('The selected translator backend could not be loaded, '
-                          'falling back to default...')
-            if module != 'google':
-                return GoogleTranslator()
-            else:
-                raise
+            # old style, TODO deprecate once everything is a plugin
+            return clazz()
+        except:
+            return clazz(config)
 
 
 class DetectorFactory:
     CLASSES = {
         "amazon": AmazonDetector,
-        "google": GoogleDetector,
         "cld2": Pycld2Detector,
         "cld3": Pycld3Detector,
         "fastlang": FastLangDetector,
@@ -718,23 +655,13 @@ class DetectorFactory:
         config = Configuration.get().get("language", {})
         module = module or config.get("detection_module", "fastlang")
 
+        if module not in DetectorFactory.CLASSES:
+            # plugin!
+            clazz = load_lang_detect_plugin(module)
+        else:
+            clazz = DetectorFactory.CLASSES.get(module)
         try:
-            if module not in DetectorFactory.CLASSES:
-                # plugin!
-                clazz = load_lang_detect_plugin(module)
-            else:
-                clazz = DetectorFactory.CLASSES.get(module)
-            try:
-                # old style, TODO deprecate once everything is a plugin
-                return clazz()
-            except:
-                return clazz(config)
-        except Exception as e:
-            # The translate backend failed to start. Report it and fall back to
-            # default.
-            LOG.exception('The selected language detector backend could not be loaded, '
-                          'falling back to default...')
-            if module != 'fastlang':
-                return FastLangDetector()
-            else:
-                raise
+            # old style, TODO deprecate once everything is a plugin
+            return clazz()
+        except:
+            return clazz(config)
