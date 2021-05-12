@@ -670,53 +670,11 @@ class ApertiumTranslator(LanguageTranslator):
         return r["responseData"]["translatedText"]
 
 
-class LibreTranslateTranslator(LanguageTranslator):
-    def __init__(self):
-        super().__init__()
-        # host it yourself https://github.com/uav4geo/LibreTranslate
-        self.url = self.config.get("libretranslate_host") or \
-                   "https://libretranslate.com/translate"
-        self.api_key = self.config.get("key")
-
-    def translate(self, text, target=None, source=None, url=None):
-        if self.boost and not source:
-            source = self.default_language
-        target = target or self.internal_language
-        params = {"q": text,
-                  "source": source.split("-")[0],
-                  "target": target.split("-")[0]}
-        if self.api_key:
-            params["api_key"] = self.api_key
-        r = requests.post(self.url, params=params).json()
-        if r.get("error"):
-            return None
-        return r["translatedText"]
-
-
-class LibreTranslateDetector(LanguageDetector):
-    def __init__(self):
-        super().__init__()
-        # host it yourself https://github.com/uav4geo/LibreTranslate
-        self.url = self.config.get("libretranslate_host") or \
-                   "https://libretranslate.com/detect"
-        self.api_key = self.config.get("key")
-
-    def detect(self, text):
-        return self.detect_probs(text)[0]["language"]
-
-    def detect_probs(self, text):
-        params = {"q": text}
-        if self.api_key:
-            params["api_key"] = self.api_key
-        return requests.post(self.url, params=params).json()
-
-
 class TranslatorFactory:
     CLASSES = {
         "google": GoogleTranslator,
         "amazon": AmazonTranslator,
-        "apertium": ApertiumTranslator,
-        "libretranslate": LibreTranslateTranslator
+        "apertium": ApertiumTranslator
     }
 
     @staticmethod
@@ -729,7 +687,11 @@ class TranslatorFactory:
                 clazz = load_tx_plugin(module)
             else:
                 clazz = TranslatorFactory.CLASSES.get(module)
-            return clazz()
+            try:
+                # old style, TODO deprecate once everything is a plugin
+                return clazz()
+            except:
+                return clazz(config)
         except Exception as e:
             # The translate backend failed to start. Report it and fall back to
             # default.
@@ -748,8 +710,7 @@ class DetectorFactory:
         "cld2": Pycld2Detector,
         "cld3": Pycld3Detector,
         "fastlang": FastLangDetector,
-        "detect": LangDetectDetector,
-        "libretranslate": LibreTranslateDetector
+        "detect": LangDetectDetector
     }
 
     @staticmethod
@@ -763,7 +724,11 @@ class DetectorFactory:
                 clazz = load_lang_detect_plugin(module)
             else:
                 clazz = DetectorFactory.CLASSES.get(module)
-            return clazz()
+            try:
+                # old style, TODO deprecate once everything is a plugin
+                return clazz()
+            except:
+                return clazz(config)
         except Exception as e:
             # The translate backend failed to start. Report it and fall back to
             # default.
