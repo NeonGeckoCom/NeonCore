@@ -23,6 +23,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from mycroft.configuration import Configuration, get_private_keys
+from ovos_plugin_manager.language import load_lang_detect_plugin, load_tx_plugin
 from mycroft.util.log import LOG
 import os
 import requests
@@ -723,7 +724,11 @@ class TranslatorFactory:
         config = Configuration.get().get("language", {})
         module = module or config.get("translation_module", "google")
         try:
-            clazz = TranslatorFactory.CLASSES.get(module)
+            if module not in DetectorFactory.CLASSES:
+                # plugin!
+                clazz = load_tx_plugin(module)
+            else:
+                clazz = TranslatorFactory.CLASSES.get(module)
             return clazz()
         except Exception as e:
             # The translate backend failed to start. Report it and fall back to
@@ -743,15 +748,21 @@ class DetectorFactory:
         "cld2": Pycld2Detector,
         "cld3": Pycld3Detector,
         "fastlang": FastLangDetector,
-        "detect": LangDetectDetector
+        "detect": LangDetectDetector,
+        "libretranslate": LibreTranslateDetector
     }
 
     @staticmethod
     def create(module=None):
         config = Configuration.get().get("language", {})
         module = module or config.get("detection_module", "fastlang")
+
         try:
-            clazz = DetectorFactory.CLASSES.get(module)
+            if module not in DetectorFactory.CLASSES:
+                # plugin!
+                clazz = load_lang_detect_plugin(module)
+            else:
+                clazz = DetectorFactory.CLASSES.get(module)
             return clazz()
         except Exception as e:
             # The translate backend failed to start. Report it and fall back to

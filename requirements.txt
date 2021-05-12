@@ -28,6 +28,7 @@ rapidfuzz
 kthread
 ovos_utils>=0.0.6
 ovos-skills-manager>=0.0.2
+ovos-plugin-manager>=0.0.1a2
 
 # vision stuff
 numpy
