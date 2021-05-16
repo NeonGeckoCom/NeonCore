@@ -22,10 +22,6 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import random
-import os
-import re
-from pathlib import Path
 from os.path import join
 from mycroft.dialog import MustacheDialogRenderer, load_dialogs
 from mycroft.util import resolve_resource_file

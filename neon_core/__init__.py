@@ -22,12 +22,34 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from os.path import dirname
+
+# this import will monkey patch mycroft.conf to ovos.conf
+from neon_core.configuration import *
 from neon_core.skills import NeonSkill, NeonFallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
-NEON_ROOT_PATH = dirname(__file__)
+from ovos_utils.system import set_root_path
+from ovos_utils.fingerprinting import get_fingerprint
+from os.path import dirname
+
+
+NEON_ROOT_PATH = dirname(dirname(__file__))
+# ensure ovos_utils can find neon_core
+set_root_path(NEON_ROOT_PATH)
+
+
+# patch version string to allow downstream to know where it is running
+import mycroft.version
+CORE_VERSION_STR = '.'.join(map(str, mycroft.version.CORE_VERSION_TUPLE)) + \
+                   "(NeonGecko)"
+mycroft.version.CORE_VERSION_STR = CORE_VERSION_STR
+
+
+FINGERPRINT = get_fingerprint()
+
 
 __all__ = ['NEON_ROOT_PATH',
            'NeonIntentService',
            'NeonSkill',
-           'NeonFallbackSkill']
+           'NeonFallbackSkill',
+           'FINGERPRINT',
+           'CORE_VERSION_STR']

@@ -27,14 +27,14 @@
 
     This handles playback of audio and speech
 """
-from mycroft.configuration import Configuration
-from mycroft.messagebus import get_messagebus
 from mycroft.util import reset_sigint_handler, wait_for_exit_signal, \
     create_daemon, create_echo_function, check_for_signal
 from mycroft.util.log import LOG
-
-import mycroft.audio.speech as speech
 from mycroft.audio.audioservice import AudioService
+
+from neon_core.configuration import Configuration
+from neon_core.messagebus import get_messagebus
+import neon_core.audio.speech as speech
 
 
 def main():

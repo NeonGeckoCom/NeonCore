@@ -1,15 +1,15 @@
 # mycroft
-HolmesV[all]>=2021.5.6a9
+HolmesV[all]>=2021.5.6a12
 mock_msm
 
 # neon stuff
-git+https://github.com/NeonGeckoCom/neon-skill-utils
+#git+https://github.com/NeonGeckoCom/neon-skill-utils
 #git+https://github.com/NeonJarbas/neon_speech
 
 # utils
 rapidfuzz
 kthread
-ovos_utils>=0.0.6
+ovos_utils>=0.0.9
 ovos-skills-manager>=0.0.2
 
 # plugins
