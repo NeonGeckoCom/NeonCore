@@ -29,6 +29,11 @@ kthread
 ovos_utils>=0.0.6
 ovos-skills-manager>=0.0.2
 
+# plugins
+ovos-plugin-manager>=0.0.1a2
+libretranslate_neon_plugin
+
+
 # vision stuff
 numpy
 imutils
