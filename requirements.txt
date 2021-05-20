@@ -1,5 +1,5 @@
 # mycroft
-HolmesV[all]>=2021.5.6a12
+HolmesV[all]>=2021.5.6a13
 mock_msm
 
 # neon stuff
@@ -9,7 +9,7 @@ mock_msm
 # utils
 rapidfuzz
 kthread
-ovos_utils>=0.0.9
+ovos_utils>=0.0.10
 ovos-skills-manager>=0.0.2
 
 # plugins
