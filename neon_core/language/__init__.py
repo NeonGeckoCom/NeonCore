@@ -22,7 +22,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from mycroft.configuration import Configuration, get_private_keys
+from neon_core.configuration import Configuration, get_private_keys
 from ovos_plugin_manager.language import load_lang_detect_plugin, \
     load_tx_plugin
 import os
