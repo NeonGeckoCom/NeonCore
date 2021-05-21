@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 from setuptools import setup, find_packages
 import os.path
 
@@ -28,7 +28,7 @@ def required(requirements_file):
 
 setup(
     name='neon-core',
-    version=get_version(),
+    version='2021.05.21',
     license='NeonAI License v1.0',
     author='Neongecko',
     author_email='developers@neon.ai',
@@ -40,15 +40,15 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'neon-messagebus=mycroft.messagebus.service.__main__:main',
+            'neon-messagebus=neon_core.messagebus.service.__main__:main',
             'neon-bus-monitor=mycroft.messagebus.__main__:main',
-            'neon-skills=mycroft.skills.__main__:main',
-            'neon-audio=mycroft.audio.__main__:main',  # TODO: Remove when #74 merged and audio extracted from core
+            'neon-skills=neon_core.skills.__main__:main',
+            'neon-audio=neon_core.audio.__main__:main',  # TODO: Remove when #74 merged and audio extracted from core
             'neon-echo-observer=mycroft.messagebus.client.ws:echo',
             'neon-audio-test=mycroft.util.audio_test:main',
-            'neon-gui-listener=mycroft.enclosure.__main__:main',
-            'neon-start=mycroft.run_neon:start_neon',
-            'neon-stop=mycroft.run_neon:stop_neon'
+            'neon-gui-listener=neon_core.enclosure.__main__:main',
+            'neon-start=neon_core.run_neon:start_neon',
+            'neon-stop=neon_core.run_neon:stop_neon'
         ]
     }
 )
