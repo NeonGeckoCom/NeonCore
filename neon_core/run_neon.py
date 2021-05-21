@@ -82,6 +82,7 @@ def _get_log_file(process_name):
 
 
 def _start_process(name, logfile: IO = None):
+    # TODO: As discussed in https://github.com/NeonJarbas/NeonCore/pull/76 this should be handled differently DM
     logfile = logfile or _get_log_file(name)
     proc = Popen(name, stdout=logfile, stderr=STDOUT)
     PROCESSES[repr(name)] = proc
