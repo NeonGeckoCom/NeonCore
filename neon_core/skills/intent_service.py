@@ -84,6 +84,7 @@ class NeonIntentService(IntentService):
             if not message.context.get("timing"):
                 LOG.warning("No timing data available at intent service")
                 message.context["timing"] = {}
+            # TODO: This isn't necessarily a transcribe time, should be refactored here and in neon-test-utils DM
             message.context["timing"]["transcribed"] = message.context["timing"].get("transcribed", time.time())
 
             # pipe utterance trough parsers to get extra metadata
