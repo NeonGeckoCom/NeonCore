@@ -23,10 +23,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mycroft.tts import TTS, TTSValidator
+from neon_core.tts import TTS, TTSValidator
 from mycroft.tts.remote_tts import RemoteTTSTimeoutException
 from mycroft.util.log import LOG
-from mycroft.tts import cache_handler
+from neon_core.tts import cache_handler
 from mycroft.util import play_wav, get_cache_directory
 from requests_futures.sessions import FuturesSession
 from requests.exceptions import (

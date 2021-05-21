@@ -507,9 +507,9 @@ def load_tts_plugin(module_name):
 
 
 class TTSFactory:
-    from mycroft.tts.mimic_tts import Mimic
-    from mycroft.tts.mimic2_tts import Mimic2
-    from mycroft.tts.polly_tts import PollyTTS
+    from neon_core.tts.mimic_tts import Mimic
+    from neon_core.tts.mimic2_tts import Mimic2
+    from neon_core.tts.polly_tts import PollyTTS
 
     CLASSES = {
         "mimic": Mimic,

@@ -36,10 +36,10 @@ import re
 import shutil
 import hashlib
 import json
-import mycroft.util as util
 from urllib import parse
 from requests_futures.sessions import FuturesSession
 from mycroft.util.log import LOG
+from mycroft.util import get_cache_directory
 
 
 REGEX_SPL_CHARS = re.compile(r'[@#$%^*()<>/\|}{~:]')
@@ -167,7 +167,7 @@ def copy_cache(cache_audio_dir):
     """
     if os.path.exists(cache_audio_dir):
         # get tmp directory where tts cache is stored
-        dest = util.get_cache_directory('tts/' + 'Mimic2')
+        dest = get_cache_directory('tts/' + 'Mimic2')
         files = os.listdir(cache_audio_dir)
         for f in files:
             shutil.copy2(os.path.join(cache_audio_dir, f), dest)

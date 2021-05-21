@@ -29,7 +29,7 @@ import time
 from collections import namedtuple
 from threading import Lock
 
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 from mycroft.util import create_daemon
 from mycroft.util.log import LOG
 

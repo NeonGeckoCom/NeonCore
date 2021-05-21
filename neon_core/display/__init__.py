@@ -28,7 +28,7 @@ from os import listdir
 from os.path import abspath, dirname, basename, isdir, join
 from threading import Lock
 
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
 

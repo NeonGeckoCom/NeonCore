@@ -25,7 +25,7 @@
 
 from os.path import join, dirname
 from neon_core.processing_modules import ModuleLoaderService
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 
 
 class TextParsersService(ModuleLoaderService):

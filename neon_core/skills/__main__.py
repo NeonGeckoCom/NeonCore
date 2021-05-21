@@ -20,7 +20,7 @@ directory.  The executable gets added to the bin directory when installed
 """
 import time
 import mycroft.lock
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 from mycroft.util import (
     connected,
     reset_sigint_handler,

@@ -23,8 +23,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import boto3
-from mycroft.tts import TTS, TTSValidator
-from mycroft.configuration import Configuration
+from neon_core.tts import TTS, TTSValidator
+from neon_core.configuration import Configuration
 
 
 class PollyTTS(TTS):

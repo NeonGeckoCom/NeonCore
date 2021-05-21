@@ -25,7 +25,7 @@
 from ovos_skills_manager.session import SESSION as requests
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 from neon_core.messagebus import get_messagebus
 from mycroft.skills.event_scheduler import EventSchedulerInterface
 from mycroft.util import connected

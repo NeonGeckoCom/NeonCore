@@ -74,7 +74,7 @@ def get_all(phrase, lang=None, context=None):
         [str]: Array of all the versions of the phrase
     """
     if not lang:
-        from mycroft.configuration import Configuration
+        from neon_core.configuration import Configuration
         conf = Configuration.get()
         lang = conf.get("internal_lang") or conf.get("lang")
 

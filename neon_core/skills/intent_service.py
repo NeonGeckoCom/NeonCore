@@ -1,6 +1,6 @@
 from copy import copy
 
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 from mycroft.messagebus.message import Message
 from mycroft.util.log import LOG
 from mycroft.util.parse import normalize

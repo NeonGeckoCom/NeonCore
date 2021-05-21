@@ -30,7 +30,7 @@
     TODO videos
     TODO multiple displays
 """
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 from neon_core.messagebus import get_messagebus
 from mycroft.util import reset_sigint_handler, wait_for_exit_signal, \
     create_echo_function, check_for_signal

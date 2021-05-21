@@ -26,7 +26,7 @@ import re
 import time
 from threading import Lock
 
-from mycroft.configuration import Configuration
+from neon_core.configuration import Configuration
 from mycroft.metrics import report_timing, Stopwatch
 from mycroft.tts import TTSFactory
 from mycroft.util import check_for_signal
