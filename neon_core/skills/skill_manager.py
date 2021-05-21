@@ -31,8 +31,6 @@ class NeonSkillManager(SkillManager):
             
     def run(self):
         """Load skills and update periodically from disk and internet."""
-        if connected():
-            self._connected_event.set()
         self.download_or_update_defaults()
         super().run()
 
