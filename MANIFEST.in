@@ -1,6 +1,5 @@
-recursive-include mycroft/client/speech/recognizer/model *
 include requirements.txt
-include mycroft/configuration/*.conf
-recursive-include mycroft/res *
-recursive-include mycroft/res/snd *
-recursive-include mycroft/res/text/* *
+include neon_core/configuration/*.conf
+recursive-include neon_core/res *
+recursive-include neon_core/res/snd *
+recursive-include neon_core/res/text/* *
