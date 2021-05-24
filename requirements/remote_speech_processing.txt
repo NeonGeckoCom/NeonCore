@@ -1,0 +1,2 @@
+neon-stt-plugin-google_cloud_streaming @ git+https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming
+neon-tts-plugin-polly @ git+https://github.com/NeonGeckoCom/neon-tts-plugin-polly
