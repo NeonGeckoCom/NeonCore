@@ -1,3 +1,5 @@
 include requirements.txt
-include configuration/*.conf
-recursive-include res/*
+include neon_core/configuration/*.conf
+recursive-include neon_core/res *
+recursive-include neon_core/res/snd *
+recursive-include neon_core/res/text/* *
