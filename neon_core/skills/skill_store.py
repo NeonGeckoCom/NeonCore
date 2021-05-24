@@ -232,6 +232,10 @@ class SkillsStore:
             updated = self.install_skill(skill, update=update)
             skills.append((skill, updated))
         for skill in self.default_skills:
-            updated = self.install_skill(skill, update=update)
+            try:
+                updated = self.install_skill(skill, update=update)
+            except Exception as e:
+                LOG.error(e)
+                continue  # Assume install has failed and skill is not installed
             skills.append((skill, updated))
         return skills

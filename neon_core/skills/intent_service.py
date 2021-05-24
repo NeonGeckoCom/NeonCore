@@ -1,4 +1,7 @@
+import time
 from copy import copy
+
+from mycroft.metrics import Stopwatch
 
 from neon_core.configuration import Configuration
 from mycroft.messagebus.message import Message
@@ -77,16 +80,25 @@ class NeonIntentService(IntentService):
             utterances = message.data.get('utterances', [])
 
             message.context = message.context or {}
+            # Add or init timing data
+            if not message.context.get("timing"):
+                LOG.warning("No timing data available at intent service")
+                message.context["timing"] = {}
+            # TODO: This isn't necessarily a transcribe time, should be refactored here and in neon-test-utils DM
+            message.context["timing"]["transcribed"] = message.context["timing"].get("transcribed", time.time())
+
             # pipe utterance trough parsers to get extra metadata
             # use cases: translation, emotion_data, keyword spotting etc.
             # parsers are ordered by priority
             # keep in mind utterance might be modified by previous parser
-            for parser in self.parser_service.modules:
-                # mutate utterances and retrieve extra data
-                utterances, data = self.parser_service.parse(parser, utterances, lang)
-                # update message context with extra data
-                message.context = merge_dict(message.context, data)
-
+            stopwatch = Stopwatch()
+            with stopwatch:
+                for parser in self.parser_service.modules:
+                    # mutate utterances and retrieve extra data
+                    utterances, data = self.parser_service.parse(parser, utterances, lang)
+                    # update message context with extra data
+                    message.context = merge_dict(message.context, data)
+            message.context["timing"]["text_parsers"] = stopwatch.time
             # normalize() changes "it's a boy" to "it is a boy", etc.
             norm_utterances = [normalize(u.lower(), remove_articles=False)
                                for u in utterances]
@@ -110,6 +122,7 @@ class NeonIntentService(IntentService):
             # now pass our modified message to mycroft-lib
             message.data["lang"] = lang
             message.data["utterances"] = utterances
+            # TODO: Consider how to implement 'and' parsing and converse here DM
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
