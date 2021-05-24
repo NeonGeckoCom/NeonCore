@@ -43,7 +43,6 @@ setup(
             'neon-messagebus=neon_core.messagebus.service.__main__:main',
             'neon-bus-monitor=neon_core.messagebus.__main__:main',
             'neon-skills=neon_core.skills.__main__:main',
-            'neon-audio=neon_core.audio.__main__:main',
             'neon-gui-listener=neon_core.enclosure.__main__:main'
         ]
     }
