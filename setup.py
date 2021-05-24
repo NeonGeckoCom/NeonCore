@@ -36,8 +36,8 @@ setup(
     description='NeonCore',
     install_requires=required('requirements.txt'),
     packages=find_packages(include=['neon_core*']),
-    package_data={'neon_core': ['res/*.voc', 'res/*.dialog', 'res/*.qml', 'res/*.mp3', 'res/*.wav',
-                                'configuration/*.conf']
+    package_data={'neon_core': ['res/precise_models/*', 'res/snd/*', 'res/text/*/*.voc', 'res/text/*/*.dialog',
+                                'res/ui/*.qml', 'res/ui/*.png', 'res/*', 'configuration/*.conf']
                   },
     include_package_data=True,
     entry_points={
