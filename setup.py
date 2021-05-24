@@ -36,8 +36,8 @@ setup(
     description='NeonCore',
     install_requires=required('requirements.txt'),
     packages=find_packages(include=['neon_core*']),
-    package_data={'': ['*.voc', '*.dialog', '*.qml', '*.mp3', '*.wav']},
-    include_package_data=True,
+    # package_data={'': ['*.voc', '*.dialog', '*.qml', '*.mp3', '*.wav']},
+    # include_package_data=True,
     entry_points={
         'console_scripts': [
             'neon-messagebus=neon_core.messagebus.service.__main__:main',
