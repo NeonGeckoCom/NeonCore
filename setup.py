@@ -36,7 +36,8 @@ setup(
     description='NeonCore',
     install_requires=required('requirements.txt'),
     packages=find_packages(include=['neon_core*']),
-    package_data={'': ['*.voc', '*.dialog', '*.qml', '*.mp3', '*.wav']},
+    package_data={'neon_core.res': ['*.voc', '*.dialog', '*.qml', '*.mp3', '*.wav'],
+                  'configuration': ['*.conf']},
     include_package_data=True,
     entry_points={
         'console_scripts': [
