@@ -22,21 +22,25 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 from ovos_skills_manager.session import SESSION as requests
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
-from neon_core.configuration import Configuration
+# from neon_core.configuration import Configuration
 from neon_core.messagebus import get_messagebus
 from mycroft.skills.event_scheduler import EventSchedulerInterface
 from mycroft.util import connected
 from mycroft.util.log import LOG
-from os.path import expanduser
+# from os.path import expanduser
 from datetime import datetime, timedelta
+
+from neon_utils.authentication_utils import repo_is_neon
+from neon_utils.configuration_utils import get_neon_skills_config
 
 
 class SkillsStore:
     def __init__(self, skills_dir, config=None, bus=None):
-        self.config = config or Configuration.get()["skills"]
+        self.config = config or get_neon_skills_config()
         self.disabled = self.config.get("disable_osm", False)
         self.skills_dir = skills_dir
         self.osm = self.load_osm()
@@ -68,7 +72,7 @@ class SkillsStore:
                                                 when, interval=interval,
                                                 name="default_skills.update")
 
-    def handle_update(self, message):
+    def handle_update(self, _):
         try:
             self.install_default_skills(update=True)
         except Exception as e:
@@ -80,7 +84,7 @@ class SkillsStore:
                 # if no internet just skip this update
                 LOG.error("no internet, skipped skills update")
 
-    def handle_sync_appstores(self, message):
+    def handle_sync_appstores(self, _):
         try:
             self.osm.sync_appstores()
         except Exception as e:
@@ -181,8 +185,7 @@ class SkillsStore:
     def get_remote_entries(self, url):
         """ parse url and return a list of SkillEntry,
          expects 1 skill per line, can be a skill_id or url"""
-        # TODO improve detection of neon github repos
-        if "/neon" in url.lower() and "github" in url:
+        if repo_is_neon(url):
             self.authenticate_neon()
             r = requests.get(url)
             self.deauthenticate_neon()

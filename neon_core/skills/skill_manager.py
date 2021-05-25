@@ -2,6 +2,7 @@ from mycroft.util.log import LOG
 from mycroft.util import connected
 from mycroft.skills.skill_manager import SkillManager
 from neon_core.skills.skill_store import SkillsStore
+from neon_utils.configuration_utils import get_neon_skills_config
 
 SKILL_MAIN_MODULE = '__init__.py'
 
@@ -10,14 +11,15 @@ class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.skill_downloader = SkillsStore(skills_dir=self.msm.skills_dir,
+        self.skill_config = kwargs.get("config") or get_neon_skills_config()
+        self.skill_downloader = SkillsStore(skills_dir=self.skill_config["directory"], config=self.skill_config,
                                             bus=self.bus)
-        self.skill_downloader.skills_dir = self.msm.skills_dir
+        self.skill_downloader.skills_dir = self.skill_config["directory"]
 
     def download_or_update_defaults(self):
         # on launch only install if missing, updates handled separately
         # if osm is disabled in .conf this does nothing
-        if self.config["skills"]["auto_update"]:
+        if self.skill_config["auto_update"]:
             try:
                 self.skill_downloader.install_default_skills()
             except Exception as e:
