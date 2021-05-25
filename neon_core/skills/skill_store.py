@@ -193,6 +193,8 @@ class SkillsStore:
             r = requests.get(url)
         if r.status_code == 200:
             return [s for s in r.text.split("\n") if s.strip()]
+        else:
+            LOG.error(f"{url} request failed with code: {r.status_code}")
         return []
 
     def _parse_config_entry(self, entry):
