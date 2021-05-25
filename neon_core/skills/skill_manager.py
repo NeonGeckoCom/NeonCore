@@ -48,8 +48,10 @@ class NeonSkillManager(SkillManager):
         self.bus.emit(reply)
 
     def _get_skill_directories(self):
+        """
+        Locates all skill directories in the configured skill install path
+        """
         base_skill_dir = glob(os.path.join(self.skill_config["directory"], "*/"))
-        LOG.debug(base_skill_dir)
         skill_directories = []
         for skill_dir in base_skill_dir:
             # TODO: all python packages must have __init__.py!  Better way?
@@ -63,3 +65,4 @@ class NeonSkillManager(SkillManager):
                     self.empty_skill_dirs.add(skill_dir)
                     LOG.debug('Found skills directory with no skill: ' +
                               skill_dir)
+        return skill_directories
