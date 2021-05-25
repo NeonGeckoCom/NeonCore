@@ -1,0 +1,1 @@
+neon-client @ git+https://github.com/NeonGeckoCom/neon-core-client

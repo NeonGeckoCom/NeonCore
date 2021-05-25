@@ -1,0 +1,2 @@
+neon-stt-plugin-deepspeech_stream_local @ git+https://github.com/NeonGeckoCom/neon-stt-plugin-deepspeech_stream_local
+neon-tts-plugin-mozilla_local @ git+https://github.com/NeonGeckoCom/neon-tts-plugin-mozilla_local

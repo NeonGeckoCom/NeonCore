@@ -3,8 +3,9 @@ HolmesV[all]>=2021.5.6a13
 mock_msm
 
 # neon stuff
-#git+https://github.com/NeonGeckoCom/neon-skill-utils
-#git+https://github.com/NeonJarbas/neon_speech
+neon_speech @ git+https://github.com/NeonGeckoCom/neon_speech
+neon_audio @ git+https://github.com/NeonGeckoCom/neon_audio
+neon_enclosure @ git+https://github.com/NeonGeckoCom/neon_enclosure
 
 # utils
 rapidfuzz

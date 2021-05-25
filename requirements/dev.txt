@@ -1,0 +1,2 @@
+neon-test-utils @ git+https://github.com/NeonGeckoCom/neon-test-utils
+neon_cli_client @ git+https://github.com/NeonGeckoCom/neon_cli

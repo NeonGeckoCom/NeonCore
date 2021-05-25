@@ -20,7 +20,7 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 def required(requirements_file):
     """ Read requirements file and remove comments and empty lines. """
-    with open(os.path.join(BASEDIR, requirements_file), 'r') as f:
+    with open(os.path.join(BASEDIR, "requirements", requirements_file), 'r') as f:
         requirements = f.read().splitlines()
         return [pkg for pkg in requirements
                 if pkg.strip() and not pkg.startswith("#")]
@@ -35,6 +35,13 @@ setup(
     url='https://github.com/MycroftAI/mycroft-core',
     description='NeonCore',
     install_requires=required('requirements.txt'),
+    extras_require={
+        "client": required("client.txt"),
+        "server": required("server.txt"),
+        "dev": required("dev.txt"),
+        "local": required("local_speech_processing.txt"),
+        "remote": required("remote_speech_processing.txt")
+    },
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*', 'res/text/*/*.voc', 'res/text/*/*.dialog',
                                 'res/ui/*.qml', 'res/ui/*.png', 'res/*', 'configuration/*.conf']
