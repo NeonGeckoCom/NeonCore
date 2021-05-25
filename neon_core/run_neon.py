@@ -112,7 +112,7 @@ def _stop_all_core_processes(include_runner=False):
     procs = {p.pid: p.cmdline() for p in psutil.process_iter()}
     for pid, cmdline in procs.items():
         if cmdline and (any(pname in cmdline[-1] for pname in ("mycroft.messagebus.service", "neon_speech_client",
-                                                               "neon_audio_client", "mycroft.skills",
+                                                               "neon_audio_client", "neon_core.skills",
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
                                                                "NGI.utilities.gui"))
@@ -142,7 +142,7 @@ def start_neon():
         _start_process(["python3", "-m", "mycroft.messagebus.service"])
         _start_process("neon_speech_client")
         _start_process("neon_audio_client")
-        _start_process(["python3", "-m", "mycroft.skills"])
+        _start_process(["python3", "-m", "neon_core.skills"])
         if get_neon_device_type() == "server":
             _start_process("neon_core_server")
         else:
