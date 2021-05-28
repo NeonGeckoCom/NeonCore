@@ -42,7 +42,6 @@ setup(
         "local": required("local_speech_processing.txt"),
         "remote": required("remote_speech_processing.txt"),
         "vision": required("vision.txt"),
-        "extras": required("extras.txt"),
         "test": required("extras.txt")
     },
     packages=find_packages(include=['neon_core*']),
