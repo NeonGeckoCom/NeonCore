@@ -17,12 +17,5 @@ ovos-skills-manager>=0.0.2
 ovos-plugin-manager>=0.0.1a2
 libretranslate_neon_plugin
 
-
-# vision stuff
-numpy
-imutils
-opencv-python
-opencv-contrib-python
-
 # text parser modules
 RAKEkeywords>=0.2.0

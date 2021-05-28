@@ -1,1 +1,8 @@
 neon-client @ git+https://github.com/NeonGeckoCom/neon-core-client
+# wake word plugins
+## https://github.com/HelloChatterbox/dummy_wakeword_plugin
+chatterbox-wake-word-plugin-dummy
+## https://github.com/JarbasLingua/jarbas-wakeword-plugin-pocketsphinx
+jarbas-wake-word-plugin-pocketsphinx
+## https://github.com/JarbasLingua/jarbas-wake-word-plugin-precise
+jarbas-wake-word-plugin-precise

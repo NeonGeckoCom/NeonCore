@@ -1,0 +1,5 @@
+# vision stuff
+numpy
+imutils
+opencv-python
+opencv-contrib-python
