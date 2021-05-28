@@ -1,21 +1,43 @@
-# Copyright 2017 Mycroft AI Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
+# # All trademark and other rights reserved by their respective owners
+# # Copyright 2008-2021 Neongecko.com Inc.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+# OR PROFITS;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 from setuptools import setup, find_packages
 import os.path
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
+
+
+def get_version():
+    """ Find the version of mycroft-core"""
+    version = None
+    version_file = os.path.join(BASEDIR, 'version.py')
+    with open(version_file) as f:
+        for line in f:
+            if '__version__' in line:
+                version = line.split('=')[1].strip()
+    return version
 
 
 def required(requirements_file):
@@ -28,12 +50,12 @@ def required(requirements_file):
 
 setup(
     name='neon-core',
-    version="2021.5.6a12",
-    license='Apache-2.0',
-    author='NeonGecko',
-    author_email='devs@mycroft.ai',
-    url='https://github.com/MycroftAI/mycroft-core',
-    description='NeonCore',
+    version=get_version(),
+    license='NeonAI License v1.0',
+    author='Neongecko',
+    author_email='developers@neon.ai',
+    url='https://github.com/NeonGeckoCom/NeonCore',
+    description='Neon Core',
     install_requires=required('requirements.txt'),
     extras_require={
         "client": required("client.txt"),
@@ -51,11 +73,15 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'neon-messagebus=neon_core.messagebus.service.__main__:main',
-            'neon-bus-monitor=neon_core.messagebus.__main__:main',
-            'neon-skills=neon_core.skills.__main__:main',
-            'neon-audio=neon_core.audio.__main__:main',
-            'neon-gui-listener=neon_core.enclosure.__main__:main'
+            'neon-messagebus=mycroft.messagebus.service.__main__:main',
+            'neon-bus-monitor=mycroft.messagebus.__main__:main',
+            'neon-skills=mycroft.skills.__main__:main',
+            'neon-audio=mycroft.audio.__main__:main',  # TODO: Remove when #74 merged and audio extracted from core
+            'neon-echo-observer=mycroft.messagebus.client.ws:echo',
+            'neon-audio-test=mycroft.util.audio_test:main',
+            'neon-gui-listener=mycroft.enclosure.__main__:main',
+            'neon-start=mycroft.run_neon:start_neon',
+            'neon-stop=mycroft.run_neon:stop_neon'
         ]
     }
 )
