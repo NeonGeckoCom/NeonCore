@@ -76,7 +76,6 @@ setup(
             'neon-messagebus=mycroft.messagebus.service.__main__:main',
             'neon-bus-monitor=mycroft.messagebus.__main__:main',
             'neon-skills=mycroft.skills.__main__:main',
-            'neon-audio=mycroft.audio.__main__:main',  # TODO: Remove when #74 merged and audio extracted from core
             'neon-echo-observer=mycroft.messagebus.client.ws:echo',
             'neon-audio-test=mycroft.util.audio_test:main',
             'neon-gui-listener=mycroft.enclosure.__main__:main',
