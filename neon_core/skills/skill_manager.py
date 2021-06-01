@@ -51,6 +51,7 @@ class NeonSkillManager(SkillManager):
         """
         Locates all skill directories in the configured skill install path
         """
+        # TODO: Integrate this with OSM local appstores DM
         base_skill_dir = glob(os.path.join(self.skill_config["directory"], "*/"))
         skill_directories = []
         for skill_dir in base_skill_dir:
