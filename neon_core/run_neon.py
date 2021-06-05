@@ -68,7 +68,10 @@ def handle_load_modules(message):
 
 def _cycle_logs():
     archive_logs()
-    remove_old_logs()
+    try:
+        remove_old_logs()
+    except Exception as e:
+        LOG.error(e)
 
 
 def _get_log_file(process_name):
@@ -88,6 +91,7 @@ def _get_log_file(process_name):
 
 
 def _start_process(name, logfile: IO = None):
+    # TODO: As discussed in https://github.com/NeonJarbas/NeonCore/pull/76 this should be handled differently DM
     logfile = logfile or _get_log_file(name)
     proc = Popen(name, stdout=logfile, stderr=STDOUT)
     PROCESSES[repr(name)] = proc
@@ -116,7 +120,7 @@ def _stop_all_core_processes(include_runner=False):
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
                                                                "NGI.utilities.gui"))
-                        or include_runner and cmdline[-1] == "run_neon.py"):
+                        or include_runner and (cmdline[-1] == "run_neon.py" or cmdline[-1].endswith("bin/neon-start"))):
             LOG.info(f"Terminating {cmdline} {pid}")
             try:
                 psutil.Process(pid).terminate()
@@ -136,9 +140,9 @@ def start_neon():
     bus.on("neon.load_modules", handle_load_modules)
     bus.run_in_thread()
 
+    _stop_all_core_processes()
+    _cycle_logs()
     try:
-        _stop_all_core_processes()
-        _cycle_logs()
         _start_process(["python3", "-m", "mycroft.messagebus.service"])
         _start_process("neon_speech_client")
         _start_process("neon_audio_client")
