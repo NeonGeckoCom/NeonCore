@@ -50,8 +50,6 @@ export sttModule="google_cloud_streaming"
 export ttsModule="amazon"
 
 installMimic=false
-# Directory Variables
-# TODO: Export these somewhere? DM
 
 askYesNo(){
     while true; do
@@ -317,7 +315,7 @@ doInstall(){
         installGui && echo "Installing GUI"
     fi
 
-    printenv  # TODO: Get these exported vars into clean config DM
+    neon-config-import
 
     # Setup Completed
     echo "Setup Complete"
