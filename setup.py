@@ -24,15 +24,15 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from setuptools import setup, find_packages
-import os.path
+from os import path, getenv
 
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
+BASEDIR = path.abspath(path.dirname(__file__))
 
 
 def get_version():
     """ Find the version of mycroft-core"""
     version = None
-    version_file = os.path.join(BASEDIR, 'version.py')
+    version_file = path.join(BASEDIR, 'version.py')
     with open(version_file) as f:
         for line in f:
             if '__version__' in line:
@@ -40,12 +40,22 @@ def get_version():
     return version
 
 
-def required(requirements_file):
-    """ Read requirements file and remove comments and empty lines. """
-    with open(os.path.join(BASEDIR, "requirements", requirements_file), 'r') as f:
-        requirements = f.read().splitlines()
-        return [pkg for pkg in requirements
-                if pkg.strip() and not pkg.startswith("#")]
+def get_requirements(requirements_filename: str):
+    requirements_file = path.join(path.abspath(path.dirname(__file__)), "requirements", requirements_filename)
+    with open(requirements_file, 'r', encoding='utf-8') as r:
+        requirements = r.readlines()
+    requirements = [r.strip() for r in requirements if r.strip() and not r.strip().startswith("#")]
+
+    for i in range(0, len(requirements)):
+        r = requirements[i]
+        if "@" in r:
+            parts = [p.lower() if p.strip().startswith("git+http") else p for p in r.split('@')]
+            r = "@".join(parts)
+            if getenv("GITHUB_TOKEN"):
+                if "github.com" in r:
+                    r = r.replace("github.com", f"{getenv('GITHUB_TOKEN')}@github.com")
+            requirements[i] = r
+    return requirements
 
 
 setup(
@@ -56,15 +66,15 @@ setup(
     author_email='developers@neon.ai',
     url='https://github.com/NeonGeckoCom/NeonCore',
     description='Neon Core',
-    install_requires=required('requirements.txt'),
+    install_requires=get_requirements('requirements.txt'),
     extras_require={
-        "client": required("client.txt"),
-        "server": required("server.txt"),
-        "dev": required("dev.txt"),
-        "local": required("local_speech_processing.txt"),
-        "remote": required("remote_speech_processing.txt"),
-        "vision": required("vision.txt"),
-        "test": required("extras.txt")
+        "client": get_requirements("client.txt"),
+        "server": get_requirements("server.txt"),
+        "dev": get_requirements("dev.txt"),
+        "local": get_requirements("local_speech_processing.txt"),
+        "remote": get_requirements("remote_speech_processing.txt"),
+        "vision": get_requirements("vision.txt"),
+        "test": get_requirements("test.txt")
     },
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*', 'res/text/*/*.voc', 'res/text/*/*.dialog',
@@ -73,14 +83,10 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'neon-messagebus=mycroft.messagebus.service.__main__:main',
-            'neon-bus-monitor=mycroft.messagebus.__main__:main',
-            'neon-skills=mycroft.skills.__main__:main',
-            'neon-echo-observer=mycroft.messagebus.client.ws:echo',
-            'neon-audio-test=mycroft.util.audio_test:main',
-            'neon-gui-listener=mycroft.enclosure.__main__:main',
-            'neon-start=mycroft.run_neon:start_neon',
-            'neon-stop=mycroft.run_neon:stop_neon'
+            'neon-messagebus=neon_core.messagebus.service.__main__:main',
+            'neon-skills=neon_core.skills.__main__:main',
+            'neon-start=neon_core.run_neon:start_neon',
+            'neon-stop=neon_core.run_neon:stop_neon'
         ]
     }
 )
