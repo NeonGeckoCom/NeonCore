@@ -176,6 +176,8 @@ class SkillsStore:
                 else:
                     entry = SkillEntry.from_github_url(skill)
                 return entry
+            elif isinstance(store_skill, list):
+                return store_skill[0]
             else:
                 return store_skill
         elif "." in skill:
