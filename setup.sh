@@ -252,12 +252,6 @@ getOptions(){
     done
 }
 
-doMimicInstall(){
-    curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
-    sudo apt-get update
-    sudo apt-get install mimic
-}
-
 doInstall(){
     options=()
     if [ "${localDeps}" == "true" ]; then
@@ -294,8 +288,9 @@ doInstall(){
     fi
 
     ## Actual Installation bits
-    sudo apt install python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
+    sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
 
+    # Do GUI install
     if [ "${installGui}" == "true" ]; then
       if [ -d mycroft-gui ]; then
         rm -rf mycroft-gui
@@ -305,16 +300,19 @@ doInstall(){
       rm -rf mycroft-gui
     fi
 
-    echo "${GITHUB_TOKEN}">~/token.txt
-    pip install pip~=21.1
-    pip install wheel
-    pip install "${pipStr}"
-
-    # Do Gui install
-    if [ "${installGui}" == 'true' ]; then
-        installGui && echo "Installing GUI"
+    # Do Mimic Install
+    if [ "${installMimic}" == "true" ]; then
+      curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
+      sudo apt-get update
+      sudo apt-get install -y mimic
     fi
 
+    echo "${GITHUB_TOKEN}">~/token.txt
+    pip install --upgrade pip~=21.1
+    pip install wheel
+    pip install "${pipStr}"
+    # TODO: Below is for testing only DM
+    pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
     neon-config-import
 
     # Setup Completed
@@ -323,6 +321,9 @@ doInstall(){
 }
 
 touch "neon_setup.log"
-export GITHUB_TOKEN="${1}"
+if [ ! -z "${1}" ]; then
+  export GITHUB_TOKEN="${1}"
+fi
+
 getOptions
 doInstall | tee -a "neon_setup.log"
