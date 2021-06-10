@@ -37,7 +37,7 @@ export autoUpdate=false     # enables neonAI to check for updates at runtime
 export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 
-export sttModule="google_cloud_streaming"
+export sttModule="deepspeech_stream_local"
 export ttsModule="mimic"
 
 localDeps="false"
