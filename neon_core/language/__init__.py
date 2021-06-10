@@ -27,14 +27,14 @@ from ovos_plugin_manager.language import load_lang_detect_plugin, \
     load_tx_plugin
 import os
 
+from neon_utils.configuration_utils import get_neon_lang_config
+
 
 def get_lang_config():
     config = Configuration.get()
     lang_config = config.get("language", {})
-    lang_config["internal"] = lang_config.get("internal") or config.get("lang",
-                                                                        "en-us")
-    lang_config["user"] = lang_config.get("user") or config.get("lang",
-                                                                "en-us")
+    lang_config["internal"] = lang_config.get("internal") or config.get("lang") or "en-us"
+    lang_config["user"] = lang_config.get("user") or config.get("lang") or "en-us"
     return lang_config
 
 
@@ -68,6 +68,7 @@ class TranslatorFactory:
 
     @staticmethod
     def create(module=None):
+        # TODO: Get this from neon config
         config = Configuration.get().get("language", {})
         module = module or config.get("translation_module", "google")
         if module not in DetectorFactory.CLASSES:
@@ -85,7 +86,7 @@ class DetectorFactory:
 
     @staticmethod
     def create(module=None):
-        config = Configuration.get().get("language", {})
+        config = get_neon_lang_config()
         module = module or config.get("detection_module", "fastlang")
 
         if module not in DetectorFactory.CLASSES:
