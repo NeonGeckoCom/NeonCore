@@ -27,7 +27,7 @@
 
 export GITHUB_TOKEN="${1}"
 
-installerDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/NeonAI"
+installerDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export installerDir
 
 # Preferences
@@ -40,23 +40,67 @@ export installServer=false  # enables neonAI server module
 export sttModule="google_cloud_streaming"
 export ttsModule="polly"
 
-## Actual Installation bits
-sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
+localDeps="false"
+installGui="false"
+installMimic="false"
+options=()
+    if [ "${localDeps}" == "true" ]; then
+      options+=("local")
+    else
+      options+=("remote")
+    fi
 
-echo "${GITHUB_TOKEN}">~/token.txt
-pip install --upgrade pip~=21.1
-pip install wheel
-python "${installerDir}/../parse_requirements.py" requirements/requirements.txt
-python "${installerDir}/../parse_requirements.py" requirements/remote_speech_processing.txt
-python "${installerDir}/../parse_requirements.py" requirements/client.txt
-pip install -r requirements/requirements.txt
-pip install -r requirements/remote_speech_processing.txt
-pip install -r requirements/client.txt
+    if [ "${installServer}" == "true" ]; then
+      options+=("server")
+    else
+      options+=("client")
+    fi
 
-# TODO: Below is for testing only DM
-pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
-neon-config-import
+    if [ "${devMode}" == "true" ]; then
+      options+=("dev")
+    fi
+    optStr=$(printf ",%s" "${options[@]}")
+    optStr="[${optStr:1}]"
+    pipStr="git+https://${GITHUB_TOKEN}@github.com/NeonDaniel/NeonCore#egg=neon_core${optStr}"
 
-# Setup Completed
-echo "Setup Complete"
-exit 0
+    # Create install directory if specified and doesn't exist
+    if [ ! -d "${installerDir}" ]; then
+      echo "Creating Install Directory: ${installerDir}"
+      mkdir -p "${installerDir}"
+    fi
+
+    # Make venv if not in one
+    if [ -z "${VIRTUAL_ENV}" ]; then
+      echo "Creating new Virtual Environment"
+      cd "${installerDir}" || exit 10
+      python3 -m venv .venv
+      . .venv/bin/activate
+    fi
+
+    ## Actual Installation bits
+    sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
+
+    # Do GUI install
+    if [ "${installGui}" == "true" ]; then
+      if [ -d mycroft-gui ]; then
+        rm -rf mycroft-gui
+      fi
+      git clone https://github.com/mycroftai/mycroft-gui
+      bash mycroft-gui/dev_setup.sh
+      rm -rf mycroft-gui
+    fi
+
+    # Do Mimic Install
+    if [ "${installMimic}" == "true" ]; then
+      curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
+      sudo apt-get update
+      sudo apt-get install -y mimic
+    fi
+
+    echo "${GITHUB_TOKEN}">~/token.txt
+    pip install --upgrade pip~=21.1
+    pip install wheel
+    pip install "${pipStr}"
+    # TODO: Below is for testing only DM
+    pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
+    neon-config-import
