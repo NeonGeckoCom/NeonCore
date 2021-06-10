@@ -44,63 +44,63 @@ localDeps="false"
 installGui="false"
 installMimic="false"
 options=()
-    if [ "${localDeps}" == "true" ]; then
-      options+=("local")
-    else
-      options+=("remote")
-    fi
+if [ "${localDeps}" == "true" ]; then
+  options+=("local")
+else
+  options+=("remote")
+fi
 
-    if [ "${installServer}" == "true" ]; then
-      options+=("server")
-    else
-      options+=("client")
-    fi
+if [ "${installServer}" == "true" ]; then
+  options+=("server")
+else
+  options+=("client")
+fi
 
-    if [ "${devMode}" == "true" ]; then
-      options+=("dev")
-    fi
-    optStr=$(printf ",%s" "${options[@]}")
-    optStr="[${optStr:1}]"
-    pipStr="git+https://${GITHUB_TOKEN}@github.com/NeonDaniel/NeonCore#egg=neon_core${optStr}"
+if [ "${devMode}" == "true" ]; then
+  options+=("dev")
+fi
+optStr=$(printf ",%s" "${options[@]}")
+optStr="[${optStr:1}]"
+pipStr="git+https://${GITHUB_TOKEN}@github.com/NeonDaniel/NeonCore/tree/FEAT_UnitTestsSetup#egg=neon_core${optStr}"
 
-    # Create install directory if specified and doesn't exist
-    if [ ! -d "${installerDir}" ]; then
-      echo "Creating Install Directory: ${installerDir}"
-      mkdir -p "${installerDir}"
-    fi
+# Create install directory if specified and doesn't exist
+if [ ! -d "${installerDir}" ]; then
+  echo "Creating Install Directory: ${installerDir}"
+  mkdir -p "${installerDir}"
+fi
 
-    # Make venv if not in one
-    if [ -z "${VIRTUAL_ENV}" ]; then
-      echo "Creating new Virtual Environment"
-      cd "${installerDir}" || exit 10
-      python3 -m venv .venv
-      . .venv/bin/activate
-    fi
+# Make venv if not in one
+if [ -z "${VIRTUAL_ENV}" ]; then
+  echo "Creating new Virtual Environment"
+  cd "${installerDir}" || exit 10
+  python3 -m venv .venv
+  . .venv/bin/activate
+fi
 
-    ## Actual Installation bits
-    sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
+## Actual Installation bits
+sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
 
-    # Do GUI install
-    if [ "${installGui}" == "true" ]; then
-      if [ -d mycroft-gui ]; then
-        rm -rf mycroft-gui
-      fi
-      git clone https://github.com/mycroftai/mycroft-gui
-      bash mycroft-gui/dev_setup.sh
-      rm -rf mycroft-gui
-    fi
+# Do GUI install
+if [ "${installGui}" == "true" ]; then
+  if [ -d mycroft-gui ]; then
+    rm -rf mycroft-gui
+  fi
+  git clone https://github.com/mycroftai/mycroft-gui
+  bash mycroft-gui/dev_setup.sh
+  rm -rf mycroft-gui
+fi
 
-    # Do Mimic Install
-    if [ "${installMimic}" == "true" ]; then
-      curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
-      sudo apt-get update
-      sudo apt-get install -y mimic
-    fi
+# Do Mimic Install
+if [ "${installMimic}" == "true" ]; then
+  curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
+  sudo apt-get update
+  sudo apt-get install -y mimic
+fi
 
-    echo "${GITHUB_TOKEN}">~/token.txt
-    pip install --upgrade pip~=21.1
-    pip install wheel
-    pip install "${pipStr}"
-    # TODO: Below is for testing only DM
-    pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
-    neon-config-import
+echo "${GITHUB_TOKEN}">~/token.txt
+pip install --upgrade pip~=21.1
+pip install wheel
+pip install "${pipStr}"
+# TODO: Below is for testing only DM
+pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
+neon-config-import
