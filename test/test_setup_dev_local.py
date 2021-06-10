@@ -8,6 +8,7 @@ class TestSetupDevLocal(unittest.TestCase):
         self.assertTrue(local_config["prefFlags"]["devMode"])
         self.assertEqual(local_config["stt"]["module"], "deepspeech_stream_local")
         self.assertEqual(local_config["tts"]["module"], "mozilla_remote")
+        self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
         import neon_tts_plugin_mozilla_remote

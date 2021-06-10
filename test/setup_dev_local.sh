@@ -25,6 +25,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+export GITHUB_TOKEN="${1}"
+
 installerDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/NeonAI"
 export installerDir
 
@@ -38,29 +40,17 @@ export installServer=false  # enables neonAI server module
 export sttModule="deepspeech_stream_remote"
 export ttsModule="mozilla_local"
 
-pipStr="git+https://${GITHUB_TOKEN}@github.com/NeonDaniel/NeonCore#egg=neon_core[dev,local,client]"
-
-# Create install directory if specified and doesn't exist
-if [ ! -d "${installerDir}" ]; then
-  echo "Creating Install Directory: ${installerDir}"
-  mkdir -p "${installerDir}"
-fi
-
-# Make venv if not in one
-if [ -z "${VIRTUAL_ENV}" ]; then
-  echo "Creating new Virtual Environment"
-  cd "${installerDir}" || exit 10
-  python3 -m venv .venv
-  . .venv/bin/activate
-fi
-
 ## Actual Installation bits
 sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
 
 echo "${GITHUB_TOKEN}">~/token.txt
 pip install --upgrade pip~=21.1
 pip install wheel
-pip install "${pipStr}"
+pip install -r ../requirements/requirements.txt
+pip install -r ../requirements/dev.txt
+pip install -r ../requirements/local_speech_processing.txt
+pip install -r ../requirements/client.txt
+
 # TODO: Below is for testing only DM
 pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
 neon-config-import
@@ -68,11 +58,3 @@ neon-config-import
 # Setup Completed
 echo "Setup Complete"
 exit 0
-
-touch "neon_setup.log"
-if [ -n "${1}" ]; then
-  export GITHUB_TOKEN="${1}"
-fi
-
-getOptions
-doInstall | tee -a "neon_setup.log"
