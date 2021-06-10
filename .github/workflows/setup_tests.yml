@@ -20,7 +20,7 @@ jobs:
       - name: Setup Core
         run: |
           bash test/setup_dev_local.sh ${NEON_TOKEN}
-          . .venv/bin/activate
+          . NeonAI/.venv/bin/activate
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
