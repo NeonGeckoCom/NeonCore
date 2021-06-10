@@ -27,7 +27,7 @@
 
 export GITHUB_TOKEN="${1}"
 
-installerDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/NeonAI"
+installerDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export installerDir
 
 # Preferences
