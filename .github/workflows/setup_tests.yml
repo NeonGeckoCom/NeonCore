@@ -24,7 +24,7 @@ jobs:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
         run: |
-          . .venv/bin.activate
+          . .venv/bin/activate
           pip install pytest pytest-timeout
           pytest test/test_setup_remote.py --junitxml=tests/remote-test-results.xml
       - name: Upload Core Setup test results
@@ -52,7 +52,7 @@ jobs:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
         run: |
-          . .venv/bin.activate
+          . .venv/bin/activate
           pip install pytest pytest-timeout
           pytest test/test_setup_dev_local.py --junitxml=tests/dev_local-test-results.xml
       - name: Upload Core Setup test results
