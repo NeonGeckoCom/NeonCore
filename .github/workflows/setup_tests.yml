@@ -1,12 +1,12 @@
 # This workflow will run unit tests
 
-name: Test Install Dev Local
+name: Test Installation
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  unit_tests:
+  dev_local:
     strategy:
       matrix:
         python-version: [ 3.6, 3.8 ]
@@ -31,4 +31,30 @@ jobs:
         with:
           name: pytest-results-3.6
           path: tests/dev_local-test-results.xml
+        if: ${{ always() }}
+  remote:
+    strategy:
+      matrix:
+        python-version: [ 3.6, 3.8 ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Core
+        run: |
+          bash test/setup_remote.sh ${NEON_TOKEN}
+        env:
+          NEON_TOKEN: ${{secrets.neon_token}}
+      - name: Test Core Setup
+        run: |
+          pip install pytest pytest-timeout
+          pytest test/test_setup_remote.py --junitxml=tests/remote-test-results.xml
+      - name: Upload Core Setup test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-results-3.6
+          path: tests/remote-test-results.xml
         if: ${{ always() }}
