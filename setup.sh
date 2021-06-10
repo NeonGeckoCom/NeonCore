@@ -311,8 +311,6 @@ doInstall(){
     pip install --upgrade pip~=21.1
     pip install wheel
     pip install "${pipStr}"
-    # TODO: Below is for testing only DM
-    pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
     neon-config-import
 
     # Setup Completed
@@ -321,7 +319,7 @@ doInstall(){
 }
 
 touch "neon_setup.log"
-if [ ! -z "${1}" ]; then
+if [ -n "${1}" ]; then
   export GITHUB_TOKEN="${1}"
 fi
 
