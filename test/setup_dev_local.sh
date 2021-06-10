@@ -104,3 +104,5 @@ pip install "${pipStr}"
 # TODO: Below is for testing only DM
 pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
 neon-config-import
+
+exit 0
