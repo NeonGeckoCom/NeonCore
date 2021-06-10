@@ -46,10 +46,10 @@ sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaud
 echo "${GITHUB_TOKEN}">~/token.txt
 pip install --upgrade pip~=21.1
 pip install wheel
-pip install -r ../requirements/requirements.txt
-pip install -r ../requirements/dev.txt
-pip install -r ../requirements/local_speech_processing.txt
-pip install -r ../requirements/client.txt
+pip install -r requirements/requirements.txt
+pip install -r requirements/dev.txt
+pip install -r requirements/local_speech_processing.txt
+pip install -r requirements/client.txt
 
 # TODO: Below is for testing only DM
 pip install --upgrade git+https://github.com/NeonDaniel/neon-skill-utils@FEAT_HandleConfigFromSetup
