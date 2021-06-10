@@ -12,8 +12,11 @@ class TestSetupDevLocal(unittest.TestCase):
 
     def test_installed_packages(self):
         import neon_tts_plugin_mozilla_local
-        import neon_stt_plugin_deepspeech_stream_local
+        import neon_stt_plugin_deepspeech_stream_remote
         import neon_test_utils
+        import neon_core_client
+        with self.assertRaises(ImportError):
+            import neon_core_server
 
 
 if __name__ == '__main__':
