@@ -101,8 +101,7 @@ echo "${GITHUB_TOKEN}">~/token.txt
 pip install --upgrade pip~=21.1
 pip install wheel
 pip install "${pipStr}"
-# TODO: Below is for testing only DM
-pip install --upgrade git+https://github.com/NeonGeckoCom/neon-skill-utils@dev
+
 neon-config-import
 
 exit 0
