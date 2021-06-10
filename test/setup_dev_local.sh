@@ -37,8 +37,8 @@ export autoUpdate=false     # enables neonAI to check for updates at runtime
 export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 
-export sttModule="deepspeech_stream_remote"
-export ttsModule="mozilla_local"
+export sttModule="deepspeech_stream_local"
+export ttsModule="mozilla_remote"
 
 ## Actual Installation bits
 sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
