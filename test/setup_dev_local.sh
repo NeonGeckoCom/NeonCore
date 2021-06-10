@@ -46,6 +46,10 @@ sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaud
 echo "${GITHUB_TOKEN}">~/token.txt
 pip install --upgrade pip~=21.1
 pip install wheel
+python "${installerDir}/../parse_requirements.py" requirements/requirements.txt
+python "${installerDir}/../parse_requirements.py" requirements/dev.txt
+python "${installerDir}/../parse_requirements.py" requirements/local_speech_processing.txt
+python "${installerDir}/../parse_requirements.py" requirements/client.txt
 pip install -r requirements/requirements.txt
 pip install -r requirements/dev.txt
 pip install -r requirements/local_speech_processing.txt

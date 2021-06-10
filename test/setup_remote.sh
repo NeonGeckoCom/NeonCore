@@ -37,8 +37,8 @@ export autoUpdate=false     # enables neonAI to check for updates at runtime
 export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 
-export sttModule="deepspeech_stream_local"
-export ttsModule="mozilla_remote"
+export sttModule="google_cloud_streaming"
+export ttsModule="polly"
 
 ## Actual Installation bits
 sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
@@ -46,6 +46,9 @@ sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaud
 echo "${GITHUB_TOKEN}">~/token.txt
 pip install --upgrade pip~=21.1
 pip install wheel
+python "${installerDir}/../parse_requirements.py" requirements/requirements.txt
+python "${installerDir}/../parse_requirements.py" requirements/remote_speech_processing.txt
+python "${installerDir}/../parse_requirements.py" requirements/client.txt
 pip install -r requirements/requirements.txt
 pip install -r requirements/remote_speech_processing.txt
 pip install -r requirements/client.txt
