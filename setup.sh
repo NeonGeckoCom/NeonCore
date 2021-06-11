@@ -288,7 +288,13 @@ doInstall(){
     fi
 
     ## Actual Installation bits
-    sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
+    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git
+
+    # TODO: Patching json_database/OSM, default log directory here:
+    mkdir ~/.local/share/json_database
+    mkdir ~/.local/share/icons
+    sudo mkdir /var/log/mycroft
+    sudo chmod 777 /var/log/mycroft
 
     # Do GUI install
     if [ "${installGui}" == "true" ]; then
