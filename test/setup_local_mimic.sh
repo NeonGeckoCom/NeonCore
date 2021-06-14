@@ -102,7 +102,7 @@ pip install --upgrade pip~=21.1
 pip install wheel
 pip install "${pipStr}"
 
-neon-config-import
 pip install git+https://github.com/NeonDaniel/neon-skill-utils@FIX_SetupDefaultLogsDir
+neon-config-import
 
 exit 0
