@@ -11,6 +11,7 @@ neon_enclosure @ git+https://github.com/NeonGeckoCom/neon_enclosure
 # utils
 rapidfuzz
 kthread
+psutil
 ovos_utils>=0.0.10
 ovos-skills-manager>=0.0.2
 
