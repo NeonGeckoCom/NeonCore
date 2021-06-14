@@ -104,4 +104,6 @@ pip install "${pipStr}"
 
 neon-config-import
 
+pip install git+https://github.com/NeonDaniel/neon-skill-utils@FIX_SetupDefaultLogsDir
+
 exit 0
