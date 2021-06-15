@@ -29,8 +29,6 @@ import unittest
 import pytest
 
 from multiprocessing import Process
-from time import sleep
-
 from neon_utils.logger import LOG
 from mycroft_bus_client import MessageBusClient, Message
 
@@ -43,10 +41,11 @@ class TestSetupFirstRun(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
-        sleep(60)
+        bus = MessageBusClient()
+        bus.run_in_thread()
+        bus.connected_event.wait(60)
 
     @classmethod
-    @pytest.mark.timeout(30)
     def tearDownClass(cls) -> None:
         try:
             stop = Process(target=stop_neon, daemon=False)
