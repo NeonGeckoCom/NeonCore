@@ -42,7 +42,6 @@ class TestSetupFirstRun(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
-        sleep(15)
 
     @classmethod
     @pytest.mark.timeout(30)
@@ -57,7 +56,7 @@ class TestSetupFirstRun(unittest.TestCase):
         except Exception as e:
             LOG.error(e)
 
-    @pytest.mark.timeout(30)
+    @pytest.mark.timeout(60)
     def test_messagebus_connection(self):
         from mycroft_bus_client import MessageBusClient
         bus = MessageBusClient()
@@ -66,7 +65,7 @@ class TestSetupFirstRun(unittest.TestCase):
         bus.connected_event.wait(30)
         self.assertTrue(bus.connected_event.is_set())
 
-    @pytest.mark.timeout(30)
+    @pytest.mark.timeout(60)
     def test_skills_list(self):
         from mycroft_bus_client import MessageBusClient, Message
         bus = MessageBusClient()
@@ -75,6 +74,10 @@ class TestSetupFirstRun(unittest.TestCase):
         self.assertIsInstance(response, Message)
         loaded_skills = response.data
         self.assertIsInstance(loaded_skills, dict)
+
+    # TODO: Trivial test of speech, audio, enclosure modules
+    # TODO: Test default skills installation
+    # TODO: Test user utterance -> response
 
 
 if __name__ == '__main__':
