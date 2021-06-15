@@ -40,13 +40,13 @@ from neon_core.run_neon import start_neon, stop_neon
 
 class TestSetupFirstRun(unittest.TestCase):
     @classmethod
-    @pytest.mark.timeout(60)
+    @pytest.mark.timeout(600)
     def setUpClass(cls) -> None:
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
         bus = MessageBusClient()
         bus.run_in_thread()
-        bus.connected_event.wait(60)
+        bus.connected_event.wait(360)
 
     @classmethod
     @pytest.mark.timeout(30)
