@@ -44,13 +44,7 @@ class TestSetupFirstRun(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        while not bus.connected_event.is_set():
-            try:
-                bus.connected_event.wait()
-            except Exception as e:
-                LOG.error(e)
+        sleep(120)
 
     @classmethod
     @pytest.mark.timeout(30)
