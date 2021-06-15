@@ -46,7 +46,11 @@ class TestSetupFirstRun(unittest.TestCase):
         cls.process.start()
         bus = MessageBusClient()
         bus.run_in_thread()
-        bus.connected_event.wait()
+        while not bus.connected_event.is_set():
+            try:
+                bus.connected_event.wait()
+            except Exception as e:
+                LOG.error(e)
 
     @classmethod
     @pytest.mark.timeout(30)
