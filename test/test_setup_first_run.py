@@ -32,6 +32,7 @@ from multiprocessing import Process
 from time import sleep
 
 from neon_utils.logger import LOG
+from mycroft_bus_client import MessageBusClient, Message
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.run_neon import start_neon, stop_neon
@@ -39,9 +40,13 @@ from neon_core.run_neon import start_neon, stop_neon
 
 class TestSetupFirstRun(unittest.TestCase):
     @classmethod
+    @pytest.mark.timeout(60)
     def setUpClass(cls) -> None:
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
+        bus = MessageBusClient()
+        bus.run_in_thread()
+        bus.connected_event.wait(60)
 
     @classmethod
     @pytest.mark.timeout(30)
@@ -62,14 +67,14 @@ class TestSetupFirstRun(unittest.TestCase):
         bus = MessageBusClient()
         bus.run_in_thread()
         self.assertTrue(bus.started_running)
-        bus.connected_event.wait(30)
+        bus.connected_event.wait(10)
         self.assertTrue(bus.connected_event.is_set())
 
     @pytest.mark.timeout(60)
     def test_skills_list(self):
-        from mycroft_bus_client import MessageBusClient, Message
         bus = MessageBusClient()
         bus.run_in_thread()
+        bus.connected_event.wait(10)
         response = bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
         self.assertIsInstance(response, Message)
         loaded_skills = response.data
