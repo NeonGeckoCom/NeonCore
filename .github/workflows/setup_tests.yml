@@ -34,7 +34,12 @@ jobs:
           name: pytest-results-3.6
           path: tests/remote-test-results.xml
         if: ${{ always() }}
-
+      - name: Upload Core Setup logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-results-3.6
+          path: ~/.local/share/neon/logs/*.log
+        if: ${{ always() }}
   dev_local:
     strategy:
       matrix:
