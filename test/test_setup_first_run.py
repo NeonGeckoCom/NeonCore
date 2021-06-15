@@ -26,6 +26,7 @@
 import os.path
 import sys
 import unittest
+import pytest
 
 from multiprocessing import Process
 from time import sleep
@@ -44,6 +45,7 @@ class TestSetupFirstRun(unittest.TestCase):
         sleep(15)
 
     @classmethod
+    @pytest.mark.timeout(30)
     def tearDownClass(cls) -> None:
         try:
             stop = Process(target=stop_neon, daemon=False)
@@ -55,6 +57,7 @@ class TestSetupFirstRun(unittest.TestCase):
         except Exception as e:
             LOG.error(e)
 
+    @pytest.mark.timeout(30)
     def test_messagebus_connection(self):
         from mycroft_bus_client import MessageBusClient
         bus = MessageBusClient()
@@ -63,6 +66,7 @@ class TestSetupFirstRun(unittest.TestCase):
         bus.connected_event.wait(30)
         self.assertTrue(bus.connected_event.is_set())
 
+    @pytest.mark.timeout(30)
     def test_skills_list(self):
         from mycroft_bus_client import MessageBusClient, Message
         bus = MessageBusClient()
