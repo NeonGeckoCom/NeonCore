@@ -254,6 +254,7 @@ getOptions(){
 }
 
 doInstall(){
+  # Build optional dependency string for pip installation
     options=()
     if [ "${localDeps}" == "true" ]; then
       options+=("local")
@@ -280,6 +281,10 @@ doInstall(){
       mkdir -p "${installerDir}"
     fi
 
+    # Install system dependencies
+    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git curl
+    # TODO: curl here to patch news skill; should be moved to skill deps
+
     # Make venv if not in one
     if [ -z "${VIRTUAL_ENV}" ]; then
       echo "Creating new Virtual Environment"
@@ -288,9 +293,6 @@ doInstall(){
       . .venv/bin/activate || exit 11
     fi
 
-    ## Actual Installation bits
-    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git curl
-    # TODO: curl here to patch news skill; should be moved to skill deps
     # TODO: Patching json_database/OSM, default log directory here:
     mkdir ~/.local/share/json_database
     mkdir ~/.local/share/icons
