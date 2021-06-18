@@ -49,7 +49,6 @@ export installServer=false  # enables neonAI server module
 export sttModule="google_cloud_streaming"
 export ttsModule="amazon"
 
-installMimic=false
 
 
 askYesNo(){
@@ -140,29 +139,17 @@ askWrapper(){
             echo -e "\nYour device will not update unless asked to.\n"
         fi
     ;;
-    "mimic")
-        askYesNo "Install Mimic?"
-        result=${?}
-        if  [ ${result} == 0 ]; then
-            installMimic='true'
-            export ttsModule="mimic"
-            echo -e "\nMimic will be installed.\n"
-        elif  [ ${result} == 1 ]; then
-            installMimic='false'
-            echo -e "\nNo Mimic installation.\n"
-        fi
-    ;;
     "localSpeech")
-        askYesNo "Use local STT (Deepspeech)/TTS (Mozilla)?"
+        askYesNo "Use local STT (Deepspeech)/TTS (Mimic)?"
         result=${?}
         if  [ ${result} == 0 ]; then
             localDeps='true'
             export sttModule="deepspeech_stream_local"
-            export ttsModule="mozilla_local"
-            echo -e "\nDeepspeech and MozillaTTS will be installed.\n"
+            export ttsModule="ovos_tts_mimic"
+            echo -e "\nDeepspeech and Mimic will be used.\n"
         elif  [ ${result} == 1 ]; then
             localDeps='false'
-            echo -e "\nGoogle STT and Amazon TTS plugins will be installed.\n"
+            echo -e "\nGoogle STT and Amazon TTS plugins will be used.\n"
         fi
     ;;
     "gui")
@@ -192,7 +179,6 @@ askWrapper(){
         Run Neon at Login      : ${autoStart}
         Automatic Neon Updates : ${autoUpdate}
         Install GUI            : ${installGui}
-        Install Mimic          : ${installMimic}
         STT Engine             : ${sttModule}
         TTS Engine             : ${ttsModule}
         Server                 : ${installServer}"
@@ -227,7 +213,6 @@ askWrapper(){
             "autorun"
             "autoupdate"
             "localSpeech"
-            "mimic"
             "gui"
             "confirmSettings"
             )
@@ -281,8 +266,12 @@ doInstall(){
       mkdir -p "${installerDir}"
     fi
 
+    # Add Mimic apt repository
+    curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
+    sudo apt-get update
+
     # Install system dependencies
-    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git curl mpg123 ffmpeg
+    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git curl mpg123 ffmpeg mimic
     # TODO: curl here to patch news skill; should be moved to skill deps
 
     # Make venv if not in one
@@ -307,13 +296,6 @@ doInstall(){
       git clone https://github.com/mycroftai/mycroft-gui
       bash mycroft-gui/dev_setup.sh
       rm -rf mycroft-gui
-    fi
-
-    # Do Mimic Install
-    if [ "${installMimic}" == "true" ]; then
-      curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
-      sudo apt-get update
-      sudo apt-get install -y mimic
     fi
 
     echo "${GITHUB_TOKEN}">~/token.txt
