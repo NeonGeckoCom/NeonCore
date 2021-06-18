@@ -267,11 +267,12 @@ doInstall(){
     fi
 
     # Add Mimic apt repository
+    sudo apt install -y curl
     curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
     sudo apt-get update
 
     # Install system dependencies
-    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git curl mpg123 ffmpeg mimic
+    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
     # TODO: curl here to patch news skill; should be moved to skill deps
 
     # Make venv if not in one
@@ -383,6 +384,6 @@ touch "neon_setup.log"
 if [ -n "${1}" ]; then
   export GITHUB_TOKEN="${1}"
 fi
-
+# TODO: Exit if no Token? DM
 getOptions
 doInstall | tee -a "neon_setup.log"
