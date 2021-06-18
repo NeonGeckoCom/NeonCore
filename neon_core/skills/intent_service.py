@@ -24,6 +24,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import time
+import wave
 
 from neon_core.configuration import Configuration
 from neon_core.language import get_lang_config
@@ -129,10 +130,14 @@ class NeonIntentService(IntentService):
 
             # Write out text and audio transcripts if service is available
             if self.transcript_service:
+                audio = message.context.get("raw_audio")  # This is a tempfile
+                if audio:
+                    audio = wave.open(audio, 'r')
+                    audio = audio.readframes(audio.getnframes())
                 audio_file = self.transcript_service.write_transcript(get_message_user(message),
                                                                       message.data.get('utterances', [''])[0],
                                                                       message.context["timing"]["transcribed"],
-                                                                      message.context.get("raw_audio"))
+                                                                      audio)
                 message.context["audio_file"] = audio_file
 
             # pipe utterance trough parsers to get extra metadata
