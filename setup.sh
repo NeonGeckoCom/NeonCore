@@ -282,7 +282,7 @@ doInstall(){
     fi
 
     # Install system dependencies
-    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git curl
+    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git curl mpg123 ffmpeg
     # TODO: curl here to patch news skill; should be moved to skill deps
 
     # Make venv if not in one
@@ -350,7 +350,7 @@ start_script="#!/bin/bash
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 . \"${VIRTUAL_ENV}/bin/activate\"
-coproc neon-start
+coproc neon-start 2>&1 >/dev/null
 exit 0
 "
 
