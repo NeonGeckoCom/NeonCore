@@ -1,2 +1,2 @@
 neon-stt-plugin-deepspeech_stream_local @ git+https://github.com/NeonGeckoCom/neon-stt-plugin-deepspeech_stream_local
-neon-tts-plugin-mozilla_remote @ git+https://github.com/NeonGeckoCom/neon-tts-plugin-mozilla_remote
+ovos-tts-plugin-mimic
