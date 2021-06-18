@@ -147,6 +147,7 @@ def start_neon():
         _start_process("neon_speech_client")
         _start_process("neon_audio_client")
         _start_process(["python3", "-m", "neon_core.skills"])
+        _start_process("neon_transcripts_controller")
         if get_neon_device_type() == "server":
             _start_process("neon_core_server")
         else:
