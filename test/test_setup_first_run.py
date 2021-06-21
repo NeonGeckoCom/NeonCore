@@ -43,15 +43,11 @@ AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "aud
 class TestSetupFirstRun(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        print("setup")
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
-        print("processes started")
         bus = MessageBusClient()
         bus.run_in_thread()
-        print("bus started")
         bus.connected_event.wait(60)
-        print("connected")
 
     @classmethod
     def tearDownClass(cls) -> None:
