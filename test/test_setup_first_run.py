@@ -26,6 +26,8 @@
 import os.path
 import sys
 import unittest
+from time import time
+
 import pytest
 
 from multiprocessing import Process
@@ -34,6 +36,8 @@ from mycroft_bus_client import MessageBusClient, Message
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.run_neon import start_neon, stop_neon
+
+AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 
 
 class TestSetupFirstRun(unittest.TestCase):
@@ -76,7 +80,45 @@ class TestSetupFirstRun(unittest.TestCase):
         loaded_skills = response.data
         self.assertIsInstance(loaded_skills, dict)
 
-    # TODO: Trivial test of speech, audio, enclosure modules
+    @pytest.mark.timeout(60)
+    def test_speech_module(self):
+        bus = MessageBusClient()
+        bus.run_in_thread()
+        bus.connected_event.wait(10)
+        context = {"client": "tester",
+                   "ident": str(round(time())),
+                   "user": "TestRunner"}
+        stt_resp = bus.wait_for_response(Message("neon.get_stt",
+                                                 {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
+                                                 context), context["ident"])
+        self.assertEqual(stt_resp.context, context)
+        self.assertIsInstance(stt_resp.data.get("parser_data"), dict)
+        self.assertIsInstance(stt_resp.data.get("transcripts"), list)
+        self.assertIn("stop", stt_resp.data.get("transcripts"))
+
+    def test_audio_module(self):
+        bus = MessageBusClient()
+        bus.run_in_thread()
+        bus.connected_event.wait(10)
+        text = "This is a test"
+        context = {"client": "tester",
+                   "ident": str(time()),
+                   "user": "TestRunner"}
+        stt_resp = bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
+                                         context["ident"], timeout=60)
+        self.assertEqual(stt_resp.context, context)
+        responses = stt_resp.data
+        self.assertIsInstance(responses, dict)
+        self.assertEqual(len(responses), 1)
+        resp = list(responses.values())[0]
+        self.assertIsInstance(resp, dict)
+        self.assertEqual(resp.get("sentence"), text)
+
+    # def test_skills_module(self):
+    #     bus = MessageBusClient()
+    #     bus.run_in_thread()
+    #     bus.connected_event.wait(10)
+    # TODO: Trivial test of enclosure module
     # TODO: Test default skills installation
     # TODO: Test user utterance -> response
 
