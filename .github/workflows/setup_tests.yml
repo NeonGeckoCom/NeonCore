@@ -11,6 +11,7 @@ jobs:
       matrix:
         python-version: [ 3.6, 3.8 ]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
       - name: Set up python ${{ matrix.python-version }}
@@ -45,6 +46,7 @@ jobs:
       matrix:
         python-version: [ 3.6, 3.8 ]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
       - name: Set up python ${{ matrix.python-version }}
@@ -74,6 +76,7 @@ jobs:
       matrix:
         python-version: [ 3.6, 3.8 ]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2
       - name: Set up python ${{ matrix.python-version }}
