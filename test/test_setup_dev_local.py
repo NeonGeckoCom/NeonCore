@@ -36,7 +36,7 @@ class TestSetupDevLocal(unittest.TestCase):
         self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
-        import neon_tts_plugin_mozilla_remote
+        # import ovos-tts-plugin-mimic
         import neon_stt_plugin_deepspeech_stream_local
         import mycroft
         import neon_cli
