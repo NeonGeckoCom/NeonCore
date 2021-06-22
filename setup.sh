@@ -275,7 +275,6 @@ doInstall(){
 
     # Install system dependencies
     sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
-    # TODO: curl here to patch news skill; should be moved to skill deps
 
     # Make venv if not in one
     if [ -z "${VIRTUAL_ENV}" ]; then

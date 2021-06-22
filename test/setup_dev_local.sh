@@ -42,7 +42,6 @@ export ttsModule="mozilla_remote"
 
 localDeps="true"
 installGui="false"
-installMimic="false"
 options=()
 options+=("test")
 if [ "${localDeps}" == "true" ]; then
@@ -79,7 +78,13 @@ if [ -z "${VIRTUAL_ENV}" ]; then
 fi
 
 ## Actual Installation bits
-sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
+# Add Mimic apt repository
+sudo apt install -y curl
+curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
+sudo apt-get update
+
+# Install system dependencies
+sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
 
 # Do GUI install
 if [ "${installGui}" == "true" ]; then
@@ -89,13 +94,6 @@ if [ "${installGui}" == "true" ]; then
   git clone https://github.com/mycroftai/mycroft-gui
   bash mycroft-gui/dev_setup.sh
   rm -rf mycroft-gui
-fi
-
-# Do Mimic Install
-if [ "${installMimic}" == "true" ]; then
-  curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
-  sudo apt-get update
-  sudo apt-get install -y mimic
 fi
 
 echo "${GITHUB_TOKEN}">~/token.txt
