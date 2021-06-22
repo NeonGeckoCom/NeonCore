@@ -43,7 +43,7 @@ export ttsModule="polly"
 localDeps="false"
 installGui="false"
 installMimic="false"
-options=()
+options=("test")
 if [ "${localDeps}" == "true" ]; then
   options+=("local")
 else
