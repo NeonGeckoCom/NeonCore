@@ -25,7 +25,6 @@
 
 import os
 import sys
-import mock
 import unittest
 
 from multiprocessing import Process
@@ -33,6 +32,7 @@ from time import time, sleep
 from mycroft_bus_client import MessageBusClient, Message
 from neon_speech.__main__ import main as neon_speech_main
 from neon_audio.__main__ import main as neon_audio_main
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.messagebus.service.__main__ import main as messagebus_service
 
@@ -66,6 +66,7 @@ class TestModules(unittest.TestCase):
         cls.audio_thread.terminate()
 
     def test_get_stt_valid_file(self):
+        self.assertTrue(self.speech_thread.is_alive())
         context = {"client": "tester",
                    "ident": "12345",
                    "user": "TestRunner"}
@@ -77,23 +78,8 @@ class TestModules(unittest.TestCase):
         self.assertIsInstance(stt_resp.data.get("transcripts"), list)
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
-    def test_audio_input_valid(self):
-        handle_utterance = mock.Mock()
-        self.bus.once("recognizer_loop:utterance", handle_utterance)
-        context = {"client": "tester",
-                   "ident": "11111",
-                   "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.audio_input", {"audio_file": os.path.join(AUDIO_FILE_PATH,
-                                                                                                      "stop.wav")},
-                                                      context), context["ident"], 30.0)
-        self.assertIsInstance(stt_resp, Message)
-        for key in context:
-            self.assertIn(key, stt_resp.context)
-            self.assertEqual(context[key], stt_resp.context[key])
-        self.assertIsInstance(stt_resp.data.get("skills_recv"), bool)
-        handle_utterance.assert_called_once()
-
     def test_get_tts_valid_default(self):
+        self.assertTrue(self.audio_thread.is_alive())
         text = "This is a test"
         context = {"client": "tester",
                    "ident": str(time()),
