@@ -21,13 +21,11 @@ jobs:
       - name: Setup Core
         run: |
           bash test/setup_remote.sh ${NEON_TOKEN}
-          pip install -r requirements/test.txt
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
         run: |
           . test/.venv/bin/activate
-          pip install pytest pytest-timeout
           pytest test/test_setup_remote.py --junitxml=tests/remote-setup-results.xml
           pytest test/test_run_modules.py -o log_cli=true --junitxml=tests/remote-modules-results.xml
           pytest test/test_setup_first_run.py -o log_cli=true --junitxml=tests/remote-test-results.xml
@@ -58,7 +56,6 @@ jobs:
 #      - name: Setup Core
 #        run: |
 #          bash test/setup_dev_local.sh ${NEON_TOKEN}
-#          pip install -r requirements/test.txt
 #        env:
 #          NEON_TOKEN: ${{secrets.neon_token}}
 #      - name: Test Core Setup

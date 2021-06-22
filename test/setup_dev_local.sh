@@ -43,7 +43,7 @@ export ttsModule="mozilla_remote"
 localDeps="true"
 installGui="false"
 installMimic="false"
-options=()
+options=("test")
 if [ "${localDeps}" == "true" ]; then
   options+=("local")
 else
