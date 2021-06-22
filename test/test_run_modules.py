@@ -32,7 +32,6 @@ from time import time, sleep
 from mycroft_bus_client import MessageBusClient, Message
 from neon_speech.__main__ import main as neon_speech_main
 from neon_audio.__main__ import main as neon_audio_main
-from neon_utils.log_utils import LOG, LOG_DIR
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.messagebus.service.__main__ import main as messagebus_service
@@ -82,8 +81,8 @@ class TestModules(unittest.TestCase):
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
     def test_get_tts_valid_default(self):
-        with open(os.path.join(LOG_DIR, "audio.log")) as log:
-            LOG.info(log.read())
+        while not self.bus.started_running:
+            sleep(1)
         self.assertTrue(self.audio_thread.is_alive())
         text = "This is a test"
         context = {"client": "tester",
