@@ -21,7 +21,7 @@ jobs:
       - name: Setup Core
         run: |
           bash test/setup_remote.sh ${NEON_TOKEN}
-          pip install requirements/test.txt
+          pip install -r requirements/test.txt
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
@@ -58,7 +58,7 @@ jobs:
 #      - name: Setup Core
 #        run: |
 #          bash test/setup_dev_local.sh ${NEON_TOKEN}
-#          pip install requirements/test.txt
+#          pip install -r requirements/test.txt
 #        env:
 #          NEON_TOKEN: ${{secrets.neon_token}}
 #      - name: Test Core Setup
