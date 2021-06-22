@@ -47,7 +47,7 @@ class TestRunNeon(unittest.TestCase):
         cls.process.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
-        sleep(45)
+        sleep(30)  # TODO: This shouldn't be necessary? DM
         # for log in LOG_FILES:
         #     with open(os.path.join(LOG_DIR, log)) as f:
         #         LOG.info(log)
@@ -56,13 +56,16 @@ class TestRunNeon(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         try:
+            cls.bus.emit(Message("neon.shutdown"))
             cls.bus.close()
-            stop = Process(target=stop_neon, daemon=False)
-            stop.start()
-            stop.join(20)
-            cls.process.join(5)
-            stop.kill()
-            cls.process.kill()
+            cls.process.join(30)
+            if cls.process.is_alive():
+                stop = Process(target=stop_neon, daemon=False)
+                stop.start()
+                stop.join(60)
+                cls.process.join(15)
+            if cls.process.is_alive:
+                raise ChildProcessError("Process Not Killed!")
         except Exception as e:
             LOG.error(e)
 
