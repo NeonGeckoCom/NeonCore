@@ -65,34 +65,6 @@ class TestModules(unittest.TestCase):
         cls.speech_thread.terminate()
         cls.audio_thread.terminate()
 
-    def test_get_stt_no_file(self):
-        context = {"client": "tester",
-                   "ident": "123",
-                   "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.get_stt", {}, context), context["ident"])
-        self.assertEqual(stt_resp.context, context)
-        self.assertIsInstance(stt_resp.data.get("error"), str)
-        self.assertEqual(stt_resp.data["error"], "audio_file not specified!")
-
-    def test_get_stt_invalid_file_path(self):
-        context = {"client": "tester",
-                   "ident": "1234",
-                   "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.get_stt", {"audio_file": "~/invalid_file.wav"}, context),
-                                              context["ident"])
-        self.assertEqual(stt_resp.context, context)
-        self.assertIsInstance(stt_resp.data.get("error"), str)
-
-    def test_get_stt_invalid_file_type(self):
-        context = {"client": "tester",
-                   "ident": "123456",
-                   "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.get_stt", {"audio_file": os.path.join(AUDIO_FILE_PATH,
-                                                                                                  "test.txt")},
-                                                      context), context["ident"])
-        self.assertEqual(stt_resp.context, context)
-        self.assertIsInstance(stt_resp.data.get("error"), str)
-
     def test_get_stt_valid_file(self):
         context = {"client": "tester",
                    "ident": "12345",
@@ -121,24 +93,6 @@ class TestModules(unittest.TestCase):
         self.assertIsInstance(stt_resp.data.get("skills_recv"), bool)
         handle_utterance.assert_called_once()
 
-    def test_get_tts_no_sentence(self):
-        context = {"client": "tester",
-                   "ident": "123",
-                   "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.get_tts", {}, context), context["ident"])
-        self.assertEqual(stt_resp.context, context)
-        self.assertIsInstance(stt_resp.data.get("error"), str)
-        self.assertEqual(stt_resp.data["error"], "No text provided.")
-
-    def test_get_tts_invalid_type(self):
-        context = {"client": "tester",
-                   "ident": "1234",
-                   "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.get_tts", {"text": 123}, context),
-                                              context["ident"], timeout=60)
-        self.assertEqual(stt_resp.context, context)
-        self.assertTrue(stt_resp.data.get("error").startswith("text is not a str:"))
-
     def test_get_tts_valid_default(self):
         text = "This is a test"
         context = {"client": "tester",
@@ -154,6 +108,7 @@ class TestModules(unittest.TestCase):
         resp = list(responses.values())[0]
         self.assertIsInstance(resp, dict)
         self.assertEqual(resp.get("sentence"), text)
+
 
 if __name__ == '__main__':
     unittest.main()
