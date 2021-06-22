@@ -30,14 +30,13 @@ import pytest
 
 from time import time, sleep
 from multiprocessing import Process
-from neon_utils.log_utils import LOG, LOG_DIR
+from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.run_neon import start_neon, stop_neon
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
-# LOG_FILES = ("bus.log", "speech.log", "skills.log", "audio.log", "gui.log")
 
 
 class TestRunNeon(unittest.TestCase):
@@ -47,11 +46,7 @@ class TestRunNeon(unittest.TestCase):
         cls.process.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
-        sleep(30)  # TODO: This shouldn't be necessary? DM
-        # for log in LOG_FILES:
-        #     with open(os.path.join(LOG_DIR, log)) as f:
-        #         LOG.info(log)
-        #         LOG.info(f.read())
+        sleep(30)  # TODO: Better method to wait for process startup DM
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -97,6 +92,7 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(stt_resp.data.get("transcripts"), list)
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
+    @pytest.mark.timeout(60)
     def test_audio_module(self):
         text = "This is a test"
         context = {"client": "tester",
@@ -113,7 +109,32 @@ class TestRunNeon(unittest.TestCase):
         self.assertEqual(resp.get("sentence"), text)
 
     @pytest.mark.timeout(60)
-    def test_skills_list(self):
+    def test_enclosure_module(self):
+        resp = self.bus.wait_for_response(Message("mycroft.volume.get"))
+        self.assertIsInstance(resp, Message)
+        vol = resp.data.get("percent")
+        mute = resp.data.get("muted")
+
+        self.assertIsInstance(vol, float)
+        self.assertIsInstance(mute, bool)
+
+    # TODO: Implement transcribe tests when transcribe module is updated
+    # @pytest.mark.timeout(60)
+    # def test_transcribe_module(self):
+    #     resp = self.bus.wait_for_response(Message("get_transcripts"))
+    #     self.assertIsInstance(resp, Message)
+    #     matches = resp.data.get("transcripts")
+    #     self.assertIsInstance(matches, list)
+
+    @pytest.mark.timeout(60)
+    def test_client_module(self):
+        resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
+        self.assertIsInstance(resp, Message)
+        data = resp.data
+        self.assertIsInstance(data["success"], bool)
+
+    @pytest.mark.timeout(60)
+    def test_skills_module(self):
         response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
         self.assertIsInstance(response, Message)
         loaded_skills = response.data
@@ -123,7 +144,6 @@ class TestRunNeon(unittest.TestCase):
     #     bus = MessageBusClient()
     #     bus.run_in_thread()
     #     bus.connected_event.wait(10)
-    # TODO: Trivial test of enclosure module
     # TODO: Test default skills installation
     # TODO: Test user utterance -> response
 
