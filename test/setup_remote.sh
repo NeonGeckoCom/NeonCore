@@ -38,7 +38,7 @@ export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 
 export sttModule="google_cloud_streaming"
-export ttsModule="polly"
+export ttsModule="amazon"
 
 localDeps="false"
 installGui="false"

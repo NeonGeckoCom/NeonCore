@@ -32,7 +32,7 @@ class TestSetupRemote(unittest.TestCase):
         local_config = get_neon_local_config()
         self.assertFalse(local_config["prefFlags"]["devMode"])
         self.assertEqual(local_config["stt"]["module"], "google_cloud_streaming")
-        self.assertEqual(local_config["tts"]["module"], "polly")
+        self.assertEqual(local_config["tts"]["module"], "amazon")
         self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
