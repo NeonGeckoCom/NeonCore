@@ -47,10 +47,7 @@ class TestSetupFirstRun(unittest.TestCase):
         cls.process.start()
         bus = MessageBusClient()
         bus.run_in_thread()
-        bus.connected_event.wait(60)
-        if not bus.connected_event.is_set():
-            raise ConnectionError
-        sleep(5)
+        sleep(45)
         LOG.info("test setup completed!")
         for log in LOG_FILES:
             with open(os.path.join(LOG_DIR, log)) as f:
