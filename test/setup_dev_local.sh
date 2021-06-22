@@ -38,7 +38,7 @@ export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 
 export sttModule="deepspeech_stream_local"
-export ttsModule="mozilla_remote"
+export ttsModule="ovos_tts_mimic"
 
 localDeps="true"
 installGui="false"
