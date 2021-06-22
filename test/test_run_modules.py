@@ -47,6 +47,7 @@ class TestModules(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        neon_audio_main()
         cls.bus_thread = Process(target=messagebus_service, daemon=False)
         cls.speech_thread = Process(target=neon_speech_main, daemon=False)
         cls.audio_thread = Process(target=neon_audio_main, daemon=False)
