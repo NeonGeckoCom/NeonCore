@@ -62,7 +62,7 @@ if [ "${devMode}" == "true" ]; then
 fi
 optStr=$(printf ",%s" "${options[@]}")
 optStr="[${optStr:1}]"
-pipStr="git+https://${GITHUB_TOKEN}@github.com/NeonGeckoCom/NeonCore/tree/FEAT_UnitTestsSetup#egg=neon_core${optStr}"
+pipStr="git+https://${GITHUB_TOKEN}@github.com/NeonGeckoCom/NeonCore@FEAT_UnitTestsSetup#egg=neon_core${optStr}"
 
 # Create install directory if specified and doesn't exist
 if [ ! -d "${installerDir}" ]; then
