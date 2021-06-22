@@ -32,7 +32,7 @@ class TestSetupDevLocal(unittest.TestCase):
         local_config = get_neon_local_config()
         self.assertTrue(local_config["prefFlags"]["devMode"])
         self.assertEqual(local_config["stt"]["module"], "deepspeech_stream_local")
-        self.assertEqual(local_config["tts"]["module"], "mozilla_remote")
+        self.assertEqual(local_config["tts"]["module"], "ovos_tts_mimic")
         self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
