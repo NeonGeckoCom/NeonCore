@@ -47,7 +47,6 @@ class TestModules(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        neon_audio_main()
         cls.bus_thread = Process(target=messagebus_service, daemon=False)
         cls.speech_thread = Process(target=neon_speech_main, daemon=False)
         cls.audio_thread = Process(target=neon_audio_main, daemon=False)
@@ -56,19 +55,20 @@ class TestModules(unittest.TestCase):
         cls.audio_thread.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
-        while not cls.bus.started_running:
-            sleep(1)
-        sleep(45)  # TODO: Actually do something to check for modules started? DM
 
     @classmethod
     def tearDownClass(cls) -> None:
+        cls.bus.close()
         cls.bus_thread.terminate()
         cls.speech_thread.terminate()
         cls.audio_thread.terminate()
 
-    def test_get_stt_valid_file(self):
+    def setUp(self):
+        self.bus.connected_event.wait(30)
         while not self.bus.started_running:
             sleep(1)
+
+    def test_get_stt_valid_file(self):
         self.assertTrue(self.speech_thread.is_alive())
         context = {"client": "tester",
                    "ident": "12345",
@@ -82,8 +82,6 @@ class TestModules(unittest.TestCase):
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
     def test_get_tts_valid_default(self):
-        while not self.bus.started_running:
-            sleep(1)
         self.assertTrue(self.audio_thread.is_alive())
         text = "This is a test"
         context = {"client": "tester",
