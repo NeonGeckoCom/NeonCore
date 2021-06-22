@@ -30,14 +30,14 @@ import pytest
 
 from time import time, sleep
 from multiprocessing import Process
-from neon_utils.logger import LOG
+from neon_utils.log_utils import LOG, LOG_DIR
 from mycroft_bus_client import MessageBusClient, Message
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.run_neon import start_neon, stop_neon
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
-
+LOG_FILES = ("bus.log", "speech.log", "skills.log", "audio.log", "gui.log")
 
 class TestSetupFirstRun(unittest.TestCase):
     @classmethod
@@ -50,6 +50,11 @@ class TestSetupFirstRun(unittest.TestCase):
         if not bus.connected_event.is_set():
             raise ConnectionError
         sleep(5)
+        LOG.info("test setup completed!")
+        for log in LOG_FILES:
+            with open(os.path.join(LOG_DIR, log)) as f:
+                LOG.info(log)
+                LOG.info(f.read())
 
     @classmethod
     def tearDownClass(cls) -> None:
