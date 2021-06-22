@@ -37,10 +37,10 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.run_neon import start_neon, stop_neon
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
-LOG_FILES = ("bus.log", "speech.log", "skills.log", "audio.log", "gui.log")
+# LOG_FILES = ("bus.log", "speech.log", "skills.log", "audio.log", "gui.log")
 
 
-class TestSetupFirstRun(unittest.TestCase):
+class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.process = Process(target=start_neon, daemon=False)
@@ -48,10 +48,10 @@ class TestSetupFirstRun(unittest.TestCase):
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
         sleep(45)
-        for log in LOG_FILES:
-            with open(os.path.join(LOG_DIR, log)) as f:
-                LOG.info(log)
-                LOG.info(f.read())
+        # for log in LOG_FILES:
+        #     with open(os.path.join(LOG_DIR, log)) as f:
+        #         LOG.info(log)
+        #         LOG.info(f.read())
 
     @classmethod
     def tearDownClass(cls) -> None:
