@@ -33,7 +33,7 @@ jobs:
           . test/.venv/bin/activate
           pytest test/test_setup_remote.py --junitxml=tests/remote-setup-results.xml
           pytest test/test_run_modules.py
-          pytest test/test_run_neon.py -o --junitxml=tests/remote-test-results.xml
+          pytest test/test_run_neon.py --junitxml=tests/remote-test-results.xml
       - name: Upload Core Setup test results
         uses: actions/upload-artifact@v2
         with:

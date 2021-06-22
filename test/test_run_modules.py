@@ -53,7 +53,7 @@ class TestModules(unittest.TestCase):
         cls.bus_thread.start()
         cls.speech_thread.start()
         cls.audio_thread.start()
-        sleep(30)  # TODO: This shouldn't be necessary? DM
+        sleep(45)  # TODO: This shouldn't be necessary? DM
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
 
