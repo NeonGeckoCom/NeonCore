@@ -6,47 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  remote:
-    strategy:
-      matrix:
-        python-version: [ 3.6, 3.8 ]
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Setup Core
-        run: |
-          mkdir -p ~/.local/share/neon
-          echo ${GOOGLE_KEY}>~/.local/share/neon/google.json
-          echo ${AWS_CREDS}>~/.local/share/neon/aws.json
-          bash test/setup_remote.sh ${NEON_TOKEN}
-        env:
-          NEON_TOKEN: ${{secrets.neon_token}}
-          GOOGLE_KEY: ${{secrets.google_api_key}}
-          AWS_CREDS: ${{secrets.amazon_creds}}
-      - name: Test Core Setup
-        run: |
-          . test/.venv/bin/activate
-          pytest test/test_setup_remote.py --junitxml=tests/remote-setup-results.xml
-          pytest test/test_run_modules.py -o log_cli=true --junitxml=tests/remote-modules-results.xml
-          pytest test/test_setup_first_run.py -o log_cli=true --junitxml=tests/remote-test-results.xml
-      - name: Upload Core Setup test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: pytest-results-3.6
-          path: tests/remote-test-results.xml
-        if: ${{ always() }}
-      - name: Upload Core Setup logs
-        uses: actions/upload-artifact@v2
-        with:
-          name: pytest-results-3.6
-          path: ~/.local/share/neon/logs/*.log
-        if: ${{ always() }}
-#  dev_local:
+#  remote:
 #    strategy:
 #      matrix:
 #        python-version: [ 3.6, 3.8 ]
@@ -60,18 +20,59 @@ jobs:
 #          python-version: ${{ matrix.python-version }}
 #      - name: Setup Core
 #        run: |
-#          bash test/setup_dev_local.sh ${NEON_TOKEN}
+#          mkdir -p ~/.local/share/neon
+#          echo ${GOOGLE_KEY}>~/.local/share/neon/google.json
+#          echo ${AWS_CREDS}>~/.local/share/neon/aws.json
+#          bash test/setup_remote.sh ${NEON_TOKEN}
 #        env:
 #          NEON_TOKEN: ${{secrets.neon_token}}
+#          GOOGLE_KEY: ${{secrets.google_api_key}}
+#          AWS_CREDS: ${{secrets.amazon_creds}}
 #      - name: Test Core Setup
 #        run: |
 #          . test/.venv/bin/activate
-#          pip install pytest pytest-timeout
-#          pytest test/test_setup_dev_local.py --junitxml=tests/dev_local-setup-results.xml
-#          pytest test/test_setup_first_run.py --junitxml=tests/dev_local-test-results.xml
+#          pytest test/test_setup_remote.py --junitxml=tests/remote-setup-results.xml
+#          pytest test/test_run_modules.py -o log_cli=true --junitxml=tests/remote-modules-results.xml
+#          pytest test/test_setup_first_run.py -o log_cli=true --junitxml=tests/remote-test-results.xml
 #      - name: Upload Core Setup test results
 #        uses: actions/upload-artifact@v2
 #        with:
 #          name: pytest-results-3.6
-#          path: tests/dev_local-test-results.xml
+#          path: tests/remote-test-results.xml
 #        if: ${{ always() }}
+#      - name: Upload Core Setup logs
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: pytest-results-3.6
+#          path: ~/.local/share/neon/logs/*.log
+#        if: ${{ always() }}
+  dev_local:
+    strategy:
+      matrix:
+        python-version: [ 3.6, 3.8 ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Core
+        run: |
+          bash test/setup_dev_local.sh ${NEON_TOKEN}
+        env:
+          NEON_TOKEN: ${{secrets.neon_token}}
+      - name: Test Core Setup
+        run: |
+          . test/.venv/bin/activate
+          pip install pytest pytest-timeout
+          pytest test/test_setup_dev_local.py --junitxml=tests/dev_local-setup-results.xml
+          pytest test/test_run_modules.py -o log_cli=true --junitxml=tests/remote-modules-results.xml
+          pytest test/test_setup_first_run.py --junitxml=tests/dev_local-test-results.xml
+      - name: Upload Core Setup test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: pytest-results-3.6
+          path: tests/dev_local-test-results.xml
+        if: ${{ always() }}

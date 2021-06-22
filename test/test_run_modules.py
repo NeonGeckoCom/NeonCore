@@ -92,7 +92,7 @@ class TestModules(unittest.TestCase):
                                               context["ident"], timeout=60)
         self.assertEqual(stt_resp.context, context)
         responses = stt_resp.data
-        self.assertIsInstance(responses, dict)
+        self.assertIsInstance(responses, dict, responses)
         print(responses)
         self.assertEqual(len(responses), 1)
         resp = list(responses.values())[0]
