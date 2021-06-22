@@ -39,6 +39,7 @@ from neon_core.run_neon import start_neon, stop_neon
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 LOG_FILES = ("bus.log", "speech.log", "skills.log", "audio.log", "gui.log")
 
+
 class TestSetupFirstRun(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -68,58 +69,58 @@ class TestSetupFirstRun(unittest.TestCase):
         except Exception as e:
             LOG.error(e)
 
-    @pytest.mark.timeout(60)
-    def test_messagebus_connection(self):
-        from mycroft_bus_client import MessageBusClient
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        self.assertTrue(bus.started_running)
-        bus.connected_event.wait(10)
-        self.assertTrue(bus.connected_event.is_set())
-
-    @pytest.mark.timeout(60)
-    def test_skills_list(self):
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(10)
-        response = bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
-        self.assertIsInstance(response, Message)
-        loaded_skills = response.data
-        self.assertIsInstance(loaded_skills, dict)
-
-    @pytest.mark.timeout(60)
-    def test_speech_module(self):
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(10)
-        context = {"client": "tester",
-                   "ident": str(round(time())),
-                   "user": "TestRunner"}
-        stt_resp = bus.wait_for_response(Message("neon.get_stt",
-                                                 {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
-                                                 context), context["ident"])
-        self.assertEqual(stt_resp.context, context)
-        self.assertIsInstance(stt_resp.data.get("parser_data"), dict)
-        self.assertIsInstance(stt_resp.data.get("transcripts"), list)
-        self.assertIn("stop", stt_resp.data.get("transcripts"))
-
-    def test_audio_module(self):
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(10)
-        text = "This is a test"
-        context = {"client": "tester",
-                   "ident": str(time()),
-                   "user": "TestRunner"}
-        stt_resp = bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
-                                         context["ident"], timeout=60)
-        self.assertEqual(stt_resp.context, context)
-        responses = stt_resp.data
-        self.assertIsInstance(responses, dict)
-        self.assertEqual(len(responses), 1)
-        resp = list(responses.values())[0]
-        self.assertIsInstance(resp, dict)
-        self.assertEqual(resp.get("sentence"), text)
+    # @pytest.mark.timeout(60)
+    # def test_messagebus_connection(self):
+    #     from mycroft_bus_client import MessageBusClient
+    #     bus = MessageBusClient()
+    #     bus.run_in_thread()
+    #     self.assertTrue(bus.started_running)
+    #     bus.connected_event.wait(10)
+    #     self.assertTrue(bus.connected_event.is_set())
+    #
+    # @pytest.mark.timeout(60)
+    # def test_skills_list(self):
+    #     bus = MessageBusClient()
+    #     bus.run_in_thread()
+    #     bus.connected_event.wait(10)
+    #     response = bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
+    #     self.assertIsInstance(response, Message)
+    #     loaded_skills = response.data
+    #     self.assertIsInstance(loaded_skills, dict)
+    #
+    # @pytest.mark.timeout(60)
+    # def test_speech_module(self):
+    #     bus = MessageBusClient()
+    #     bus.run_in_thread()
+    #     bus.connected_event.wait(10)
+    #     context = {"client": "tester",
+    #                "ident": str(round(time())),
+    #                "user": "TestRunner"}
+    #     stt_resp = bus.wait_for_response(Message("neon.get_stt",
+    #                                              {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
+    #                                              context), context["ident"])
+    #     self.assertEqual(stt_resp.context, context)
+    #     self.assertIsInstance(stt_resp.data.get("parser_data"), dict)
+    #     self.assertIsInstance(stt_resp.data.get("transcripts"), list)
+    #     self.assertIn("stop", stt_resp.data.get("transcripts"))
+    #
+    # def test_audio_module(self):
+    #     bus = MessageBusClient()
+    #     bus.run_in_thread()
+    #     bus.connected_event.wait(10)
+    #     text = "This is a test"
+    #     context = {"client": "tester",
+    #                "ident": str(time()),
+    #                "user": "TestRunner"}
+    #     stt_resp = bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
+    #                                      context["ident"], timeout=60)
+    #     self.assertEqual(stt_resp.context, context)
+    #     responses = stt_resp.data
+    #     self.assertIsInstance(responses, dict)
+    #     self.assertEqual(len(responses), 1)
+    #     resp = list(responses.values())[0]
+    #     self.assertIsInstance(resp, dict)
+    #     self.assertEqual(resp.get("sentence"), text)
 
     # def test_skills_module(self):
     #     bus = MessageBusClient()
