@@ -26,10 +26,9 @@
 import os.path
 import sys
 import unittest
-from time import time
-
 import pytest
 
+from time import time, sleep
 from multiprocessing import Process
 from neon_utils.logger import LOG
 from mycroft_bus_client import MessageBusClient, Message
@@ -48,6 +47,9 @@ class TestSetupFirstRun(unittest.TestCase):
         bus = MessageBusClient()
         bus.run_in_thread()
         bus.connected_event.wait(60)
+        if not bus.connected_event.is_set():
+            raise ConnectionError
+        sleep(5)
 
     @classmethod
     def tearDownClass(cls) -> None:
