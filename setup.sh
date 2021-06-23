@@ -49,6 +49,7 @@ export installServer=false  # enables neonAI server module
 export sttModule="google_cloud_streaming"
 export ttsModule="amazon"
 
+installGui=false
 
 
 askYesNo(){
@@ -167,9 +168,9 @@ askWrapper(){
                 result=${?}
         if [ ${result} == 0 ]; then
             installServer='true'
-            echo -e "\nGUI will be installed.\n"
+            echo -e "\nServer module will be installed.\n"
         elif [ ${result} == 1 ]; then
-            echo -e "\nNo GUI.\n"
+            echo -e "\nClient device.\n"
         fi
     ;;
     "confirmSettings")
@@ -214,6 +215,7 @@ askWrapper(){
             "autoupdate"
             "localSpeech"
             "gui"
+            "server"
             "confirmSettings"
             )
         fi
