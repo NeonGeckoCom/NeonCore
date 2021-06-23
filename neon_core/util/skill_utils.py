@@ -44,12 +44,8 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         set_github_token(config["neon_token"])
     for url in skills_to_install:
         try:
-            skill = osm.skill_entry_from_url(url)
-            # TODO: osm needs to populate authorname, below is a tempfix DM
-            skill._data["authorname"] = skill._data.get("authorname") or "neon"
-            LOG.info(skill.skill_name)
-            skill.install(skill_dir)
-            LOG.info(f"Installed {skill.skill_name} to {skill_dir}")
+            osm.install_skill_from_url(url, skill_dir)
+            LOG.info(f"Installed {url} to {skill_dir}")
         except Exception as e:
             LOG.error(e)
     if token_set:
