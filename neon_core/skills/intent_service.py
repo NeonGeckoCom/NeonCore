@@ -65,7 +65,10 @@ class NeonIntentService(IntentService):
         self.parser_service = TextParsersService(self.bus)
         self.parser_service.start()
 
-        self.transcript_service = Transcribe()
+        if Transcribe:
+            self.transcript_service = Transcribe()
+        else:
+            self.transcript_service = None
 
     def _setup_converse_handlers(self):
         self.bus.on('skill.converse.error', self.handle_converse_error)
