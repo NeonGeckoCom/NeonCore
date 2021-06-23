@@ -23,11 +23,11 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from ovos_skills_manager.session import SESSION as requests
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
 # from neon_core.configuration import Configuration
 from neon_core.messagebus import get_messagebus
+from neon_core.util.skill_utils import get_remote_entries
 from mycroft.skills.event_scheduler import EventSchedulerInterface
 from mycroft.util import connected
 from mycroft.util.log import LOG
@@ -187,17 +187,14 @@ class SkillsStore:
     def get_remote_entries(self, url):
         """ parse url and return a list of SkillEntry,
          expects 1 skill per line, can be a skill_id or url"""
+        authenticated = False
         if repo_is_neon(url):
             self.authenticate_neon()
-            r = requests.get(url)
+            authenticated = True
+        skills_list = get_remote_entries(url)
+        if authenticated:
             self.deauthenticate_neon()
-        else:
-            r = requests.get(url)
-        if r.status_code == 200:
-            return [s for s in r.text.split("\n") if s.strip()]
-        else:
-            LOG.error(f"{url} request failed with code: {r.status_code}")
-        return []
+        return skills_list
 
     def _parse_config_entry(self, entry):
         """
