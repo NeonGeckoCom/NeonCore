@@ -41,9 +41,6 @@ from typing.io import IO
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
-run_log = open(os.path.join(LOG_DIR, "start.log"), "a+")
-sys.stdout = run_log
-
 LOG_FILES = {}
 PROCESSES = {}
 STOP_MODULES = Event()
@@ -92,9 +89,15 @@ def _get_log_file(process_name):
 
 def _start_process(name, logfile: IO = None):
     # TODO: As discussed in https://github.com/NeonJarbas/NeonCore/pull/76 this should be handled differently DM
-    logfile = logfile or _get_log_file(name)
-    proc = Popen(name, stdout=logfile, stderr=STDOUT)
-    PROCESSES[repr(name)] = proc
+    try:
+        logfile = logfile or _get_log_file(name)
+        proc = Popen(name, stdout=logfile, stderr=STDOUT)
+        PROCESSES[repr(name)] = proc
+        return True
+    except Exception as e:
+        LOG.error(f"Failed to start: {name}")
+        LOG.error(e)
+        return False
 
 
 def _stop_process(process):
@@ -142,21 +145,19 @@ def start_neon():
 
     _stop_all_core_processes()
     _cycle_logs()
-    try:
-        _start_process(["python3", "-m", "mycroft.messagebus.service"])
-        _start_process("neon_speech_client")
-        _start_process("neon_audio_client")
-        _start_process(["python3", "-m", "neon_core.skills"])
-        _start_process("neon_transcripts_controller")
-        if get_neon_device_type() == "server":
-            _start_process("neon_core_server")
-        else:
-            _start_process("neon_enclosure_client")
-            _start_process("neon_core_client")
-            _start_process("mycroft-gui-app")
-    except Exception as e:
-        LOG.error(e)
-        STOP_MODULES.set()
+
+    _start_process(["python3", "-m", "neon_core.messagebus.service"]) or STOP_MODULES.set()
+    _start_process("neon_speech_client") or STOP_MODULES.set()
+    _start_process("neon_audio_client") or STOP_MODULES.set()
+    _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
+    _start_process("neon_transcripts_controller")
+    if get_neon_device_type() == "server":
+        _start_process("neon_core_server")
+    else:
+        _start_process("neon_enclosure_client")
+        _start_process("neon_core_client")
+        _start_process("mycroft-gui-app")
+
     try:
         STOP_MODULES.wait()
     except KeyboardInterrupt:
@@ -203,4 +204,6 @@ def main():
 
 
 if __name__ == "__main__":
+    run_log = open(os.path.join(LOG_DIR, "start.log"), "a+")
+    sys.stdout = run_log
     main()
