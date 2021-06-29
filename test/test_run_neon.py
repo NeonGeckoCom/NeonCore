@@ -105,14 +105,15 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(resp, dict)
         self.assertEqual(resp.get("sentence"), text)
 
-    def test_enclosure_module(self):
-        resp = self.bus.wait_for_response(Message("mycroft.volume.get"))
-        self.assertIsInstance(resp, Message)
-        vol = resp.data.get("percent")
-        mute = resp.data.get("muted")
-
-        self.assertIsInstance(vol, float)
-        self.assertIsInstance(mute, bool)
+    # TODO: Define some generic enclosure events to test
+    # def test_enclosure_module(self):
+    #     resp = self.bus.wait_for_response(Message("mycroft.volume.get"))
+    #     self.assertIsInstance(resp, Message)
+    #     vol = resp.data.get("percent")
+    #     mute = resp.data.get("muted")
+    #
+    #     self.assertIsInstance(vol, float)
+    #     self.assertIsInstance(mute, bool)
 
     # TODO: Implement transcribe tests when transcribe module is updated
     # def test_transcribe_module(self):
