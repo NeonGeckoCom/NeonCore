@@ -44,7 +44,7 @@ SKILL_DIR = os.path.join(os.path.dirname(__file__), "test_skills")
 SKILL_CONFIG = {
     "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/neon-skills-submodules/dev/.utilities/"
                       "DEFAULT-SKILLS-DEV",
-    "neon_token": "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",  # os.environ.get("neon_token"),
+    "neon_token": os.environ.get("neon_token"),
     "directory": SKILL_DIR
 }
 
