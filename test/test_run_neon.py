@@ -69,7 +69,6 @@ class TestRunNeon(unittest.TestCase):
         while not self.bus.started_running:
             sleep(1)
 
-    @pytest.mark.timeout(60)
     def test_messagebus_connection(self):
         from mycroft_bus_client import MessageBusClient
         bus = MessageBusClient()
@@ -79,7 +78,6 @@ class TestRunNeon(unittest.TestCase):
         self.assertTrue(bus.connected_event.is_set())
         bus.close()
 
-    @pytest.mark.timeout(60)
     def test_speech_module(self):
         context = {"client": "tester",
                    "ident": str(round(time())),
@@ -92,7 +90,6 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(stt_resp.data.get("transcripts"), list)
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
-    @pytest.mark.timeout(60)
     def test_audio_module(self):
         text = "This is a test"
         context = {"client": "tester",
@@ -108,7 +105,6 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(resp, dict)
         self.assertEqual(resp.get("sentence"), text)
 
-    @pytest.mark.timeout(60)
     def test_enclosure_module(self):
         resp = self.bus.wait_for_response(Message("mycroft.volume.get"))
         self.assertIsInstance(resp, Message)
@@ -119,21 +115,18 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(mute, bool)
 
     # TODO: Implement transcribe tests when transcribe module is updated
-    # @pytest.mark.timeout(60)
     # def test_transcribe_module(self):
     #     resp = self.bus.wait_for_response(Message("get_transcripts"))
     #     self.assertIsInstance(resp, Message)
     #     matches = resp.data.get("transcripts")
     #     self.assertIsInstance(matches, list)
 
-    @pytest.mark.timeout(60)
     def test_client_module(self):
         resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
         self.assertIsInstance(resp, Message)
         data = resp.data
         self.assertIsInstance(data["success"], bool)
 
-    @pytest.mark.timeout(60)
     def test_skills_module(self):
         response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
         self.assertIsInstance(response, Message)
