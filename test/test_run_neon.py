@@ -46,7 +46,7 @@ class TestRunNeon(unittest.TestCase):
         cls.process.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
-        sleep(30)  # TODO: Better method to wait for process startup DM
+        sleep(60)  # TODO: Better method to wait for process startup DM
 
     @classmethod
     def tearDownClass(cls) -> None:
