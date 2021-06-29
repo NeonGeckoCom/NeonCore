@@ -101,7 +101,6 @@ pip install --upgrade pip~=21.1
 pip install wheel
 pip install "${pipStr}"
 
-pip install --no-deps --force-reinstall git+https://github.com/NeonDaniel/neon-skill-utils@FIX_SetupDefaultLogsDir
 neon-config-import
 
 exit 0

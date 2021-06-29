@@ -30,6 +30,7 @@ from neon_utils.configuration_utils import get_neon_local_config
 class TestSetupDevLocal(unittest.TestCase):
     def test_config_from_setup(self):
         local_config = get_neon_local_config()
+        self.assertEqual(local_config["devVars"]["devType"], "linux")
         self.assertTrue(local_config["prefFlags"]["devMode"])
         self.assertEqual(local_config["stt"]["module"], "deepspeech_stream_local")
         self.assertEqual(local_config["tts"]["module"], "ovos_tts_mimic")
