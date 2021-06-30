@@ -1,0 +1,26 @@
+# This workflow will run unit tests
+
+name: Test Utilities
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  util_tests:
+    strategy:
+      matrix:
+        python-version: [ 3.6, 3.8 ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Test Skill Utils
+        run: |
+          export neon_token=${NEON_TOKEN}
+          pytest test/test_skill_utils.py
+        env:
+          NEON_TOKEN: ${{secrets.neon_token}}
