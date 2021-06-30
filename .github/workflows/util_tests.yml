@@ -18,9 +18,14 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          python test/install_requirements.py requirements.txt
+          python test/install_requirements.py test.txt
+        env:
+          GITHUB_TOKEN: ${{secrets.neon_token}}
       - name: Test Skill Utils
         run: |
-          export neon_token=${NEON_TOKEN}
           pytest test/test_skill_utils.py
         env:
-          NEON_TOKEN: ${{secrets.neon_token}}
+          GITHUB_TOKEN: ${{secrets.neon_token}}
