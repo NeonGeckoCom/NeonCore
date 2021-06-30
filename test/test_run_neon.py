@@ -56,7 +56,7 @@ class TestSetupFirstRun(unittest.TestCase):
         try:
             stop = Process(target=stop_neon, daemon=False)
             stop.start()
-            stop.join(10)
+            stop.join(30)
             cls.process.join(5)
             stop.kill()
             cls.process.kill()
