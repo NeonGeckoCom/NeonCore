@@ -48,8 +48,9 @@ class TestSetupRemote(unittest.TestCase):
 
     def test_installed_skills(self):
         local_config = get_neon_local_config()
-        self.assertTrue(os.path.isdir(local_config["dirVars"]["skillsDir"]))
-        self.assertGreater(len(os.listdir(local_config["dirVars"]["skillsDir"])), 0)
+        skill_dir = os.path.expanduser(local_config["dirVars"]["skillsDir"])
+        self.assertTrue(os.path.isdir(skill_dir))
+        self.assertGreater(len(os.listdir(skill_dir)), 0)
 
 
 if __name__ == '__main__':
