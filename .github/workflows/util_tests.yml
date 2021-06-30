@@ -20,8 +20,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
         run: |
-          pip install -r requirements/test.txt
-          pip install ovos_skills_manager
+          pip install -r requirements/test_requirements.txt
+        env:
+          GITHUB_TOKEN: ${{secrets.neon_token}}
       - name: Test Skill Utils
         run: |
           pytest test/test_skill_utils.py
