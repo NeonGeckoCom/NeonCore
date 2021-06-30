@@ -20,6 +20,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
         run: |
+          sudo apt install -y gcc libfann-dev
           pip install -r requirements/test_requirements.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
