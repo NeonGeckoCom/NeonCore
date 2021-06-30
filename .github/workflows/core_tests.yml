@@ -5,6 +5,7 @@ on:
   push:
   workflow_dispatch:
 
+# TODO: Run tests here for everything in NeonCore
 jobs:
   util_tests:
     strategy:
