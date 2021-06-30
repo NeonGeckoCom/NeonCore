@@ -23,6 +23,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import unittest
 from neon_utils.configuration_utils import get_neon_local_config
 
@@ -30,19 +31,26 @@ from neon_utils.configuration_utils import get_neon_local_config
 class TestSetupDevLocal(unittest.TestCase):
     def test_config_from_setup(self):
         local_config = get_neon_local_config()
+        self.assertEqual(local_config["devVars"]["devType"], "linux")
         self.assertTrue(local_config["prefFlags"]["devMode"])
         self.assertEqual(local_config["stt"]["module"], "deepspeech_stream_local")
-        self.assertEqual(local_config["tts"]["module"], "mozilla_remote")
+        self.assertEqual(local_config["tts"]["module"], "ovos_tts_mimic")
         self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
-        # import ovos-tts-plugin-mimic
+        import ovos_tts_plugin_mimic
         import neon_stt_plugin_deepspeech_stream_local
         import mycroft
         import neon_cli
         import neon_core_client
         with self.assertRaises(ImportError):
             import neon_core_server
+
+    def test_installed_skills(self):
+        local_config = get_neon_local_config()
+        skill_dir = os.path.expanduser(local_config["dirVars"]["skillsDir"])
+        self.assertTrue(os.path.isdir(skill_dir))
+        self.assertGreater(len(os.listdir(skill_dir)), 0)
 
 
 if __name__ == '__main__':

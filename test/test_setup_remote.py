@@ -23,6 +23,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import unittest
 from neon_utils.configuration_utils import get_neon_local_config
 
@@ -30,9 +31,10 @@ from neon_utils.configuration_utils import get_neon_local_config
 class TestSetupRemote(unittest.TestCase):
     def test_config_from_setup(self):
         local_config = get_neon_local_config()
+        self.assertEqual(local_config["devVars"]["devType"], "linux")
         self.assertFalse(local_config["prefFlags"]["devMode"])
         self.assertEqual(local_config["stt"]["module"], "google_cloud_streaming")
-        self.assertEqual(local_config["tts"]["module"], "polly")
+        self.assertEqual(local_config["tts"]["module"], "amazon")
         self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
@@ -43,6 +45,12 @@ class TestSetupRemote(unittest.TestCase):
         with self.assertRaises(ImportError):
             import neon_test_utils
             import neon_core_server
+
+    def test_installed_skills(self):
+        local_config = get_neon_local_config()
+        skill_dir = os.path.expanduser(local_config["dirVars"]["skillsDir"])
+        self.assertTrue(os.path.isdir(skill_dir))
+        self.assertGreater(len(os.listdir(skill_dir)), 0)
 
 
 if __name__ == '__main__':

@@ -38,11 +38,10 @@ export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 
 export sttModule="deepspeech_stream_local"
-export ttsModule="mozilla_remote"
+export ttsModule="ovos_tts_mimic"
 
 localDeps="true"
 installGui="false"
-installMimic="false"
 options=()
 options+=("test")
 if [ "${localDeps}" == "true" ]; then
@@ -79,7 +78,13 @@ if [ -z "${VIRTUAL_ENV}" ]; then
 fi
 
 ## Actual Installation bits
-sudo apt install -y python3-dev python3-venv swig libssl-dev libfann-dev portaudio19-dev git
+# Add Mimic apt repository
+sudo apt install -y curl
+curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
+sudo apt-get update
+
+# Install system dependencies
+sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
 
 # Do GUI install
 if [ "${installGui}" == "true" ]; then
@@ -91,19 +96,14 @@ if [ "${installGui}" == "true" ]; then
   rm -rf mycroft-gui
 fi
 
-# Do Mimic Install
-if [ "${installMimic}" == "true" ]; then
-  curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
-  sudo apt-get update
-  sudo apt-get install -y mimic
-fi
-
 echo "${GITHUB_TOKEN}">~/token.txt
 pip install --upgrade pip~=21.1
 pip install wheel
 pip install "${pipStr}"
 
-pip install --no-deps --force-reinstall git+https://github.com/NeonDaniel/neon-skill-utils@FIX_SetupDefaultLogsDir
 neon-config-import
+
+# Install Default Skills
+neon-install-default-skills
 
 exit 0

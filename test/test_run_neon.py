@@ -23,82 +23,118 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
+import os.path
 import sys
 import unittest
+import pytest
 
-from multiprocessing import Process
 from time import time, sleep
+from multiprocessing import Process
+from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
-from neon_speech.__main__ import main as neon_speech_main
-from neon_audio.__main__ import main as neon_audio_main
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.messagebus.service.__main__ import main as messagebus_service
-
+from neon_core.run_neon import start_neon, stop_neon
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 
 
-# TODO: Depreciate this test; covered in test_run_neon
-class TestModules(unittest.TestCase):
-    bus_thread = None
-    speech_thread = None
-    audio_thread = None
-
+class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.bus_thread = Process(target=messagebus_service, daemon=False)
-        cls.speech_thread = Process(target=neon_speech_main, daemon=False)
-        cls.audio_thread = Process(target=neon_audio_main, daemon=False)
-        cls.bus_thread.start()
-        cls.speech_thread.start()
-        cls.audio_thread.start()
-        sleep(60)  # TODO: This shouldn't be necessary? DM
+        cls.process = Process(target=start_neon, daemon=False)
+        cls.process.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
+        sleep(60)  # TODO: Better method to wait for process startup DM
 
     @classmethod
     def tearDownClass(cls) -> None:
-        cls.bus.close()
-        cls.bus_thread.terminate()
-        cls.speech_thread.terminate()
-        cls.audio_thread.terminate()
+        try:
+            cls.bus.emit(Message("neon.shutdown"))
+            cls.bus.close()
+            cls.process.join(30)
+            if cls.process.is_alive():
+                stop = Process(target=stop_neon, daemon=False)
+                stop.start()
+                stop.join(60)
+                cls.process.join(15)
+            if cls.process.is_alive:
+                raise ChildProcessError("Process Not Killed!")
+        except Exception as e:
+            LOG.error(e)
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.bus.connected_event.wait(30)
         while not self.bus.started_running:
             sleep(1)
 
-    def test_get_stt_valid_file(self):
-        self.assertTrue(self.speech_thread.is_alive())
+    def test_messagebus_connection(self):
+        from mycroft_bus_client import MessageBusClient
+        bus = MessageBusClient()
+        bus.run_in_thread()
+        self.assertTrue(bus.started_running)
+        bus.connected_event.wait(10)
+        self.assertTrue(bus.connected_event.is_set())
+        bus.close()
+
+    def test_speech_module(self):
         context = {"client": "tester",
-                   "ident": "12345",
+                   "ident": str(round(time())),
                    "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.get_stt", {"audio_file": os.path.join(AUDIO_FILE_PATH,
-                                                                                                  "stop.wav")},
-                                                      context), context["ident"])
+        stt_resp = self.bus.wait_for_response(Message("neon.get_stt",
+                                                 {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
+                                                 context), context["ident"])
         self.assertEqual(stt_resp.context, context)
         self.assertIsInstance(stt_resp.data.get("parser_data"), dict)
         self.assertIsInstance(stt_resp.data.get("transcripts"), list)
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
-    def test_get_tts_valid_default(self):
-        self.assertTrue(self.audio_thread.is_alive())
+    def test_audio_module(self):
         text = "This is a test"
         context = {"client": "tester",
                    "ident": str(time()),
                    "user": "TestRunner"}
         stt_resp = self.bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
-                                              context["ident"], timeout=60)
+                                         context["ident"], timeout=60)
         self.assertEqual(stt_resp.context, context)
         responses = stt_resp.data
-        self.assertIsInstance(responses, dict, responses)
-        print(responses)
+        self.assertIsInstance(responses, dict)
         self.assertEqual(len(responses), 1)
         resp = list(responses.values())[0]
         self.assertIsInstance(resp, dict)
         self.assertEqual(resp.get("sentence"), text)
+
+    # TODO: Define some generic enclosure events to test
+    # def test_enclosure_module(self):
+    #     resp = self.bus.wait_for_response(Message("mycroft.volume.get"))
+    #     self.assertIsInstance(resp, Message)
+    #     vol = resp.data.get("percent")
+    #     mute = resp.data.get("muted")
+    #
+    #     self.assertIsInstance(vol, float)
+    #     self.assertIsInstance(mute, bool)
+
+    # TODO: Implement transcribe tests when transcribe module is updated
+    # def test_transcribe_module(self):
+    #     resp = self.bus.wait_for_response(Message("get_transcripts"))
+    #     self.assertIsInstance(resp, Message)
+    #     matches = resp.data.get("transcripts")
+    #     self.assertIsInstance(matches, list)
+
+    def test_client_module(self):
+        resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
+        self.assertIsInstance(resp, Message)
+        data = resp.data
+        self.assertIsInstance(data["success"], bool)
+
+    def test_skills_module(self):
+        response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
+        self.assertIsInstance(response, Message)
+        loaded_skills = response.data
+        self.assertIsInstance(loaded_skills, dict)
+
+    # TODO: Test user utterance -> response
 
 
 if __name__ == '__main__':
