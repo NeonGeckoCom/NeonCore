@@ -40,6 +40,7 @@ from neon_core.messagebus.service.__main__ import main as messagebus_service
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 
 
+# TODO: Depreciate this test; covered in test_run_neon
 class TestModules(unittest.TestCase):
     bus_thread = None
     speech_thread = None

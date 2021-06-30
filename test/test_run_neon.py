@@ -134,11 +134,6 @@ class TestRunNeon(unittest.TestCase):
         loaded_skills = response.data
         self.assertIsInstance(loaded_skills, dict)
 
-    # def test_skills_module(self):
-    #     bus = MessageBusClient()
-    #     bus.run_in_thread()
-    #     bus.connected_event.wait(10)
-    # TODO: Test default skills installation
     # TODO: Test user utterance -> response
 
 

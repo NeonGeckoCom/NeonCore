@@ -23,6 +23,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import unittest
 from neon_utils.configuration_utils import get_neon_local_config
 
@@ -44,6 +45,11 @@ class TestSetupDevLocal(unittest.TestCase):
         import neon_core_client
         with self.assertRaises(ImportError):
             import neon_core_server
+
+    def test_installed_skills(self):
+        local_config = get_neon_local_config()
+        self.assertTrue(os.path.isdir(local_config["dirVars"]["skillsDir"]))
+        self.assertGreater(len(os.listdir(local_config["dirVars"]["skillsDir"])), 0)
 
 
 if __name__ == '__main__':
