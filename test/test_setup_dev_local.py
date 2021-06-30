@@ -23,62 +23,27 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os.path
-import sys
 import unittest
-import pytest
-
-from multiprocessing import Process
-from neon_utils.logger import LOG
-from mycroft_bus_client import MessageBusClient, Message
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.run_neon import start_neon, stop_neon
+from neon_utils.configuration_utils import get_neon_local_config
 
 
-class TestSetupFirstRun(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.process = Process(target=start_neon, daemon=False)
-        cls.process.start()
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(60)
+class TestSetupDevLocal(unittest.TestCase):
+    def test_config_from_setup(self):
+        local_config = get_neon_local_config()
+        self.assertEqual(local_config["devVars"]["devType"], "linux")
+        self.assertTrue(local_config["prefFlags"]["devMode"])
+        self.assertEqual(local_config["stt"]["module"], "deepspeech_stream_local")
+        self.assertEqual(local_config["tts"]["module"], "ovos_tts_mimic")
+        self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        try:
-            stop = Process(target=stop_neon, daemon=False)
-            stop.start()
-            stop.join(10)
-            cls.process.join(5)
-            stop.kill()
-            cls.process.kill()
-        except Exception as e:
-            LOG.error(e)
-
-    @pytest.mark.timeout(60)
-    def test_messagebus_connection(self):
-        from mycroft_bus_client import MessageBusClient
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        self.assertTrue(bus.started_running)
-        bus.connected_event.wait(10)
-        self.assertTrue(bus.connected_event.is_set())
-
-    @pytest.mark.timeout(60)
-    def test_skills_list(self):
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(10)
-        response = bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
-        self.assertIsInstance(response, Message)
-        loaded_skills = response.data
-        self.assertIsInstance(loaded_skills, dict)
-
-    # TODO: Trivial test of speech, audio, enclosure modules
-    # TODO: Test default skills installation
-    # TODO: Test user utterance -> response
+    def test_installed_packages(self):
+        import ovos-tts-plugin-mimic
+        import neon_stt_plugin_deepspeech_stream_local
+        import mycroft
+        import neon_cli
+        import neon_core_client
+        with self.assertRaises(ImportError):
+            import neon_core_server
 
 
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ import pytest
 
 from time import time, sleep
 from multiprocessing import Process
-from neon_utils.logger import LOG
+from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -39,31 +39,36 @@ from neon_core.run_neon import start_neon, stop_neon
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 
 
-class TestSetupFirstRun(unittest.TestCase):
+class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(60)
-        if not bus.connected_event.is_set():
-            raise ConnectionError
-        sleep(5)
+        cls.bus = MessageBusClient()
+        cls.bus.run_in_thread()
+        sleep(60)  # TODO: Better method to wait for process startup DM
 
     @classmethod
     def tearDownClass(cls) -> None:
         try:
-            stop = Process(target=stop_neon, daemon=False)
-            stop.start()
-            stop.join(30)
-            cls.process.join(5)
-            stop.kill()
-            cls.process.kill()
+            cls.bus.emit(Message("neon.shutdown"))
+            cls.bus.close()
+            cls.process.join(30)
+            if cls.process.is_alive():
+                stop = Process(target=stop_neon, daemon=False)
+                stop.start()
+                stop.join(60)
+                cls.process.join(15)
+            if cls.process.is_alive:
+                raise ChildProcessError("Process Not Killed!")
         except Exception as e:
             LOG.error(e)
 
-    @pytest.mark.timeout(60)
+    def setUp(self) -> None:
+        self.bus.connected_event.wait(30)
+        while not self.bus.started_running:
+            sleep(1)
+
     def test_messagebus_connection(self):
         from mycroft_bus_client import MessageBusClient
         bus = MessageBusClient()
@@ -71,26 +76,13 @@ class TestSetupFirstRun(unittest.TestCase):
         self.assertTrue(bus.started_running)
         bus.connected_event.wait(10)
         self.assertTrue(bus.connected_event.is_set())
+        bus.close()
 
-    @pytest.mark.timeout(60)
-    def test_skills_list(self):
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(10)
-        response = bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
-        self.assertIsInstance(response, Message)
-        loaded_skills = response.data
-        self.assertIsInstance(loaded_skills, dict)
-
-    @pytest.mark.timeout(60)
     def test_speech_module(self):
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(10)
         context = {"client": "tester",
                    "ident": str(round(time())),
                    "user": "TestRunner"}
-        stt_resp = bus.wait_for_response(Message("neon.get_stt",
+        stt_resp = self.bus.wait_for_response(Message("neon.get_stt",
                                                  {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
                                                  context), context["ident"])
         self.assertEqual(stt_resp.context, context)
@@ -99,14 +91,11 @@ class TestSetupFirstRun(unittest.TestCase):
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
     def test_audio_module(self):
-        bus = MessageBusClient()
-        bus.run_in_thread()
-        bus.connected_event.wait(10)
         text = "This is a test"
         context = {"client": "tester",
                    "ident": str(time()),
                    "user": "TestRunner"}
-        stt_resp = bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
+        stt_resp = self.bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
                                          context["ident"], timeout=60)
         self.assertEqual(stt_resp.context, context)
         responses = stt_resp.data
@@ -116,11 +105,39 @@ class TestSetupFirstRun(unittest.TestCase):
         self.assertIsInstance(resp, dict)
         self.assertEqual(resp.get("sentence"), text)
 
+    # TODO: Define some generic enclosure events to test
+    # def test_enclosure_module(self):
+    #     resp = self.bus.wait_for_response(Message("mycroft.volume.get"))
+    #     self.assertIsInstance(resp, Message)
+    #     vol = resp.data.get("percent")
+    #     mute = resp.data.get("muted")
+    #
+    #     self.assertIsInstance(vol, float)
+    #     self.assertIsInstance(mute, bool)
+
+    # TODO: Implement transcribe tests when transcribe module is updated
+    # def test_transcribe_module(self):
+    #     resp = self.bus.wait_for_response(Message("get_transcripts"))
+    #     self.assertIsInstance(resp, Message)
+    #     matches = resp.data.get("transcripts")
+    #     self.assertIsInstance(matches, list)
+
+    def test_client_module(self):
+        resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
+        self.assertIsInstance(resp, Message)
+        data = resp.data
+        self.assertIsInstance(data["success"], bool)
+
+    def test_skills_module(self):
+        response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
+        self.assertIsInstance(response, Message)
+        loaded_skills = response.data
+        self.assertIsInstance(loaded_skills, dict)
+
     # def test_skills_module(self):
     #     bus = MessageBusClient()
     #     bus.run_in_thread()
     #     bus.connected_event.wait(10)
-    # TODO: Trivial test of enclosure module
     # TODO: Test default skills installation
     # TODO: Test user utterance -> response
 
