@@ -377,6 +377,9 @@ exit 0
     sudo chmod ugo+x start_neon.sh
     sudo chmod ugo+x stop_neon.sh
 
+    # Install Default Skills
+    neon-install-default-skills
+
     # Setup Completed
     echo "Setup Complete"
     exit 0
