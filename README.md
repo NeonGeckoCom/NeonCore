@@ -248,7 +248,7 @@ be recommended here.
 1. Make sure you have your `accessKeys.csv`, `google.json`, and `wolfram.txt` files here as well, otherwise you will be 
    prompted for credentials during setup  
 1. Open a terminal in your home directory (`ctrl`+`alt`+`t`)  
-1. Type in `bash setup.sh` and press `Enter`  
+1. Type in `bash setup.sh ${GITHUB_TOKEN}` and press `Enter` (where `${GITHUB_TOKEN}` is your Github token)
    >![NeonDev](https://0000.us/klatchat/app/files/neon_images/neon_setup_screens/Neon2.png)  
 1. Type `n` to Install in User Mode (Not Developer Mode)
 1. Type `n` to Input Custom settings
