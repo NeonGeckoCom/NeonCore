@@ -1,5 +1,5 @@
-neon-client @ git+https://github.com/NeonGeckoCom/neon-core-client
-neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_controller
+neon-client @ git+https://github.com/NeonGeckoCom/neon-core-client@0.0.4
+neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_controller@0.0.1
 
 # wake word plugins
 chatterbox-wake-word-plugin-dummy
