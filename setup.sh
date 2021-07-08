@@ -241,10 +241,24 @@ getOptions(){
 }
 
 doInstall(){
+    # Add piwheels if pi
+    if  find . | grep -q "x86" <<< "$(lscpu)" ; then
+        arm=false
+    else
+        arm=true
+        echo -e "[global]\nextra-index-url=https://www.piwheels.org/simple\n">pip.conf
+        sudo my pip.conf /etc
+    fi
+
   # Build optional dependency string for pip installation
     options=()
     if [ "${localDeps}" == "true" ]; then
-      options+=("local")
+      if [ "${arm}" == "true" ]; then
+        echo "Local Dependencies not supported on ARM; remote STT/TTS will be used."
+        options+=("remote")
+      else
+        options+=("local")
+      fi
     else
       options+=("remote")
     fi
@@ -275,7 +289,6 @@ doInstall(){
 
     # Install system dependencies
     sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
-    # TODO: curl here to patch news skill; should be moved to skill deps
 
     # Make venv if not in one
     if [ -z "${VIRTUAL_ENV}" ]; then
