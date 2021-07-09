@@ -36,7 +36,7 @@ from mycroft.lock import Lock
 from mycroft.configuration.locale import setup_locale
 from mycroft.util.log import LOG
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
-from mycroft.configuration.locations import DEFAULT_CONFIG
+from mycroft.configuration.locations import USER_CONFIG
 from mycroft.skills.api import SkillApi
 from mycroft.skills.core import FallbackSkill
 from mycroft.skills.event_scheduler import EventScheduler
@@ -72,7 +72,7 @@ def main(alive_hook=on_alive, started_hook=on_started, ready_hook=on_ready,
     Lock('skills')
 
     # Write Mycroft-compatible config
-    write_mycroft_compatible_config(DEFAULT_CONFIG)
+    write_mycroft_compatible_config(USER_CONFIG)
     config = Configuration.get()
 
     # Set the active lang and tz to match configuration
