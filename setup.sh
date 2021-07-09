@@ -48,6 +48,8 @@ export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 export sttModule="google_cloud_streaming"
 export ttsModule="amazon"
+export translateModule="googletranslate_plug"
+export detectionModule="googletranslate_detection_plug"
 
 installGui=false
 
@@ -147,6 +149,8 @@ askWrapper(){
             localDeps='true'
             export sttModule="deepspeech_stream_local"
             export ttsModule="ovos_tts_mimic"
+            export translateModule="libretranslate_plug"
+            export detectionModule="libretranslate_detection_plug"
             echo -e "\nDeepspeech and Mimic will be used.\n"
         elif  [ ${result} == 1 ]; then
             localDeps='false'

@@ -1,2 +1,3 @@
 neon-stt-plugin-deepspeech_stream_local @ git+https://github.com/NeonGeckoCom/neon-stt-plugin-deepspeech_stream_local
 ovos-tts-plugin-mimic @ git+https://github.com/NeonGeckoCom/neon-tts-plugin-mimic
+libretranslate_neon_plugin

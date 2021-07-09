@@ -27,6 +27,7 @@ from ovos_plugin_manager.language import load_lang_detect_plugin, \
     load_tx_plugin
 import os
 
+from neon_utils.log_utils import LOG
 from neon_utils.configuration_utils import get_neon_lang_config
 
 
@@ -68,17 +69,23 @@ class TranslatorFactory:
 
     @staticmethod
     def create(module=None):
-        # TODO: Get this from neon config
-        config = Configuration.get().get("language", {})
-        module = module or config.get("translation_module", "google")
-        if module not in DetectorFactory.CLASSES:
-            # plugin!
-            clazz = load_tx_plugin(module)
-        else:
-            clazz = TranslatorFactory.CLASSES.get(module)
+        config = get_neon_lang_config()
+        module = module or config.get("translation_module", "googletranslate_plug")
+        if module == "google":
+            module = "googletranslate_plug"
+        LOG.info(module)
+        try:
+            if module not in DetectorFactory.CLASSES:
+                # plugin!
+                clazz = load_tx_plugin(module)
+            else:
+                clazz = TranslatorFactory.CLASSES.get(module)
 
-        config["keys"] = get_private_keys()
-        return clazz(config)
+            config["keys"] = get_private_keys()
+            return clazz(config)
+        except Exception as e:
+            LOG.error(e)
+            return None
 
 
 class DetectorFactory:
@@ -87,13 +94,20 @@ class DetectorFactory:
     @staticmethod
     def create(module=None):
         config = get_neon_lang_config()
-        module = module or config.get("detection_module", "fastlang")
+        module = module or config.get("detection_module", "googletranslate_detection_plug")
+        if module == "google":
+            module = "googletranslate_detection_plug"
 
-        if module not in DetectorFactory.CLASSES:
-            # plugin!
-            clazz = load_lang_detect_plugin(module)
-        else:
-            clazz = DetectorFactory.CLASSES.get(module)
+        LOG.info(module)
+        try:
+            if module not in DetectorFactory.CLASSES:
+                # plugin!
+                clazz = load_lang_detect_plugin(module)
+            else:
+                clazz = DetectorFactory.CLASSES.get(module)
 
-        config["keys"] = get_private_keys()
-        return clazz(config)
+            config["keys"] = get_private_keys()
+            return clazz(config)
+        except Exception as e:
+            LOG.error(e)
+            return None

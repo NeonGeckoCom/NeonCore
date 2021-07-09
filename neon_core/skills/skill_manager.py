@@ -22,15 +22,17 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import json
 import os
-from glob import glob
 
-from mycroft.util.log import LOG
+from glob import glob
+from neon_core.skills.skill_store import SkillsStore
+from neon_utils.configuration_utils import get_neon_skills_config, get_mycroft_compatible_config
+from neon_utils.log_utils import LOG
+
 from mycroft.util import connected
 from mycroft.skills.skill_manager import SkillManager
-from neon_core.skills.skill_store import SkillsStore
-from neon_utils.configuration_utils import get_neon_skills_config
+from mycroft.configuration.locations import DEFAULT_CONFIG
 
 SKILL_MAIN_MODULE = '__init__.py'
 
@@ -38,6 +40,9 @@ SKILL_MAIN_MODULE = '__init__.py'
 class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
+        neon_config = get_mycroft_compatible_config()
+        with open(DEFAULT_CONFIG, "w") as f:
+            json.dump(neon_config, f)
         super().__init__(*args, **kwargs)
         self.skill_config = kwargs.get("config") or get_neon_skills_config()
         self.skill_downloader = SkillsStore(skills_dir=self.skill_config["directory"], config=self.skill_config,

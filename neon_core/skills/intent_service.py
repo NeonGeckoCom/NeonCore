@@ -38,7 +38,7 @@ from neon_utils.log_utils import LOG
 from neon_utils.configuration_utils import get_neon_device_type
 from ovos_utils.json_helper import merge_dict
 
-from mycroft.util.lang import set_default_lang
+from mycroft.configuration import setup_locale
 from mycroft.util.parse import normalize
 from mycroft.skills.intent_service import IntentService
 
@@ -58,7 +58,7 @@ class NeonIntentService(IntentService):
         self.config = Configuration.get().get('context', {})
         self.language_config = get_lang_config()
 
-        set_default_lang(self.language_config["internal"])
+        setup_locale(self.language_config["internal"])
 
         self._setup_converse_handlers()
 
@@ -89,7 +89,7 @@ class NeonIntentService(IntentService):
     def reset_converse(self, message):
         """Let skills know there was a problem with speech recognition"""
         lang = message.data.get('lang', "en-us")
-        set_default_lang(lang)
+        setup_locale(lang)
         for skill in copy(self.active_skills):
             self.do_converse([], skill[0], lang, message)
 

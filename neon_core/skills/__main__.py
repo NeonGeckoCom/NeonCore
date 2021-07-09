@@ -18,27 +18,29 @@ In this repo, you will not find an entry called mycroft-skills in the bin
 directory.  The executable gets added to the bin directory when installed
 (see setup.py)
 """
+import logging
 import time
-import mycroft.lock
+
 from neon_core.configuration import Configuration
+from neon_core.skills.skill_manager import NeonSkillManager
+from neon_core.skills.intent_service import NeonIntentService
+from neon_utils.configuration_utils import write_mycroft_compatible_config
+
 from mycroft.util import (
     connected,
     reset_sigint_handler,
     start_message_bus_client,
     wait_for_exit_signal
 )
-from mycroft.util.lang import set_default_lang
-from mycroft.util.time import set_default_tz
+from mycroft.lock import Lock
+from mycroft.configuration.locale import setup_locale
 from mycroft.util.log import LOG
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
-
+from mycroft.configuration.locations import DEFAULT_CONFIG
 from mycroft.skills.api import SkillApi
 from mycroft.skills.core import FallbackSkill
 from mycroft.skills.event_scheduler import EventScheduler
-from mycroft.skills.skill_manager import SkillManager
 from mycroft.skills.msm_wrapper import MsmException
-from neon_core.skills.skill_manager import NeonSkillManager
-from neon_core.skills.intent_service import NeonIntentService
 
 
 def on_started():
@@ -63,15 +65,18 @@ def on_stopping():
 
 def main(alive_hook=on_alive, started_hook=on_started, ready_hook=on_ready,
          error_hook=on_error, stopping_hook=on_stopping, watchdog=None):
+    logging.getLogger("botocore").setLevel(logging.WARNING)
+
     reset_sigint_handler()
     # Create PID file, prevent multiple instances of this service
-    mycroft.lock.Lock('skills')
-    config = Configuration.get()
-    # Set the active lang to match the configured one
-    set_default_lang(config.get('lang', 'en-us'))
+    Lock('skills')
 
-    # Set the default timezone to match the configured one
-    set_default_tz()
+    # Write Mycroft-compatible config
+    write_mycroft_compatible_config(DEFAULT_CONFIG)
+    config = Configuration.get()
+
+    # Set the active lang and tz to match configuration
+    setup_locale(config.get('lang', 'en-us'))
 
     # Connect this process to the Mycroft message bus
     bus = start_message_bus_client("SKILLS")
