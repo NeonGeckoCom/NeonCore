@@ -24,7 +24,7 @@ import time
 from neon_core.configuration import Configuration
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.skills.intent_service import NeonIntentService
-from neon_utils.configuration_utils import write_mycroft_compatible_config
+from neon_utils.configuration_utils import write_mycroft_compatible_config, get_neon_lang_config
 
 from mycroft.util import (
     connected,
@@ -73,10 +73,10 @@ def main(alive_hook=on_alive, started_hook=on_started, ready_hook=on_ready,
 
     # Write Mycroft-compatible config
     write_mycroft_compatible_config(USER_CONFIG)
-    config = Configuration.get()
 
     # Set the active lang and tz to match configuration
-    setup_locale(config.get('lang', 'en-us'))
+    lang_config = get_neon_lang_config()
+    setup_locale(lang_config["internal"])
 
     # Connect this process to the Mycroft message bus
     bus = start_message_bus_client("SKILLS")

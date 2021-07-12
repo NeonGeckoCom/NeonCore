@@ -73,7 +73,7 @@ class TranslatorFactory:
         module = module or config.get("translation_module", "googletranslate_plug")
         if module == "google":
             module = "googletranslate_plug"
-        LOG.info(module)
+        LOG.debug(f"requested translation module: {module}")
         try:
             if module not in DetectorFactory.CLASSES:
                 # plugin!
@@ -98,7 +98,7 @@ class DetectorFactory:
         if module == "google":
             module = "googletranslate_detection_plug"
 
-        LOG.info(module)
+        LOG.debug(f"requested detection module: {module}")
         try:
             if module not in DetectorFactory.CLASSES:
                 # plugin!
