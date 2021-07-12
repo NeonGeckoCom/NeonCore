@@ -3,8 +3,7 @@
 1. [Forking Git Source](#1-forking-git-source)  
 2. [Setting Up Service Accounts](#2-setting-up-service-accounts)  
    * [a. Google Cloud Speech](#a-google-cloud-speech-setup)  
-   * [b. Amazon Polly and Translate](#b-amazon-polly-and-translate-setup)  
-   * [c. Wolfram|Alpha](#c-wolframalpha-setup)  
+   * [b. Amazon Polly and Translate](#b-amazon-polly-and-translate-setup)
 3. [Setting Up Hardware](#3-setting-up-hardware)  
 4. [Installing Neon](#4-installing-neon)  
    * [a. Development Environment](#a-installing-neon-in-a-development-environment)  
@@ -149,27 +148,6 @@ setup without continuing, but Amazon and Wolfram|Alpha services are *highly* rec
 
 The Users menu lets you create new users and new access keys per user as you wish, as well as modify permissions.
 
-## c. Wolfram|Alpha Setup
-1. Go to: 
-    > http://developer.wolframalpha.com/portal/myapps/
-
-1. Sign in or register for a free account
-1. Click `'Get an AppID'` at the top right of the screen
-    >![Wolfram](https://0000.us/klatchat/app/files/neon_images/account_setup_screens/Wolfram1.png)
-
-
-1. Assign an `Application name` and `Description` and click `Get AppID`
-1. You will presented with a window listing your `AppID`
-    >![Wolfram](https://0000.us/klatchat/app/files/neon_images/account_setup_screens/Wolfram2.png)
-
-
-1. Copy your `AppID` into a file named `wolfram.txt` in the same directory as neonSetup.sh
-
-    > *Note*: You can access the AppID later at the same link; you may use this one AppID accross multiple installations of 
-    Neon or create multiple appIDs if you'd like to track queries by device or manage access for different applications 
-    separately.
-
-
 # 3. Setting Up Hardware
 Before continuing, make sure you have your hardware setup ready for installation. You will need the following:
 * A computer running up-to-date Ubuntu 20.04
@@ -231,17 +209,17 @@ Before starting here, make sure you have already completed
 
 
 All of the following options, such as autorun and automatic updates can be easily modified later using your voice,
-settings table, or configuration files.
+profile settings, or configuration files.
   
 ## Installing Neon in a Development Environment  
 
 1. Clone NeonCore from your forked repository into a local directory.
 1. Configure a virtual environment and install any desired requirements
-  >Recommended `requirements.txt`,`dev.txt`, `test.txt`, and `remote_speech_processing.txt`
+  >*Note*: `requirements.txt`,`dev.txt`, `test.txt`, and `remote_speech_processing.txt` are recommended for installation
   
 ## Installing Neon in a User/Deployment Environment  
-Installing in a User Environment is very similar to installing in a development environment, but different options will 
-be recommended here.  
+Installing in a User Environment differs from a developer environment; you will not be able to modify Neon Core if you 
+use this installation method.
   
 1. Take your `setup.sh` file and place it in your home directory  
     >![NeonDev](https://0000.us/klatchat/app/files/neon_images/neon_setup_screens/Neon1.png)  
@@ -353,7 +331,6 @@ making a change would be:
 1. Make any changes to the `core` or `skills`
 1. Test changes in the Developer Environment (Look for errors in logs, unexpected behaviour, etc)
 1. Run `Test Neon` to check that all skills and TTS/STT behave as expected
-1. Update `NGI/temp/*.version` to reflect new version (`YYYY-MM-DD.version`)
 1. Commit and Push changes to git
 1. Check for updates in User Environment
 1. Run complete tests using `Test Neon`
