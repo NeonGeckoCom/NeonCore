@@ -299,6 +299,7 @@ doInstall(){
       git clone https://github.com/mycroftai/mycroft-gui
       bash mycroft-gui/dev_setup.sh
       rm -rf mycroft-gui
+      sudo apt-get install libqt5multimedia5-plugins qml-module-qtmultimedia
     fi
 
     echo "${GITHUB_TOKEN}">~/token.txt
