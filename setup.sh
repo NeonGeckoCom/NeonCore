@@ -34,6 +34,19 @@ if [ "${USER}" == "root" ]; then
   fi
 fi
 
+# Check platform
+modelFile=/proc/device-tree/model
+
+# Determine if device is a Raspberry Pi
+if [ -f ${modelFile} ] && [ "$(grep "Raspberry Pi" "${modelFile}")" ]; then
+  raspberryPi="true"
+else
+  raspberryPi="false"
+fi
+export raspberryPi
+
+
+# Define installation directory
 installerDir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 if [ "${installerDir}" == "${HOME}" ]; then
   installerDir="${installerDir}/NeonAI"
@@ -182,7 +195,8 @@ askWrapper(){
         Install GUI            : ${installGui}
         STT Engine             : ${sttModule}
         TTS Engine             : ${ttsModule}
-        Server                 : ${installServer}"
+        Server                 : ${installServer}
+        Pi                     : ${raspberryPi}"
 
         askYesNo "Continue with these settings?"
         result=${?}
@@ -306,6 +320,9 @@ doInstall(){
 
     # Do GUI install
     if [ "${installGui}" == "true" ]; then
+      if [ "${raspberryPi}" == "true" ]; then
+        sudo apt install xorg
+      fi
       if [ -d mycroft-gui ]; then
         rm -rf mycroft-gui
       fi
@@ -349,7 +366,7 @@ start_script="#!/bin/bash
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 . \"${VIRTUAL_ENV}/bin/activate\"
-coproc neon-start 2>&1 >/dev/null
+coproc neon-start >/dev/null 2>&1
 exit 0
 "
 
@@ -403,6 +420,12 @@ touch "neon_setup.log"
 if [ -n "${1}" ]; then
   export GITHUB_TOKEN="${1}"
 fi
-# TODO: Exit if no Token? DM
+
+# Warn and exit if no github token is available for dependency gathering
+if [ -z "${GITHUB_TOKEN}" ]; then
+  echo "GITHUB_TOKEN not defined! cancelling setup."
+  exit 10
+fi
+
 getOptions
 doInstall | tee -a "neon_setup.log"
