@@ -403,10 +403,12 @@ exit 0
 "
 
     # Copy shortcut files
-    echo "${start_script}">start_neon.sh
-    echo "${stop_script}">stop_neon.sh
-    sudo chmod ugo+x start_neon.sh
-    sudo chmod ugo+x stop_neon.sh
+    if [ ${raspberryPi} == "false" ]; then
+      echo "${start_script}">start_neon.sh
+      echo "${stop_script}">stop_neon.sh
+      sudo chmod ugo+x start_neon.sh
+      sudo chmod ugo+x stop_neon.sh
+    fi
 
     # Install Default Skills
     neon-install-default-skills
