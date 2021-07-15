@@ -74,7 +74,8 @@ setup(
         "local": get_requirements("local_speech_processing.txt"),
         "remote": get_requirements("remote_speech_processing.txt"),
         "vision": get_requirements("vision.txt"),
-        "test": get_requirements("test.txt")
+        "test": get_requirements("test.txt"),
+        "pi": get_requirements("pi.txt")
     },
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*', 'res/text/*/*.voc', 'res/text/*/*.dialog',
