@@ -146,7 +146,7 @@ askWrapper(){
         if  [ ${result} == 0 ]; then
             localDeps='true'
             export sttModule="deepspeech_stream_local"
-            export ttsModule="ovos_tts_mimic"
+            export ttsModule="neon_tts_mimic"
             echo -e "\nDeepspeech and Mimic will be used.\n"
         elif  [ ${result} == 1 ]; then
             localDeps='false'
