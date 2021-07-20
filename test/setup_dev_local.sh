@@ -29,7 +29,7 @@ export GITHUB_TOKEN="${1}"
 
 installerDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 export installerDir
-
+sourceDir="$( cd "$( dirname "${installerDir}" )" && pwd )"
 # Preferences
 export devMode=true         # false will enable fullscreen gui, isolated directories, and other device management
 export autoStart=false      # enables neonAI to run at login of installUser
@@ -38,7 +38,7 @@ export devName=${HOSTNAME}  # device name used to identify uploads
 export installServer=false  # enables neonAI server module
 
 export sttModule="deepspeech_stream_local"
-export ttsModule="ovos_tts_mimic"
+export ttsModule="neon_tts_mimic"
 
 localDeps="true"
 installGui="false"
@@ -61,7 +61,6 @@ if [ "${devMode}" == "true" ]; then
 fi
 optStr=$(printf ",%s" "${options[@]}")
 optStr="[${optStr:1}]"
-pipStr="git+https://${GITHUB_TOKEN}@github.com/NeonGeckoCom/NeonCore#egg=neon_core${optStr}"
 
 # Create install directory if specified and doesn't exist
 if [ ! -d "${installerDir}" ]; then
@@ -99,7 +98,9 @@ fi
 echo "${GITHUB_TOKEN}">~/token.txt
 pip install --upgrade pip~=21.1
 pip install wheel
-pip install "${pipStr}"
+
+cd "${sourceDir}" || exit 10
+pip install ".${optStr}"
 
 neon-config-import
 
