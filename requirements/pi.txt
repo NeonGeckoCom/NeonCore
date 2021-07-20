@@ -2,4 +2,4 @@ neon-client @ git+https://github.com/NeonGeckoCom/neon-core-client
 neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_controller
 jarbas-wake-word-plugin-pocketsphinx
 neon-stt-plugin-google_cloud_streaming @ git+https://github.com/NeonGeckoCom/neon-stt-plugin-google_cloud_streaming
-ovos-tts-plugin-mimic @ git+https://github.com/NeonGeckoCom/neon-tts-plugin-mimic
+neon-tts-plugin-mimic @ git+https://github.com/NeonGeckoCom/neon-tts-plugin-mimic
