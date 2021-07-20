@@ -34,11 +34,11 @@ class TestSetupDevLocal(unittest.TestCase):
         self.assertEqual(local_config["devVars"]["devType"], "linux")
         self.assertTrue(local_config["prefFlags"]["devMode"])
         self.assertEqual(local_config["stt"]["module"], "deepspeech_stream_local")
-        self.assertEqual(local_config["tts"]["module"], "ovos_tts_mimic")
+        self.assertEqual(local_config["tts"]["module"], "neon_tts_mimic")
         self.assertIsInstance(local_config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
-        import ovos_tts_plugin_mimic
+        import neon_tts_plugin_mimic
         import neon_stt_plugin_deepspeech_stream_local
         import mycroft
         import neon_cli
