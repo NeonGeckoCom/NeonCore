@@ -95,10 +95,10 @@ class TestRunNeon(unittest.TestCase):
         context = {"client": "tester",
                    "ident": str(time()),
                    "user": "TestRunner"}
-        stt_resp = self.bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
-                                         context["ident"], timeout=60)
-        self.assertEqual(stt_resp.context, context)
-        responses = stt_resp.data
+        tts_resp = self.bus.wait_for_response(Message("neon.get_tts", {"text": text}, context),
+                                              context["ident"], timeout=60)
+        self.assertEqual(tts_resp.context, context)
+        responses = tts_resp.data
         self.assertIsInstance(responses, dict)
         self.assertEqual(len(responses), 1)
         resp = list(responses.values())[0]
