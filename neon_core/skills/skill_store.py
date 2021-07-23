@@ -166,7 +166,11 @@ class SkillsStore:
 
     def get_skill_entry(self, skill):
         if "http" in skill:
-            store_skill = self.osm.search_skills_by_url(skill)
+            if "/neongeckocom/" in skill.lower():
+                # TODO: This is just patching OSM updates DM
+                store_skill = None
+            else:
+                store_skill = self.osm.search_skills_by_url(skill)
             if not store_skill:
                 # skill is not in any appstore
                 if "/neon" in skill.lower() and "github" in skill:
