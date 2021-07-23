@@ -47,6 +47,7 @@ STOP_MODULES = Event()
 STOP_MODULES.clear()
 instance = time()
 bus = MessageBusClient()
+run_log = None
 
 
 # TODO: Use core hash or something to validate these messages to restart/kill modules DM
@@ -115,17 +116,21 @@ def _stop_process(process):
             raise e
 
 
-def _stop_all_core_processes(include_runner=False):
+def _stop_all_core_processes():
+    my_pid = os.getpid()
     procs = {p.pid: p.cmdline() for p in psutil.process_iter()}
     for pid, cmdline in procs.items():
         if cmdline and (any(pname in cmdline[-1] for pname in ("mycroft.messagebus.service", "neon_speech_client",
                                                                "neon_audio_client", "neon_core.skills",
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
-                                                               "NGI.utilities.gui"))
-                        or include_runner and (cmdline[-1] == "run_neon.py" or cmdline[-1].endswith("bin/neon-start"))):
+                                                               "NGI.utilities.gui", "run_neon.py"))
+                        or cmdline[-1].endswith("bin/neon-start")):
             LOG.info(f"Terminating {cmdline} {pid}")
             try:
+                if pid == my_pid:
+                    LOG.debug(f"Skipping Termination of self ({pid})")
+                    continue
                 psutil.Process(pid).terminate()
                 sleep(1)
                 if psutil.pid_exists(pid) and psutil.Process(pid).is_running():
@@ -172,9 +177,10 @@ def start_neon():
         log.close()
 
     sys.stdout = sys.__stdout__
-    run_log.close()
+    if run_log:
+        run_log.close()
 
-    _stop_all_core_processes(True)
+    _stop_all_core_processes()
 
 
 def stop_neon():
@@ -190,7 +196,7 @@ def stop_neon():
     except Exception as x:
         LOG.error(x)
     LOG.info("stopping")
-    _stop_all_core_processes(True)
+    _stop_all_core_processes()
 
     LOG.info("stopped")
     exit(0)
@@ -206,4 +212,5 @@ def main():
 if __name__ == "__main__":
     run_log = open(os.path.join(LOG_DIR, "start.log"), "a+")
     sys.stdout = run_log
+    sys.stderr = run_log
     main()
