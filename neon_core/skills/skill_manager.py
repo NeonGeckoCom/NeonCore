@@ -24,13 +24,13 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from glob import glob
 
-from mycroft.util.log import LOG
+from glob import glob
+from neon_utils.configuration_utils import get_neon_skills_config
+from neon_utils.log_utils import LOG
+from neon_core.skills.skill_store import SkillsStore
 from mycroft.util import connected
 from mycroft.skills.skill_manager import SkillManager
-from neon_core.skills.skill_store import SkillsStore
-from neon_utils.configuration_utils import get_neon_skills_config
 
 SKILL_MAIN_MODULE = '__init__.py'
 
@@ -58,7 +58,39 @@ class NeonSkillManager(SkillManager):
                 else:
                     # if no internet just skip this update
                     LOG.error("no internet, skipped default skills installation")
-            
+
+    def load_priority(self):
+        # NOTE: mycroft uses the skill name, this is not deterministic! msm
+        # decides what the name is based on the meta info from selene,
+        # if missing it uses folder name (skill_id), for backwards compat
+        # name is still support but skill_id is recommended! the name can be
+        # changed at any time and mess up the .conf, if the skill_id changes
+        # lots of other stuff will break so you are assured to notice
+        # TODO deprecate usage of skill_name once mycroft catches up
+        skills = {skill.name: skill for skill in self.msm.all_skills}
+        skill_ids = {os.path.basename(skill.path): skill
+                     for skill in self.msm.all_skills}
+        priority_skills = self.skill_config.get("priority", [])
+        for skill_name in priority_skills:
+            skill = skill_ids.get(skill_name) or skills.get(skill_name)
+            if skill is not None:
+                if not skill.is_local:
+                    try:
+                        self.msm.install(skill)
+                    except Exception as e:
+                        LOG.exception(f"Downloading priority skill: {skill_name} failed")
+                        LOG.error(e)
+                        continue
+                loader = self._load_skill(skill.path)
+                if loader:
+                    self.upload_queue.put(loader)
+            else:
+                LOG.error(
+                    'Priority skill {} can\'t be found'.format(skill_name)
+                )
+
+        self._alive_status = True
+
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self.download_or_update_defaults()
