@@ -34,6 +34,19 @@ if [ "${USER}" == "root" ]; then
   fi
 fi
 
+# Check platform
+modelFile=/proc/device-tree/model
+
+# Determine if device is a Raspberry Pi
+if [ -f ${modelFile} ] && [ "$(grep "Raspberry Pi" "${modelFile}")" ]; then
+  raspberryPi="true"
+else
+  raspberryPi="false"
+fi
+export raspberryPi
+
+
+# Define installation directory
 installerDir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 if [ "${installerDir}" == "${HOME}" ]; then
   installerDir="${installerDir}/NeonAI"
@@ -182,7 +195,8 @@ askWrapper(){
         Install GUI            : ${installGui}
         STT Engine             : ${sttModule}
         TTS Engine             : ${ttsModule}
-        Server                 : ${installServer}"
+        Server                 : ${installServer}
+        Pi                     : ${raspberryPi}"
 
         askYesNo "Continue with these settings?"
         result=${?}
@@ -241,10 +255,24 @@ getOptions(){
 }
 
 doInstall(){
+    # Add piwheels if pi
+    if  find . | grep -q "x86" <<< "$(lscpu)" ; then
+        arm=false
+    else
+        arm=true
+        echo -e "[global]\nextra-index-url=https://www.piwheels.org/simple\n">pip.conf
+        sudo my pip.conf /etc
+    fi
+
   # Build optional dependency string for pip installation
     options=()
     if [ "${localDeps}" == "true" ]; then
-      options+=("local")
+      if [ "${arm}" == "true" ]; then
+        echo "Local Dependencies not supported on ARM; remote STT/TTS will be used."
+        options+=("remote")
+      else
+        options+=("local")
+      fi
     else
       options+=("remote")
     fi
@@ -275,7 +303,6 @@ doInstall(){
 
     # Install system dependencies
     sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
-    # TODO: curl here to patch news skill; should be moved to skill deps
 
     # Make venv if not in one
     if [ -z "${VIRTUAL_ENV}" ]; then
@@ -293,6 +320,9 @@ doInstall(){
 
     # Do GUI install
     if [ "${installGui}" == "true" ]; then
+      if [ "${raspberryPi}" == "true" ]; then
+        sudo apt install xorg
+      fi
       if [ -d mycroft-gui ]; then
         rm -rf mycroft-gui
       fi
@@ -336,7 +366,7 @@ start_script="#!/bin/bash
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 . \"${VIRTUAL_ENV}/bin/activate\"
-coproc neon-start 2>&1 >/dev/null
+coproc neon-start >/dev/null 2>&1
 exit 0
 "
 
@@ -373,10 +403,12 @@ exit 0
 "
 
     # Copy shortcut files
-    echo "${start_script}">start_neon.sh
-    echo "${stop_script}">stop_neon.sh
-    sudo chmod ugo+x start_neon.sh
-    sudo chmod ugo+x stop_neon.sh
+    if [ ${raspberryPi} == "false" ]; then
+      echo "${start_script}">start_neon.sh
+      echo "${stop_script}">stop_neon.sh
+      sudo chmod ugo+x start_neon.sh
+      sudo chmod ugo+x stop_neon.sh
+    fi
 
     # Install Default Skills
     neon-install-default-skills
@@ -390,6 +422,12 @@ touch "neon_setup.log"
 if [ -n "${1}" ]; then
   export GITHUB_TOKEN="${1}"
 fi
-# TODO: Exit if no Token? DM
+
+# Warn and exit if no github token is available for dependency gathering
+if [ -z "${GITHUB_TOKEN}" ]; then
+  echo "GITHUB_TOKEN not defined! cancelling setup."
+  exit 10
+fi
+
 getOptions
 doInstall | tee -a "neon_setup.log"
