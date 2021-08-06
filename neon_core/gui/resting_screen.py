@@ -1,3 +1,28 @@
+# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
+# # All trademark and other rights reserved by their respective owners
+# # Copyright 2008-2021 Neongecko.com Inc.
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+# CONTRIBUTORS  BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+# OR PROFITS;  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import time
 
 from threading import Lock
@@ -78,7 +103,7 @@ class RestingScreen:
         self.gui["selected"] = message.data["selected"]
         self.save()
 
-    def show(self):
+    def show(self, _=None):
         """Show the idle screen or return to the skill that's overriding idle."""
         LOG.debug("Showing idle screen")
         screen = None
@@ -126,46 +151,45 @@ class RestingScreen:
         self.start_idle_event(30)
 
     def on_gui_page_show(self, message):
-        if "mark-2" not in message.data.get("__from", ""):
-            # Some skill other than the handler is showing a page
-            self.has_show_page = True
+        # Some skill other than the handler is showing a page
+        self.has_show_page = True
 
-            # If a skill overrides the animations do not show any
-            override_animations = message.data.get("__animations", False)
-            if override_animations:
-                # Disable animations
-                LOG.info("Disabling all animations for page")
-                self.override_animations = True
-            else:
-                LOG.info("Displaying all animations for page")
-                self.override_animations = False
+        # If a skill overrides the animations do not show any
+        override_animations = message.data.get("__animations", False)
+        if override_animations:
+            # Disable animations
+            LOG.info("Disabling all animations for page")
+            self.override_animations = True
+        else:
+            LOG.info("Displaying all animations for page")
+            self.override_animations = False
 
-            # If a skill overrides the idle do not switch page
-            override_idle = message.data.get("__idle")
-            if override_idle is True:
-                # Disable idle screen
-                LOG.info("Cancelling Idle screen")
-                self.cancel_idle_event()
-                self.override(message)
-            elif isinstance(override_idle, int) and override_idle is not False:
-                LOG.info(
-                    "Overriding idle timer to" " {} seconds".format(override_idle)
-                )
-                self.override(None)
-                self.start_idle_event(override_idle)
-            elif message.data["page"] and not message.data["page"][0].endswith(
-                    "idle.qml"
+        # If a skill overrides the idle do not switch page
+        override_idle = message.data.get("__idle")
+        if override_idle is True:
+            # Disable idle screen
+            LOG.info("Cancelling Idle screen")
+            self.cancel_idle_event()
+            self.override(message)
+        elif isinstance(override_idle, int) and override_idle is not False:
+            LOG.info(
+                "Overriding idle timer to" " {} seconds".format(override_idle)
+            )
+            self.override(None)
+            self.start_idle_event(override_idle)
+        elif message.data["page"] and not message.data["page"][0].endswith(
+                "idle.qml"
+        ):
+            # Check if the show_page deactivates a previous idle override
+            # This is only possible if the page is from the same skill
+            LOG.info("Cancelling idle override")
+            if override_idle is False and compare_origin(
+                    message, self.override_idle[0]
             ):
-                # Check if the show_page deactivates a previous idle override
-                # This is only possible if the page is from the same skill
-                LOG.info("Cancelling idle override")
-                if override_idle is False and compare_origin(
-                        message, self.override_idle[0]
-                ):
-                    # Remove the idle override page if override is set to false
-                    self.cancel_override()
-                # Set default idle screen timer
-                self.start_idle_event(30)
+                # Remove the idle override page if override is set to false
+                self.cancel_override()
+            # Set default idle screen timer
+            self.start_idle_event(30)
 
     def cancel_idle_event(self):
         """Cancel the event monitoring current system idle time."""

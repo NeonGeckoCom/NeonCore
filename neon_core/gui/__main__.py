@@ -22,5 +22,16 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from mycroft.enclosure import *
 
+from neon_core.gui.gui import GUIManager
+from neon_core.gui.resting_screen import init_resting_screen_manager
+
+
+def main():
+    gui = GUIManager()
+    init_resting_screen_manager()
+    gui.run()
+
+
+if __name__ == "__main__":
+    main()
