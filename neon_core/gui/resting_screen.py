@@ -28,7 +28,7 @@ import time
 from threading import Lock
 from neon_utils.log_utils import LOG
 from mycroft_bus_client import Message, MessageBusClient
-from mycroft import MycroftSkill
+from mycroft.skills.mycroft_skill import MycroftSkill
 
 
 def compare_origin(m1, m2):

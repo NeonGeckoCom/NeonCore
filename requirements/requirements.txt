@@ -2,6 +2,7 @@
 HolmesV[all]==2021.5.6a20
 mock_msm
 mycroft-messagebus-client~=0.9,!=0.9.2
+tornado
 
 # neon stuff
 neon_speech @ git+https://github.com/NeonGeckoCom/neon_speech
