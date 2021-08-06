@@ -23,10 +23,12 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from neon_core.enclosure.gui import GUIManager
+from neon_core.enclosure.resting_screen import init_resting_screen_manager
 
 
 def main():
     gui = GUIManager()
+    init_resting_screen_manager()
     gui.run()
 
 
