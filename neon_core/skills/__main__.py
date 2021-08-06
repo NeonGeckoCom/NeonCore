@@ -88,7 +88,7 @@ def main(alive_hook=on_alive, started_hook=on_started, ready_hook=on_ready,
     skill_manager = _initialize_skill_manager(bus, watchdog)
 
     status.set_started()
-    # _wait_for_internet_connection()
+    _wait_for_internet_connection()
 
     if skill_manager is None:
         skill_manager = _initialize_skill_manager(bus, watchdog)
