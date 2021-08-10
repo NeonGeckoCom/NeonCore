@@ -23,10 +23,18 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from neon_utils.skills.mycroft_skill import PatchedMycroftSkill
 from neon_core.skills.neon_skill import NeonSkill
 from neon_core.skills.fallback_skill import NeonFallbackSkill
 from neon_core.skills.decorators import intent_handler, intent_file_handler, \
-    resting_screen_handler, conversational_intent, skill_api_method
+    resting_screen_handler, conversational_intent
+
+import mycroft.skills.core
+mycroft.skills.MycroftSkill = PatchedMycroftSkill
+mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
+mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
+
+
 __all__ = ['NeonSkill',
            'intent_handler',
            'intent_file_handler',
