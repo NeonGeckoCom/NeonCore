@@ -9,7 +9,7 @@ neon_audio @ git+https://github.com/NeonGeckoCom/neon_audio
 neon_enclosure @ git+https://github.com/NeonGeckoCom/neon_enclosure
 
 # utils
-neon-utils>=0.5.7
+neon-utils>=0.6.0
 rapidfuzz
 kthread
 psutil
