@@ -44,10 +44,14 @@ class RestingScreen:
     encapsulating the system.
     """
 
-    def __init__(self, skill: MycroftSkill, settings: dict):
+    def __init__(self):
+        skill = MycroftSkill()
+        bus = MessageBusClient()
+        bus.run_in_thread()
+        skill.bind(bus)
         self.bus = skill.bus
         self.gui = skill.gui
-        self.settings = settings
+        self.settings = {}
         self.schedule_event = skill.schedule_event
         self.cancel_scheduled_event = skill.cancel_scheduled_event
         self.has_show_page = False  # resets with each handler
@@ -220,13 +224,3 @@ class RestingScreen:
                 LOG.info("Showing idle screen in " "{} seconds".format(offset))
             except Exception as e:
                 LOG.exception(repr(e))
-
-
-def init_resting_screen_manager():
-    homescreen_skill = MycroftSkill()
-    bus = MessageBusClient()
-    bus.run_in_thread()
-    homescreen_skill.bind(bus)
-    homescreen_settings = {}
-    rsm = RestingScreen(homescreen_skill, homescreen_settings)
-    return rsm

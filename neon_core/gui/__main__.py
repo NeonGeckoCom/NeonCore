@@ -24,12 +24,12 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from neon_core.gui.gui import GUIManager
-from neon_core.gui.resting_screen import init_resting_screen_manager
+from neon_core.gui.resting_screen import RestingScreen
 
 
 def main():
     gui = GUIManager()
-    init_resting_screen_manager()
+    RestingScreen()
     gui.run()
 
 
