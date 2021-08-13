@@ -44,10 +44,13 @@ class RestingScreen:
     encapsulating the system.
     """
 
-    def __init__(self):
+    def __init__(self, bus: MessageBusClient = None):
+        bus = bus or MessageBusClient()
+        if not bus.started_running:
+            bus.run_in_thread()
+
         skill = MycroftSkill()
-        bus = MessageBusClient()
-        bus.run_in_thread()
+        skill.skill_id = "resting_screen.neon"
         skill.bind(bus)
         self.bus = skill.bus
         self.gui = skill.gui
