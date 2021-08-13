@@ -30,6 +30,7 @@ from neon_core.skills.decorators import intent_handler, intent_file_handler, \
     resting_screen_handler, conversational_intent
 
 import mycroft.skills.core
+mycroft.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
