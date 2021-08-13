@@ -22,25 +22,25 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-""" Interface for interacting with the Mycroft gui qml viewer. """
-from os.path import join
+
 import asyncio
-import time
-from collections import namedtuple
-from threading import Lock
-
-from neon_core.configuration import Configuration
-from mycroft.util import create_daemon
-from mycroft.util.log import LOG
-
 import json
 import tornado.web as web
+
+from os.path import join
+from collections import namedtuple
+from threading import Lock
+from typing import Optional, Awaitable
 from tornado import ioloop
 from tornado.websocket import WebSocketHandler
-from mycroft.messagebus.message import Message
+from neon_core.configuration import Configuration
 from neon_core.messagebus import get_messagebus
-from mycroft.util import resolve_resource_file
 from ovos_utils import wait_for_exit_signal
+
+from mycroft.util import create_daemon
+from mycroft.util.log import LOG
+from mycroft.messagebus.message import Message
+from mycroft.util import resolve_resource_file
 
 
 class SkillGUI:
@@ -134,7 +134,7 @@ class SkillGUI:
         self.skill.bus.emit(Message("gui.clear.namespace",
                                     {"__from": self.skill.skill_id}))
 
-    def send_event(self, event_name, params={}):
+    def send_event(self, event_name, params=None):
         """Trigger a gui event.
 
         Arguments:
@@ -142,6 +142,7 @@ class SkillGUI:
             params: json serializable object containing any parameters that
                     should be sent along with the request.
         """
+        params = params or {}
         self.skill.bus.emit(Message("gui.event.send",
                                     {"__from": self.skill.skill_id,
                                      "event_name": event_name,
@@ -243,6 +244,10 @@ class SkillGUI:
         Arguments:
             text (str): Main text content.  It will auto-paginate
             title (str): A title to display above the text content.
+            override_idle (boolean, int):
+                True: Takes over the resting page indefinitely
+                (int): Delays resting page for the specified number of
+                       seconds.
         """
         self.clear()
         self["text"] = text
@@ -260,6 +265,10 @@ class SkillGUI:
             title (str): A title to display above the image content
             fill (str): Fill type supports 'PreserveAspectFit',
             'PreserveAspectCrop', 'Stretch'
+            override_idle (boolean, int):
+                True: Takes over the resting page indefinitely
+                (int): Delays resting page for the specified number of
+                       seconds.
         """
         self.clear()
         self["image"] = url
@@ -274,6 +283,10 @@ class SkillGUI:
         Arguments:
             html (str): HTML text to display
             resource_url (str): Pointer to HTML resources
+            override_idle (boolean, int):
+                True: Takes over the resting page indefinitely
+                (int): Delays resting page for the specified number of
+                       seconds.
         """
         self.clear()
         self["html"] = html
@@ -285,6 +298,10 @@ class SkillGUI:
 
         Arguments:
             url (str): URL to render
+            override_idle (boolean, int):
+                True: Takes over the resting page indefinitely
+                (int): Delays resting page for the specified number of
+                       seconds.
         """
         self.clear()
         self["url"] = url
@@ -400,7 +417,8 @@ class GUIManager:
         self.bus.emit(message.reply("gui.status.request.response",
                                     {"connected": self.gui_connected}))
 
-    def send(self, msg_dict):
+    @staticmethod
+    def send(msg_dict):
         """ Send to all registered GUIs. """
         for connection in GUIWebsocketHandler.clients:
             try:
@@ -439,7 +457,7 @@ class GUIManager:
             self.datastore[namespace][name] = value
 
             # If the namespace is loaded send data to GUI
-            if namespace in [l.name for l in self.loaded]:
+            if namespace in [ns.name for ns in self.loaded]:
                 msg = {"type": "mycroft.session.set",
                        "namespace": namespace,
                        "data": {name: value}}
@@ -514,7 +532,7 @@ class GUIManager:
         # Remove the page from the local reprensentation as well.
         self.loaded[0].pages.pop(pos)
         # Add a check to return any display to idle from position 0
-        if (pos == 0 and len(self.loaded[0].pages) == 0):
+        if pos == 0 and len(self.loaded[0].pages) == 0:
             self.bus.emit(Message("mycroft.device.show.idle"))
 
     def __insert_new_namespace(self, namespace, pages):
@@ -525,7 +543,7 @@ class GUIManager:
 
         Args:
             namespace (str):  The skill namespace to create
-            pages (str):      Pages to insert (name matches QML)
+            pages (list):     Pages to insert (name matches QML)
         """
         LOG.debug("Inserting new namespace")
         self.send({"type": "mycroft.session.list.insert",
@@ -760,6 +778,9 @@ class GUIWebsocketHandler(WebSocketHandler):
     """The socket pipeline between the GUI and Mycroft."""
     clients = []
 
+    def data_received(self, chunk: bytes) -> Optional[Awaitable[None]]:
+        pass
+
     def open(self):
         GUIWebsocketHandler.clients.append(self)
         LOG.info('New Connection opened!')
@@ -817,7 +838,9 @@ class GUIWebsocketHandler(WebSocketHandler):
             # A value was changed send it back to the skill
             msg_type = '{}.{}'.format(msg['namespace'], 'set')
             msg_data = msg['data']
-
+        else:
+            LOG.error(f"Unhandled message type: {msg.get('type')}")
+            return
         message = Message(msg_type, msg_data)
         LOG.info('Forwarding to bus...')
         self.application.gui_service.bus.emit(message)
