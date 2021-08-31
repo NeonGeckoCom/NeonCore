@@ -1,55 +1,29 @@
 
 # Table of Contents
-1. [Forking Git Source](#1-forking-git-source)  
-2. [Setting Up Service Accounts](#2-setting-up-service-accounts)  
+1. [Optional Service Account Setup](#optional-service-account-setup)  
    * [a. Google Cloud Speech](#a-google-cloud-speech-setup)  
    * [b. Amazon Polly and Translate](#b-amazon-polly-and-translate-setup)
-3. [Setting Up Hardware](#3-setting-up-hardware)  
-4. [Installing Neon](#4-installing-neon)  
-   * [a. Development Environment](#a-installing-neon-in-a-development-environment)  
-   * [b. User Environment](#b-installing-neon-in-a-userdeployment-environment)  
-1. [Using Neon](#5-using-neon)  
-   * [a. Running Tests](#a-running-tests)  
-   * [b. Troubleshooting](#b-troubleshooting)  
-1. [Making Changes](#6-making-changes)  
+2. [Setting Up Hardware](#setting-up-hardware)  
+3. [Installing Neon](#installing-neon)  
+   * [a. Development Environment](#installing-neon-in-a-development-environment)  
+   * [b. User Environment](#installing-neon-in-a-userdeployment-environment)  
+4. [Using Neon](#using-neon)  
+   * [a. Activating the venv](#a-activating-the-venv)
+   * [c. Running Tests](#c-running-tests)  
+   * [d. Troubleshooting](#d-troubleshooting)  
+6. [Making Changes](#making-code-changes)  
    * [a. System Overview](#a-system-overview)  
-   * [b. Creating a Skill](#b-creating-a-skill)  
-7. [Getting New Neon AI Releases](#7-getting-new-neon-ai-releases)  
-7. [Removing and re-installing Neon](#8-reinstalling-neon)  
+   * [b. Creating a Skill](#b-creating-a-skill)   
+8. [Removing and re-installing Neon](#removing-and-re-installing-neon-ai)  
 
 # Welcome to Neon AI
-Neon AI is an open source voice assistant. Follow these instructions to start using Neon on your computer.
+Neon AI is an open source voice assistant. Follow these instructions to start using Neon on your computer. If you are 
+using a Raspberry Pi, you may use the prebuilt image available [on our website](https://neon.ai/DownloadNeonAI).
 
-# 1. Forking Git Source
-Before installing Neon, you will need to fork your own branch of the Neon
-[core](https://github.com/NeonGeckoCom/shared-neon-core) and [skills] repositories on github. You will also need to get
-`neonSetup.sh` from your forked core git.
-
-1. Go to the [core repository](https://github.com/NeonGeckoCom/shared-neon-core) and click "Fork" in the upper right
-hand corner.
-   >![NeonDev](https://0000.us/klatchat/app/files/neon_images/git_setup_screens/Git1.png)
-
-1. Select the account you wish to fork to (generally you only have one listed)
-
-1. Do the same for the [skills repository](https://github.com/NeonGeckoCom/neon-skills-submodules)
-   > *Note*: You may also wish to fork individual skills and update the submodule references in your forked repository.
-   > You can find more information about submodules [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
-
-1. Locate `NGI\neonSetup.sh` in your `core` repository
-   > ![NeonDev](https://0000.us/klatchat/app/files/neon_images/git_setup_screens/Git3.png)
-
-5. Right Click on `Raw` and select `Save link as...`
-   > ![NeonDev](https://0000.us/klatchat/app/files/neon_images/git_setup_screens/Git4_1.png)
-
-6. Rename the file to neonSetup.sh and save to your `Home` directory 
-   >  *Note*: If you completed this step on a Windows PC, save the file to a flash drive to transfer to the computer you
-   >  will install Neon on. Move `neonSetup.sh` to a directory on the machine you will be installing on.
-   >  Recommended `~/` (resolves to /home/`$USER`).
-
-
-# 2. Setting Up Service Accounts
-Please follow these steps to create the three credential files required to install Neon. During setup, all credentials 
-will be imported and validated with any errors logged in `status.log`.
+# Optional Service Account Setup
+There are several online services that may be used with Neon. Speech-to-Text (STT) and Text-to-Speech (TTS) may be run 
+locally, but remote implementations are often faster and more accurate. Following are some instructions for getting 
+access to Google STT and Amazon Polly TTS. During setup, these credentials will be imported and validated.
 > *Note:* If you complete this setup on a Windows PC, make sure to edit any files using a text editor such as 
 [Notepad++](https://notepad-plus-plus.org/) to ensure compatibility in Linux. Also check for correct file extensions 
 after copying your files to your Linux PC, as Windows will hide known file extensions by default.
@@ -148,7 +122,7 @@ setup without continuing, but Amazon and Wolfram|Alpha services are *highly* rec
 
 The Users menu lets you create new users and new access keys per user as you wish, as well as modify permissions.
 
-# 3. Setting Up Hardware
+# Setting Up Hardware
 Before continuing, make sure you have your hardware setup ready for installation. You will need the following:
 * A computer running up-to-date Ubuntu 20.04
   >   You can find our video tutorial for installing Ubuntu in a virtual machine 
@@ -187,57 +161,69 @@ Before continuing, make sure you have your hardware setup ready for installation
   > Some features such as the vision service may not work on systems only meeting the minimum requirements. Responses 
   > and speech processing will take longer on lower performance systems.
 
-# 4. Installing Neon
+# Installing Neon
 This guide includes instructions for installing in both a Development environment and a User environment. User 
-environment is more lightweight and does not assume any existing IDE. Developer environment will have more consoles, 
-debug outputs, and logs available. See details below. 
+environment is more lightweight and does not assume any existing IDE 
+(similar to what is found on our [Raspberry Pi Image](https://neon.ai/DownloadNeonAI)). A developer environment will
+include more debugging utilities and be designed to run alongside other instances of Neon/OVOS/Mycroft.
 
 A development environment is designed to be a testable installation of NeonAI that can be connected to an IDE   
 (ex. Pycharm) for modifications and skill development. This guide assumes installation in a development environment from 
 an unmodified fork of NeonAI. After installation, any changes and additions can be pushed to git or hosted on a private 
-server.  
+server. 
   
 A user environment is designed to be an installation on a device that will be used normally as a voice assistant. You
 may want to test how your changes affect performance on less powerful hardware or test how changes may be deployed as
 updates.  
 If you are developing in a virtual machine, installation on physical hardware in a user environment is useful for
-testing audio and video I/O which can be difficult in many virtualized environments.  
+testing audio and video I/O which can be difficult in many virtualized environments.
 
-Before starting here, make sure you have already completed
-[setting up your service accounts](#setting-up-service-accounts). You should have `google.json`,
-`wolfram.txt`, and `accessKeys.csv` already saved to the machine you are installing to.
-
-
-All of the following options, such as autorun and automatic updates can be easily modified later using your voice,
+All the following options, such as autorun and automatic updates can be easily modified later using your voice,
 profile settings, or configuration files.
   
 ## Installing Neon in a Development Environment  
 
 1. Clone NeonCore from your forked repository into a local directory.
-1. Configure a virtual environment and install any desired requirements
-  >*Note*: `requirements.txt`,`dev.txt`, `test.txt`, and `remote_speech_processing.txt` are recommended for installation
+2. Create a virtual environment
+
+```shell
+python3 -m venv ./.venv
+```
+
+3. install any desired requirements
+```shell
+pip install -r requirements/requirements.txt
+pip install -r requirements/client.txt
+pip install -r requirements/dev.txt
+pip install -r requirements/test.txt
+pip install -r requirements/remote_speech_processing.txt
+```
+  >*Note*: `requirements.txt`,`dev.txt`, `test.txt`, `client.txt`, and `remote_speech_processing.txt` 
+  > are recommended for general development installations
   
 ## Installing Neon in a User/Deployment Environment  
 Installing in a User Environment differs from a developer environment; you will not be able to modify Neon Core if you 
 use this installation method.
-  
-1. Take your `setup.sh` file and place it in your home directory  
-    >![NeonDev](https://0000.us/klatchat/app/files/neon_images/neon_setup_screens/Neon1.png)  
-1. Make sure you have your `accessKeys.csv`, `google.json`, and `wolfram.txt` files here as well, otherwise you will be 
-   prompted for credentials during setup  
-1. Open a terminal in your home directory (`ctrl`+`alt`+`t`)  
-1. Type in `bash setup.sh ${GITHUB_TOKEN}` and press `Enter` (where `${GITHUB_TOKEN}` is your Github token)
+
+1. Download `setup.sh` from the [NeonCore repository](https://github.com/NeonGeckoCom/NeonCore/blob/dev/setup.sh).
+   >*Note*: You can download this file by right clicking `Raw` and selecting `Save link as...`
+2. Take your `setup.sh` file and place it in your home directory  
+   >![NeonDev](https://0000.us/klatchat/app/files/neon_images/neon_setup_screens/Neon1.png)
+3. Open a terminal in your home directory (`ctrl`+`alt`+`t`)  
+4. Type in `bash setup.sh ${GITHUB_TOKEN}` and press `Enter` (where `${GITHUB_TOKEN}` is your Github token)
+   >*Note*: You can find instructions on how to generate a GitHub Personal Access Token 
+   > [here](https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+   
    >![NeonDev](https://0000.us/klatchat/app/files/neon_images/neon_setup_screens/Neon2.png)  
-1. Type `n` to Install in User Mode (Not Developer Mode)
-1. Type `n` to Input Custom settings
+5. Type `n` to Install in User Mode (Not Developer Mode)
+6. Type `n` to Input Custom settings
     >*Note*: You may use quick settings and skip the following prompts
 ___
 8. Type `n` to install in User mode  (`y` for full Developer mode)
 8. `Autorun` is recommended (`y`) on for User Environments  
 8. `Automatic updates` are recommended (`y`) on for User Environments  
-8. `Local STT` is NOT recommended (`n`) if you have google and aws keys as remote processing is faster and more accurate 
-8. `Install GUI` is recommended (`y`) so long as you are running a current/supported version of Ubuntu and your device
-   has a display
+8. `Local STT` is NOT recommended (`n`) IF you have google and aws keys, as remote processing is faster and more accurate 
+8. `Install GUI` is recommended (`y`) so long as your device has a display
 8. Find out more about OpenHAB [here](https://www.openhab.org/docs/)  
 14. `Server` is NOT recommended (`n`) unless you know otherwise 
     
@@ -245,44 +231,39 @@ ___
    correct a previous setting
    > ![NeonDev](https://0000.us/klatchat/app/files/neon_images/neon_setup_screens/Neon3-1.png)
    
-1. When setup is complete, you will be able to start neon via `start_neon.sh`
+1. When setup is complete, you will be able to start Neon via `start_neon.sh` and stop Neon via: `stop_neon.sh`
   
-# 5. Using Neon  
+# Using Neon  
 After you have completed [Installing Neon](#installing-neon), you will have a fully functional system ready to test.
-A useful first step after a new installation or update is to run an automated test of your skills.
 
-## a. Running Tests
-1. With Neon running, use the desktop shortcut `Test Neon` or File menu option `Run Tests` to run tests
-    >![TestNeon](https://0000.us/klatchat/app/files/neon_images/test_neon_screens/Test1.png)
-    
-1. The test program will automatically backup your user settings and run a network speed test and then present you with 
-the test options
-    >![TestNeon](https://0000.us/klatchat/app/files/neon_images/test_neon_screens/Test2.png)
-    
-    >
-    >  The upper case options determine the way testing is run (Text or Audio).  
-    >  The lower case options determine which skills are tested.
+## a. Activating the venv
+If you followed the [Developer instructions](#installing-neon-in-a-development-environment) and attached Neon to an IDE 
+(such as PyCharm), your IDE likely configured a virtual environment in `NeonCore/venv`. 
+If you followed the [User instructions](#installing-neon-in-a-userdeployment-environment), a virtual environment was 
+created at `~/NeonAI/.venv`.
 
-1. Type in the options you wish to test with, you may string multiple together (ex. `TaAa` would run all tests as Text 
-and then all tests as Audio)
-   >  *Note*: If running audio tests, you must loop back audio output to audio input (the easiest way to do this is to
-   >  run a 3.5mm cable from your speaker port to your microphone port)
+To interact with Neon from a terminal, you need to activate the correct virtual environment by running:
+`. ~/NeonAI/.venv/bin/activate` (or the appropriate path if you installed to a different directory).
+> *Note:* If you are using an IDE like PyCharm, the built-in terminal will often activate the virtual environment automatically.
 
-1. After selecting your options and pressing `Enter`, you will see the test pass either text or audio to Neon.
-    >![TestNeon](https://0000.us/klatchat/app/files/neon_images/test_neon_screens/Test3.png)
-    
-1. The `System Monitor` will show available statistics such as CPU Utilization, Temperature, and Power
-    > *Note*: This data is saved with test results
-    
-1. After the tests have completed, Neon will restart and you will see an option to review test results. The results are 
-saved as `Tab` separated values, so make sure only the `Tab` option is selected.
-    >![TestNeon](https://0000.us/klatchat/app/files/neon_images/test_neon_screens/Test4.png)
+You will know that your virtual environment is active by the `(.venv)` printed in your terminal. You may exit the `.venv`
+shell by running `deactivate`.
 
-1. More complete logs and information can be found in the Diagnostics directory
+## b. Terminal Commands
+From your shell with the virtual environment activated, you can see a list of available terminal commands by typing `neon`
+and tapping `TAB` twice. Depending on which packages were installed with Neon, you might see `neon_cli_client` which 
+will launch the CLI for debugging. 
+
+## c. Running Tests
+From your shell with the virtual environment activated, `neon_skills_tests` will launch automated testing. You will be
+prompted to select a test set to run (no entry will run `all`). Neon will proceed to execute and respond to a number of 
+requests, corresponding to all default installed skills. After all tests have run, a summary will be printed to the terminal
+followed by any logged errors.
+>*Note:* More complete logs and information can be found in the Diagnostics directory
     >By default, this is at `~\NeonAI\Diagnostics\testing` for Development Machines and
      `~\Documents\NeonGecko\Diagnostics\testing` for User Machines.
      
-## b. Troubleshooting
+## d. Troubleshooting
 If you encounter any of the following issues while using Neon, please try these troubleshooting steps
 
 * My computer is slow to respond
@@ -324,15 +305,15 @@ If you encounter any of the following issues while using Neon, please try these 
   >   If you encounter any other issues while using Neon, they can often be solved by restarting Neon or your computer.
   >   If this does not resolve you issue, please contact support at [info@neongecko.com](mailto:info@neongecko.com).
 
-# 6. Making Code Changes
+# Making Code Changes
 After completing setup and testing, you are ready to begin making changes and creating skills. An example workflow for 
 making a change would be:
 
-1. Make any changes to the `core` or `skills`
-1. Test changes in the Developer Environment (Look for errors in logs, unexpected behaviour, etc)
+1. Create or modify a skill
+1. Test changes in the Developer Environment (Look for errors in logs, unexpected behaviour, etc.)
 1. Run `Test Neon` to check that all skills and TTS/STT behave as expected
-1. Commit and Push changes to git
-1. Check for updates in User Environment
+1. Commit and Push changes to git (for collaborative development, it is often best to create a new branch for any changes)
+1. Install your updated skill in a User Environment (check for any missing dependencies, invalid file paths, etc.)
 1. Run complete tests using `Test Neon`
 1. Check logs for any errors
 
@@ -344,6 +325,7 @@ The `core` is composed of several modules, but generally includes:
   - `skills` for processing user input to find intent and provide a response
   - `audio` for speaking the response generated in skills
   - `bus` for handling all communications between modules
+  - `enclosure` for handling any hardware interactions like speakers, microphone, lights, and buttons
 
 Other modules may also be running for gui functionality, etc and may be added to provide new functionality.
 
@@ -356,34 +338,6 @@ https://youtu.be/fxg25MaxIcE
 https://youtu.be/DVSroqv6E6k
 https://youtu.be/R_3Q-P3pk8o
 
-# 7. Getting New Neon AI Releases
-Neongecko will regularly release updates to the Neon core and skills via GitHub. It is recommended that you merge these
-updates into your own fork so that you get the latest feature updates and bug fixes. To update your repository to the
-latest release:
-
-1. Go to [GitHub](https://github.com) and sign in.
-2. Go to the Neongecko [neon-shared-core repository](https://github.com/NeonGeckoCom/neon-shared-core).
-   > ![NewRelease](https://0000.us/klatchat/app/files/neon_images/neon_release_screens/NewRelease1.png)
-3. Open a `New pull request`
-4. Click `compare across forks`
-5. Select your forked repository from the `base repository` drop-down on the left
-   > ![NewRelease](https://0000.us/klatchat/app/files/neon_images/neon_release_screens/NewRelease2.png)
-6. You may modify the pull request title and description (optional)
-   > *Note*: All changes are displayed per file on this page. You may want to change the title for your own reference
-   > later.
-7. Click `Create pull request` after you have reviewed the changes
-8. Click `Merge pull request` on the next page to finish merging the changes to your branch
-   > ![NewRelease](https://0000.us/klatchat/app/files/neon_images/neon_release_screens/NewRelease3.png)
-9. Go to the Neongecko [neon-skills-submodules](https://github.com/NeonGeckoCom/neon-skills-submodules) and repeat
-   the above steps to update your skills
-   > *Note*: If you have modified your forked submodules repository, you may want to update the submodules in your repository
-   > instead of pulling changes here. You can find more information about submodules 
-   > [here](https://git-scm.com/book/en/v2/Git-Tools-Submodules).
-9.  You are now using the latest release of Neon AI, make sure to update any installations if they are not set to update
-    automatically
-10. Use the desktop shortcut `Update Neon` or File menu option `Check for Updates` to update Neon
-    >![TestNeon](https://0000.us/klatchat/app/files/neon_images/test_neon_screens/Test1.png)
-
 ## Additional Steps for Developers Using PyCharm
 11. Next you should update your IDE in your Developer Environment
 >    *Note*: This is PyCharm if you followed our setup guide.
@@ -393,20 +347,19 @@ latest release:
     > ![NewRelease](https://0000.us/klatchat/app/files/neon_images/neon_release_screens/NewRelease5.png)
 
 
-
-# 8. Removing and Re-installing Neon AI
+# Removing and Re-installing Neon AI
 You may wish to remove your Neon AI installation to start fresh with a new version. Below is a list of locaitons
 where Neon may have saved files:
-   > *Note:* You will need your credential files for Google, Amazon, and Wolfram|Alpha to complete re-installation.
-  - `~/.neon`
-  - `~/.local/share/neon`
-  - `~/.local/cache/neon`
-  - `/opt/neon`
-  - `/tmp/neon`
   - `~/Documents/NeonGecko`
   - `~/Pictures/NeonGecko`
   - `~/Videos/NeonGecko`
   - `~/Music/NeonGecko`
+  - `~/.local/share/neon`
+  - `~/.cache/neon`
+  - `~/NeonAI`
+  - `~/.neon`
+  - `/opt/neon`
+  - `/tmp/neon`
 
-
-5. You may now [re-install Neon](#4-installing-neon)
+You may now [re-install Neon](#installing-neon)
+   > *Note:* You may need your [credential files](#optional-service-account-setup) to complete re-installation.
