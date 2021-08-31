@@ -163,9 +163,10 @@ Before continuing, make sure you have your hardware setup ready for installation
 
 # Installing Neon
 This guide includes instructions for installing in both a Development environment and a User environment. User 
-environment is more lightweight and does not assume any existing IDE 
-(similar to what is found on our [Raspberry Pi Image](https://neon.ai/DownloadNeonAI)). A developer environment will
-include more debugging utilities and be designed to run alongside other instances of Neon/OVOS/Mycroft.
+environment is similar to what is found on our [Raspberry Pi Image](https://neon.ai/DownloadNeonAI); packages will be 
+installed from distributions and installed code should not be modified.
+A developer environment will clone `NeonCore` from source and include more debugging utilities. 
+Developer installations are also designed to run alongside other instances of Neon/OVOS/Mycroft.
 
 A development environment is designed to be a testable installation of NeonAI that can be connected to an IDE   
 (ex. Pycharm) for modifications and skill development. This guide assumes installation in a development environment from 
@@ -181,32 +182,116 @@ testing audio and video I/O which can be difficult in many virtualized environme
 All the following options, such as autorun and automatic updates can be easily modified later using your voice,
 profile settings, or configuration files.
   
-## Installing Neon in a Development Environment  
+## Installing Neon in a Development Environment
+Neon "core" is a collection of modules that may be installed and modified individually. These instructions will 
+outline a basic setup where the `neon_audio`, `neon_enclosure`, `neon_speech`, and any other modules are installed to their
+latest stable versions. These modules may be installed as editable for further development; instructions for this can be 
+found [here](https://pip.pypa.io/en/stable/cli/pip_install/#editable-installs)
 
-1. Clone NeonCore from your forked repository into a local directory.
-2. Create a virtual environment
+1. Install required system packages
+```shell
+sudo apt install python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg
+```
+> *Note*: The following commands can be used to install mimic for local TTS
+```shell
+sudo apt install -y curl
+curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | sudo apt-key add - 2> /dev/null && echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | sudo tee /etc/apt/sources.list.d/mycroft-desktop.list
+sudo apt-get update
+sudo apt install mimic
+```
 
+2. Clone NeonCore from your forked repository into a local directory.
+
+```shell
+git clone https://github.com/NeonGeckoCom/NeonCore ~/NeonAI
+cd ~/NeonAI
+```
+
+3. Create a virtual environment and activate it.
 ```shell
 python3 -m venv ./.venv
+. .venv/bin/activate
+pip install wheel  # this speeds up subsequent 
 ```
 
-3. install any desired requirements
+4. If you have access to private Neon repositories, export your Github Personal Access Token as an environment variable
 ```shell
-pip install -r requirements/requirements.txt
-pip install -r requirements/client.txt
-pip install -r requirements/dev.txt
-pip install -r requirements/test.txt
-pip install -r requirements/remote_speech_processing.txt
+export GITHUB_TOKEN=<insert_token_here>
 ```
-  >*Note*: `requirements.txt`,`dev.txt`, `test.txt`, `client.txt`, and `remote_speech_processing.txt` 
-  > are recommended for general development installations
-  
+
+5. Install any desired requirements
+```shell
+pip install .[client,dev,remote]
+```
+  >*Note*: `dev`, `client`, and `remote` are recommended for general development installations.
+  > `local` may be substituted for `remote`
+
+6. Install the mycroft-gui package (optional)
+```shell
+git clone https://github.com/mycroftai/mycroft-gui
+bash mycroft-gui/dev_setup.sh
+rm -rf mycroft-gui
+sudo apt-get install libqt5multimedia5-plugins qml-module-qtmultimedia
+```
+  >*Note*: dev_setup.sh is an interactive script; do not copy/paste the full block above into your terminal.
+
+7. Create and update configuration
+```shell
+neon-config-import
+```
+Open `ngi_local_conf.yml` in your text editor of choice and make any desired changes.
+If you selected `local` options above, you should change the following STT/TTS module lines:
+```yaml
+tts:
+  module: neon_tts_mimic
+
+stt:
+  module: deepspeech_stream_local
+```
+
+You may also choose to place logs, skills, configuration files, diagnostic files, etc. in the same directory as your cloned core
+(default location is `~/.local/share/neon`). This isolates logs and skills if you have multiple cores installed.
+```yaml
+dirVars:
+  logsDir: ~/NeonCore/logs
+  diagsDir: ~/NeonCore/Diagnostics
+  skillsDir: ~/NeonCore/skills
+  confDir: ~/NeonCore/config
+```
+
+> *Note:* You may also have a configuration file you wish to copy here to overwrite the default one.
+
+8. Install default skills (optional)
+```shell
+neon-install-default-skills
+```
+Installation of default skills will usually occur every time neon is started, but you may want to do this manually and 
+disable automatic skill installation to avoid conflicts with local development. The list of default skills may be changed
+in `ngi_local_conf.yml`
+```yaml
+skills:
+  default_skills: <url to list of skills or list of skill URL's>
+```
+  >*Note:* The default_skills list may include URLs with branch specs, skill names, 
+  > or a link to a text file containing either of these lists.
+
+10. Neon is now ready to run. You may start Neon with `neon-start` from a terminal; to start Neon in the background, run:
+```shell
+coproc neon-start >/dev/null 2>&1 &
+```
+   >*Note:* Starting Neon can take some time when skills are set to automatically install/update. You can speed this up
+    by disabling automatic skill installation/updates in `ngi_local_conf.yml`. 
+```yaml
+skills:
+  auto_update: false
+```
+
 ## Installing Neon in a User/Deployment Environment  
 Installing in a User Environment differs from a developer environment; you will not be able to modify Neon Core if you 
 use this installation method.
 
 1. Download `setup.sh` from the [NeonCore repository](https://github.com/NeonGeckoCom/NeonCore/blob/dev/setup.sh).
-   >*Note*: You can download this file by right clicking `Raw` and selecting `Save link as...`
+   >*Note*: You can download this file by right-clicking `Raw` and selecting `Save link as...`
 2. Take your `setup.sh` file and place it in your home directory  
    >![NeonDev](https://0000.us/klatchat/app/files/neon_images/neon_setup_screens/Neon1.png)
 3. Open a terminal in your home directory (`ctrl`+`alt`+`t`)  
