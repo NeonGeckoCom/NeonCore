@@ -3,5 +3,5 @@ neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_co
 
 # wake word plugins
 chatterbox-wake-word-plugin-dummy
-jarbas-wake-word-plugin-pocketsphinx
-jarbas-wake-word-plugin-precise
+ovos-ww-plugin-pocketsphinx
+ovos-ww-plugin-precise
