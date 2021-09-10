@@ -335,7 +335,22 @@ doInstall(){
     echo "${GITHUB_TOKEN}">~/token.txt
     pip install --upgrade pip~=21.1
     pip install wheel
-    pip install "${pipStr}"
+    if [ "${devMode}" == "true" ]; then
+      git clone https://github.com/NeonGeckoCom/NeonCore
+      cd NeonCore || exit 10
+      for opt in "${options[@]}"; do
+        if [ "${opt}" == "remote" ]; then
+          opt_str="remove_speech_processing"
+        elif [ "${opt}" == "local" ]; then
+          opt_str="local_speech_processing"
+        else
+          opt_str="${opt}"
+        fi
+        pip install -r "requirements/${opt_str}.txt"
+      done
+    else
+      pip install "${pipStr}"
+    fi
     neon-config-import
 
 start_script="#!/bin/bash
