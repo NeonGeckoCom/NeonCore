@@ -100,7 +100,7 @@ pip install --upgrade pip~=21.1
 pip install wheel
 
 cd "${sourceDir}" || exit 10
-pip install ".${optStr}"
+pip install ".${optStr}" -c requirements/constrants.txt
 
 neon-config-import
 

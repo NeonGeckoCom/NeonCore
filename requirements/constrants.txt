@@ -1,0 +1,4 @@
+boto3==1.17.90
+click==8.0.1
+mongoengine==0.23.1
+pymongo==3.12.0
