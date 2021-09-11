@@ -24,6 +24,3 @@ libretranslate_neon_plugin
 # text parser modules
 RAKEkeywords>=0.2.0
 
-# Patching PIP Resolver
-mongoengine==0.8.7
-memory-tempfile==2.2.2
