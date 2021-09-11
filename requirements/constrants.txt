@@ -3,3 +3,6 @@ click==8.0.1
 mongoengine==0.23.1
 pymongo==3.12.0
 memory-tempfile==2.2.2
+ovos_skill_installer==0.0.3
+proto-plus==1.18.1
+pyyaml==5.4
