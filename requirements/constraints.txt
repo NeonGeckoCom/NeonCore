@@ -22,6 +22,7 @@ importlib-metadata==4.7.1
 inflection==0.5.0
 itsdangerous==2.0.0
 jmespath==0.9.5
+json_database==0.5.5
 kthread==0.2.1
 langdetect==1.0.8
 libcst==0.3.19
@@ -34,12 +35,17 @@ numpy==1.20.2
 oath2client==4.1.2
 ovos-skill-installer==0.0.5
 ovos-skills-manager>=0.0.6
-pymongo==3.12.0
+ovos-utils==0.0.10
+packaging==20.9
+pako==0.3.0
+pooch==1.5.0
 protobuf==3.17.2
 proto-plus==1.18.1
 pulsectl==21.5.18
 pyasn1==0.3.7
 pyasn1-models==0.2.7
+pyasn1-modules==0.2.7
+pymongo==3.12.0
 pyparsing==2.4.6
 pyyaml==5.4
 quebra_frases==0.3.6
