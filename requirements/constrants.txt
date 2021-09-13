@@ -29,7 +29,11 @@ proto-plus==1.18.1
 pulsectl==21.5.18
 pyyaml==5.4
 s3transfer==0.4.1
+soupsieve==2.2
+threadpoolctl==2.1.0
 typing-extensions==3.10.0.1
 typing-inspect==0.7.0
+url-normalize==1.4.2
+urllib3==1.26.5
 zeroconf==0.36.1
 zipp==3.4.2
