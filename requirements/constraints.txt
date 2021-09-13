@@ -1,10 +1,12 @@
 appdirs==1.4.3
+audioread==2.1.9
 boto3==1.17.90
 botocore==1.20.111
 bs4==0.0.1
 cachetools==4.2.0
 certifi==2020.12.5
 cffi==1.14.5
+chardet==4.0.0
 charset-normalizer==2.0.3
 chatterbox-wake-word-plugin-dummy==0.1
 click==8.0.1
@@ -36,6 +38,7 @@ memory-tempfile==2.2.2
 mongoengine==0.23.1
 mypy-extensions==0.4.2
 neon-mq-connector>=0.1.0
+neon-utils>=0.7.2
 nltk==3.6.1
 numba==0.53.0
 numpy==1.19.5
