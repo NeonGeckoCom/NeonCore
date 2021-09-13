@@ -3,6 +3,7 @@ boto3==1.17.90
 botocore==1.20.111
 bs4==0.0.1
 cachetools==4.2.0
+cffi==1.14.5
 chatterbox-wake-word-plugin-dummy==0.1
 click==8.0.1
 grpcio==1.39.0
@@ -29,10 +30,13 @@ proto-plus==1.18.1
 pulsectl==21.5.18
 pyyaml==5.4
 s3transfer==0.4.1
+scipy==1.7.0
+six==1.15.0
 soupsieve==2.2
 threadpoolctl==2.1.0
 typing-extensions==3.10.0.1
 typing-inspect==0.7.0
+uritemplate==3.0.0
 url-normalize==1.4.2
 urllib3==1.26.5
 zeroconf==0.36.1
