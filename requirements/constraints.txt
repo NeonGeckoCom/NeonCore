@@ -101,13 +101,9 @@ mtranslate==1.8
 multi-key-dict==2.0.3
 murmurhash==1.0.5
 mycroft-messagebus-client==0.9.1
-neon-audio==0.1.1
 neon-cli-client==0.0.6
-neon-client==0.0.4
-neon-enclosure==0.0.2
 neon-mq-connector==0.1.2
 neon-script-parser==0.2.10
-neon-speech==0.1.6
 neon-stt-plugin-deepspeech_stream_local==0.0.8
 neon-stt-plugin-google-cloud-streaming==0.0.3
 neon-test-utils==0.0.2
