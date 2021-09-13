@@ -105,13 +105,12 @@ neon-audio==0.1.1
 neon-cli-client==0.0.6
 neon-client==0.0.4
 neon-enclosure==0.0.2
--e git+https://github.com/NeonDaniel/NeonCore@eed3ea9cb3d0941b5b9fa13267272701a40163d3#egg=neon_mq_connector
+neon-mq-connector==0.1.2
 neon-script-parser==0.2.10
 neon-speech==0.1.6
-neon-stt-plugin-deepspeech-stream-local @ git+https://github.com/NeonDaniel/neon-stt-plugin-deepspeech_stream_local@428dc57621dfe307e9eda037f1e6c9824e1a2cba
+neon-stt-plugin-deepspeech_stream_local==0.0.8
 neon-stt-plugin-google-cloud-streaming==0.0.3
 neon-test-utils==0.0.2
--e git+https://github.com/neongeckocom/transcripts_controller@927f6abda7ca6c42a533a0db3531c40d105f2888#egg=neon_transcripts_controller
 neon-tts-plugin-mozilla-remote==0.0.1
 neon-tts-plugin-polly==0.0.3
 neon-utils==0.7.2
@@ -125,7 +124,7 @@ oauth2client==4.1.3
 opentone==0.1.2
 ovos-plugin-manager==0.0.1a3
 ovos-skill-installer==0.0.5
-ovos-skills-manager @ git+https://github.com/OpenVoiceOS/ovos_skill_manager@4e517a7ea199e0b5a2f512ded75f7fb3a5a25f05
+ovos-skills-manager==0.0.8
 ovos-utils==0.0.11
 packaging==20.9
 padaos==0.1.9
