@@ -3,9 +3,14 @@ boto3==1.17.90
 botocore==1.20.111
 bs4==0.0.1
 cachetools==4.2.0
+certifi==2020.12.5
 cffi==1.14.5
+charset-normalizer==2.0.3
 chatterbox-wake-word-plugin-dummy==0.1
 click==8.0.1
+combo-lock==0.1.1post2
+fasteners==0.16.2
+geographiclib==1.50
 grpcio==1.39.0
 google-api-core==1.31.1
 google-auth==1.34.0
@@ -18,6 +23,7 @@ inflection==0.5.0
 itsdangerous==2.0.0
 jmespath==0.9.5
 kthread==0.2.1
+langdetect==1.0.8
 libcst==0.3.19
 llvmlite==0.36.0rc2
 memory-tempfile==2.2.2
@@ -31,7 +37,11 @@ ovos-skills-manager>=0.0.6
 pymongo==3.12.0
 proto-plus==1.18.1
 pulsectl==21.5.18
+pyasn1-models==0.2.7
+pyparsing==2.4.6
 pyyaml==5.4
+quebra_frases==0.3.6
+requests==2.25.1
 requests-cache==0.7.3
 rsa==4.7.1
 ruamel.yaml==0.16.12
