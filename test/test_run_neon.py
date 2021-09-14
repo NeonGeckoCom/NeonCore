@@ -46,7 +46,8 @@ class TestRunNeon(unittest.TestCase):
         cls.process.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
-        sleep(60)  # TODO: Better method to wait for process startup DM
+        cls.bus.connected_event.wait()
+        cls.bus.wait_for_message("mycroft.ready", 90)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -64,11 +65,6 @@ class TestRunNeon(unittest.TestCase):
         except Exception as e:
             LOG.error(e)
 
-    def setUp(self) -> None:
-        self.bus.connected_event.wait(30)
-        while not self.bus.started_running:
-            sleep(1)
-
     def test_messagebus_connection(self):
         from mycroft_bus_client import MessageBusClient
         bus = MessageBusClient()
@@ -79,18 +75,24 @@ class TestRunNeon(unittest.TestCase):
         bus.close()
 
     def test_speech_module(self):
+        response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+        self.assertTrue(response.data['status'])
+
         context = {"client": "tester",
                    "ident": str(round(time())),
                    "user": "TestRunner"}
         stt_resp = self.bus.wait_for_response(Message("neon.get_stt",
-                                                 {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
-                                                 context), context["ident"])
+                                                      {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
+                                                      context), context["ident"])
         self.assertEqual(stt_resp.context, context)
         self.assertIsInstance(stt_resp.data.get("parser_data"), dict)
         self.assertIsInstance(stt_resp.data.get("transcripts"), list)
         self.assertIn("stop", stt_resp.data.get("transcripts"))
 
     def test_audio_module(self):
+        response = self.bus.wait_for_response(Message('mycroft.audio.is_ready'))
+        self.assertTrue(response.data['status'])
+
         text = "This is a test"
         context = {"client": "tester",
                    "ident": str(time()),
@@ -129,6 +131,9 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(data["success"], bool)
 
     def test_skills_module(self):
+        response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
+        self.assertTrue(response.data['status'])
+
         response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
         self.assertIsInstance(response, Message)
         loaded_skills = response.data

@@ -16,7 +16,7 @@ ovos_utils>=0.0.10
 ovos-skills-manager>=0.0.2
 
 # plugins
-ovos-plugin-manager==0.0.1a3
+ovos-plugin-manager~=0.0.1a3
 neon-lang-plugin-libretranslate>=0.1.0
 
 # text parser modules
