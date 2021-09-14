@@ -99,11 +99,11 @@ fi
 
 
 echo "${GITHUB_TOKEN}">~/token.txt
-pip install --upgrade pip~=21.1
+pip install --upgrade pip~=21.1.0
 pip install wheel
 
 cd "${sourceDir}" || exit 10
-pip install ".${optStr}" -c requirements/constraints.txt
+pip install ".${optStr}" --use-deprecated=legacy-resolver
 
 neon-config-import
 
