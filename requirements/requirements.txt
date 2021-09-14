@@ -1,8 +1,6 @@
 # mycroft
 HolmesV[all]==2021.5.6a20
 mock_msm
-mycroft-messagebus-client==0.9.1
-tornado
 
 # neon stuff
 neon_speech
@@ -24,3 +22,8 @@ neon-lang-plugin-libretranslate>=0.1.0
 # text parser modules
 RAKEkeywords>=0.2.0
 
+# Patch Dependency Conflicts
+mycroft-messagebus-client==0.9.1
+tornado==6.0.3
+numpy==1.19.5
+pyee==8.1.0
