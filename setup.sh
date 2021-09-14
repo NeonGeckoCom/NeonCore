@@ -335,7 +335,7 @@ doInstall(){
     echo "${GITHUB_TOKEN}">~/token.txt
     pip install --upgrade pip~=21.1.0
     pip install wheel
-    pip install "${pipStr}"
+    pip install "${pipStr}" --use-deprecated=legacy-resolver
     neon-config-import
 
 start_script="#!/bin/bash

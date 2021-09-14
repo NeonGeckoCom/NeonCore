@@ -103,7 +103,7 @@ pip install --upgrade pip==21.2.4
 pip install wheel
 
 cd "${sourceDir}" || exit 10
-pip install ".${optStr}"
+pip install ".${optStr}" --use-deprecated=legacy-resolver
 
 neon-config-import
 
