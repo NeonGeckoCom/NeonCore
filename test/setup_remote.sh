@@ -99,7 +99,7 @@ fi
 
 
 echo "${GITHUB_TOKEN}">~/token.txt
-pip install --upgrade pip~=21.1.0
+pip install --upgrade pip==21.2.4
 pip install wheel
 
 cd "${sourceDir}" || exit 10
