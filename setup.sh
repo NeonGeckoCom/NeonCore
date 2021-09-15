@@ -302,7 +302,7 @@ doInstall(){
     sudo apt-get update
 
     # Install system dependencies
-    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
+    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev libsndfile1 git mpg123 ffmpeg mimic
 
     # Make venv if not in one
     if [ -z "${VIRTUAL_ENV}" ]; then
