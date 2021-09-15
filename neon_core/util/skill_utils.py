@@ -22,7 +22,8 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import os
+import shutil
 from os.path import expanduser
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION as requests, set_github_token, clear_github_token
@@ -49,6 +50,10 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             LOG.info(f"Installed {url} to {skill_dir}")
         except Exception as e:
             LOG.error(e)
+    # TODO: This is patching OSM which may resolve 'neon' authorname instead of 'neongeckocom' from repository
+    for skill in os.listdir(skill_dir):
+        if skill.endswith(".neon"):
+            shutil.move(os.path.join(skill_dir, skill), os.path.join(skill_dir, f"{skill}geckocom"))
     if token_set:
         clear_github_token()
 
