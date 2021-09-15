@@ -125,7 +125,8 @@ def _stop_all_core_processes():
                                                                "neon_core.skills", "neon_core.gui"
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
-                                                               "NGI.utilities.gui", "run_neon.py"))
+                                                               "NGI.utilities.gui", "run_neon.py")
+                            if "test" not in cmdline[-1])
                         or cmdline[-1].endswith("bin/neon-start")):
             LOG.info(f"Terminating {cmdline} {pid}")
             try:

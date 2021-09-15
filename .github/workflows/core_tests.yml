@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git
-          pip install -r requirements/test_requirements.txt
+          pip install -r requirements/requirements.txt
           pip install -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
