@@ -72,13 +72,13 @@ class SkillUtilsTests(unittest.TestCase):
         install_skills_from_list(TEST_SKILLS_NO_AUTH, SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_NO_AUTH))
-        self.assertIn("alerts.neon.neon", skill_dirs)
+        self.assertIn("alerts.neon.neongeckocom", skill_dirs)
 
     def test_install_skills_from_list_with_auth(self):
         install_skills_from_list(TEST_SKILLS_WITH_AUTH, SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_WITH_AUTH))
-        self.assertIn("i-like-brands.neon.neon", skill_dirs)
+        self.assertIn("i-like-brands.neon.neongeckocom", skill_dirs)
 
     def test_install_skills_default(self):
         install_skills_default(SKILL_CONFIG)
