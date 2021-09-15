@@ -2,10 +2,10 @@
 HolmesV[all]==2021.5.6a20
 mock_msm
 
-# neon stuff
-neon_speech
-neon_audio
-neon_enclosure
+# neon core modules
+neon_speech>=0.2.0
+neon_audio>=0.3.0
+neon_enclosure>=0.1.0
 
 # utils
 neon-utils>=0.6.0
