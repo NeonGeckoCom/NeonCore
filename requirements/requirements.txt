@@ -12,7 +12,7 @@ neon-utils>=0.6.0
 rapidfuzz
 kthread
 psutil
-ovos_utils>=0.0.10
+ovos_utils>=0.0.12a3
 ovos-skills-manager>=0.0.2
 
 # plugins
@@ -22,6 +22,7 @@ ovos-plugin-manager==0.0.1
 RAKEkeywords>=0.2.0
 
 # Patch Dependency Conflicts
+protobuf~=3.17.0
 mycroft-messagebus-client==0.9.1
 tornado==6.0.3
 numpy==1.19.5
