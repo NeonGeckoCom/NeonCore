@@ -12,7 +12,7 @@ neon-utils>=0.6.0
 rapidfuzz
 kthread
 psutil
-ovos_utils>=0.0.10
+ovos_utils>=0.0.12a3
 ovos-skills-manager>=0.0.2
 
 # plugins
