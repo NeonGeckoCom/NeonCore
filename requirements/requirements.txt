@@ -4,7 +4,7 @@ mock_msm
 
 # neon core modules
 neon_speech>=0.2.0
-neon_audio>=0.3.0
+neon_audio>=0.3.2
 neon_enclosure>=0.1.0
 
 # utils
