@@ -1,2 +1,2 @@
-neon-stt-plugin-deepspeech_stream_local @ git+https://github.com/NeonGeckoCom/neon-stt-plugin-deepspeech_stream_local
-neon-tts-plugin-mimic @ git+https://github.com/NeonGeckoCom/neon-tts-plugin-mimic
+neon-stt-plugin-deepspeech-stream-local
+neon-tts-plugin-mimic
