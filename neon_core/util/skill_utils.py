@@ -22,8 +22,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import os
-import shutil
+
 from os.path import expanduser
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION as requests, set_github_token, clear_github_token
