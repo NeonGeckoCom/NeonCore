@@ -50,10 +50,6 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             LOG.info(f"Installed {url} to {skill_dir}")
         except Exception as e:
             LOG.error(e)
-    # TODO: This is patching OSM which may resolve 'neon' authorname instead of 'neongeckocom' from repository
-    for skill in os.listdir(skill_dir):
-        if skill.endswith(".neon"):
-            shutil.move(os.path.join(skill_dir, skill), os.path.join(skill_dir, f"{skill}geckocom"))
     if token_set:
         clear_github_token()
 
