@@ -33,9 +33,9 @@ from mycroft.util.lang import set_default_lang
 from mycroft.util.time import set_default_tz
 from mycroft.util.log import LOG
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
-
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
+from mycroft.skills.skill_manager import SkillManager
 from mycroft.skills.msm_wrapper import MsmException
 
 
