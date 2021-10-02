@@ -44,6 +44,8 @@ class LanguageTests(unittest.TestCase):
         base_dir = os.path.join(os.path.dirname(__file__), "lang_res")
         self.assertEqual(get_language_dir(base_dir), os.path.join(base_dir, "en-us"))
         self.assertEqual(get_language_dir(base_dir, "en"), os.path.join(base_dir, "en"))
+        self.assertEqual(get_language_dir(base_dir, "en-uk"), os.path.join(base_dir, "en-uk"))
+        self.assertEqual(get_language_dir(base_dir, "en-au"), os.path.join(base_dir, "en"))
         self.assertEqual(get_language_dir(base_dir, "es-mx"), os.path.join(base_dir, "es-es"))
         self.assertEqual(get_language_dir(base_dir, "es-es"), os.path.join(base_dir, "es-es"))
         self.assertEqual(get_language_dir(base_dir, "es"), os.path.join(base_dir, "es-es"))
