@@ -59,7 +59,7 @@ class LanguageTests(unittest.TestCase):
         translator = TranslatorFactory.create("libretranslate_plug")
         self.assertIsInstance(translator, LanguageTranslator)
         output = translator.translate("hello", "es-es", "en-us")
-        self.assertEqual(output, "hola")
+        self.assertEqual(output.lower(), "hola")
 
     def test_detector(self):
         detector = DetectorFactory.create("libretranslate_detection_plug")
