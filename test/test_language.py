@@ -40,9 +40,18 @@ class LanguageTests(unittest.TestCase):
         self.assertIsInstance(config['internal'], str)
         self.assertIsInstance(config['user'], str)
 
-    def test_get_language_dir(self):
-        # TODO: Write some tests for this method DM
-        pass
+    def test_get_language_dir_valid(self):
+        base_dir = os.path.join(os.path.dirname(__file__), "lang_res")
+        self.assertEqual(get_language_dir(base_dir), os.path.join(base_dir, "en-us"))
+        self.assertEqual(get_language_dir(base_dir, "en"), os.path.join(base_dir, "en"))
+        self.assertEqual(get_language_dir(base_dir, "es-mx"), os.path.join(base_dir, "es-es"))
+        self.assertEqual(get_language_dir(base_dir, "es-es"), os.path.join(base_dir, "es-es"))
+        self.assertEqual(get_language_dir(base_dir, "es"), os.path.join(base_dir, "es-es"))
+
+    def test_get_language_dir_invalid(self):
+        base_dir = os.path.join(os.path.dirname(__file__), "lang_res")
+        self.assertEqual(get_language_dir(base_dir, "ru"), os.path.join(base_dir, "ru"))
+        self.assertEqual(get_language_dir(base_dir, "ru-ru"), os.path.join(base_dir, "ru-ru"))
 
     def test_translator(self):
         translator = TranslatorFactory.create("libretranslate_plug")

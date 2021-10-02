@@ -31,3 +31,6 @@ jobs:
           pytest test/test_skill_utils.py
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
+      - name: Test Language
+        run: |
+          pytest test/test_language.py
