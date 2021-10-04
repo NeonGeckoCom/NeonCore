@@ -33,6 +33,15 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.language import *
 
 
+resolved_languages = {
+    "en": "en",
+    "en-uk": "en-uk",
+    "en-au": "en",
+    "es-mx": "es-es",
+    "es-es": "es-es"
+}
+
+
 class LanguageTests(unittest.TestCase):
     def test_get_lang_config(self):
         config = get_lang_config()
@@ -43,12 +52,13 @@ class LanguageTests(unittest.TestCase):
     def test_get_language_dir_valid(self):
         base_dir = os.path.join(os.path.dirname(__file__), "lang_res")
         self.assertEqual(get_language_dir(base_dir), os.path.join(base_dir, "en-us"))
-        self.assertEqual(get_language_dir(base_dir, "en"), os.path.join(base_dir, "en"))
-        self.assertEqual(get_language_dir(base_dir, "en-uk"), os.path.join(base_dir, "en-uk"))
-        self.assertEqual(get_language_dir(base_dir, "en-au"), os.path.join(base_dir, "en"))
-        self.assertEqual(get_language_dir(base_dir, "es-mx"), os.path.join(base_dir, "es-es"))
-        self.assertEqual(get_language_dir(base_dir, "es-es"), os.path.join(base_dir, "es-es"))
-        self.assertEqual(get_language_dir(base_dir, "es"), os.path.join(base_dir, "es-es"))
+        for search, result in resolved_languages.items():
+            self.assertEqual(get_language_dir(base_dir, search), os.path.join(base_dir, result))
+        # self.assertEqual(get_language_dir(base_dir, "en-uk"), os.path.join(base_dir, "en-uk"))
+        # self.assertEqual(get_language_dir(base_dir, "en-au"), os.path.join(base_dir, "en"))
+        # self.assertEqual(get_language_dir(base_dir, "es-mx"), os.path.join(base_dir, "es-es"))
+        # self.assertEqual(get_language_dir(base_dir, "es-es"), os.path.join(base_dir, "es-es"))
+        # self.assertEqual(get_language_dir(base_dir, "es"), os.path.join(base_dir, "es-es"))
 
     def test_get_language_dir_invalid(self):
         base_dir = os.path.join(os.path.dirname(__file__), "lang_res")
