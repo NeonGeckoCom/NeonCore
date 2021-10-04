@@ -8,7 +8,7 @@ neon_audio>=0.3.2
 neon_enclosure>=0.1.0
 
 # utils
-neon-utils>=0.8.1a1
+neon-utils>=0.9.0
 rapidfuzz
 kthread
 psutil
