@@ -23,14 +23,14 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neon_core.gui.gui import GUIManager
-from neon_core.gui.resting_screen import RestingScreen
-
+from neon_core.gui.service import NeonGUIService
+from mycroft.util import wait_for_exit_signal
 
 def main():
-    gui = GUIManager()
-    RestingScreen()
-    gui.run()
+    gui = NeonGUIService(daemonic=True)
+    gui.start()
+    wait_for_exit_signal()
+    gui.shutdown()
 
 
 if __name__ == "__main__":
