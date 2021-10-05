@@ -19,26 +19,23 @@ directory.  The executable gets added to the bin directory when installed
 (see setup.py)
 """
 import time
-import mycroft.lock
-from neon_core.configuration import Configuration
-from mycroft.util import (
-    connected,
-    reset_sigint_handler,
-    start_message_bus_client,
-    wait_for_exit_signal
-)
+
+from neon_core.skills.skill_manager import NeonSkillManager
+from neon_core.skills.intent_service import NeonIntentService
+from neon_core.skills.fallback_skill import FallbackSkill
+
+from neon_utils.net_utils import check_online
+from neon_utils.configuration_utils import get_neon_skills_config, get_neon_lang_config
+
+from mycroft.lock import Lock
+from mycroft.util import reset_sigint_handler, start_message_bus_client, wait_for_exit_signal
 from mycroft.util.lang import set_default_lang
 from mycroft.util.time import set_default_tz
 from mycroft.util.log import LOG
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
-
 from mycroft.skills.api import SkillApi
-from mycroft.skills.core import FallbackSkill
 from mycroft.skills.event_scheduler import EventScheduler
-from mycroft.skills.skill_manager import SkillManager
 from mycroft.skills.msm_wrapper import MsmException
-from neon_core.skills.skill_manager import NeonSkillManager
-from neon_core.skills.intent_service import NeonIntentService
 
 
 def on_started():
@@ -65,10 +62,10 @@ def main(alive_hook=on_alive, started_hook=on_started, ready_hook=on_ready,
          error_hook=on_error, stopping_hook=on_stopping, watchdog=None):
     reset_sigint_handler()
     # Create PID file, prevent multiple instances of this service
-    mycroft.lock.Lock('skills')
-    config = Configuration.get()
+    Lock('skills')
+    # config = Configuration.get()
     # Set the active lang to match the configured one
-    set_default_lang(config.get('lang', 'en-us'))
+    set_default_lang(get_neon_lang_config().get('internal', 'en-us'))
 
     # Set the default timezone to match the configured one
     set_default_tz()
@@ -88,7 +85,10 @@ def main(alive_hook=on_alive, started_hook=on_started, ready_hook=on_ready,
     skill_manager = _initialize_skill_manager(bus, watchdog)
 
     status.set_started()
-    _wait_for_internet_connection()
+    if get_neon_skills_config().get("wait_for_internet", True):
+        _wait_for_internet_connection()
+    else:
+        LOG.info("Online check disabled, device may be offline")
 
     if skill_manager is None:
         skill_manager = _initialize_skill_manager(bus, watchdog)
@@ -145,7 +145,7 @@ def _initialize_skill_manager(bus, watchdog):
 
 
 def _wait_for_internet_connection():
-    while not connected():
+    while not check_online():
         time.sleep(1)
 
 
