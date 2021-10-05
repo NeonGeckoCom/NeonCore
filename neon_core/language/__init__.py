@@ -68,15 +68,13 @@ class TranslatorFactory:
 
     @staticmethod
     def create(module=None):
-        # TODO: Get this from neon config
-        config = Configuration.get().get("language", {})
-        module = module or config.get("translation_module", "google")
+        config = get_neon_lang_config()
+        module = module or config.get("translation_module", "libretranslate_plug")
         if module not in DetectorFactory.CLASSES:
             # plugin!
             clazz = load_tx_plugin(module)
         else:
             clazz = TranslatorFactory.CLASSES.get(module)
-
         config["keys"] = get_private_keys()
         return clazz(config)
 
@@ -87,7 +85,7 @@ class DetectorFactory:
     @staticmethod
     def create(module=None):
         config = get_neon_lang_config()
-        module = module or config.get("detection_module", "fastlang")
+        module = module or config.get("detection_module", "libretranslate_detection_plug")
 
         if module not in DetectorFactory.CLASSES:
             # plugin!
