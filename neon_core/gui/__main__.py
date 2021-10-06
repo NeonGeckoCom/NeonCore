@@ -26,6 +26,7 @@
 from neon_core.gui.service import NeonGUIService
 from mycroft.util import wait_for_exit_signal
 
+
 def main():
     gui = NeonGUIService(daemonic=True)
     gui.start()
