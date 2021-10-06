@@ -23,24 +23,16 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import asyncio
-import json
-import tornado.web as web
-
 from os.path import join
 from collections import namedtuple
 from threading import Lock
-from typing import Optional, Awaitable
-from tornado import ioloop
-from tornado.websocket import WebSocketHandler
+from ovos_utils import wait_for_exit_signal
+from ovos_utils import resolve_resource_file
+from neon_utils import LOG
+from mycroft_bus_client import Message
+
 from neon_core.configuration import Configuration
 from neon_core.messagebus import get_messagebus
-from ovos_utils import wait_for_exit_signal
-
-from mycroft.util import create_daemon
-from mycroft.util.log import LOG
-from mycroft.messagebus.message import Message
-from mycroft.util import resolve_resource_file
 
 
 class SkillGUI:
@@ -407,6 +399,7 @@ class GUIManager:
     # GUI client API
     @property
     def gui_connected(self):
+        from neon_core.gui.service import GUIWebsocketHandler
         """Returns True if at least 1 gui is connected, else False"""
         return len(GUIWebsocketHandler.clients) > 0
 
@@ -418,6 +411,7 @@ class GUIManager:
 
     @staticmethod
     def send(msg_dict):
+        from neon_core.gui.service import GUIWebsocketHandler
         """ Send to all registered GUIs. """
         for connection in GUIWebsocketHandler.clients:
             try:
@@ -746,4 +740,3 @@ class GUIManager:
         # self.bus.on('recognizer_loop:audio_output_start', self.mouth.talk)
         # self.bus.on('recognizer_loop:audio_output_end', self.mouth.reset)
         pass
-

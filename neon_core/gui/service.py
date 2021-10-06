@@ -25,18 +25,20 @@
 
 import asyncio
 import json
-from threading import Thread
-from typing import Optional, Awaitable
 import sys
 import tornado.options
 import tornado.web as web
-from mycroft.messagebus.message import Message
-from mycroft.util.log import LOG
-from neon_core.configuration import Configuration
-from neon_core.gui.gui import GUIManager
-from neon_core.gui.resting_screen import RestingScreen
+
 from tornado import ioloop
 from tornado.websocket import WebSocketHandler
+from threading import Thread
+from typing import Optional, Awaitable
+from mycroft_bus_client import Message
+from neon_utils import LOG
+
+from neon_core.configuration import Configuration
+from neon_core.gui.gui import GUIManager, write_lock
+from neon_core.gui.resting_screen import RestingScreen
 
 ##########################################################################
 # GUIConnection
@@ -160,7 +162,8 @@ class NeonGUIService(Thread):
         LOG.info('GUI service started!')
         ioloop.IOLoop.instance().start()
 
-    def _init_tornado(self):
+    @staticmethod
+    def _init_tornado():
         # Disable all tornado logging so mycroft loglevel isn't overridden
         tornado.options.parse_command_line(sys.argv + ['--logging=None'])
         # get event loop for this thread
