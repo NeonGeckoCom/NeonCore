@@ -2,7 +2,7 @@
 
 name: Test Utilities
 on:
-  push:
+  pull_request:
   workflow_dispatch:
 
 # TODO: Run tests here for everything in NeonCore
