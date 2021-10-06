@@ -22,27 +22,32 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-""" Message bus service for mycroft-core
-
-The message bus facilitates inter-process communication between mycroft-core
-processes. It implements a websocket server so can also be used by external
-systems to integrate with the Mycroft system.
-"""
-from mycroft.lock import Lock  # creates/supports PID locking file
+from mycroft.lock import Lock
 from mycroft.util import wait_for_exit_signal, reset_sigint_handler
 from neon_core.messagebus.service import NeonBusService
+from neon_core.skills.service import NeonSkillService
+from neon_core.gui.service import NeonGUIService
+from time import sleep
 
+reset_sigint_handler()
+# Create PID file, prevent multiple instances of this service
+# TODO should also detect old services Locks
+lock = Lock("NeonCore")
 
-def main():
-    reset_sigint_handler()
-    # Create PID file, prevent multiple instances of this service
-    lock = Lock("bus")
-    # TODO debug should be False by default
-    service = NeonBusService(debug=True, daemonic=True)
-    service.start()
-    wait_for_exit_signal()
-    service.shutdown()
+# launch websocket listener
+bus = NeonBusService(daemonic=True)
+bus.start()
 
+# launch GUI websocket listener
+gui = NeonGUIService(daemonic=True)
+gui.start()
 
-if __name__ == "__main__":
-    main()
+# launch skills service
+skills = NeonSkillService()
+skills.start()
+
+wait_for_exit_signal()
+
+skills.shutdown()
+gui.shutdown()
+bus.shutdown()
