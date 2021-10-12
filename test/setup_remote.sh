@@ -84,7 +84,7 @@ curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | s
 sudo apt-get update
 
 # Install system dependencies
-sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic
+sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev git mpg123 ffmpeg mimic libpulse-dev
 
 
 # Do GUI install
@@ -103,7 +103,7 @@ pip install --upgrade pip==21.2.4
 pip install wheel
 
 cd "${sourceDir}" || exit 10
-pip install ".${optStr}" --use-deprecated=legacy-resolver
+pip install ".${optStr}"  # --use-deprecated=legacy-resolver
 
 neon-config-import
 
