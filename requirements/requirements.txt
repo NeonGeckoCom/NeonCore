@@ -19,14 +19,3 @@ ovos-plugin-manager==0.0.1
 
 # text parser modules
 RAKEkeywords>=0.2.0
-
-# Patch Dependency Conflicts
-# protobuf~=3.17.0
-# mycroft-messagebus-client>=0.9.4
-# tornado==6.0.3
-# numpy==1.19.5
-# pyee==8.1.0
-# python-dateutil==2.6.0
-# requests==2.26.0
-# requests-cache==0.8.0
-# urllib3==1.26.7
