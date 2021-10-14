@@ -29,15 +29,16 @@ from os import path, getenv
 BASEDIR = path.abspath(path.dirname(__file__))
 
 
-def get_version():
-    """ Find the version of mycroft-core"""
-    version = None
-    version_file = path.join(BASEDIR, 'version.py')
-    with open(version_file) as f:
-        for line in f:
-            if '__version__' in line:
-                version = line.split('=')[1].strip()
-    return version
+with open("./version.py", "r", encoding="utf-8") as v:
+    for line in v.readlines():
+        if line.startswith("__version__"):
+            if '"' in line:
+                version = line.split('"')[1]
+            else:
+                version = line.split("'")[1]
+
+with open("README.md", "r") as f:
+    long_description = f.read()
 
 
 def get_requirements(requirements_filename: str):
@@ -60,12 +61,14 @@ def get_requirements(requirements_filename: str):
 
 setup(
     name='neon-core',
-    version=get_version(),
+    version=version,
     license='NeonAI License v1.0',
     author='Neongecko',
     author_email='developers@neon.ai',
     url='https://github.com/NeonGeckoCom/NeonCore',
     description='Neon Core',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     install_requires=get_requirements('requirements.txt'),
     extras_require={
         "client": get_requirements("client.txt"),
