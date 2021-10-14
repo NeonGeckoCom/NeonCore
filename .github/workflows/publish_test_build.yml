@@ -30,10 +30,3 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Increment Version
-      - name: Build Distribution Packages
-        run: |
-          python setup.py bdist_wheel
-      - name: Publish to Test PyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          password: ${{secrets.PYPI_TOKEN}}
