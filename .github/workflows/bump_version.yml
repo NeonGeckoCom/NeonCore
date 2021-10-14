@@ -1,0 +1,21 @@
+
+name: Publish Alpha Build
+on:
+  pull_request:
+    branches:
+      - dev
+    paths-ignore:
+      - 'version.py'
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Increment Version
+        run: |
+          VER=$(python setup.py --version)
+          python version_bump.py
+      - name: Push Version Change
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Increment Version

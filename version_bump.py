@@ -38,7 +38,7 @@ else:
     new_post = int(post) + 1
     version = version.replace(f"a{post}", f"a{new_post}")
 
-for line in fileinput.input(join(dirname(__file__), "version.py"), inplace=True):
+for line in fileinput.input(join(dirname(__file__), "neon_core", "version.py"), inplace=True):
     if line.startswith("__version__"):
         print(f"__version__ = \"{version}\"")
     else:

@@ -29,7 +29,7 @@ from os import path, getenv
 BASEDIR = path.abspath(path.dirname(__file__))
 
 
-with open("./version.py", "r", encoding="utf-8") as v:
+with open("./neon_core/version.py", "r", encoding="utf-8") as v:
     for line in v.readlines():
         if line.startswith("__version__"):
             if '"' in line:
