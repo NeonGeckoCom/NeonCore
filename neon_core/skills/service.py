@@ -28,10 +28,9 @@ from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
 from mycroft.skills.msm_wrapper import MsmException
 from mycroft.util import start_message_bus_client
-from mycroft.util.lang import set_default_lang
+from mycroft.configuration.locale import set_default_lang, set_default_tz
 from mycroft.util.log import LOG
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
-from mycroft.util.time import set_default_tz
 from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager

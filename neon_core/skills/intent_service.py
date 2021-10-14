@@ -38,7 +38,7 @@ from neon_utils.log_utils import LOG
 from neon_utils.configuration_utils import get_neon_device_type
 from ovos_utils.json_helper import merge_dict
 
-from mycroft.util.lang import set_default_lang
+from mycroft.configuration.locale import set_default_lang
 from mycroft.util.parse import normalize
 from mycroft.skills.intent_service import IntentService
 
