@@ -8,9 +8,16 @@ on:
       - 'version.py'
 
 jobs:
-  build_and_publish:
+  bump_version:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
       - name: Increment Version
         run: |
           VER=$(python setup.py --version)
