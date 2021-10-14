@@ -1,5 +1,5 @@
 
-name: Publish Alpha Build
+name: Bump Version
 on:
   pull_request:
     branches:
