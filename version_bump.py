@@ -20,7 +20,7 @@
 import fileinput
 from os.path import join, dirname
 
-with open(join(dirname(__file__), "version.py"), "r", encoding="utf-8") as v:
+with open(join(dirname(__file__), "neon_core", "version.py"), "r", encoding="utf-8") as v:
     for line in v.readlines():
         if line.startswith("__version__"):
             if '"' in line:
