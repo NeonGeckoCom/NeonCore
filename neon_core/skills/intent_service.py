@@ -143,11 +143,13 @@ class NeonIntentService(IntentService):
             # Add or init timing data
             message.context = message.context or {}
             if not message.context.get("timing"):
-                LOG.warning("No timing data available at intent service")
+                LOG.debug("No timing data available at intent service")
                 message.context["timing"] = {}
             message.context["timing"]["handle_utterance"] = time.time()
             stopwatch = Stopwatch()
 
+            # TODO: Consider saving transcriptions after text parsers cleanup utterance. This should retain the raw
+            #       transcription, in addition to the one modified by the parsers DM
             # Write out text and audio transcripts if service is available
             with stopwatch:
                 self._save_utterance_transcription(message)
