@@ -148,7 +148,7 @@ class NeonIntentService(IntentService):
             message.context["timing"]["handle_utterance"] = time.time()
 
             # Make sure there is a `transcribed` timestamp (should have been added in speech module)
-            if not message.context["timing"]["transcribed"]:
+            if not message.context["timing"].get("transcribed"):
                 message.context["timing"]["transcribed"] = message.context["timing"]["handle_utterance"]
 
             stopwatch = Stopwatch()
