@@ -1,0 +1,21 @@
+# This workflow will generate a PR for changes in cert into master
+
+name: Pull to Master
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  pull_changes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: pull-request-action
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_reviewer: 'neonreviewers'
+          pr_assignee: 'neondaniel'
+          pr_draft: true
