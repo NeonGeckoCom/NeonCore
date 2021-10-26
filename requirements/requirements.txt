@@ -1,5 +1,5 @@
 # mycroft
-HolmesV[all]==2021.10.8
+ovos-core[all]==0.0.1
 mock_msm
 
 # neon core modules
