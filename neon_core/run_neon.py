@@ -162,7 +162,7 @@ def start_neon():
         _start_process("neon_core_server")
     else:
         _start_process("neon_enclosure_client")
-        _start_process("neon_core_client")
+        # _start_process("neon_core_client")
         _start_process("mycroft-gui-app")
         _start_process(["python3", "-m", "neon_core.gui"])
 

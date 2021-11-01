@@ -124,11 +124,11 @@ class TestRunNeon(unittest.TestCase):
     #     matches = resp.data.get("transcripts")
     #     self.assertIsInstance(matches, list)
 
-    def test_client_module(self):
-        resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
-        self.assertIsInstance(resp, Message)
-        data = resp.data
-        self.assertIsInstance(data["success"], bool)
+    # def test_client_module(self):
+    #     resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
+    #     self.assertIsInstance(resp, Message)
+    #     data = resp.data
+    #     self.assertIsInstance(data["success"], bool)
 
     def test_skills_module(self):
         response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
