@@ -123,8 +123,8 @@ def _stop_all_core_processes():
     procs = {p.pid: p.cmdline() for p in psutil.process_iter()}
     for pid, cmdline in procs.items():
         if cmdline and (any(pname in cmdline[-1] for pname in ("mycroft.messagebus.service", "neon_speech_client",
-                                                               "neon_audio_client",
-                                                               "neon_core.skills", "neon_core.gui"
+                                                               "neon_audio_client", "neon_core.messagebus.service",
+                                                               "neon_core.skills", "neon_core.gui",
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
                                                                "NGI.utilities.gui", "run_neon.py")
@@ -138,7 +138,7 @@ def _stop_all_core_processes():
                 psutil.Process(pid).terminate()
                 sleep(1)
                 if psutil.pid_exists(pid) and psutil.Process(pid).is_running():
-                    LOG.error(f"Process {pid} not terminated!!")
+                    LOG.info(f"Process {pid} not terminated!!")
                     psutil.Process(pid).kill()
             except Exception as e:
                 LOG.error(e)
