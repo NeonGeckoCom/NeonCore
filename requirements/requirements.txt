@@ -16,6 +16,7 @@ ovos-skills-manager>=0.0.2
 
 # plugins
 ovos-plugin-manager==0.0.1
+neon-lang-plugin-libretranslate>=0.1.2
 
 # text parser modules
 RAKEkeywords>=0.2.0
