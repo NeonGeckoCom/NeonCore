@@ -1,0 +1,23 @@
+2021-10-26 14:05:55.196 - neon-utils - neon_utils.configuration_utils:_move_config_sections:779 - WARNING - Depreciated keys found in user config! Adding them to local config
+2021-10-26 14:05:55.451 - neon-utils - neon_utils.configuration_utils:_write_yaml_file:309 - DEBUG - YAML updated ngi_local_conf
+2021-10-26 14:05:55.503 - neon-utils - neon_utils.configuration_utils:dict_make_equal_keys:525 - WARNING - Removing 'phonemes' from dict!
+2021-10-26 14:05:55.768 - neon-utils - neon_utils.configuration_utils:_write_yaml_file:309 - DEBUG - YAML updated ngi_local_conf
+2021-10-26 14:05:55.872 - neon-utils - neon_utils.configuration_utils:get_neon_local_config:856 - INFO - Loaded local config from /home/d_mcknight/PycharmProjects/_.Core/NeonCore/ngi_local_conf.yml
+2021-10-26 14:05:59.996 | INFO     | 375209 | mycroft.messagebus.load_config:load_message_bus_config:33 | Loading message bus configs
+2021-10-26 14:05:59.998 | ERROR    | 375209 | mycroft_bus_client.client.client | === ConnectionRefusedError(111, 'Connection refused') ===
+Traceback (most recent call last):
+  File "/home/d_mcknight/PycharmProjects/_.Core/venv/lib/python3.8/site-packages/websocket/_app.py", line 312, in run_forever
+    self.sock.connect(
+  File "/home/d_mcknight/PycharmProjects/_.Core/venv/lib/python3.8/site-packages/websocket/_core.py", line 249, in connect
+    self.sock, addrs = connect(url, self.sock_opt, proxy_info(**options),
+  File "/home/d_mcknight/PycharmProjects/_.Core/venv/lib/python3.8/site-packages/websocket/_http.py", line 130, in connect
+    sock = _open_socket(addrinfo_list, options.sockopt, options.timeout)
+  File "/home/d_mcknight/PycharmProjects/_.Core/venv/lib/python3.8/site-packages/websocket/_http.py", line 208, in _open_socket
+    raise err
+  File "/home/d_mcknight/PycharmProjects/_.Core/venv/lib/python3.8/site-packages/websocket/_http.py", line 185, in _open_socket
+    sock.connect(address)
+ConnectionRefusedError: [Errno 111] Connection refused
+2021-10-26 14:05:59.999 | ERROR    | 375209 | mycroft_bus_client.client.client | Exception closing websocket: ConnectionRefusedError(111, 'Connection refused')
+2021-10-26 14:05:59.999 | WARNING  | 375209 | mycroft_bus_client.client.client | Message Bus Client will reconnect in 5.0 seconds.
+2021-10-26 14:06:05.005 | INFO     | 375209 | mycroft_bus_client.client.client | Connected
+2021-10-26 14:06:05.006 | INFO     | 375209 | mycroft.util.process_utils:start_message_bus_client:155 | Connected to messagebus

@@ -1,0 +1,15 @@
+qt5ct: using qt5ct plugin
+Attribute Qt::AA_ShareOpenGLContexts must be set before QCoreApplication is created.
+qrc:/main.qml:38:5: Unable to assign [undefined] to int
+qrc:/main.qml:37:5: Unable to assign [undefined] to int
+qrc:/main.qml:36:5: Unable to assign [undefined] to int
+qrc:/main.qml:35:5: Unable to assign [undefined] to int
+qrc:/main.qml:34:5: Unable to assign [undefined] to int
+qrc:/main.qml:33:5: Unable to assign [undefined] to int
+qrc:/main.qml:225:17: Unable to assign ApplicationWindow_QMLTYPE_68 to QQuickItem
+qrc:/main.qml:252:17: Unable to assign null to QStringList
+qml: Trying to connect to Mycroft
+/usr/bin/mycroft-gui-core-loader: 8: cd: can't cd to /home/d_mcknight/mycroft-core
+Main Socket connected, trying to connect gui
+Received port 18181 for gui "{23153746-1acd-4ba1-9630-1edc0d0b5ab9}"
+
