@@ -90,8 +90,8 @@ def setup_ovos_config():
 
 setup_ovos_config()
 
-# make holmesV Configuration.get() load neon.conf
-# TODO HolmesV does not yet support yaml configs, once it does
+# make ovos-core Configuration.get() load neon.conf
+# TODO ovos-core does not yet support yaml configs, once it does
 #  Configuration.get() will be made to load the existing neon config files,
 #  for now it simply provides correct default values
 setup_ovos_core_config()
@@ -99,6 +99,7 @@ setup_ovos_core_config()
 neon_config_path = join(xdg.BaseDirectory.save_config_path("neon"),
                         "neon.conf")
 write_mycroft_compatible_config(neon_config_path)
+LOG.info(f"{neon_config_path} will be overwritten with Neon YAML config contents.")
 
 # patch version string to allow downstream to know where it is running
 import mycroft.version
