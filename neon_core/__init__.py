@@ -38,11 +38,11 @@ NEON_ROOT_PATH = dirname(dirname(__file__))
 
 def setup_ovos_core_config():
     """
-    Runs at module init to ensure base holmes.conf exists to patch ovos-core. Note that this must run before any import
+    Runs at module init to ensure base ovos.conf exists to patch ovos-core. Note that this must run before any import
     of Configuration class.
     """
     OVOS_CONFIG = join(xdg.BaseDirectory.save_config_path("OpenVoiceOS"),
-                         "ovos.conf")
+                       "ovos.conf")
 
     _NEON_OVOS_CONFIG = {
         "module_overrides": {
@@ -67,6 +67,8 @@ def setup_ovos_core_config():
     try:
         with open(OVOS_CONFIG) as f:
             cfg = json.load(f)
+    except FileNotFoundError:
+        pass
     except Exception as e:
         LOG.error(e)
 
@@ -77,8 +79,9 @@ def setup_ovos_core_config():
 
 def setup_ovos_config():
     """
-    Configure OVOS config to read from neon.conf files and set this path as the root.
+    Configure ovos_utils to read from neon.conf files and set this path as the root.
     """
+    # TODO: This method will be handled in ovos-core directly in the future
     # ensure ovos_utils can find neon_core
     set_root_path(NEON_ROOT_PATH)
     # make ovos_utils load the proper .conf files
