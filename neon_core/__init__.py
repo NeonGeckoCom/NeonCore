@@ -36,15 +36,15 @@ from neon_utils.configuration_utils import write_mycroft_compatible_config
 NEON_ROOT_PATH = dirname(dirname(__file__))
 
 
-def setup_holmes_config():
+def setup_ovos_core_config():
     """
     Runs at module init to ensure base holmes.conf exists to patch ovos-core. Note that this must run before any import
     of Configuration class.
     """
-    HOLMES_CONFIG = join(xdg.BaseDirectory.save_config_path("HolmesV"),
-                         "holmes.conf")
+    OVOS_CONFIG = join(xdg.BaseDirectory.save_config_path("OpenVoiceOS"),
+                         "ovos.conf")
 
-    _NEON_HOLMES_CONFIG = {
+    _NEON_OVOS_CONFIG = {
         "module_overrides": {
             "neon_core": {
                 "xdg": True,
@@ -65,13 +65,13 @@ def setup_holmes_config():
 
     cfg = {}
     try:
-        with open(HOLMES_CONFIG) as f:
+        with open(OVOS_CONFIG) as f:
             cfg = json.load(f)
     except Exception as e:
         LOG.error(e)
 
-    cfg = merge_dict(cfg, _NEON_HOLMES_CONFIG)
-    with open(HOLMES_CONFIG, "w") as f:
+    cfg = merge_dict(cfg, _NEON_OVOS_CONFIG)
+    with open(OVOS_CONFIG, "w") as f:
         json.dump(cfg, f, indent=4, ensure_ascii=True)
 
 
@@ -91,7 +91,7 @@ setup_ovos_config()
 # TODO HolmesV does not yet support yaml configs, once it does
 #  Configuration.get() will be made to load the existing neon config files,
 #  for now it simply provides correct default values
-setup_holmes_config()
+setup_ovos_core_config()
 
 neon_config_path = join(xdg.BaseDirectory.save_config_path("neon"),
                         "neon.conf")
