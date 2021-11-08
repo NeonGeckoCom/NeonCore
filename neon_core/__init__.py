@@ -99,6 +99,7 @@ setup_ovos_core_config()
 neon_config_path = join(xdg.BaseDirectory.save_config_path("neon"),
                         "neon.conf")
 write_mycroft_compatible_config(neon_config_path)
+# TODO: Consider when this log is valid/config is changed or not already synced with neon_config DM
 LOG.info(f"{neon_config_path} will be overwritten with Neon YAML config contents.")
 
 # patch version string to allow downstream to know where it is running
