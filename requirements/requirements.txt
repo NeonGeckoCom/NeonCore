@@ -3,9 +3,9 @@ ovos-core[all]==0.0.1
 mock_msm
 
 # neon core modules
-neon_speech>=0.2.0
-neon_audio>=0.3.2
-neon_enclosure>=0.1.0
+neon_speech~=0.3
+neon_audio~=0.4
+neon_enclosure~=0.1,>=0.1.2
 
 # utils
 neon-utils>=0.12.0
@@ -15,7 +15,7 @@ ovos_utils>=0.0.12a3
 ovos-skills-manager>=0.0.2
 
 # plugins
-ovos-plugin-manager==0.0.1
+ovos-plugin-manager~=0.0.1
 neon-lang-plugin-libretranslate>=0.1.2
 
 # text parser modules
