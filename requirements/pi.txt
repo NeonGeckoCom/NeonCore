@@ -1,9 +1,5 @@
-neon-client @ git+https://github.com/NeonGeckoCom/neon-core-client
-neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_controller
-ovos-ww-plugin-pocketsphinx
-neon-tts-plugin-mimic
 deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
-neon-stt-plugin-deepspeech-stream-local
-
-# Install vosk in case user installs that plugin
 vosk @ https://github.com/alphacep/vosk-api/releases/download/v0.3.30/vosk-0.3.30-py3-none-linux_aarch64.whl
+
+neon-tts-plugin-mimic
+neon-stt-plugin-deepspeech-stream-local
