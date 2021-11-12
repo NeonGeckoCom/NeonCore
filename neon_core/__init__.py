@@ -90,7 +90,7 @@ def setup_ovos_config():
     # ensure ovos_utils can find neon_core
     set_root_path(NEON_ROOT_PATH)
     # make ovos_utils load the proper .conf files
-    set_config_name("neon", "neon_core")
+    set_config_name("neon.conf", "neon_core")
 
 
 setup_ovos_config()
