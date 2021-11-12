@@ -51,3 +51,27 @@ jobs:
       - name: Test Language
         run: |
           pytest test/test_language.py
+
+  unit_tests:
+    strategy:
+      matrix:
+        python-version: [ 3.6, 3.7, 3.8 ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
+          pip install -r requirements/requirements.txt
+          pip install -r requirements/test.txt
+        env:
+          GITHUB_TOKEN: ${{secrets.neon_token}}
+      - name: Test Configuration Module
+          run: |
+            pytest test/test_configuration.py

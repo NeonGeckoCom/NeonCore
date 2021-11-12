@@ -26,6 +26,8 @@
 from os.path import join, dirname
 import xdg.BaseDirectory
 import json
+import ovos_utils.signal
+
 from ovos_utils.json_helper import merge_dict
 from ovos_utils.system import set_root_path
 from ovos_utils.configuration import set_config_name
@@ -34,6 +36,9 @@ from neon_utils import LOG
 from neon_utils.configuration_utils import write_mycroft_compatible_config
 
 NEON_ROOT_PATH = dirname(dirname(__file__))
+
+from mycroft.util.signal import get_ipc_directory
+ovos_utils.signal.get_ipc_directory = get_ipc_directory
 
 
 def setup_ovos_core_config():
