@@ -32,32 +32,31 @@ from ovos_plugin_manager.templates.language import LanguageDetector, LanguageTra
 
 from neon_utils.configuration_utils import get_mycroft_compatible_config
 
-from mycroft.configuration import Configuration as MycroftConfig
-
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.configuration import *
 
 
 class ConfigurationTests(unittest.TestCase):
     def test_neon_core_config_init(self):
+        from neon_core.configuration import Configuration
         neon_compat_config = Configuration.get()
         neon_config = get_mycroft_compatible_config()
         for key, val in neon_config.items():
             if isinstance(val, dict):
                 for k, v in val.items():
                     if not isinstance(v, dict):
-                        self.assertEqual(neon_compat_config[key][k], v)
+                        self.assertEqual(neon_compat_config[key][k], v, neon_compat_config[key])
             else:
                 self.assertEqual(neon_compat_config[key], val)
 
     def test_ovos_core_config_init(self):
+        from mycroft.configuration import Configuration as MycroftConfig
         mycroft_config = MycroftConfig.get()
         neon_config = get_mycroft_compatible_config()
         for key, val in neon_config.items():
             if isinstance(val, dict):
                 for k, v in val.items():
                     if not isinstance(v, dict):
-                        self.assertEqual(mycroft_config[key][k], v)
+                        self.assertEqual(mycroft_config[key][k], v, mycroft_config[key])
             else:
                 self.assertEqual(mycroft_config[key], val)
 
