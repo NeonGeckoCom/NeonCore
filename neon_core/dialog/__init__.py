@@ -22,10 +22,12 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 from os.path import join
+from neon_utils import LOG
+
 from mycroft.dialog import MustacheDialogRenderer, load_dialogs
 from mycroft.util import resolve_resource_file
-from mycroft.util.log import LOG
 
 
 def get(phrase, lang=None, context=None):

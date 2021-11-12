@@ -25,17 +25,15 @@
 
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
-# from neon_core.configuration import Configuration
+from neon_utils import LOG
+from neon_utils.net_utils import check_online
+from neon_utils.authentication_utils import repo_is_neon
+from neon_utils.configuration_utils import get_neon_skills_config
+from datetime import datetime, timedelta
+
 from neon_core.messagebus import get_messagebus
 from neon_core.util.skill_utils import get_remote_entries
 from mycroft.skills.event_scheduler import EventSchedulerInterface
-from mycroft.util import connected
-from mycroft.util.log import LOG
-# from os.path import expanduser
-from datetime import datetime, timedelta
-
-from neon_utils.authentication_utils import repo_is_neon
-from neon_utils.configuration_utils import get_neon_skills_config
 
 
 class SkillsStore:
@@ -76,7 +74,7 @@ class SkillsStore:
         try:
             self.install_default_skills(update=True)
         except Exception as e:
-            if connected():
+            if check_online():
                 # if there is internet log the error
                 LOG.exception(e)
                 LOG.error("skills update failed")
@@ -88,7 +86,7 @@ class SkillsStore:
         try:
             self.osm.sync_appstores()
         except Exception as e:
-            if connected():
+            if check_online():
                 # if there is internet log the error
                 LOG.exception(e)
                 LOG.error("appstore sync failed")

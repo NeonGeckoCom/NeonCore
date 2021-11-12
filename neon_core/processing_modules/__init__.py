@@ -23,15 +23,16 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from threading import Thread, Event
-from os.path import join, basename
 import os
 import time
 import sys
 import gc
-from glob import glob
 import imp
-from mycroft.util.log import LOG
+
+from glob import glob
+from threading import Thread, Event
+from os.path import join, basename
+from neon_utils import LOG
 
 DEBUG = True
 

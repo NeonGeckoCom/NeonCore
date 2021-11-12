@@ -24,7 +24,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import time
-from mycroft.messagebus.message import Message
+from mycroft_bus_client import Message
 from neon_core.messagebus import get_messagebus
 from os.path import abspath
 
