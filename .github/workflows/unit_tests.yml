@@ -43,14 +43,28 @@ jobs:
           pip install -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
+
       - name: Test Skill Utils
         run: |
-          pytest test/test_skill_utils.py
+          pytest test/test_skill_utils.py --doctest-modules --junitxml=tests/skill-utils-test-results.xml
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
-      - name: Test Language
+      - name: Upload Skill Utils test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: skill-utils-test-results
+          path: tests/skill-utils-test-results.xml
+
+      - name: Test Diagnostic Utils
         run: |
-          pytest test/test_language.py
+          pytest test/test_diagnostic_utils.py --doctest-modules --junitxml=tests/diagnostic-utils-test-results.xml
+        env:
+          GITHUB_TOKEN: ${{secrets.neon_token}}
+      - name: Upload Diagnostic Utils test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: diagnostic-utils-test-results
+          path: tests/diagnostic-utils-test-results.xml
 
   unit_tests:
     strategy:
@@ -72,6 +86,21 @@ jobs:
           pip install -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
+
       - name: Test Configuration Module
         run: |
-          pytest test/test_configuration.py
+          pytest test/test_configuration.py --doctest-modules --junitxml=tests/configuration-test-results.xml
+      - name: Upload Configuration test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: configuration-test-results
+          path: tests/configuration-test-results.xml
+
+      - name: Test Language
+        run: |
+          pytest test/test_language.py --doctest-modules --junitxml=tests/language-test-results.xml
+      - name: Upload Language test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: language-test-results
+          path: tests/language-test-results.xml

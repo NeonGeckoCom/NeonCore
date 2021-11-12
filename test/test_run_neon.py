@@ -47,7 +47,7 @@ class TestRunNeon(unittest.TestCase):
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
         cls.bus.connected_event.wait()
-        cls.bus.wait_for_message("mycroft.ready", 360)
+        cls.bus.wait_for_message("mycroft.ready", 600)
 
     @classmethod
     def tearDownClass(cls) -> None:
