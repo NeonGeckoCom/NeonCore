@@ -73,5 +73,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
       - name: Test Configuration Module
-          run: |
-            pytest test/test_configuration.py
+        run: |
+          pytest test/test_configuration.py
