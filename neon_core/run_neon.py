@@ -34,6 +34,8 @@ from subprocess import Popen, STDOUT
 
 import sys
 from mycroft_bus_client import MessageBusClient, Message
+from ovos_utils.gui import is_gui_running
+
 from neon_utils.configuration_utils import get_neon_device_type
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG_DIR, LOG, get_log_file_for_module
 from typing.io import IO
@@ -121,8 +123,8 @@ def _stop_all_core_processes():
     procs = {p.pid: p.cmdline() for p in psutil.process_iter()}
     for pid, cmdline in procs.items():
         if cmdline and (any(pname in cmdline[-1] for pname in ("mycroft.messagebus.service", "neon_speech_client",
-                                                               "neon_audio_client",
-                                                               "neon_core.skills", "neon_core.gui"
+                                                               "neon_audio_client", "neon_core.messagebus.service",
+                                                               "neon_core.skills", "neon_core.gui",
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
                                                                "NGI.utilities.gui", "run_neon.py")
@@ -136,7 +138,7 @@ def _stop_all_core_processes():
                 psutil.Process(pid).terminate()
                 sleep(1)
                 if psutil.pid_exists(pid) and psutil.Process(pid).is_running():
-                    LOG.error(f"Process {pid} not terminated!!")
+                    LOG.info(f"Process {pid} not terminated!!")
                     psutil.Process(pid).kill()
             except Exception as e:
                 LOG.error(e)
@@ -161,9 +163,10 @@ def start_neon():
     if get_neon_device_type() == "server":
         _start_process("neon_core_server")
     else:
+        if not is_gui_running():
+            _start_process("mycroft-gui-app")
         _start_process("neon_enclosure_client")
-        _start_process("neon_core_client")
-        _start_process("mycroft-gui-app")
+        # _start_process("neon_core_client")
         _start_process(["python3", "-m", "neon_core.gui"])
 
     try:

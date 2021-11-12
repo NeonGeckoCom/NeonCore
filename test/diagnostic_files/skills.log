@@ -1,0 +1,3 @@
+2021-10-26 14:05:54.517 - OVOS - ovos_utils.system:set_root_path:60 - INFO - mycroft root set to NeonCore
+2021-10-26 14:05:54.528 - OVOS - ovos_utils.configuration:set_xdg_base:33 - INFO - XDG base folder set to: 'neon_core'
+2021-10-26 14:05:54.568 - OVOS - ovos_utils.configuration:set_config_filename:45 - INFO - config filename set to: 'neon'

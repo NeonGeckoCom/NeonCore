@@ -42,9 +42,6 @@ class TestSetupDevLocal(unittest.TestCase):
         import neon_stt_plugin_deepspeech_stream_local
         import mycroft
         import neon_cli
-        import neon_core_client
-        with self.assertRaises(ImportError):
-            import neon_core_server
 
     def test_installed_skills(self):
         local_config = get_neon_local_config()

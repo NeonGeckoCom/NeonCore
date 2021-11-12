@@ -22,12 +22,13 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from neon_core.configuration import Configuration, get_private_keys
-from ovos_plugin_manager.language import load_lang_detect_plugin, \
-    load_tx_plugin
+
 import os
 
-from neon_utils.configuration_utils import get_neon_lang_config
+from ovos_plugin_manager.language import load_lang_detect_plugin, \
+    load_tx_plugin
+from neon_utils.configuration_utils import get_neon_lang_config, LOG
+from neon_core.configuration import Configuration, get_private_keys
 
 
 def get_lang_config():
@@ -75,6 +76,9 @@ class TranslatorFactory:
             clazz = load_tx_plugin(module)
         else:
             clazz = TranslatorFactory.CLASSES.get(module)
+        if not clazz:
+            LOG.error(f"Configured translation module not found ({module})")
+            return None
         config["keys"] = get_private_keys()
         return clazz(config)
 
@@ -92,6 +96,8 @@ class DetectorFactory:
             clazz = load_lang_detect_plugin(module)
         else:
             clazz = DetectorFactory.CLASSES.get(module)
-
+        if not clazz:
+            LOG.error(f"Configured detection module not found ({module})")
+            return None
         config["keys"] = get_private_keys()
         return clazz(config)

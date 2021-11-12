@@ -302,7 +302,8 @@ doInstall(){
     sudo apt-get update
 
     # Install system dependencies
-    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev libsndfile1 git mpg123 ffmpeg mimic libpulse-dev
+    sudo apt install -y python3-dev python3-venv python3-pip swig libssl-dev libfann-dev portaudio19-dev libsndfile1 \
+    git mpg123 ffmpeg mimic libpulse-dev
 
     # Make venv if not in one
     if [ -z "${VIRTUAL_ENV}" ]; then
@@ -335,7 +336,7 @@ doInstall(){
     echo "${GITHUB_TOKEN}">~/token.txt
     pip install --upgrade pip~=21.1.0
     pip install wheel
-    pip install "${pipStr}" --use-deprecated=legacy-resolver
+    pip install "${pipStr}"
     neon-config-import
 
 start_script="#!/bin/bash

@@ -47,7 +47,7 @@ class TestRunNeon(unittest.TestCase):
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
         cls.bus.connected_event.wait()
-        cls.bus.wait_for_message("mycroft.ready", 90)
+        cls.bus.wait_for_message("mycroft.ready", 360)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -124,16 +124,15 @@ class TestRunNeon(unittest.TestCase):
     #     matches = resp.data.get("transcripts")
     #     self.assertIsInstance(matches, list)
 
-    def test_client_module(self):
-        resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
-        self.assertIsInstance(resp, Message)
-        data = resp.data
-        self.assertIsInstance(data["success"], bool)
+    # def test_client_module(self):
+    #     resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
+    #     self.assertIsInstance(resp, Message)
+    #     data = resp.data
+    #     self.assertIsInstance(data["success"], bool)
 
     def test_skills_module(self):
-        # TODO: Skills takes a long time on first run; speed it up and replace this test DM
-        # response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
-        # self.assertTrue(response.data['status'])
+        response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
+        self.assertTrue(response.data['status'])
 
         response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
         self.assertIsInstance(response, Message)

@@ -35,8 +35,11 @@ from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_utils.configuration_utils import get_neon_skills_config, \
-    get_neon_lang_config
+    get_neon_lang_config, get_neon_local_config
 from neon_utils.net_utils import check_online
+
+from neon_core.util.diagnostic_utils import report_metric
+from neon_utils.metrics_utils import announce_connection
 
 
 def on_started():
@@ -99,6 +102,20 @@ class NeonSkillService:
         while not self.skill_manager.is_all_loaded():
             time.sleep(0.1)
         self.status.set_ready()
+        announce_connection()
+
+    def _initialize_metrics_handler(self):
+        """
+        Start bus listener for metrics
+        """
+        def handle_metric(message):
+            report_metric(message.data.pop("name"), **message.data)
+
+        if get_neon_local_config()['prefFlags']['metrics']:
+            LOG.info("Metrics reporting enabled")
+            self.bus.on("neon.metric", handle_metric)
+        else:
+            LOG.info("Metrics reporting disabled")
 
     def _register_intent_services(self):
         """Start up the all intent services and connect them as needed.
