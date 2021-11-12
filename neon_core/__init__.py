@@ -101,9 +101,13 @@ setup_ovos_config()
 #  for now it simply provides correct default values
 setup_ovos_core_config()
 
+# Write and reload Mycroft-compat conf file
 neon_config_path = join(xdg.BaseDirectory.save_config_path("neon"),
                         "neon.conf")
 write_mycroft_compatible_config(neon_config_path)
+from neon_core.configuration import Configuration
+Configuration.load_config_stack(cache=True, remote=False)
+
 # TODO: Consider when this log is valid/config is changed or not already synced with neon_config DM
 LOG.info(f"{neon_config_path} will be overwritten with Neon YAML config contents.")
 
