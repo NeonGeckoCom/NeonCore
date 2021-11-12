@@ -8,7 +8,7 @@ neon_audio~=0.4
 neon_enclosure~=0.1,>=0.1.2
 
 # utils
-neon-utils>=0.12.0
+neon-utils>=0.12.5a3
 rapidfuzz
 kthread
 ovos_utils>=0.0.12a3
