@@ -22,13 +22,14 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import json
+from threading import Event
 from mycroft_bus_client import MessageBusClient, Message
+
 from mycroft.messagebus.service.event_handler import MessageBusEventHandler
 from mycroft.util import create_daemon
 from mycroft.messagebus.load_config import load_message_bus_config
 from mycroft.util.json_helper import merge_dict
-import json
-from threading import Event
 
 
 def get_messagebus(running=True):

@@ -30,14 +30,15 @@ systems to integrate with the Mycroft system.
 """
 import asyncio
 import sys
+import tornado.options
+
 from os.path import expanduser, isfile
 from threading import Thread
+from tornado import web, ioloop
+from neon_utils import LOG
 
-import tornado.options
 from mycroft.messagebus.load_config import load_message_bus_config
 from mycroft.messagebus.service.event_handler import MessageBusEventHandler
-from mycroft.util.log import LOG
-from tornado import web, ioloop
 
 
 class NeonBusService(Thread):

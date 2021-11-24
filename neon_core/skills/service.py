@@ -24,22 +24,23 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import time
 
+from neon_utils.configuration_utils import get_neon_skills_config, \
+    get_neon_lang_config, get_neon_local_config
+from neon_utils.net_utils import check_online
+from neon_utils import LOG
+from neon_utils.metrics_utils import announce_connection
+
+from neon_core.skills.fallback_skill import FallbackSkill
+from neon_core.skills.intent_service import NeonIntentService
+from neon_core.skills.skill_manager import NeonSkillManager
+from neon_core.util.diagnostic_utils import report_metric
+
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
 from mycroft.skills.msm_wrapper import MsmException
 from mycroft.util import start_message_bus_client
 from mycroft.configuration.locale import set_default_lang, set_default_tz
-from mycroft.util.log import LOG
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
-from neon_core.skills.fallback_skill import FallbackSkill
-from neon_core.skills.intent_service import NeonIntentService
-from neon_core.skills.skill_manager import NeonSkillManager
-from neon_utils.configuration_utils import get_neon_skills_config, \
-    get_neon_lang_config, get_neon_local_config
-from neon_utils.net_utils import check_online
-
-from neon_core.util.diagnostic_utils import report_metric
-from neon_utils.metrics_utils import announce_connection
 
 
 def on_started():

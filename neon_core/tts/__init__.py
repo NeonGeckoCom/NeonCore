@@ -24,3 +24,6 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from neon_audio.tts import TTS, PlaybackThread, TTSValidator, TTSFactory, load_tts_plugin
+from neon_utils import LOG
+LOG.warning(f"This reference is deprecated. Import from neon_audio.tts directly!")
+# TODO: Deprecate in neon_core 22.04

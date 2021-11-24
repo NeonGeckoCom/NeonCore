@@ -26,7 +26,7 @@
 import time
 
 from threading import Lock
-from neon_utils.log_utils import LOG
+from neon_utils import LOG
 from mycroft_bus_client import Message, MessageBusClient
 from neon_utils.skills.mycroft_skill import MycroftSkill
 

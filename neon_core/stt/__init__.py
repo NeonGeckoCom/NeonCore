@@ -23,4 +23,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # backwards compatibility
+
 from neon_speech.stt import *
+from neon_utils import LOG
+LOG.warning(f"This reference is deprecated. Import from neon_speech.stt directly!")
+# TODO: Deprecate in neon_core 22.04

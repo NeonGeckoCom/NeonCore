@@ -27,7 +27,7 @@ from os.path import expanduser
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION as requests, set_github_token, clear_github_token
 from neon_utils.configuration_utils import get_neon_skills_config
-from neon_utils.log_utils import LOG
+from neon_utils import LOG
 
 
 def install_skills_from_list(skills_to_install: list, config: dict = None):
