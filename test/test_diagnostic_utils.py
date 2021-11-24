@@ -61,7 +61,6 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.report_metric.reset_mock()
         neon_utils.metrics_utils.report_metric = self.report_metric
 
-
     def test_send_diagnostics_default(self):
         from neon_core.util.diagnostic_utils import send_diagnostics
         send_diagnostics()
