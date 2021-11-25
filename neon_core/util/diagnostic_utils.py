@@ -92,8 +92,8 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
 
     data = {"host": socket.gethostname(),
             "startup": startup,
-            "configurations": json.dumps(configs),
-            "logs": json.dumps(logs),
+            "configurations": json.dumps(configs) if configs else None,
+            "logs": json.dumps(logs) if logs else None,
             "transcripts": transcripts}
     report_metric("diagnostics", **data)
     return data
