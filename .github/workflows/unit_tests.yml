@@ -44,17 +44,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
 
-      - name: Test Diagnostic Utils
-        run: |
-          pytest test/test_diagnostic_utils.py --doctest-modules --junitxml=tests/diagnostic-utils-test-results.xml
-        env:
-          GITHUB_TOKEN: ${{secrets.neon_token}}
-      - name: Upload Diagnostic Utils test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: diagnostic-utils-test-results
-          path: tests/diagnostic-utils-test-results.xml
-
       - name: Test Skill Utils
         run: |
           pytest test/test_skill_utils.py --doctest-modules --junitxml=tests/skill-utils-test-results.xml
@@ -65,6 +54,17 @@ jobs:
         with:
           name: skill-utils-test-results
           path: tests/skill-utils-test-results.xml
+
+      - name: Test Diagnostic Utils
+        run: |
+          pytest test/test_diagnostic_utils.py --doctest-modules --junitxml=tests/diagnostic-utils-test-results.xml
+        env:
+          GITHUB_TOKEN: ${{secrets.neon_token}}
+      - name: Upload Diagnostic Utils test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: diagnostic-utils-test-results
+          path: tests/diagnostic-utils-test-results.xml
 
   unit_tests:
     strategy:
