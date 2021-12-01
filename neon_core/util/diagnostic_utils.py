@@ -61,6 +61,7 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
     if allow_logs:
         logs = dict()
         try:
+            LOG.info(f"Reading logs from: {logs_dir}")
             for log in glob.glob(f'{logs_dir}/*.log'):
                 if os.path.basename(log) == "start.log":
                     pass
