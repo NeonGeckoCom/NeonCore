@@ -50,6 +50,7 @@ class DiagnosticUtilsTests(unittest.TestCase):
         local_config["dirVars"]["docsDir"] = test_dir
         local_config["dirVars"]["logsDir"] = test_dir
         local_config["dirVars"]["diagsDir"] = test_dir
+        local_config.write_changes()
 
     @classmethod
     def tearDownClass(cls) -> None:
