@@ -50,7 +50,7 @@ jobs:
       matrix:
         python-version: [ 3.8 ]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v2
       - name: Set up python ${{ matrix.python-version }}

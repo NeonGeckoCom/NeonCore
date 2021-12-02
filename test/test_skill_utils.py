@@ -83,7 +83,7 @@ class SkillUtilsTests(unittest.TestCase):
     def test_install_skills_default(self):
         install_skills_default(SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
-        self.assertEqual(len(skill_dirs), len(get_remote_entries(SKILL_CONFIG["default_skills"])))
+        self.assertEqual(len(skill_dirs), len(get_remote_entries(SKILL_CONFIG["default_skills"])), f"{skill_dirs}\n\n{get_remote_entries(SKILL_CONFIG['default_skills'])}")
 
 
 if __name__ == '__main__':

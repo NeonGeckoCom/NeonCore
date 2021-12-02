@@ -61,6 +61,7 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
     if allow_logs:
         logs = dict()
         try:
+            LOG.info(f"Reading logs from: {logs_dir}")
             for log in glob.glob(f'{logs_dir}/*.log'):
                 if os.path.basename(log) == "start.log":
                     pass
@@ -92,8 +93,8 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
 
     data = {"host": socket.gethostname(),
             "startup": startup,
-            "configurations": json.dumps(configs),
-            "logs": json.dumps(logs),
+            "configurations": json.dumps(configs) if configs else None,
+            "logs": json.dumps(logs) if logs else None,
             "transcripts": transcripts}
     report_metric("diagnostics", **data)
     return data

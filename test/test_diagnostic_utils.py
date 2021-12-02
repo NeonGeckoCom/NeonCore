@@ -50,6 +50,7 @@ class DiagnosticUtilsTests(unittest.TestCase):
         local_config["dirVars"]["docsDir"] = test_dir
         local_config["dirVars"]["logsDir"] = test_dir
         local_config["dirVars"]["diagsDir"] = test_dir
+        local_config.write_changes()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -70,8 +71,8 @@ class DiagnosticUtilsTests(unittest.TestCase):
         data = args.kwargs
         self.assertIsInstance(data, dict)
         self.assertIsInstance(data["host"], str)
-        self.assertIsInstance(data["configurations"], dict)
-        self.assertIsInstance(data["logs"], dict)
+        self.assertIsInstance(data["configurations"], str)
+        self.assertIsInstance(data["logs"], str)
         self.assertIsInstance(data["transcripts"], str)
 
     def test_send_diagnostics_no_extras(self):
@@ -97,7 +98,7 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.assertIsInstance(data, dict)
         self.assertIsInstance(data["host"], str)
         self.assertIsNone(data["configurations"])
-        self.assertIsInstance(data["logs"], dict)
+        self.assertIsInstance(data["logs"], str)
         self.assertIsNone(data["transcripts"])
 
     def test_send_diagnostics_allow_transcripts(self):
@@ -122,7 +123,7 @@ class DiagnosticUtilsTests(unittest.TestCase):
         data = args.kwargs
         self.assertIsInstance(data, dict)
         self.assertIsInstance(data["host"], str)
-        self.assertIsInstance(data["configurations"], dict)
+        self.assertIsInstance(data["configurations"], str)
         self.assertIsNone(data["logs"])
         self.assertIsNone(data["transcripts"])
 
