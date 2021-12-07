@@ -30,6 +30,7 @@ from mycroft_bus_client import MessageBusClient, Message
 from neon_utils.logger import LOG
 
 BUS = MessageBusClient()
+BUS.run_in_thread()
 
 
 class Signal:
@@ -51,9 +52,9 @@ class Signal:
         """
         Marks this signal as created
         """
+        self.create_time = time()
         self._cleared_event.clear()
         self._created_event.set()
-        self.create_time = time()
 
     def clear(self):
         """
@@ -76,7 +77,8 @@ class Signal:
         :param timeout: Seconds to wait for the signal to be cleared
         :return: True if the signal is set
         """
-        return not self._cleared_event.wait(timeout)
+        self._cleared_event.wait(timeout)
+        return self.is_set
 
 
 class SignalManager:
@@ -142,106 +144,92 @@ class SignalManager:
         """
         self.bus.on("neon.create_signal", self._handle_create_signal)
         self.bus.on("neon.check_for_signal", self._handle_check_for_signal)
-        self.bus.on("neon.wait_for_signal_create", self._handle_wait_for_signal_set)
+        self.bus.on("neon.wait_for_signal_create", self._handle_wait_for_signal_create)
         self.bus.on("neon.wait_for_signal_clear", self._handle_wait_for_signal_clear)
 
     def _handle_create_signal(self, message: Message):
         signal_name = message.data["signal_name"]
         status = self.create_signal(signal_name)
-        self.bus.emit(message.reply(f"signal_status.{signal_name}", data={"signal_name": signal_name,
-                                                                          "is_set": status}))
+        self.bus.emit(message.reply(f"neon.create_signal.{signal_name}",
+                                    data={"signal_name": signal_name,
+                                          "is_set": status}))
 
     def _handle_check_for_signal(self, message: Message):
         signal_name = message.data["signal_name"]
         status = self.check_for_signal(signal_name, message.data.get("sec_lifetime", 0))
-        self.bus.emit(message.reply(f"signal_status.{signal_name}", data={"signal_name": signal_name,
-                                                                          "is_set": status}))
+        self.bus.emit(message.reply(f"neon.check_for_signal.{signal_name}",
+                                    data={"signal_name": signal_name,
+                                          "is_set": status}))
 
-    def _handle_wait_for_signal_set(self, message: Message):
+    def _handle_wait_for_signal_create(self, message: Message):
         signal_name = message.data["signal_name"]
         status = self.wait_for_signal_set(signal_name, message.data.get("timeout"))
-        self.bus.emit(message.reply(f"signal_status.{signal_name}", data={"signal_name": signal_name,
-                                                                          "is_set": status}))
+        self.bus.emit(message.reply(f"neon.wait_for_signal_create.{signal_name}",
+                                    data={"signal_name": signal_name,
+                                          "is_set": status}))
 
     def _handle_wait_for_signal_clear(self, message: Message):
         signal_name = message.data["signal_name"]
         status = self.wait_for_signal_clear(signal_name, message.data.get("timeout"))
-        self.bus.emit(message.reply(f"signal_status.{signal_name}", data={"signal_name": signal_name,
-                                                                          "is_set": status}))
+        LOG.debug(f"Wait returning {status}")
+        self.bus.emit(message.reply(f"neon.wait_for_signal_clear.{signal_name}",
+                                    data={"signal_name": signal_name,
+                                          "is_set": status}))
 
 
-def _ensure_service_is_alive(bus: MessageBusClient = BUS):
-    """
-    Method to ensure SignalManager service is alive
-    """
-    if not bus.started_running:
-        bus.run_in_thread()
-    if not bus.connected_event.wait(30):
-        raise RuntimeError("Bus unable to connect after 30 seconds!")
-    # TODO: Method to wait for signal service to come online DM
-
-
-def create_signal(signal_name: str, bus: MessageBusClient = BUS) -> bool:
+def create_signal(signal_name: str) -> bool:
     """
     Backwards-compatible method for creating a signal
     :param signal_name: named signal to create
-    :param bus: MessagebusClient Object to connect with
     :return: True if signal exists
     """
-    _ensure_service_is_alive(bus)
-    stat = bus.wait_for_response(Message("neon.create_signal",
+    stat = BUS.wait_for_response(Message("neon.create_signal",
                                          {"signal_name": signal_name}),
-                                 f"signal_status.{signal_name}")
+                                 f"neon.create_signal.{signal_name}", 10)
     return stat.data.get("is_set")
 
 
-def check_for_signal(signal_name: str, sec_lifetime: int = 0, bus: MessageBusClient = BUS) -> bool:
+def check_for_signal(signal_name: str, sec_lifetime: int = 0) -> bool:
     """
     Backwards-compatible method for checking for a signal
     :param signal_name: name of signal to check
     :param sec_lifetime: max age of signal in seconds before clearing it and returning False
-    :param bus: MessagebusClient Object to connect with
     :return: True if signal exists
     """
-    _ensure_service_is_alive(bus)
-    stat = bus.wait_for_response(Message("neon.check_for_signal",
+    stat = BUS.wait_for_response(Message("neon.check_for_signal",
                                          {"signal_name": signal_name,
                                           "sec_lifetime": sec_lifetime}),
-                                 f"signal_status.{signal_name}", 10)
+                                 f"neon.check_for_signal.{signal_name}", 10)
     return stat.data.get("is_set")
 
 
-def wait_for_signal_create(signal_name: str, timeout: int = 30, bus: MessageBusClient = BUS) -> bool:
+def wait_for_signal_create(signal_name: str, timeout: int = 30) -> bool:
     """
     Block until the specified signal is set or timeout is reached
     :param signal_name: name of signal to check
     :param timeout: max seconds to wait for signal to be created, Default is 30 seconds
-    :param bus: MessagebusClient Object to connect with
     :return: True if signal exists
     """
     timeout = 300 if timeout > 300 else timeout  # Cap wait at 5 minutes
     bus_wait_time = timeout + 5  # Allow some padding for bus handler
-    _ensure_service_is_alive(bus)
-    stat = bus.wait_for_response(Message("neon.wait_for_signal_create",
+    stat = BUS.wait_for_response(Message("neon.wait_for_signal_create",
                                          {"signal_name": signal_name,
                                           "timeout": timeout}),
-                                 f"signal_status.{signal_name}", bus_wait_time)
+                                 f"neon.wait_for_signal_create.{signal_name}", bus_wait_time)
     return stat.data.get("is_set")
 
 
-def wait_for_signal_clear(signal_name: str, timeout: int = 30, bus: MessageBusClient = BUS) -> bool:
+def wait_for_signal_clear(signal_name: str, timeout: int = 30) -> bool:
     """
     Block until the specified signal is cleared or timeout is reached
     :param signal_name: name of signal to check
     :param timeout: max seconds to wait for signal to be created, Default is 30 seconds
-    :param bus: MessagebusClient Object to connect with
     :return: True if signal exists
     """
     timeout = 300 if timeout > 300 else timeout  # Cap wait at 5 minutes
     bus_wait_time = timeout + 5  # Allow some padding for bus handler
-    _ensure_service_is_alive(bus)
-    stat = bus.wait_for_response(Message("neon.wait_for_signal_clear",
+    stat = BUS.wait_for_response(Message("neon.wait_for_signal_clear",
                                          {"signal_name": signal_name,
                                           "timeout": timeout}),
-                                 f"signal_status.{signal_name}", bus_wait_time)
+                                 f"neon.wait_for_signal_clear.{signal_name}", bus_wait_time)
     return stat.data.get("is_set")
