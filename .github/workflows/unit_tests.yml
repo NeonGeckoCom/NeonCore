@@ -66,6 +66,15 @@ jobs:
           name: diagnostic-utils-test-results
           path: tests/diagnostic-utils-test-results.xml
 
+      - name: Test Signal Utils
+        run: |
+          pytest test/test_signal_utils.py --doctest-modules --junitxml=tests/language-test-results.xml
+      - name: Upload Signal Utils test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: signal-utils-test-results
+          path: tests/signal-utils-test-results.xml
+
   unit_tests:
     strategy:
       matrix:
