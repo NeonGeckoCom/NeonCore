@@ -146,6 +146,7 @@ class SignalManager:
         self.bus.on("neon.check_for_signal", self._handle_check_for_signal)
         self.bus.on("neon.wait_for_signal_create", self._handle_wait_for_signal_create)
         self.bus.on("neon.wait_for_signal_clear", self._handle_wait_for_signal_clear)
+        self.bus.on("neon.signal_manager_active", self._handle_signal_manager_active)
 
     def _handle_create_signal(self, message: Message):
         signal_name = message.data["signal_name"]
@@ -176,6 +177,9 @@ class SignalManager:
                                     data={"signal_name": signal_name,
                                           "is_set": status}))
 
+    def _handle_signal_manager_active(self, message: Message):
+        self.bus.emit(message.response())
+
 
 def create_signal(signal_name: str) -> bool:
     """
@@ -185,7 +189,7 @@ def create_signal(signal_name: str) -> bool:
     """
     stat = BUS.wait_for_response(Message("neon.create_signal",
                                          {"signal_name": signal_name}),
-                                 f"neon.create_signal.{signal_name}", 10)
+                                 f"neon.create_signal.{signal_name}", 10) or Message('')
     return stat.data.get("is_set")
 
 
@@ -199,7 +203,7 @@ def check_for_signal(signal_name: str, sec_lifetime: int = 0) -> bool:
     stat = BUS.wait_for_response(Message("neon.check_for_signal",
                                          {"signal_name": signal_name,
                                           "sec_lifetime": sec_lifetime}),
-                                 f"neon.check_for_signal.{signal_name}", 10)
+                                 f"neon.check_for_signal.{signal_name}", 10) or Message('')
     return stat.data.get("is_set")
 
 
