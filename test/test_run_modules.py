@@ -24,7 +24,6 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import sys
 import unittest
 
 from multiprocessing import Process
@@ -32,9 +31,7 @@ from time import time, sleep
 from mycroft_bus_client import MessageBusClient, Message
 from neon_speech.__main__ import main as neon_speech_main
 from neon_audio.__main__ import main as neon_audio_main
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.messagebus.service.__main__ import main as messagebus_service
+from neon_messagebus.service import NeonBusService
 
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
@@ -48,7 +45,8 @@ class TestModules(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.bus_thread = Process(target=messagebus_service, daemon=False)
+        cls.messagebus_service = NeonBusService()
+        cls.messagebus_service.start()
         cls.speech_thread = Process(target=neon_speech_main, daemon=False)
         cls.audio_thread = Process(target=neon_audio_main, daemon=False)
         cls.bus_thread.start()
@@ -61,7 +59,7 @@ class TestModules(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         cls.bus.close()
-        cls.bus_thread.terminate()
+        cls.messagebus_service.shutdown()
         cls.speech_thread.terminate()
         cls.audio_thread.terminate()
 

@@ -87,7 +87,6 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'neon_messagebus_service=neon_core.messagebus.service.__main__:main',
             'neon_skills_service=neon_core.skills.__main__:main',
             'neon_gui_service=neon_core.gui.__main__:main',
             'neon-install-default-skills=neon_core.util.skill_utils:install_skills_default',
