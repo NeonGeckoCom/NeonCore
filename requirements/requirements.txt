@@ -10,7 +10,8 @@ neon_audio~=0.4
 neon_enclosure~=0.1,>=0.1.2
 
 # utils
-neon-utils>=0.13
+neon-utils~=0.13.2a1
+# TODO: Upgrade to stable version
 rapidfuzz
 kthread
 ovos_utils>=0.0.12
