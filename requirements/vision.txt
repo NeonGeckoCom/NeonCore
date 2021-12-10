@@ -1,5 +1,1 @@
-# vision stuff
-numpy
-imutils
-opencv-python
-opencv-contrib-python
+neon_display
