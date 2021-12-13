@@ -124,7 +124,7 @@ def _stop_all_core_processes():
     for pid, cmdline in procs.items():
         if cmdline and (any(pname in cmdline[-1] for pname in ("mycroft.messagebus.service", "neon_speech_client",
                                                                "neon_audio_client", "neon_core.messagebus.service",
-                                                               "neon_core.skills", "neon_core.gui",
+                                                               "neon_core.skills", "neon_core.gui", "neon_gui_service",
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
                                                                "NGI.utilities.gui", "run_neon.py")
@@ -167,7 +167,7 @@ def start_neon():
             _start_process("mycroft-gui-app")
         _start_process("neon_enclosure_client")
         # _start_process("neon_core_client")
-        _start_process(["python3", "-m", "neon_core.gui"])
+        _start_process(["neon_gui_service"])
 
     try:
         STOP_MODULES.wait()

@@ -6,6 +6,8 @@ mock_msm
 neon_speech~=0.3
 neon_audio~=0.4
 neon_enclosure~=0.1,>=0.1.2
+neon_gui
+# TODO: Version spec GUI
 
 # utils
 neon-utils>=0.12.6
