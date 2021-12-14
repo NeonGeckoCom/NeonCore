@@ -14,7 +14,7 @@ neon-utils>=0.12.6
 rapidfuzz
 kthread
 ovos_utils>=0.0.12
-ovos-skills-manager>=0.0.2
+ovos-skills-manager @ git+https://github.com/NeonDaniel/ovos_skill_manager@FEAT_DecreaseLoggedInstallErrors
 
 # plugins
 ovos-plugin-manager~=0.0.1
