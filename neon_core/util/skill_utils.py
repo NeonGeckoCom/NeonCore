@@ -23,7 +23,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import git
 import json
 import requests
 
@@ -34,13 +33,14 @@ from os.path import expanduser, join
 from ovos_skills_manager.skill_entry import SkillEntry
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION, set_github_token, clear_github_token
-from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url
+from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url, download_url_from_github_url
+from ovos_skill_installer import download_extract_zip
 from neon_utils.configuration_utils import get_neon_skills_config
 from neon_utils import LOG
 
 
 def get_neon_skills_data(skill_meta_repository: str = "https://github.com/neongeckocom/neon_skills",
-                         branch: str = None,
+                         branch: str = "master",
                          repo_metadata_path: str = "skill_metadata") -> dict:
     """
     Get skill data from configured neon_skills repository.
@@ -50,10 +50,13 @@ def get_neon_skills_data(skill_meta_repository: str = "https://github.com/neonge
     """
     skills_data = dict()
     temp_download_dir = mkdtemp()
-    git.Repo.clone_from(skill_meta_repository, temp_download_dir, branch=branch)
-    base_dir = join(temp_download_dir, repo_metadata_path)
-    for entry in listdir(base_dir):
-        with open(join(base_dir, entry)) as f:
+    zip_url = download_url_from_github_url(skill_meta_repository, branch)
+    base_dir = join(temp_download_dir, "neon_skill_meta")
+    download_extract_zip(zip_url, temp_download_dir, "neon_skill_meta.zip", base_dir)
+
+    meta_dir = join(base_dir, repo_metadata_path)
+    for entry in listdir(meta_dir):
+        with open(join(meta_dir, entry)) as f:
             skill_entry = json.load(f)
         skills_data[normalize_github_url(skill_entry["url"])] = skill_entry
     rmtree(temp_download_dir)
