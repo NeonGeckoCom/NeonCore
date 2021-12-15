@@ -83,7 +83,8 @@ class SkillUtilsTests(unittest.TestCase):
     def test_install_skills_default(self):
         install_skills_default(SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
-        self.assertEqual(len(skill_dirs), len(get_remote_entries(SKILL_CONFIG["default_skills"])), f"{skill_dirs}\n\n{get_remote_entries(SKILL_CONFIG['default_skills'])}")
+        self.assertEqual(len(skill_dirs), len(get_remote_entries(SKILL_CONFIG["default_skills"])),
+                         f"{skill_dirs}\n\n{get_remote_entries(SKILL_CONFIG['default_skills'])}")
 
     def test_get_neon_skills_data(self):
         neon_skills = get_neon_skills_data()
@@ -91,13 +92,6 @@ class SkillUtilsTests(unittest.TestCase):
         for skill in neon_skills:
             self.assertIsInstance(neon_skills[skill], dict)
             self.assertEqual(skill, normalize_github_url(neon_skills[skill]["url"]))
-
-    def test_install_skills_with_repo_metadata(self):
-        test_skills_url = "https://raw.githubusercontent.com/NeonGeckoCom/neon_skills/master/skill_lists/DEFAULT-SKILLS"
-        skills_list = get_remote_entries(test_skills_url)
-        install_skills_from_list(skills_list, SKILL_CONFIG)
-        skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
-        self.assertEqual(len(skill_dirs), len(skills_list))
 
 
 if __name__ == '__main__':

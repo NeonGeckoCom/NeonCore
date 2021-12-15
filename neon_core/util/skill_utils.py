@@ -25,6 +25,7 @@
 
 import git
 import json
+import requests
 
 from os import listdir
 from tempfile import mkdtemp
@@ -32,7 +33,7 @@ from shutil import rmtree
 from os.path import expanduser, join
 from ovos_skills_manager.skill_entry import SkillEntry
 from ovos_skills_manager.osm import OVOSSkillsManager
-from ovos_skills_manager.session import SESSION as requests, set_github_token, clear_github_token
+from ovos_skills_manager.session import SESSION, set_github_token, clear_github_token
 from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url
 from neon_utils.configuration_utils import get_neon_skills_config
 from neon_utils import LOG
@@ -54,10 +55,8 @@ def get_neon_skills_data(skill_meta_repository: str = "https://github.com/neonge
     for entry in listdir(base_dir):
         with open(join(base_dir, entry)) as f:
             skill_entry = json.load(f)
-        print(skill_entry)
         skills_data[normalize_github_url(skill_entry["url"])] = skill_entry
     rmtree(temp_download_dir)
-    print(skills_data)
     return skills_data
 
 
@@ -70,24 +69,25 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     config = config or get_neon_skills_config()
     skill_dir = expanduser(config["directory"])
     osm = OVOSSkillsManager()
-    skills_listing = get_neon_skills_data()
+    skills_catalog = get_neon_skills_data()
     token_set = False
     if config.get("neon_token"):
         token_set = True
         set_github_token(config["neon_token"])
     for url in skills_to_install:
-        normalized_url = normalize_github_url(url)
-        # Check if this skill is in the Neon list
-        if normalized_url in skills_listing:
-            branch = get_branch_from_github_url(url)
-            # Set URL and branch to requested spec
-            skills_listing[normalized_url]["url"] = normalized_url
-            skills_listing[normalized_url]["branch"] = branch
-            entry = SkillEntry.from_json(skills_listing.get(normalized_url), False)
-        else:
-            LOG.warning(f"Requested Skill not in Neon skill store ({url})")
-            entry = osm.skill_entry_from_url(url)
         try:
+            normalized_url = normalize_github_url(url)
+            # Check if this skill is in the Neon list
+            if normalized_url in skills_catalog:
+                branch = get_branch_from_github_url(url)
+                # Set URL and branch to requested spec
+                skills_catalog[normalized_url]["url"] = normalized_url
+                skills_catalog[normalized_url]["branch"] = branch
+                entry = SkillEntry.from_json(skills_catalog.get(normalized_url), False)
+            else:
+                LOG.warning(f"Requested Skill not in Neon skill store ({url})")
+                entry = osm.skill_entry_from_url(url)
+        # try:
             osm.install_skill(entry, skill_dir)
             LOG.info(f"Installed {url} to {skill_dir}")
         except Exception as e:
@@ -113,8 +113,12 @@ def install_skills_default(config: dict = None):
 def get_remote_entries(url):
     """ parse url and return a list of SkillEntry,
      expects 1 skill per line, can be a skill_id or url"""
-    r = requests.get(url)
-    if r.status_code == 200:
+    r = SESSION.get(url)
+    if not r.ok:
+        LOG.warning(f"Cached response returned: {r.status_code}")
+        SESSION.cache.delete_url(r.url)
+        r = requests.get(url)
+    if r.ok:
         return [s for s in r.text.split("\n") if s.strip()]
     else:
         LOG.error(f"{url} request failed with code: {r.status_code}")
