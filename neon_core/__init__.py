@@ -119,7 +119,6 @@ mycroft.version.CORE_VERSION_STR = CORE_VERSION_STR
 from neon_core.skills import NeonSkill, NeonFallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 
-
 __all__ = ['NEON_ROOT_PATH',
            'NeonIntentService',
            'NeonSkill',

@@ -1,8 +1,10 @@
 # mycroft
+# TODO: Reduce ovos-core installed deps here
 ovos-core[all]==0.0.1
 mock_msm
 
 # neon core modules
+neon_messagebus
 neon_speech~=0.3
 neon_audio~=0.4
 neon_enclosure~=0.1,>=0.1.2
@@ -10,7 +12,7 @@ neon_gui
 # TODO: Version spec GUI
 
 # utils
-neon-utils>=0.12.6
+neon-utils~=0.12
 rapidfuzz
 kthread
 ovos_utils>=0.0.12
