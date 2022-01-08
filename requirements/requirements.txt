@@ -13,15 +13,17 @@ neon_gui
 
 # utils
 neon-utils~=0.12,>=0.12.6
-rapidfuzz~=1.7
-kthread~=0.2
+# rapidfuzz~=1.7
+# kthread~=0.2
 # TODO: Below spec is patching OPM dependency
 ovos_utils~=0.0.12,!=0.0.14a1,!=0.0.14a2,!=0.0.14a3,!=0.0.14a4,!=0.0.14a4post1
 ovos-skills-manager~=0.0.2
 
 # plugins
-ovos-plugin-manager~=0.0.1
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
+
+# TODO: Patching OPM
+ovos-plugin-manager==0.0.2
 
 # text parser modules
 RAKEkeywords~=0.2
