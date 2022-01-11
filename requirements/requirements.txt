@@ -22,7 +22,7 @@ ovos-skills-manager~=0.0.8
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
 
 # TODO: Patching OPM
-# ovos-plugin-manager==0.0.2
+ovos-plugin-manager==0.0.2
 
 # text parser modules
 RAKEkeywords~=0.2
