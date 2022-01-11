@@ -131,7 +131,7 @@ class TestRunNeon(unittest.TestCase):
     #     self.assertIsInstance(data["success"], bool)
 
     def test_skills_module(self):
-        response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'), timeout=10)
+        response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
         self.assertTrue(response.data['status'])
 
         response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
