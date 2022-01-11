@@ -13,8 +13,6 @@ neon_gui
 
 # utils
 neon-utils~=0.12,>=0.12.6
-# rapidfuzz~=1.7
-# kthread~=0.2
 ovos_utils~=0.0.12
 ovos-skills-manager~=0.0.8
 

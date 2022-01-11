@@ -1,3 +1,2 @@
-# TODO: Update dependency specs
-neon-stt-plugin-deepspeech-stream-local==0.1.5a0
-neon-tts-plugin-mimic==0.1.4a0
+neon-stt-plugin-deepspeech-stream-local~=0.1
+neon-tts-plugin-mimic~=0.1
