@@ -26,12 +26,12 @@
 import os.path
 import sys
 import unittest
-import pytest
 
-from time import time, sleep
+from time import time
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
+from neon_utils.configuration_utils import get_neon_local_config
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.run_neon import start_neon, stop_neon
@@ -42,6 +42,11 @@ AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "aud
 class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        # Patch GH Internet Connection Failures+
+        local_conf = get_neon_local_config()
+        local_conf["skills"]["wait_for_internet"] = False
+        local_conf.write_changes()
+
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
         cls.bus = MessageBusClient()
