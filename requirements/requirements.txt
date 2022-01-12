@@ -12,7 +12,8 @@ neon_gui
 # TODO: Version spec GUI
 
 # utils
-neon-utils~=0.12,>=0.12.6
+neon-utils~=0.12,>=0.14.3a4
+# TODO: Update to stable version
 ovos_utils~=0.0.12
 ovos-skills-manager~=0.0.8
 
