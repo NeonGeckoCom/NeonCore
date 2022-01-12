@@ -38,13 +38,11 @@ jobs:
         with:
           name: pytest-results-${{ matrix.python-version }}
           path: tests/remote-test-results.xml
-        if: ${{ always() }}
       - name: Upload Core Setup logs
         uses: actions/upload-artifact@v2
         with:
-          name: core-logs-${{ matrix.python-version }}
+          name: core-logs-remote-${{ matrix.python-version }}
           path: ~/.local/share/neon/logs/*.log
-        if: ${{ always() }}
   dev_local:
     strategy:
       matrix:
@@ -73,4 +71,8 @@ jobs:
         with:
           name: pytest-results-${{ matrix.python-version }}
           path: tests/dev_local-test-results.xml
-        if: ${{ always() }}
+      - name: Upload Core Setup logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: core-logs-dev-local-${{ matrix.python-version }}
+          path: ~/.local/share/neon/logs/*.log
