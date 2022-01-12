@@ -29,6 +29,7 @@ jobs:
           GOOGLE_KEY: ${{secrets.google_api_key}}
           AWS_CREDS: ${{secrets.amazon_creds}}
       - name: Test Core Setup
+        timeout-minutes: 10
         run: |
           . test/.venv/bin/activate
           pytest test/test_setup_remote.py --junitxml=tests/remote-setup-results.xml
@@ -48,7 +49,7 @@ jobs:
       matrix:
         python-version: [ 3.8 ]
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
       - name: Set up python ${{ matrix.python-version }}
@@ -61,6 +62,7 @@ jobs:
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
+        timeout-minutes: 10
         run: |
           . test/.venv/bin/activate
           pip install pytest pytest-timeout
