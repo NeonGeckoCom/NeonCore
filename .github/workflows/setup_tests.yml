@@ -74,11 +74,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: pytest-results-${{ matrix.python-version }}
-          path: tests/dev_local-test-results.xml
+          path: /home/runner/work/NeonCore/NeonCore/tests/dev_local-test-results.xml
         if: always()
       - name: Upload Core Setup logs
         uses: actions/upload-artifact@v2
         with:
           name: core-logs-dev-local-${{ matrix.python-version }}
-          path: logs/*.log
+          path: /home/runner/work/NeonCore/NeonCore/logs/*.log
         if: always()
