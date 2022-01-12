@@ -36,13 +36,13 @@ jobs:
       - name: Upload Core Setup test results
         uses: actions/upload-artifact@v2
         with:
-          name: pytest-results
+          name: pytest-results-${{ matrix.python-version }}
           path: tests/remote-test-results.xml
         if: ${{ always() }}
       - name: Upload Core Setup logs
         uses: actions/upload-artifact@v2
         with:
-          name: core-logs
+          name: core-logs-${{ matrix.python-version }}
           path: ~/.local/share/neon/logs/*.log
         if: ${{ always() }}
   dev_local:
@@ -71,6 +71,6 @@ jobs:
       - name: Upload Core Setup test results
         uses: actions/upload-artifact@v2
         with:
-          name: pytest-results-3.6
+          name: pytest-results-${{ matrix.python-version }}
           path: tests/dev_local-test-results.xml
         if: ${{ always() }}
