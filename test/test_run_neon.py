@@ -27,7 +27,7 @@ import os.path
 import sys
 import unittest
 
-from time import time
+from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
@@ -83,7 +83,13 @@ class TestRunNeon(unittest.TestCase):
         bus.close()
 
     def test_speech_module(self):
+        i = 0
         response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+        while not response.data['status'] and i < 10:
+            LOG.warning(f"Speech not ready when core reported ready!")
+            sleep(5)
+            response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+            i += 1
         self.assertTrue(response.data['status'])
 
         context = {"client": "tester",
