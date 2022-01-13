@@ -105,6 +105,8 @@ pip install wheel
 cd "${sourceDir}" || exit 10
 pip install ".${optStr}"  # --use-deprecated=legacy-resolver
 
+# TODO: This is patching an issue with config paths containing `NeonCore/NeonCore`; patch in devMode setup DM
+export NEON_CONFIG_PATH="${sourceDir}"
 neon-config-import
 
 # Install Default Skills
