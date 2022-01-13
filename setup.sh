@@ -334,7 +334,7 @@ doInstall(){
     fi
 
     echo "${GITHUB_TOKEN}">~/token.txt
-    pip install --upgrade pip~=21.1.0
+    pip install --upgrade pip~=21.3
     pip install wheel
     pip install "${pipStr}"
     neon-config-import

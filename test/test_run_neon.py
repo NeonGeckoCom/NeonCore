@@ -26,12 +26,12 @@
 import os.path
 import sys
 import unittest
-import pytest
 
 from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
+from neon_utils.configuration_utils import get_neon_local_config
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core.run_neon import start_neon, stop_neon
@@ -42,6 +42,14 @@ AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "aud
 class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        # Blacklist skills to prevent logged errors
+        local_conf = get_neon_local_config()
+        local_conf["skills"]["blacklist"] = \
+            local_conf["skills"]["blacklist"].extend(
+                ["skill-ovos-homescreen.openvoiceos",
+                 "skill-balena-wifi-setup.openvoiceos"])
+        local_conf.write_changes()
+
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
         cls.bus = MessageBusClient()
@@ -75,7 +83,14 @@ class TestRunNeon(unittest.TestCase):
         bus.close()
 
     def test_speech_module(self):
+        # TODO: Remove this after readiness is better defined DM
+        i = 0
         response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+        while not response.data['status'] and i < 10:
+            LOG.warning(f"Speech not ready when core reported ready!")
+            sleep(5)
+            response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+            i += 1
         self.assertTrue(response.data['status'])
 
         context = {"client": "tester",
@@ -131,7 +146,7 @@ class TestRunNeon(unittest.TestCase):
     #     self.assertIsInstance(data["success"], bool)
 
     def test_skills_module(self):
-        response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'), timeout=10)
+        response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
         self.assertTrue(response.data['status'])
 
         response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")

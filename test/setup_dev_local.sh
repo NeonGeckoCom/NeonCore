@@ -96,12 +96,14 @@ if [ "${installGui}" == "true" ]; then
 fi
 
 echo "${GITHUB_TOKEN}">~/token.txt
-pip install --upgrade pip==21.2.4
+pip install --upgrade pip~=21.3
 pip install wheel
 
 cd "${sourceDir}" || exit 10
 pip install ".${optStr}"  # --use-deprecated=legacy-resolver
 
+# TODO: This is patching an issue with config paths containing `NeonCore/NeonCore`; patch in devMode setup DM
+export NEON_CONFIG_PATH="${sourceDir}"
 neon-config-import
 
 # Install Default Skills
