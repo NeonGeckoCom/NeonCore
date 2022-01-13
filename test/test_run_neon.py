@@ -42,17 +42,20 @@ AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "aud
 class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        # # Patch GH Internet Connection Failures
-        # local_conf = get_neon_local_config()
-        # local_conf["skills"]["wait_for_internet"] = False
-        # local_conf.write_changes()
+        # Blacklist skills to prevent logged errors
+        local_conf = get_neon_local_config()
+        local_conf["skills"]["blacklist"] = \
+            local_conf["skills"]["blacklist"].extend(
+                ["skill-ovos-homescreen.openvoiceos",
+                 "skill-balena-wifi-setup.openvoiceos"])
+        local_conf.write_changes()
 
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
         cls.bus.connected_event.wait()
-        cls.bus.wait_for_message("mycroft.ready", 360)
+        cls.bus.wait_for_message("mycroft.ready", 600)
 
     @classmethod
     def tearDownClass(cls) -> None:
