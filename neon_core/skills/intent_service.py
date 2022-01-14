@@ -35,7 +35,8 @@ from mycroft_bus_client import Message
 from neon_utils.message_utils import get_message_user
 from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
-from neon_utils.configuration_utils import get_neon_device_type
+from neon_utils.configuration_utils import get_neon_device_type,\
+    get_neon_user_config
 from ovos_utils.json_helper import merge_dict
 from lingua_franca.parse import get_full_lang_code
 
@@ -45,9 +46,11 @@ from mycroft.skills.intent_service import IntentService
 
 try:
     if get_neon_device_type() == "server":
-        from neon_transcripts_controller.transcript_db_manager import TranscriptDBManager as Transcribe
+        from neon_transcripts_controller.transcript_db_manager import\
+            TranscriptDBManager as Transcribe
     else:
-        from neon_transcripts_controller.transcript_file_manager import TranscriptFileManager as Transcribe
+        from neon_transcripts_controller.transcript_file_manager import\
+            TranscriptFileManager as Transcribe
 except ImportError:
     Transcribe = None
 
@@ -57,6 +60,8 @@ class NeonIntentService(IntentService):
         super().__init__(bus)
         self.config = Configuration.get().get('context', {})
         self.language_config = get_lang_config()
+
+        self.default_user = get_neon_user_config()
 
         set_default_lang(self.language_config["internal"])
 
@@ -148,6 +153,11 @@ class NeonIntentService(IntentService):
                 LOG.debug("No timing data available at intent service")
                 message.context["timing"] = {}
             message.context["timing"]["handle_utterance"] = time.time()
+
+            # Ensure user profile data is present
+            if "profiles" not in message.context:
+                message.context["profiles"] = [self.default_user.content]
+                message.context["username"] = self.default_user.content["username"]
 
             # Make sure there is a `transcribed` timestamp (should have been added in speech module)
             if not message.context["timing"].get("transcribed"):
