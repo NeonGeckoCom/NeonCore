@@ -155,8 +155,8 @@ class NeonIntentService(IntentService):
             message.context["timing"]["handle_utterance"] = time.time()
 
             # Ensure user profile data is present
-            if "profiles" not in message.context:
-                message.context["profiles"] = [self.default_user.content]
+            if "user_profiles" not in message.context:
+                message.context["user_profiles"] = [self.default_user.content]
                 message.context["username"] = self.default_user.content["username"]
 
             # Make sure there is a `transcribed` timestamp (should have been added in speech module)
