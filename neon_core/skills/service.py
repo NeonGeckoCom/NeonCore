@@ -30,16 +30,17 @@ from neon_utils.net_utils import check_online
 from neon_utils import LOG
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
+from neon_utils.messagebus_utils import get_messagebus
 
 from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.util.diagnostic_utils import report_metric
+from neon_core.util.skill_file_server import start_skill_http_server
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
 from mycroft.skills.msm_wrapper import MsmException
-from mycroft.util import start_message_bus_client
 from mycroft.configuration.locale import set_default_lang, set_default_tz
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
@@ -78,6 +79,8 @@ class NeonSkillService:
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
+        self.http_server = start_skill_http_server(
+            get_neon_skills_config()["directory"])
 
     def start(self):
         # config = Configuration.get()
@@ -86,7 +89,7 @@ class NeonSkillService:
         # Set the default timezone to match the configured one
         set_default_tz()
 
-        self.bus = self.bus or start_message_bus_client("SKILLS")
+        self.bus = self.bus or get_messagebus()
         init_signal_bus(self.bus)
         init_signal_handlers()
         self._register_intent_services()
@@ -167,6 +170,10 @@ class NeonSkillService:
             self.status.set_stopping()
         if self.event_scheduler is not None:
             self.event_scheduler.shutdown()
+
+        if self.http_server is not None:
+            self.http_server.shutdown()
+
         # Terminate all running threads that update skills
         if self.skill_manager is not None:
             self.skill_manager.stop()
