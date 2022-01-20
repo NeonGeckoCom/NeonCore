@@ -30,15 +30,44 @@ import os
 import socketserver
 import http.server
 
+from shutil import rmtree
+from tempfile import gettempdir
+from os.path import isdir, join, dirname
 from threading import Thread, Event
 
 _HTTP_SERVER = None
 
+class QmlFileHandler(http.server.SimpleHTTPRequestHandler):
+    def end_headers(self) -> None:
+        mimetype = self.guess_type(self.path)
+        is_file = not self.path.endswith('/')
+        if is_file and any([mimetype.startswith(prefix) for
+                           prefix in ("text/", "application/octet-stream")]):
+            self.send_header('Content-Type', "text/plain")
+            self.send_header('Content-Disposition', 'inline')
+        super().end_headers()
 
-def start_skill_http_server(skills_dir: str, port: int = 8000):
+
+def start_qml_http_server(skills_dir: str, port: int = 8000):
+    if not isdir(skills_dir):
+        os.makedirs(skills_dir)
+    system_dir = join(dirname(dirname(__file__)), "res")
+
+    qml_dir = join(gettempdir(), "neon", "qml")
+    os.makedirs(qml_dir, exist_ok=True)
+
+    served_skills_dir = join(qml_dir, "skills")
+    served_system_dir = join(qml_dir, "system")
+    if os.path.exists(served_skills_dir):
+        os.remove(served_skills_dir)
+    if os.path.exists(served_system_dir):
+        os.remove(served_system_dir)
+
+    os.symlink(skills_dir, join(qml_dir, "skills"))
+    os.symlink(system_dir, join(qml_dir, "system"))
     started_event = Event()
     http_daemon = Thread(target=_initialize_http_server,
-                         args=(started_event, skills_dir, port),
+                         args=(started_event, qml_dir, port),
                          daemon=True)
     http_daemon.start()
     started_event.wait(30)
@@ -48,9 +77,14 @@ def start_skill_http_server(skills_dir: str, port: int = 8000):
 def _initialize_http_server(started: Event, directory: str, port: int):
     global _HTTP_SERVER
     os.chdir(directory)
-    handler = http.server.SimpleHTTPRequestHandler
+    handler = QmlFileHandler
     http_server = socketserver.TCPServer(("", port), handler)
     _HTTP_SERVER = http_server
     started.set()
     http_server.serve_forever()
 
+if __name__ == "__main__":
+    from time import sleep
+    server = start_qml_http_server("/home/d_mcknight/PycharmProjects/neon_bsd_skills", 8001)
+    while True:
+        sleep(1000)

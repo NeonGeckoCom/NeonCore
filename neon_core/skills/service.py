@@ -36,7 +36,7 @@ from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.util.diagnostic_utils import report_metric
-from neon_core.util.skill_file_server import start_skill_http_server
+from neon_core.util.qml_file_server import start_qml_http_server
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
@@ -79,8 +79,12 @@ class NeonSkillService:
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
-        self.http_server = start_skill_http_server(
-            get_neon_skills_config()["directory"])
+        skill_config = get_neon_skills_config()
+        if skill_config.get("run_gui_file_server"):
+            self.http_server = start_qml_http_server(
+                skill_config["directory"])
+        else:
+            self.http_server = None
 
     def start(self):
         # config = Configuration.get()

@@ -31,13 +31,13 @@ import requests
 from socketserver import TCPServer
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.util.skill_file_server import start_skill_http_server
+from neon_core.util.qml_file_server import start_qml_http_server
 
 
 class SkillFileServerTests(unittest.TestCase):
 
     def test_start_file_server(self):
-        server = start_skill_http_server('/')
+        server = start_qml_http_server('/')
         self.assertIsInstance(server, TCPServer)
         resp = requests.get("http://localhost:8000")
         self.assertTrue(resp.ok)
