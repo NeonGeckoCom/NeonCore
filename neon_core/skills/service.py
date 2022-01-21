@@ -22,6 +22,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import time
 
 from neon_utils.configuration_utils import get_neon_skills_config, \
@@ -129,10 +130,8 @@ class NeonSkillService:
             LOG.info("Metrics reporting disabled")
 
     def _register_intent_services(self):
-        """Start up the all intent services and connect them as needed.
-
-        Arguments:
-            bus: messagebus client to register the services on
+        """
+        Start up the all intent services and connect them as needed.
         """
         service = NeonIntentService(self.bus)
         # Register handler to trigger fallback system

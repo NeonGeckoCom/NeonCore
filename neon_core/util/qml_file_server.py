@@ -30,12 +30,12 @@ import os
 import socketserver
 import http.server
 
-from shutil import rmtree
 from tempfile import gettempdir
 from os.path import isdir, join, dirname
 from threading import Thread, Event
 
 _HTTP_SERVER = None
+
 
 class QmlFileHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self) -> None:
@@ -82,9 +82,3 @@ def _initialize_http_server(started: Event, directory: str, port: int):
     _HTTP_SERVER = http_server
     started.set()
     http_server.serve_forever()
-
-if __name__ == "__main__":
-    from time import sleep
-    server = start_qml_http_server("/home/d_mcknight/PycharmProjects/neon_bsd_skills", 8001)
-    while True:
-        sleep(1000)
