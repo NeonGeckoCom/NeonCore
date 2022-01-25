@@ -22,6 +22,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import time
 
 from neon_utils.configuration_utils import get_neon_skills_config, \
@@ -30,16 +31,17 @@ from neon_utils.net_utils import check_online
 from neon_utils import LOG
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
+from neon_utils.messagebus_utils import get_messagebus
 
 from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.util.diagnostic_utils import report_metric
+from neon_core.util.qml_file_server import start_qml_http_server
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
 from mycroft.skills.msm_wrapper import MsmException
-from mycroft.util import start_message_bus_client
 from mycroft.configuration.locale import set_default_lang, set_default_tz
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
@@ -78,6 +80,12 @@ class NeonSkillService:
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
+        skill_config = get_neon_skills_config()
+        if skill_config.get("run_gui_file_server"):
+            self.http_server = start_qml_http_server(
+                skill_config["directory"])
+        else:
+            self.http_server = None
 
     def start(self):
         # config = Configuration.get()
@@ -86,7 +94,7 @@ class NeonSkillService:
         # Set the default timezone to match the configured one
         set_default_tz()
 
-        self.bus = self.bus or start_message_bus_client("SKILLS")
+        self.bus = self.bus or get_messagebus()
         init_signal_bus(self.bus)
         init_signal_handlers()
         self._register_intent_services()
@@ -122,10 +130,8 @@ class NeonSkillService:
             LOG.info("Metrics reporting disabled")
 
     def _register_intent_services(self):
-        """Start up the all intent services and connect them as needed.
-
-        Arguments:
-            bus: messagebus client to register the services on
+        """
+        Start up the all intent services and connect them as needed.
         """
         service = NeonIntentService(self.bus)
         # Register handler to trigger fallback system
@@ -167,6 +173,10 @@ class NeonSkillService:
             self.status.set_stopping()
         if self.event_scheduler is not None:
             self.event_scheduler.shutdown()
+
+        if self.http_server is not None:
+            self.http_server.shutdown()
+
         # Terminate all running threads that update skills
         if self.skill_manager is not None:
             self.skill_manager.stop()
