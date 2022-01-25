@@ -29,6 +29,7 @@ from neon_utils.configuration_utils import get_neon_skills_config, \
 from neon_utils.net_utils import check_online
 from neon_utils import LOG
 from neon_utils.metrics_utils import announce_connection
+from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 
 from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
@@ -86,6 +87,8 @@ class NeonSkillService:
         set_default_tz()
 
         self.bus = self.bus or start_message_bus_client("SKILLS")
+        init_signal_bus(self.bus)
+        init_signal_handlers()
         self._register_intent_services()
         self.event_scheduler = EventScheduler(self.bus)
         self.status = ProcessStatus('skills', self.bus, self.callbacks)
