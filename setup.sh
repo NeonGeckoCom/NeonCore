@@ -265,7 +265,7 @@ doInstall(){
     fi
 
   # Build optional dependency string for pip installation
-    options=()
+    options=("core_modules")
     if [ "${localDeps}" == "true" ]; then
       if [ "${arm}" == "true" ]; then
         echo "Local Dependencies not supported on ARM; remote STT/TTS will be used."

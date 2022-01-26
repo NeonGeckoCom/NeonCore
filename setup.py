@@ -71,6 +71,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=get_requirements('requirements.txt'),
     extras_require={
+        "core_modules": get_requirements("core_modules.txt"),
         "client": get_requirements("client.txt"),
         "server": get_requirements("server.txt"),
         "dev": get_requirements("dev.txt"),

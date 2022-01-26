@@ -1,0 +1,9 @@
+ovos-core[all]~=0.0.1
+
+# neon core modules
+neon_enclosure~=0.1,>=0.1.2
+neon_messagebus
+neon_speech~=0.3
+neon_audio~=0.4
+neon_gui
+# TODO: Version spec GUI

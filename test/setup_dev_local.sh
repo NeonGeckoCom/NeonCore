@@ -42,7 +42,7 @@ export ttsModule="neon_tts_mimic"
 
 localDeps="true"
 installGui="false"
-options=()
+options=("core_modules")
 options+=("test")
 if [ "${localDeps}" == "true" ]; then
   options+=("local")
