@@ -7,8 +7,10 @@ neon-utils~=0.12,>=0.14.3a7
 # TODO: Update to stable version
 ovos_utils~=0.0.12
 ovos-skills-manager~=0.0.8
+
 # TODO: Patching OPM
 ovos-plugin-manager==0.0.2
+SpeechRecognition~=3.8
 
 # plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
