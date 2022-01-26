@@ -37,6 +37,7 @@ from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
 from neon_utils.configuration_utils import get_neon_device_type
 from ovos_utils.json_helper import merge_dict
+from lingua_franca.parse import get_full_lang_code
 
 from mycroft.configuration.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
@@ -138,7 +139,8 @@ class NeonIntentService(IntentService):
 
         try:
             # Get language of the utterance
-            lang = message.data.get('lang', self.language_config["user"])
+            lang = get_full_lang_code(
+                message.data.get('lang', self.language_config["user"]))
 
             # Add or init timing data
             message.context = message.context or {}
