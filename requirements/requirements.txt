@@ -3,7 +3,7 @@ ovos-core[skills]==0.0.1
 mock_msm
 
 # utils
-neon-utils~=0.12,>=0.14.3a7
+neon-utils~=0.12,>=0.14.3a15
 # TODO: Update to stable version
 ovos_utils~=0.0.12
 ovos-skills-manager~=0.0.8
