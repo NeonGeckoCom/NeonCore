@@ -23,7 +23,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neon_messagebus.util.message_utils import get_messagebus
+from neon_utils.messagebus_utils import get_messagebus
 from neon_utils import LOG
 LOG.warning("This reference is deprecated; import from neon_messagebus directly")
 # TODO: Deprecate in neon_core 22.04

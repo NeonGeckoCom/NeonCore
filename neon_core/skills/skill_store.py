@@ -31,7 +31,7 @@ from neon_utils.authentication_utils import repo_is_neon
 from neon_utils.configuration_utils import get_neon_skills_config
 from datetime import datetime, timedelta
 
-from neon_messagebus.util.message_utils import get_messagebus
+from neon_utils.messagebus_utils import get_messagebus
 from neon_core.util.skill_utils import get_remote_entries
 from mycroft.skills.event_scheduler import EventSchedulerInterface
 

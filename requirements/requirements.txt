@@ -1,15 +1,6 @@
 # mycroft
-# TODO: Reduce ovos-core installed deps here
-ovos-core[all]==0.0.1
+ovos-core[skills]==0.0.1
 mock_msm
-
-# neon core modules
-neon_messagebus
-neon_speech~=0.3
-neon_audio~=0.4
-neon_enclosure~=0.1,>=0.1.2
-neon_gui
-# TODO: Version spec GUI
 
 # utils
 neon-utils~=0.12,>=0.14.3a7
@@ -17,11 +8,12 @@ neon-utils~=0.12,>=0.14.3a7
 ovos_utils~=0.0.12
 ovos-skills-manager~=0.0.8
 
-# plugins
-neon-lang-plugin-libretranslate~=0.1,>=0.1.2
-
 # TODO: Patching OPM
 ovos-plugin-manager==0.0.2
+SpeechRecognition~=3.8
+
+# plugins
+neon-lang-plugin-libretranslate~=0.1,>=0.1.2
 
 # text parser modules
 RAKEkeywords~=0.2
