@@ -96,7 +96,8 @@ setup_ovos_config()
 #  for now it simply provides correct default values
 setup_ovos_core_config()
 
-from neon_utils.configuration_utils import write_mycroft_compatible_config
+from neon_utils.configuration_utils import write_mycroft_compatible_config, init_config_dir
+init_config_dir()
 
 # Write and reload Mycroft-compat conf file
 neon_config_path = join(xdg.BaseDirectory.save_config_path("neon"),
