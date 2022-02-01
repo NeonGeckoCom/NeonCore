@@ -16,7 +16,8 @@ RUN apt-get update && \
     portaudio19-dev \
     libsndfile1 \
     libpulse-dev \
-    ffmpeg
+    ffmpeg \
+    git  # TODO: git required for getting scripts, skill should be refactored to remove this dependency
 
 ADD . /neon_core
 WORKDIR /neon_core
