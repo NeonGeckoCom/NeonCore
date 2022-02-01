@@ -9,6 +9,10 @@ on:
     paths-ignore:
       - 'version.py'
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
 #  increment_version:
 #    runs-on: ubuntu-latest
