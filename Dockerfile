@@ -29,7 +29,7 @@ RUN pip install wheel && \
 
 CMD ["neon_skills_service"]
 
-FROM base as with_skills
+FROM base as default_skills
 
 RUN mkdir -p /root/.config/neon
 RUN mkdir -p /root/.local/share/neon
