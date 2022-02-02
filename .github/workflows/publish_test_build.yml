@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/neon-skills
+  IMAGE_NAME: ${{ github.repository_owner }}/neon_skills
 
 jobs:
   increment_version:
