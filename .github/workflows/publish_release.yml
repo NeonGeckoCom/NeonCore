@@ -6,6 +6,10 @@ on:
     branches:
       - master
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/neon_skills
+
 jobs:
   tag_release:
     runs-on: ubuntu-latest
