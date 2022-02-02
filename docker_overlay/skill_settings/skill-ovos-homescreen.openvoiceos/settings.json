@@ -1,0 +1,7 @@
+{
+  "weather_skill": "skill-weather.neongeckocom",
+  "datetime_skill": "skill-date_time.neongeckocom",
+  "examples_skill": "skill-about.neongeckocom",
+  "wallpaper": "default.jpg",
+  "__mycroft_skill_firstrun": false
+}
