@@ -28,7 +28,6 @@ import shutil
 import sys
 import unittest
 
-import ovos_skills_manager.requirements
 from mock.mock import Mock
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
