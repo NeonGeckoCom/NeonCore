@@ -22,14 +22,16 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import json
 import os
 import shutil
 import sys
 import unittest
 
+import ovos_skills_manager.requirements
+from mock.mock import Mock
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.util.skill_utils import *
 
 TEST_SKILLS_NO_AUTH = [
     "https://github.com/NeonGeckoCom/alerts.neon/tree/dev",
@@ -60,6 +62,7 @@ class SkillUtilsTests(unittest.TestCase):
             shutil.rmtree(SKILL_DIR)
 
     def test_get_remote_entries(self):
+        from neon_core.util.skill_utils import get_remote_entries
         from ovos_skills_manager.session import set_github_token, clear_github_token
         set_github_token(SKILL_CONFIG["neon_token"])
         skills_list = get_remote_entries(SKILL_CONFIG["default_skills"])
@@ -69,29 +72,82 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertTrue(all(skill.startswith("https://github.com") for skill in skills_list))
 
     def test_install_skills_from_list_no_auth(self):
+        from neon_core.util.skill_utils import install_skills_from_list
         install_skills_from_list(TEST_SKILLS_NO_AUTH, SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_NO_AUTH))
         self.assertIn("alerts.neon.neongeckocom", skill_dirs)
 
     def test_install_skills_from_list_with_auth(self):
+        from neon_core.util.skill_utils import install_skills_from_list
         install_skills_from_list(TEST_SKILLS_WITH_AUTH, SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_WITH_AUTH))
         self.assertIn("i-like-brands.neon.neongeckocom", skill_dirs)
 
     def test_install_skills_default(self):
+        from neon_core.util.skill_utils import install_skills_default,\
+            get_remote_entries
         install_skills_default(SKILL_CONFIG)
-        skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
-        self.assertEqual(len(skill_dirs), len(get_remote_entries(SKILL_CONFIG["default_skills"])),
-                         f"{skill_dirs}\n\n{get_remote_entries(SKILL_CONFIG['default_skills'])}")
+        skill_dirs = [d for d in os.listdir(SKILL_DIR) if
+                      os.path.isdir(os.path.join(SKILL_DIR, d))]
+        self.assertEqual(
+            len(skill_dirs),
+            len(get_remote_entries(SKILL_CONFIG["default_skills"])),
+            f"{skill_dirs}\n\n"
+            f"{get_remote_entries(SKILL_CONFIG['default_skills'])}")
 
     def test_get_neon_skills_data(self):
+        from neon_core.util.skill_utils import get_neon_skills_data
+        from ovos_skills_manager.github.utils import normalize_github_url
         neon_skills = get_neon_skills_data()
         self.assertIsInstance(neon_skills, dict)
         for skill in neon_skills:
             self.assertIsInstance(neon_skills[skill], dict)
-            self.assertEqual(skill, normalize_github_url(neon_skills[skill]["url"]))
+            self.assertEqual(skill,
+                             normalize_github_url(neon_skills[skill]["url"]))
+
+    def test_install_local_skills(self):
+        import neon_core.util.skill_utils
+        install_deps = Mock()
+        neon_core.util.skill_utils._install_skill_dependencies = install_deps
+        install_local_skills = neon_core.util.skill_utils.install_local_skills
+
+        local_skills_dir = os.path.join(os.path.dirname(__file__),
+                                        "local_skills")
+
+        installed = install_local_skills(local_skills_dir)
+        num_installed = len(installed)
+        self.assertEqual(installed, os.listdir(local_skills_dir))
+        self.assertEqual(num_installed, install_deps.call_count)
+
+    def test_install_skill_dependencies(self):
+        # Patch dependency installation
+        import ovos_skills_manager.requirements
+        pip_install = Mock()
+        install_system_deps = Mock()
+        ovos_skills_manager.requirements.install_system_deps = \
+            install_system_deps
+        ovos_skills_manager.requirements.pip_install = pip_install
+
+        from ovos_skills_manager.skill_entry import SkillEntry
+        from neon_core.util.skill_utils import _install_skill_dependencies
+
+        local_skills_dir = os.path.join(os.path.dirname(__file__),
+                                        "local_skills")
+        with open(os.path.join(local_skills_dir,
+                               "skill-osm_parsing", "skill.json")) as f:
+            skill_json = json.load(f)
+        entry = SkillEntry.from_json(skill_json, False)
+        self.assertEqual(entry.json["requirements"],
+                         skill_json["requirements"])
+
+        _install_skill_dependencies(entry)
+        pip_install.assert_called_once()
+        pip_install.assert_called_with(entry.json["requirements"]["python"])
+        install_system_deps.assert_called_once()
+        install_system_deps.assert_called_with(
+            entry.json["requirements"]["system"])
 
 
 if __name__ == '__main__':

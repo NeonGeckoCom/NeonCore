@@ -1,0 +1,7 @@
+dependencies:
+  python:
+    - manifest_requirement
+  system:
+    all: system-manifest-pkg
+  skill:
+    - manifest-skill

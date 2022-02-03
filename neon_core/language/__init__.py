@@ -30,13 +30,7 @@ from ovos_plugin_manager.language import load_lang_detect_plugin, \
 from neon_utils.configuration_utils import get_neon_lang_config, LOG
 from neon_core.configuration import Configuration, get_private_keys
 
-
-def get_lang_config():
-    config = Configuration.get()
-    lang_config = config.get("language", {})
-    lang_config["internal"] = lang_config.get("internal") or config.get("lang") or "en-us"
-    lang_config["user"] = lang_config.get("user") or config.get("lang") or "en-us"
-    return lang_config
+get_lang_config = get_neon_lang_config
 
 
 def get_language_dir(base_path, lang="en-us"):
