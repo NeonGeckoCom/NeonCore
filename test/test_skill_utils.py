@@ -22,12 +22,15 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+import importlib
 import json
 import os
 import shutil
 import sys
 import unittest
+from copy import deepcopy
 
+from importlib import reload
 from mock.mock import Mock
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -108,8 +111,8 @@ class SkillUtilsTests(unittest.TestCase):
 
     def test_install_local_skills(self):
         import neon_core.util.skill_utils
+        importlib.reload(neon_core.util.skill_utils)
         install_deps = Mock()
-        _real_method = neon_core.util.skill_utils._install_skill_dependencies
         neon_core.util.skill_utils._install_skill_dependencies = install_deps
         install_local_skills = neon_core.util.skill_utils.install_local_skills
 
@@ -121,22 +124,20 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(installed, os.listdir(local_skills_dir))
         self.assertEqual(num_installed, install_deps.call_count)
 
-        neon_core.util.skill_utils._install_skill_dependencies = _real_method
 
     def test_install_skill_dependencies(self):
         # Patch dependency installation
         import ovos_skills_manager.requirements
+        importlib.reload(ovos_skills_manager.requirements)
         pip_install = Mock()
         install_system_deps = Mock()
-        _real_pip = ovos_skills_manager.requirements.pip_install
-        _real_sys = ovos_skills_manager.requirements.install_system_deps
         ovos_skills_manager.requirements.install_system_deps = \
             install_system_deps
         ovos_skills_manager.requirements.pip_install = pip_install
-
         from ovos_skills_manager.skill_entry import SkillEntry
+        import neon_core.util.skill_utils
+        importlib.reload(neon_core.util.skill_utils)
         from neon_core.util.skill_utils import _install_skill_dependencies
-
         local_skills_dir = os.path.join(os.path.dirname(__file__),
                                         "local_skills")
         with open(os.path.join(local_skills_dir,
@@ -152,9 +153,6 @@ class SkillUtilsTests(unittest.TestCase):
         install_system_deps.assert_called_once()
         install_system_deps.assert_called_with(
             entry.json["requirements"]["system"])
-
-        ovos_skills_manager.requirements.pip_install = _real_pip
-        ovos_skills_manager.requirements.install_system_deps = _real_sys
 
 
 if __name__ == '__main__':
