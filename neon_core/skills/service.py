@@ -41,7 +41,6 @@ from neon_core.util.qml_file_server import start_qml_http_server
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
-from mycroft.skills.msm_wrapper import MsmException
 from mycroft.configuration.locale import set_default_lang, set_default_tz
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
@@ -147,18 +146,13 @@ class NeonSkillService:
         Returns:
             SkillManager instance or None if it couldn't be initialized
         """
-        try:
-            self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
-            self.skill_manager.load_priority()
-        except MsmException:
-            # skill manager couldn't be created, wait for network connection and
-            # retry
-            self.skill_manager = None
-            LOG.info(
-                'MSM is uninitialized and requires network connection to fetch '
-                'skill information\nWill retry after internet connection is '
-                'established.'
-            )
+        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
+
+        # TODO: This config patching should be handled in neon_utils
+        self.skill_manager.config["skills"]["priority_skills"] = \
+            self.skill_manager.config["skills"].get("priority") or \
+            self.skill_manager.config["skills"]["priority_skills"]
+        self.skill_manager.load_priority()
 
     def _wait_for_internet_connection(self):
         if get_neon_skills_config().get("wait_for_internet", True):
