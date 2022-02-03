@@ -89,7 +89,6 @@ setup(
     entry_points={
         'console_scripts': [
             'neon_skills_service=neon_core.skills.__main__:main',
-            'neon_gui_service=neon_core.gui.__main__:main',
             'neon-install-default-skills=neon_core.util.skill_utils:install_skills_default',
             'neon-upload-diagnostics=neon_core.util.diagnostic_utils:cli_send_diags',
             'neon-start=neon_core.run_neon:start_neon',
