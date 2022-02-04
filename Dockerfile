@@ -30,7 +30,7 @@ COPY docker_overlay/neon.conf /root/.config/neon/neon.conf
 RUN pip install wheel && \
     pip install .
 
-CMD ["neon_skills_service"]
+CMD ["neon", "run-skills", "-i", "/skills"]
 
 FROM base as default_skills
 
