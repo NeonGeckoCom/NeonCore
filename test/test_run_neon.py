@@ -153,6 +153,7 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(response, Message)
         loaded_skills = response.data
         self.assertIsInstance(loaded_skills, dict)
+        self.assertGreater(loaded_skills.keys(), 1)
 
     # TODO: Test user utterance -> response
 

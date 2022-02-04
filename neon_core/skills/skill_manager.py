@@ -23,12 +23,11 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
-
-from glob import glob
 from neon_utils.configuration_utils import get_neon_skills_config
 from neon_utils.log_utils import LOG
+
 from neon_core.skills.skill_store import SkillsStore
+
 from mycroft.util import connected
 from mycroft.skills.skill_manager import SkillManager
 
@@ -71,24 +70,3 @@ class NeonSkillManager(SkillManager):
         reply = message.reply('skill.converse.error',
                               data=dict(skill_id=skill_id, error=error_msg))
         self.bus.emit(reply)
-
-    def _get_skill_directories(self):
-        """
-        Locates all skill directories in the configured skill install path
-        """
-        # TODO: Integrate this with OSM local appstores DM
-        base_skill_dir = glob(os.path.join(self.skill_config["directory"], "*/"))
-        skill_directories = []
-        for skill_dir in base_skill_dir:
-            # TODO: all python packages must have __init__.py!  Better way?
-            # check if folder is a skill (must have __init__.py)
-            if SKILL_MAIN_MODULE in os.listdir(skill_dir):
-                skill_directories.append(skill_dir.rstrip('/'))
-                if skill_dir in self.empty_skill_dirs:
-                    self.empty_skill_dirs.discard(skill_dir)
-            else:
-                if skill_dir not in self.empty_skill_dirs:
-                    self.empty_skill_dirs.add(skill_dir)
-                    LOG.debug('Found skills directory with no skill: ' +
-                              skill_dir)
-        return skill_directories
