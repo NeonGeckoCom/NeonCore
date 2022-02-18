@@ -1,4 +1,5 @@
 ovos-core[all]~=0.0.2a5
+# TODO: Update to stable version or spec ovos per-module?
 
 # neon core modules
 neon_enclosure~=0.1,>=0.1.2
