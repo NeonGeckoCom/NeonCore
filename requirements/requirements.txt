@@ -14,6 +14,8 @@ kthread
 ovos_utils>=0.0.12
 ovos-skills-manager>=0.0.2
 
+json_database<0.7.0
+
 # plugins
 ovos-plugin-manager~=0.0.1
 neon-lang-plugin-libretranslate>=0.1.2
