@@ -23,10 +23,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mycroft.configuration.config import Configuration, LocalConf
+from mycroft.configuration.config import Configuration
+
 
 def get_private_keys():
     return Configuration.get(remote=False).get("keys", {})
-
-
-

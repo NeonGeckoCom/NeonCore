@@ -22,98 +22,13 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import os.path
-from os.path import join, dirname
-import json
 
-from ovos_utils.json_helper import merge_dict
-from ovos_utils.system import set_root_path
-from ovos_utils.configuration import set_config_name
-from ovos_utils.xdg_utils import xdg_config_home
-from neon_utils import LOG
+from neon_core.config import init_config
+from os.path import dirname
+
 
 NEON_ROOT_PATH = dirname(dirname(__file__))
-
-
-def setup_ovos_core_config():
-    """
-    Runs at module init to ensure base ovos.conf exists to patch ovos-core. Note that this must run before any import
-    of Configuration class.
-    """
-    OVOS_CONFIG = join(xdg_config_home(), "OpenVoiceOS", "ovos.conf")
-
-    _NEON_OVOS_CONFIG = {
-        "module_overrides": {
-            "neon_core": {
-                "xdg": True,
-                "base_folder": "neon",
-                "config_filename": "neon.conf",
-                "default_config_path": join(dirname(__file__),
-                                            'configuration', 'neon.conf')
-            }
-        },
-        # if these services are running standalone (neon_core not in venv)
-        # config them to use neon_core config from above
-        "submodule_mappings": {
-            "neon_speech": "neon_core",
-            "neon_audio": "neon_core",
-            "neon_enclosure": "neon_core"
-        }
-    }
-
-    cfg = {}
-    try:
-        with open(OVOS_CONFIG) as f:
-            cfg = json.load(f)
-    except FileNotFoundError:
-        pass
-    except Exception as e:
-        LOG.error(e)
-
-    cfg = merge_dict(cfg, _NEON_OVOS_CONFIG)
-    with open(OVOS_CONFIG, "w") as f:
-        json.dump(cfg, f, indent=4, ensure_ascii=True)
-
-
-def setup_ovos_config():
-    """
-    Configure ovos_utils to read from neon.conf files and set this path as the root.
-    """
-    # TODO: This method will be handled in ovos-core directly in the future
-    # ensure ovos_utils can find neon_core
-    set_root_path(NEON_ROOT_PATH)
-    # make ovos_utils load the proper .conf files
-    set_config_name("neon.conf", "neon_core")
-
-
-setup_ovos_config()
-
-# make ovos-core Configuration.get() load neon.conf
-# TODO ovos-core does not yet support yaml configs, once it does
-#  Configuration.get() will be made to load the existing neon config files,
-#  for now it simply provides correct default values
-setup_ovos_core_config()
-
-from neon_utils.configuration_utils import write_mycroft_compatible_config, init_config_dir
-init_config_dir()
-
-# Write and reload Mycroft-compat conf file
-neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
-if not os.path.isdir(dirname(neon_config_path)):
-    os.makedirs(dirname(neon_config_path))
-write_mycroft_compatible_config(neon_config_path)
-from neon_core.configuration import Configuration
-Configuration.load_config_stack(cache=True, remote=False)
-
-
-# TODO: Consider when this log is valid/config is changed or not already synced with neon_config DM
-LOG.info(f"{neon_config_path} will be overwritten with Neon YAML config contents.")
-
-# patch version string to allow downstream to know where it is running
-import mycroft.version
-CORE_VERSION_STR = '.'.join(map(str, mycroft.version.CORE_VERSION_TUPLE)) + \
-                   "(NeonGecko)"
-mycroft.version.CORE_VERSION_STR = CORE_VERSION_STR
+CORE_VERSION_STR = init_config(NEON_ROOT_PATH)
 
 
 from neon_core.skills import NeonSkill, NeonFallbackSkill

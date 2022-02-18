@@ -1,5 +1,6 @@
 # mycroft
-ovos-core[skills]~=0.0.2a5
+ovos-core[skills_lgpl]~=0.0.2a5
+# TODO: Update to stable version
 mock_msm
 
 # utils
