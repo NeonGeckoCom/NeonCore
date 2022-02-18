@@ -11,7 +11,7 @@ neon_enclosure~=0.1,>=0.1.2
 neon-utils>=0.12.6
 rapidfuzz
 kthread
-ovos_utils>=0.0.12
+ovos_utils~=0.0.12,<0.0.14
 ovos-skills-manager>=0.0.2
 
 json_database<0.7.0
