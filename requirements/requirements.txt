@@ -17,7 +17,7 @@ ovos-skills-manager>=0.0.2
 json_database==0.5.1
 
 # plugins
-ovos-plugin-manager~=0.0.1
+ovos-plugin-manager~=0.0.1,<=0.0.3
 neon-lang-plugin-libretranslate>=0.1.2
 
 # text parser modules
