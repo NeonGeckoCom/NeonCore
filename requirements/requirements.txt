@@ -14,7 +14,7 @@ kthread
 ovos_utils~=0.0.12,<0.0.14
 ovos-skills-manager>=0.0.2
 
-json_database==0.5.1
+json_database==0.5.5
 
 # plugins
 ovos-plugin-manager~=0.0.1,<0.0.3
