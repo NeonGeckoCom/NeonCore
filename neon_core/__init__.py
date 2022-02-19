@@ -22,7 +22,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import os.path
 from os.path import join, dirname
 import json
 
@@ -99,6 +99,8 @@ init_config_dir()
 
 # Write and reload Mycroft-compat conf file
 neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
+if not os.path.isdir(dirname(neon_config_path)):
+    os.makedirs(dirname(neon_config_path))
 write_mycroft_compatible_config(neon_config_path)
 from neon_core.configuration import Configuration
 Configuration.load_config_stack(cache=True, remote=False)
