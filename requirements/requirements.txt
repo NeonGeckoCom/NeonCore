@@ -12,6 +12,9 @@ ovos-skills-manager~=0.0.10a20
 ovos-plugin-manager~=0.0.4
 SpeechRecognition~=3.8
 
+# TODO: Patching alerts skill dependency
+json-database==0.5.5
+
 # plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
 
