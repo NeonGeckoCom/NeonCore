@@ -24,13 +24,12 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from os.path import join, dirname
-import xdg.BaseDirectory
 import json
 
 from ovos_utils.json_helper import merge_dict
 from ovos_utils.system import set_root_path
 from ovos_utils.configuration import set_config_name
-
+from ovos_utils.xdg_utils import xdg_config_home
 from neon_utils import LOG
 
 NEON_ROOT_PATH = dirname(dirname(__file__))
@@ -41,8 +40,7 @@ def setup_ovos_core_config():
     Runs at module init to ensure base ovos.conf exists to patch ovos-core. Note that this must run before any import
     of Configuration class.
     """
-    OVOS_CONFIG = join(xdg.BaseDirectory.save_config_path("OpenVoiceOS"),
-                       "ovos.conf")
+    OVOS_CONFIG = join(xdg_config_home(), "OpenVoiceOS", "ovos.conf")
 
     _NEON_OVOS_CONFIG = {
         "module_overrides": {
@@ -100,8 +98,7 @@ from neon_utils.configuration_utils import write_mycroft_compatible_config, init
 init_config_dir()
 
 # Write and reload Mycroft-compat conf file
-neon_config_path = join(xdg.BaseDirectory.save_config_path("neon"),
-                        "neon.conf")
+neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
 write_mycroft_compatible_config(neon_config_path)
 from neon_core.configuration import Configuration
 Configuration.load_config_stack(cache=True, remote=False)
