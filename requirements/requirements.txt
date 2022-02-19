@@ -6,10 +6,9 @@ mock_msm
 neon-utils~=0.12,>=0.14.3a15
 # TODO: Update to stable version
 ovos_utils~=0.0.12
-ovos-skills-manager~=0.0.8
-
-# TODO: Patching OPM
-ovos-plugin-manager==0.0.2
+ovos-skills-manager~=0.0.10a20
+# TODO: Update to stable version
+ovos-plugin-manager~=0.0.4
 SpeechRecognition~=3.8
 
 # plugins
