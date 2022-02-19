@@ -4,16 +4,13 @@ ovos-core[skills_lgpl]~=0.0.2a5
 mock_msm
 
 # utils
-neon-utils~=0.12,>=0.14.3a15
+neon-utils~=0.12,>=0.15.1a1
 # TODO: Update to stable version
 ovos_utils~=0.0.12
 ovos-skills-manager~=0.0.10a20
 # TODO: Update to stable version
 ovos-plugin-manager~=0.0.4
 SpeechRecognition~=3.8
-
-# TODO: Patching alerts skill dependency
-json-database==0.5.5
 
 # plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
