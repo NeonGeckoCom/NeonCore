@@ -1,5 +1,5 @@
 # mycroft
-ovos-core[skills]~=0.0.2a6
+ovos-core[skills]~=0.0.2a5
 mock_msm
 
 # utils
