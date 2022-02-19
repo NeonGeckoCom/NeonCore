@@ -1,4 +1,4 @@
-ovos-core[all]~=0.0.1
+ovos-core[all]~=0.0.2a5
 
 # neon core modules
 neon_enclosure~=0.1,>=0.1.2

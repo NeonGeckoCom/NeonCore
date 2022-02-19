@@ -39,8 +39,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
-          pip install -r requirements/requirements.txt
-          pip install -r requirements/test.txt
+          pip install wheel -r requirements/requirements.txt -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
 
@@ -91,8 +90,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
-          pip install -r requirements/requirements.txt
-          pip install -r requirements/test.txt
+          pip install wheel -r requirements/requirements.txt -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
 
