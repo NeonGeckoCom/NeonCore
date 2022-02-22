@@ -24,6 +24,8 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import json
+import os.path
+
 import requests
 
 from os import listdir
@@ -93,6 +95,9 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         # try:
             osm.install_skill(entry, skill_dir)
             LOG.info(f"Installed {url} to {skill_dir}")
+            if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
+                LOG.error(f"Failed to install: "
+                          f"{os.path.join(skill_dir, entry.uuid)}")
         except Exception as e:
             LOG.error(e)
     if token_set:
