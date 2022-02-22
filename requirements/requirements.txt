@@ -1,14 +1,11 @@
 # mycroft
 ovos-core[skills_lgpl]~=0.0.2a5
-# TODO: Update to stable version
-mock_msm
 
 # utils
 neon-utils~=0.12,>=0.15.1a1
-# TODO: Update to stable version
-ovos_utils~=0.0.12
+ovos_utils~=0.0.17a0
 ovos-skills-manager~=0.0.10a20
-# TODO: Update to stable version
+# TODO: Update to stable versions
 ovos-plugin-manager~=0.0.4
 SpeechRecognition~=3.8
 
