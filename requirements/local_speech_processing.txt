@@ -1,2 +1,3 @@
 neon-stt-plugin-deepspeech-stream-local~=0.1
-neon-tts-plugin-mimic~=0.1
+# neon-tts-plugin-mimic~=0.1
+neon-tts-plugin-mimic @ git+https://github.com/NeonDaniel/neon-tts-plugin-mimic@FIX_RefactorXDGDependency
