@@ -1,5 +1,9 @@
-ovos-core[all]~=0.0.2a5
-# TODO: Update to stable version or spec ovos per-module?
+# Patching compat with extra-stt
+# ovos-core[all]~=0.0.2a5
+ovos-core[audio-backend,PHAL,tts,skills_lgpl,gui,bus]~=0.0.2a5
+SpeechRecognition~=3.8.1
+PyAudio~=0.2.11
+ovos-ww-plugin-pocketsphinx~=0.1.2
 
 # neon core modules
 neon_enclosure~=0.1,>=0.1.2

@@ -7,7 +7,6 @@ ovos_utils~=0.0.15,>=0.0.17a1
 ovos-skills-manager~=0.0.10a20
 # TODO: Update to stable versions
 ovos-plugin-manager~=0.0.4
-SpeechRecognition~=3.8
 
 # plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
