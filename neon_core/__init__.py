@@ -23,11 +23,14 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import sys
+
 from neon_core.config import init_config
 from os.path import dirname
 
 
-NEON_ROOT_PATH = dirname(dirname(__file__))
+NEON_ROOT_PATH = dirname(__file__)
+sys.path.append(NEON_ROOT_PATH)
 CORE_VERSION_STR = init_config(NEON_ROOT_PATH)
 
 

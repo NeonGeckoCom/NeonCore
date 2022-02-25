@@ -124,7 +124,7 @@ def init_config(neon_root_path: str):
     """
     Initialize all configuration methods to read from the same config
     """
-    setup_ovos_config(neon_root_path)
+    # setup_ovos_config(neon_root_path)
     setup_neon_system_config()
     # make ovos-core Configuration.get() load neon.conf
     # TODO ovos-core does not yet support yaml configs, once it does
