@@ -71,9 +71,15 @@ def setup_ovos_core_config():
     except Exception as e:
         LOG.error(e)
 
-    cfg = merge_dict(cfg, neon_default_config)
+    if cfg == neon_default_config:
+        # Skip merge/write config if it's already equivalent
+        return
+    new_cfg = merge_dict(cfg, neon_default_config)
+    if cfg == new_cfg:
+        # Skip merge/write config if it's already equivalent
+        return
     with open(ovos_config_path, "w") as f:
-        json.dump(cfg, f, indent=4, ensure_ascii=True)
+        json.dump(new_cfg, f, indent=4, ensure_ascii=True)
 
 
 def setup_ovos_config(neon_root_path):
