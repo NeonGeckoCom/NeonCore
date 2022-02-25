@@ -104,9 +104,9 @@ def setup_neon_system_config():
     os.environ["MYCROFT_SYSTEM_CONFIG"] = config_file
 
 
-def overwrite_neon_config():
+def overwrite_neon_conf():
     """
-    Write over .conf files with Neon configuration
+    Write over neon.conf file with Neon configuration
     """
 
     from neon_utils.configuration_utils import \
@@ -131,7 +131,7 @@ def init_config(neon_root_path: str):
     #  Configuration.get() will be made to load the existing neon config files,
     #  for now it simply provides correct default values
     setup_ovos_core_config()
-    overwrite_neon_config()
+    overwrite_neon_conf()
 
     from neon_core.configuration import Configuration
     Configuration.load_config_stack(cache=True, remote=False)
