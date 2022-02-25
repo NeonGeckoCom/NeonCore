@@ -24,6 +24,8 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import json
+import os.path
+
 import requests
 
 from os import listdir
@@ -90,9 +92,13 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             else:
                 LOG.warning(f"Requested Skill not in Neon skill store ({url})")
                 entry = osm.skill_entry_from_url(url)
-        # try:
+
             osm.install_skill(entry, skill_dir)
-            LOG.info(f"Installed {url} to {skill_dir}")
+            if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
+                LOG.error(f"Failed to install: "
+                          f"{os.path.join(skill_dir, entry.uuid)}")
+            else:
+                LOG.info(f"Installed {url} to {skill_dir}")
         except Exception as e:
             LOG.error(e)
     if token_set:

@@ -1,16 +1,12 @@
 # mycroft
-ovos-core[skills]==0.0.1
-mock_msm
+ovos-core[skills_lgpl]~=0.0.2a5
 
 # utils
-neon-utils~=0.12,>=0.14.3a15
-# TODO: Update to stable version
-ovos_utils~=0.0.12
-ovos-skills-manager~=0.0.8
-
-# TODO: Patching OPM
-ovos-plugin-manager==0.0.2
-SpeechRecognition~=3.8
+neon-utils~=0.12,>=0.15.1a1
+ovos_utils~=0.0.15,>=0.0.17a1
+ovos-skills-manager~=0.0.10a20
+ovos-plugin-manager~=0.0.4,>=0.0.7a0
+# TODO: Update to stable versions
 
 # plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2

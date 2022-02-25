@@ -23,9 +23,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from neon_core.skills.service import NeonSkillService
+
 from mycroft.lock import Lock
 from mycroft.util import reset_sigint_handler, wait_for_exit_signal
-from neon_core.skills.service import NeonSkillService
 
 
 def main(*args, **kwargs):

@@ -24,11 +24,8 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import shutil
 import sys
 import unittest
-
-from ovos_plugin_manager.templates.language import LanguageDetector, LanguageTranslator
 
 from neon_utils.configuration_utils import get_mycroft_compatible_config
 
@@ -44,7 +41,8 @@ class ConfigurationTests(unittest.TestCase):
             if isinstance(val, dict):
                 for k, v in val.items():
                     if not isinstance(v, dict):
-                        self.assertEqual(neon_compat_config[key][k], v, neon_compat_config[key])
+                        self.assertEqual(neon_compat_config[key][k],
+                                         v, neon_compat_config[key])
             else:
                 self.assertEqual(neon_compat_config[key], val)
 
@@ -56,11 +54,15 @@ class ConfigurationTests(unittest.TestCase):
             if isinstance(val, dict):
                 for k, v in val.items():
                     if not isinstance(v, dict):
-                        self.assertEqual(mycroft_config[key][k], v, mycroft_config[key])
+                        self.assertEqual(mycroft_config[key][k],
+                                         v, mycroft_config[key])
             else:
                 self.assertEqual(mycroft_config[key], val)
 
     def test_signal_dir(self):
+        import neon_core
+
+        self.assertIsNotNone(os.environ.get("MYCROFT_SYSTEM_CONFIG"))
         from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
         from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
         from mycroft.util.signal import get_ipc_directory as mycroft_ipc_dir
