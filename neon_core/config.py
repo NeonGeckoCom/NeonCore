@@ -26,10 +26,10 @@
 import json
 import os
 
+from pprint import pformat
 from os.path import join, dirname
 from ovos_utils.json_helper import merge_dict
 from ovos_utils.system import set_root_path
-from ovos_utils.configuration import set_config_name
 from ovos_utils.xdg_utils import xdg_config_home
 
 from neon_utils.logger import LOG
@@ -78,6 +78,7 @@ def setup_ovos_core_config():
     if disk_cfg == cfg:
         # Skip write config if it's already equivalent
         return
+    LOG.info(f"Writing config:\n{pformat(cfg)}")
     with open(ovos_config_path, "w") as f:
         json.dump(cfg, f, indent=4, ensure_ascii=True)
 
@@ -89,8 +90,6 @@ def setup_ovos_config(neon_root_path: str):
     # TODO: This method will be handled in ovos-core directly in the future
     # ensure ovos_utils can find neon_core
     set_root_path(neon_root_path)
-    # make ovos_utils load the proper .conf files
-    set_config_name("neon.conf", "neon_core")
 
 
 def setup_neon_system_config():
