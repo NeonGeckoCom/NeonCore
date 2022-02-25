@@ -26,19 +26,28 @@
 import os
 import sys
 import unittest
+from pprint import pformat
 
+from neon_utils.logger import LOG
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 class ConfigurationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        from ovos_config_assistant import config_helpers
+
         ovos_config = os.path.expanduser("~/.config/OpenVoiceOS/ovos.conf")
         if os.path.isfile(ovos_config):
             os.remove(ovos_config)
+        assert config_helpers.get_ovos_default_config_paths() == []
 
         import neon_core
         assert isinstance(neon_core.CORE_VERSION_STR, str)
+        assert len(config_helpers.get_ovos_default_config_paths()) == 1
+        cls.ovos_config = config_helpers.get_ovos_config()
+        assert cls.ovos_config['config_filename'] == 'neon.conf'
+        LOG.info(pformat(ovos_config))
 
     def test_neon_core_config_init(self):
         from neon_utils.configuration_utils import \
@@ -75,6 +84,9 @@ class ConfigurationTests(unittest.TestCase):
         from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
         from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
         from mycroft.util.signal import get_ipc_directory as mycroft_ipc_dir
+
+        from ovos_config_assistant import config_helpers
+        self.assertEqual(config_helpers.get_ovos_config(), self.ovos_config)
 
         self.assertEqual(neon_ipc_dir, ovos_ipc_dir())
         self.assertEqual(neon_ipc_dir, mycroft_ipc_dir())
