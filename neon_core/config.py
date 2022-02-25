@@ -78,7 +78,8 @@ def setup_ovos_core_config():
     if disk_cfg == cfg:
         # Skip write config if it's already equivalent
         return
-    LOG.info(f"Writing config:\n{pformat(cfg)}")
+    if not os.path.isdir(dirname(ovos_config_path)):
+        os.makedirs(ovos_config_path)
     with open(ovos_config_path, "w") as f:
         json.dump(cfg, f, indent=4, ensure_ascii=True)
 
