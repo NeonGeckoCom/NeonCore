@@ -84,15 +84,6 @@ def setup_ovos_core_config():
         json.dump(cfg, f, indent=4, ensure_ascii=True)
 
 
-def setup_ovos_config(neon_root_path: str):
-    """
-    Configure ovos_utils to read from neon.conf files and set the root path
-    """
-    # TODO: This method will be handled in ovos-core directly in the future
-    # ensure ovos_utils can find neon_core
-    set_root_path(neon_root_path)
-
-
 def setup_neon_system_config():
     """
     Ensure default neon config file is specified in envvars
@@ -108,7 +99,6 @@ def overwrite_neon_conf():
     """
     Write over neon.conf file with Neon configuration
     """
-
     from neon_utils.configuration_utils import \
         write_mycroft_compatible_config, init_config_dir
     init_config_dir()
@@ -120,11 +110,10 @@ def overwrite_neon_conf():
     write_mycroft_compatible_config(neon_config_path)
 
 
-def init_config(neon_root_path: str):
+def init_config():
     """
     Initialize all configuration methods to read from the same config
     """
-    # setup_ovos_config(neon_root_path)
     setup_neon_system_config()
     # make ovos-core Configuration.get() load neon.conf
     # TODO ovos-core does not yet support yaml configs, once it does
@@ -133,6 +122,12 @@ def init_config(neon_root_path: str):
     setup_ovos_core_config()
     overwrite_neon_conf()
 
+
+def get_core_version() -> str:
+    """
+    Get the core version string.
+    NOTE: `init_config` should be called before this method
+    """
     from neon_core.configuration import Configuration
     Configuration.load_config_stack(cache=True, remote=False)
 
