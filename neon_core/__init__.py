@@ -23,12 +23,16 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neon_core.config import init_config
+import sys
+
+from neon_core.config import init_config, get_core_version
 from os.path import dirname
 
 
-NEON_ROOT_PATH = dirname(dirname(__file__))
-CORE_VERSION_STR = init_config(NEON_ROOT_PATH)
+NEON_ROOT_PATH = dirname(__file__)
+sys.path.append(NEON_ROOT_PATH)
+init_config()
+CORE_VERSION_STR = get_core_version()
 
 
 from neon_core.skills import NeonSkill, NeonFallbackSkill

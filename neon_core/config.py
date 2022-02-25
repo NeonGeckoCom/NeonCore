@@ -29,10 +29,8 @@ import os
 from os.path import join, dirname
 from ovos_utils.json_helper import merge_dict
 from ovos_utils.system import set_root_path
-from ovos_utils.configuration import set_config_name
 from ovos_utils.xdg_utils import xdg_config_home
-from neon_utils.configuration_utils import write_mycroft_compatible_config,\
-    init_config_dir
+
 from neon_utils.logger import LOG
 
 
@@ -71,20 +69,19 @@ def setup_ovos_core_config():
     except Exception as e:
         LOG.error(e)
 
+    if cfg == neon_default_config:
+        # Skip merge/write config if it's already equivalent
+        return
+    disk_cfg = dict(cfg)
     cfg = merge_dict(cfg, neon_default_config)
-    with open(ovos_config_path, "w") as f:
+    if disk_cfg == cfg:
+        # Skip write config if it's already equivalent
+        return
+    if not os.path.isdir(dirname(ovos_config_path)):
+        os.makedirs(dirname(ovos_config_path))
+    LOG.info(f"Writing config file: {ovos_config_path}")
+    with open(ovos_config_path, "w+") as f:
         json.dump(cfg, f, indent=4, ensure_ascii=True)
-
-
-def setup_ovos_config(neon_root_path):
-    """
-    Configure ovos_utils to read from neon.conf files and set this path as the root.
-    """
-    # TODO: This method will be handled in ovos-core directly in the future
-    # ensure ovos_utils can find neon_core
-    set_root_path(neon_root_path)
-    # make ovos_utils load the proper .conf files
-    set_config_name("neon.conf", "neon_core")
 
 
 def setup_neon_system_config():
@@ -98,23 +95,37 @@ def setup_neon_system_config():
     os.environ["MYCROFT_SYSTEM_CONFIG"] = config_file
 
 
-def init_config(neon_root_path):
-    setup_ovos_config(neon_root_path)
+def overwrite_neon_conf():
+    """
+    Write over neon.conf file with Neon configuration
+    """
+    from neon_utils.configuration_utils import \
+        write_mycroft_compatible_config, init_config_dir
+    init_config_dir()
+
+    # Write Mycroft-compat conf file
+    neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
+    write_mycroft_compatible_config(neon_config_path)
+
+
+def init_config():
+    """
+    Initialize all configuration methods to read from the same config
+    """
     setup_neon_system_config()
     # make ovos-core Configuration.get() load neon.conf
     # TODO ovos-core does not yet support yaml configs, once it does
     #  Configuration.get() will be made to load the existing neon config files,
     #  for now it simply provides correct default values
     setup_ovos_core_config()
+    overwrite_neon_conf()
 
-    init_config_dir()
 
-    # Write and reload Mycroft-compat conf file
-    neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
-    # TODO: Consider when this log is valid/config is changed or not already synced with neon_config DM
-    LOG.info(f"{neon_config_path} will be overwritten with Neon YAML config")
-    write_mycroft_compatible_config(neon_config_path)
-
+def get_core_version() -> str:
+    """
+    Get the core version string.
+    NOTE: `init_config` should be called before this method
+    """
     from neon_core.configuration import Configuration
     Configuration.load_config_stack(cache=True, remote=False)
 

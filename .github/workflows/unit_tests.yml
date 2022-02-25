@@ -104,6 +104,12 @@ jobs:
         with:
           name: configuration-test-results
           path: tests/configuration-test-results.xml
+      - name: Upload config file
+        uses: actions/upload-artifact@v2
+        with:
+          name: ovos.conf
+          path: ~/.config/OpenVoiceOS/ovos.conf
+        if: always()
 
       - name: Test Language
         run: |

@@ -26,14 +26,33 @@
 import os
 import sys
 import unittest
+from pprint import pformat
 
-from neon_utils.configuration_utils import get_mycroft_compatible_config
-
+from neon_utils.logger import LOG
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 class ConfigurationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        from ovos_config_assistant import config_helpers
+
+        ovos_config = os.path.expanduser("~/.config/OpenVoiceOS/ovos.conf")
+        if os.path.isfile(ovos_config):
+            os.remove(ovos_config)
+        assert config_helpers.get_ovos_default_config_paths() == []
+
+        import neon_core
+        assert isinstance(neon_core.CORE_VERSION_STR, str)
+        assert len(config_helpers.get_ovos_default_config_paths()) == 1
+        LOG.info(config_helpers.get_ovos_default_config_paths())
+        ovos_config = config_helpers.get_ovos_config()
+        LOG.info(pformat(ovos_config))
+        assert ovos_config['config_filename'] == 'neon.conf'
+
     def test_neon_core_config_init(self):
+        from neon_utils.configuration_utils import \
+            get_mycroft_compatible_config
         from neon_core.configuration import Configuration
         neon_compat_config = Configuration.get()
         neon_config = get_mycroft_compatible_config()
@@ -47,6 +66,8 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertEqual(neon_compat_config[key], val)
 
     def test_ovos_core_config_init(self):
+        from neon_utils.configuration_utils import \
+            get_mycroft_compatible_config
         from mycroft.configuration import Configuration as MycroftConfig
         mycroft_config = MycroftConfig.get()
         neon_config = get_mycroft_compatible_config()
@@ -60,8 +81,6 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertEqual(mycroft_config[key], val)
 
     def test_signal_dir(self):
-        import neon_core
-
         self.assertIsNotNone(os.environ.get("MYCROFT_SYSTEM_CONFIG"))
         from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
         from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
