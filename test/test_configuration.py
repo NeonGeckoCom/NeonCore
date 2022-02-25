@@ -27,13 +27,22 @@ import os
 import sys
 import unittest
 
-from neon_utils.configuration_utils import get_mycroft_compatible_config
-
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 class ConfigurationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        ovos_config = os.path.expanduser("~/.config/OpenVoiceOS/ovos.conf")
+        if os.path.isfile(ovos_config):
+            os.remove(ovos_config)
+
+        import neon_core
+        assert isinstance(neon_core.CORE_VERSION_STR, str)
+
     def test_neon_core_config_init(self):
+        from neon_utils.configuration_utils import \
+            get_mycroft_compatible_config
         from neon_core.configuration import Configuration
         neon_compat_config = Configuration.get()
         neon_config = get_mycroft_compatible_config()
@@ -47,6 +56,8 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertEqual(neon_compat_config[key], val)
 
     def test_ovos_core_config_init(self):
+        from neon_utils.configuration_utils import \
+            get_mycroft_compatible_config
         from mycroft.configuration import Configuration as MycroftConfig
         mycroft_config = MycroftConfig.get()
         neon_config = get_mycroft_compatible_config()
@@ -60,8 +71,6 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertEqual(mycroft_config[key], val)
 
     def test_signal_dir(self):
-        import neon_core
-
         self.assertIsNotNone(os.environ.get("MYCROFT_SYSTEM_CONFIG"))
         from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
         from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
