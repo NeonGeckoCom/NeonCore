@@ -80,7 +80,8 @@ def setup_ovos_core_config():
         return
     if not os.path.isdir(dirname(ovos_config_path)):
         os.makedirs(dirname(ovos_config_path))
-    with open(ovos_config_path, "w") as f:
+    LOG.info(f"Writing config file: {ovos_config_path}")
+    with open(ovos_config_path, "w+") as f:
         json.dump(cfg, f, indent=4, ensure_ascii=True)
 
 
