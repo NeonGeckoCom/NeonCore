@@ -26,7 +26,6 @@
 import json
 import os
 
-from pprint import pformat
 from os.path import join, dirname
 from ovos_utils.json_helper import merge_dict
 from ovos_utils.system import set_root_path
