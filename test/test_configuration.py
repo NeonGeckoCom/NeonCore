@@ -45,9 +45,10 @@ class ConfigurationTests(unittest.TestCase):
         import neon_core
         assert isinstance(neon_core.CORE_VERSION_STR, str)
         assert len(config_helpers.get_ovos_default_config_paths()) == 1
-        cls.ovos_config = config_helpers.get_ovos_config()
-        assert cls.ovos_config['config_filename'] == 'neon.conf'
+        LOG.info(config_helpers.get_ovos_default_config_paths())
+        ovos_config = config_helpers.get_ovos_config()
         LOG.info(pformat(ovos_config))
+        assert ovos_config['config_filename'] == 'neon.conf'
 
     def test_neon_core_config_init(self):
         from neon_utils.configuration_utils import \
@@ -84,9 +85,6 @@ class ConfigurationTests(unittest.TestCase):
         from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
         from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
         from mycroft.util.signal import get_ipc_directory as mycroft_ipc_dir
-
-        from ovos_config_assistant import config_helpers
-        self.assertEqual(config_helpers.get_ovos_config(), self.ovos_config)
 
         self.assertEqual(neon_ipc_dir, ovos_ipc_dir())
         self.assertEqual(neon_ipc_dir, mycroft_ipc_dir())
