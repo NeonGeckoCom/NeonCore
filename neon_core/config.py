@@ -79,7 +79,7 @@ def setup_ovos_core_config():
         # Skip write config if it's already equivalent
         return
     if not os.path.isdir(dirname(ovos_config_path)):
-        os.makedirs(ovos_config_path)
+        os.makedirs(dirname(ovos_config_path))
     with open(ovos_config_path, "w") as f:
         json.dump(cfg, f, indent=4, ensure_ascii=True)
 
