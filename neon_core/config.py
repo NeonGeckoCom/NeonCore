@@ -103,10 +103,8 @@ def overwrite_neon_conf():
         write_mycroft_compatible_config, init_config_dir
     init_config_dir()
 
-    # Write and reload Mycroft-compat conf file
+    # Write Mycroft-compat conf file
     neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
-    # TODO: This log should be in the called method
-    LOG.info(f"{neon_config_path} will be overwritten with Neon YAML config")
     write_mycroft_compatible_config(neon_config_path)
 
 

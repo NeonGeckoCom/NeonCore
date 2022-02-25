@@ -2,7 +2,7 @@
 ovos-core[skills_lgpl]~=0.0.2a5
 
 # utils
-neon-utils~=0.12,>=0.15.1a1
+neon-utils~=0.12,>=0.15.1a7
 ovos_utils~=0.0.18
 ovos-skills-manager~=0.0.10a20
 ovos-plugin-manager~=0.0.4,>=0.0.7a0
