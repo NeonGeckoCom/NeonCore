@@ -31,7 +31,9 @@ import requests
 from os import listdir
 from tempfile import mkdtemp
 from shutil import rmtree
-from os.path import expanduser, join
+from os.path import expanduser, join, isdir
+
+from ovos_skills_manager.requirements import install_system_deps, pip_install
 from ovos_skills_manager.skill_entry import SkillEntry
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION, set_github_token, clear_github_token
@@ -132,3 +134,47 @@ def get_remote_entries(url):
     else:
         LOG.error(f"{url} request failed with code: {r.status_code}")
     return []
+
+
+def _install_skill_dependencies(skill: SkillEntry):
+    """
+    Install any system and Python dependencies for the specified skill
+    :param skill: Skill to install dependencies for
+    """
+    sys_deps = skill.requirements.get("system")
+    requirements = skill.requirements.get("python")
+    if sys_deps:
+        install_system_deps(sys_deps)
+    if requirements:
+        pip_install(requirements)
+    LOG.info(f"Installed dependencies for {skill.skill_folder}")
+
+
+def install_local_skills(local_skills_dir: str = "/skills") -> list:
+    """
+    Install skill dependencies for skills in the specified directory and ensure
+    the directory is loaded.
+    NOTE: dependence on other skills is not handled here.
+          Only Python and System dependencies are handled
+    :param local_skills_dir: Directory to install skills from
+    :returns: list of installed skill directories
+    """
+    local_skills_dir = expanduser(local_skills_dir)
+    if not isdir(local_skills_dir):
+        raise ValueError(f"{local_skills_dir} is not a valid directory")
+    installed_skills = list()
+    for skill in listdir(local_skills_dir):
+        if not isdir(skill):
+            pass
+        LOG.debug(f"Attempting installation of {skill}")
+        try:
+            entry = SkillEntry.from_directory(join(local_skills_dir, skill))
+            _install_skill_dependencies(entry)
+            installed_skills.append(skill)
+        except Exception as e:
+            LOG.error(f"Exception while installing {skill}")
+            LOG.error(e)
+    if local_skills_dir not in \
+            get_neon_skills_config().get("extra_directories", []):
+        LOG.error(f"{local_skills_dir} not found in configuration")
+    return installed_skills
