@@ -8,7 +8,7 @@ ovos-ww-plugin-pocketsphinx~=0.1.2
 # neon core modules
 neon_enclosure~=0.1,>=0.1.2
 neon_messagebus
-neon_speech~=0.3,>=0.3.3a4
+neon_speech~=0.3,>=0.3.3a7
 neon_audio~=0.4,>=0.4.3a4
 neon_gui
 # TODO: Version spec GUI
