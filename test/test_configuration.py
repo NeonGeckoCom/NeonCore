@@ -26,7 +26,7 @@
 import os
 import sys
 import unittest
-# from pprint import pformat
+from pprint import pformat
 
 from neon_utils.logger import LOG
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -46,9 +46,9 @@ class ConfigurationTests(unittest.TestCase):
         assert isinstance(neon_core.CORE_VERSION_STR, str)
         assert len(config_helpers.get_ovos_default_config_paths()) == 1
         LOG.info(config_helpers.get_ovos_default_config_paths())
-        # ovos_config = config_helpers.get_ovos_config()
-        # LOG.info(pformat(ovos_config))
-        # assert ovos_config['config_filename'] == 'neon.conf'
+        ovos_config = config_helpers.get_ovos_config()
+        LOG.info(pformat(ovos_config))
+        assert ovos_config['config_filename'] == 'neon.conf'
 
     def test_neon_core_config_init(self):
         from neon_utils.configuration_utils import \
