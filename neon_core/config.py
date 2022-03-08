@@ -28,7 +28,6 @@ import os
 
 from os.path import join, dirname
 from ovos_utils.json_helper import merge_dict
-from ovos_utils.system import set_root_path
 from ovos_utils.xdg_utils import xdg_config_home
 
 from neon_utils.logger import LOG
