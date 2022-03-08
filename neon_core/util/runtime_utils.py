@@ -26,7 +26,9 @@
 
 def use_neon_core(func):
     """
-    Wrapper to ensure call originates from neon_core for stack checks
+    Wrapper to ensure call originates from neon_core for stack checks.
+    This is used for ovos-utils config platform detection which uses the stack
+    to determine which module config to return.
     """
     def wrapper(*args, **kwargs):
         return func(*args, **kwargs)
