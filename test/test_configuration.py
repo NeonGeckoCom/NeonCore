@@ -35,15 +35,15 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 class ConfigurationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        from neon_core.configuration import get_json_config, \
-            get_default_json_config_paths
-
         ovos_config = os.path.expanduser("~/.config/OpenVoiceOS/ovos.conf")
         if os.path.isfile(ovos_config):
             os.remove(ovos_config)
-        assert get_default_json_config_paths() == []
+        # assert get_default_json_config_paths() == []
 
         import neon_core
+        from neon_core.configuration import get_json_config, \
+            get_default_json_config_paths
+
         assert isinstance(neon_core.CORE_VERSION_STR, str)
         assert len(get_default_json_config_paths()) == 1
         LOG.info(get_default_json_config_paths())
@@ -51,12 +51,21 @@ class ConfigurationTests(unittest.TestCase):
         LOG.info(pformat(ovos_config))
         assert ovos_config['config_filename'] == 'neon.conf'
 
+        from neon_core.util.runtime_utils import use_neon_core
+
+        @staticmethod
+        @use_neon_core
+        def wrapped_function_call(func, *args, **kwargs):
+            return func(*args, **kwargs)
+
+        cls.wrapped_function_call = wrapped_function_call
+
     def test_neon_core_config_init(self):
         from neon_utils.configuration_utils import \
             get_mycroft_compatible_config
         from neon_core.configuration import Configuration
         neon_compat_config = Configuration.get()
-        neon_config = get_mycroft_compatible_config()
+        neon_config = self.wrapped_function_call(get_mycroft_compatible_config)
         for key, val in neon_config.items():
             if isinstance(val, dict):
                 for k, v in val.items():
@@ -71,7 +80,7 @@ class ConfigurationTests(unittest.TestCase):
             get_mycroft_compatible_config
         from mycroft.configuration import Configuration as MycroftConfig
         mycroft_config = MycroftConfig.get()
-        neon_config = get_mycroft_compatible_config()
+        neon_config = self.wrapped_function_call(get_mycroft_compatible_config)
         for key, val in neon_config.items():
             if isinstance(val, dict):
                 for k, v in val.items():
@@ -87,8 +96,11 @@ class ConfigurationTests(unittest.TestCase):
         from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
         from mycroft.util.signal import get_ipc_directory as mycroft_ipc_dir
 
-        self.assertEqual(neon_ipc_dir, ovos_ipc_dir())
-        self.assertEqual(neon_ipc_dir, mycroft_ipc_dir())
+        from neon_core.util.runtime_utils import use_neon_core
+
+        self.assertEqual(neon_ipc_dir, self.wrapped_function_call(ovos_ipc_dir))
+        self.assertEqual(neon_ipc_dir,
+                         self.wrapped_function_call(mycroft_ipc_dir))
 
 
 if __name__ == '__main__':
