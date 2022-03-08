@@ -28,3 +28,23 @@ from mycroft.configuration.config import Configuration
 
 def get_private_keys():
     return Configuration.get(remote=False).get("keys", {})
+
+
+def get_json_config() -> dict:
+    """
+    Wraps `get_ovos_config` so stack trace resolves the correct core
+    :returns: dict config for neon
+    """
+    from ovos_config_assistant.config_helpers import get_ovos_config
+    return get_ovos_config()
+
+
+def get_default_json_config_paths() -> list:
+    """
+    Wraps `get_ovos_default_config_paths`
+      so stack trace resolves the correct core
+    :returns: list of configuration file paths that will be used
+    """
+    from ovos_config_assistant.config_helpers import \
+        get_ovos_default_config_paths
+    return get_ovos_default_config_paths()
