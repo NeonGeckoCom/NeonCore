@@ -35,7 +35,8 @@ CMD ["neon", "run-skills", "-i", "/skills"]
 FROM base as default_skills
 
 RUN mkdir -p /root/.local/share/neon
-COPY docker_overlay/skill_settings /root/.config/neon/skills
+# TODO: This path should move to config in the future
+COPY docker_overlay/skill_settings /root/.local/share/neon/skills
 COPY docker_overlay/ngi_local_conf.yml /config/
 RUN neon-install-default-skills
 RUN rm /config/ngi_local_conf.yml
