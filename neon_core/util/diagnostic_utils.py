@@ -104,6 +104,7 @@ def cli_send_diags():
     """
     CLI Entry Point to Send Diagnostics
     """
+    LOG.warning(f"This function is deprecated. Use `neon upload-diagnostics`")
     import argparse
     parser = argparse.ArgumentParser(description="Upload Neon Diagnostics Files", add_help=True)
     parser.add_argument("--no-transcripts", dest="transcripts", default=True, action='store_false',

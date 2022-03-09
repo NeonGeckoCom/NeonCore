@@ -159,6 +159,7 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
     :param local_skills_dir: Directory to install skills from
     :returns: list of installed skill directories
     """
+    github_token = get_neon_skills_config()["neon_token"]
     local_skills_dir = expanduser(local_skills_dir)
     if not isdir(local_skills_dir):
         raise ValueError(f"{local_skills_dir} is not a valid directory")
@@ -168,7 +169,8 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
             pass
         LOG.debug(f"Attempting installation of {skill}")
         try:
-            entry = SkillEntry.from_directory(join(local_skills_dir, skill))
+            entry = SkillEntry.from_directory(join(local_skills_dir, skill),
+                                              github_token)
             _install_skill_dependencies(entry)
             installed_skills.append(skill)
         except Exception as e:
