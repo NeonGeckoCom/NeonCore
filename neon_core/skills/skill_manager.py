@@ -64,7 +64,8 @@ class NeonSkillManager(SkillManager):
         super().run()
 
     def _emit_converse_error(self, message, skill_id, error_msg):
-        super()._emit_converse_error(message, skill_id, error_msg)
+        if hasattr(super(), "_emit_converse_error"):
+            super()._emit_converse_error(message, skill_id, error_msg)
         # Also emit the old error message to keep compatibility and for any
         # listener on the bus
         reply = message.reply('skill.converse.error',

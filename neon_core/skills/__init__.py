@@ -29,11 +29,15 @@ from neon_core.skills.fallback_skill import NeonFallbackSkill
 from neon_core.skills.decorators import intent_handler, intent_file_handler, \
     resting_screen_handler, conversational_intent
 
+from mycroft.skills.intent_services.adapt_service import AdaptIntent
+
 import mycroft.skills.core
 mycroft.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
+
+mycroft.skills.intent_service.AdaptIntent = AdaptIntent
 
 
 __all__ = ['NeonSkill',

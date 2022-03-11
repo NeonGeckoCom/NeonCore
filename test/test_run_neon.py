@@ -34,7 +34,6 @@ from mycroft_bus_client import MessageBusClient, Message
 from neon_utils.configuration_utils import get_neon_local_config
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.run_neon import start_neon, stop_neon
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 
@@ -50,6 +49,8 @@ class TestRunNeon(unittest.TestCase):
                  "skill-balena-wifi-setup.openvoiceos"])
         local_conf.write_changes()
 
+        from neon_core.run_neon import start_neon
+
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
         cls.bus = MessageBusClient()
@@ -59,6 +60,8 @@ class TestRunNeon(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
+        from neon_core.run_neon import stop_neon
+
         try:
             cls.bus.emit(Message("neon.shutdown"))
             cls.bus.close()

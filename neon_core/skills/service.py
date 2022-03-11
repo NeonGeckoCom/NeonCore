@@ -100,12 +100,12 @@ class NeonSkillService:
         self.event_scheduler = EventScheduler(self.bus)
         self.status = ProcessStatus('skills', self.bus, self.callbacks)
         SkillApi.connect_bus(self.bus)
-        self._initialize_skill_manager()
+        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
         self.status.set_started()
-        self._wait_for_internet_connection()
-        # TODO can this be removed? its a hack around msm requiring internet...
-        if self.skill_manager is None:
-            self._initialize_skill_manager()
+        # self._wait_for_internet_connection()
+        # # TODO can this be removed? its a hack around msm requiring internet...
+        # if self.skill_manager is None:
+        #     self._initialize_skill_manager()
         self.skill_manager.start()
         while not self.skill_manager.is_alive():
             time.sleep(0.1)
@@ -140,19 +140,21 @@ class NeonSkillService:
         )
         return service
 
-    def _initialize_skill_manager(self):
-        """Create a thread that monitors the loaded skills, looking for updates
-
-        Returns:
-            SkillManager instance or None if it couldn't be initialized
-        """
-        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
-
-        # TODO: This config patching should be handled in neon_utils
-        self.skill_manager.config["skills"]["priority_skills"] = \
-            self.skill_manager.config["skills"].get("priority") or \
-            self.skill_manager.config["skills"]["priority_skills"]
-        self.skill_manager.load_priority()
+    # def _initialize_skill_manager(self):
+    #     """Create a thread that monitors the loaded skills, looking for updates
+    #
+    #     Returns:
+    #         SkillManager instance or None if it couldn't be initialized
+    #     """
+    #     self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
+    #
+    #     # # TODO: This config patching should be handled in neon_utils
+    #     # self.skill_manager.config["skills"]["priority_skills"] = \
+    #     #     self.skill_manager.config["skills"].get("priority") or \
+    #     #     self.skill_manager.config["skills"]["priority_skills"]
+    #     LOG.info(f"Priority={self.skill_manager.config['skills']['priority_skills']}")
+    #     LOG.info(f"Blacklisted={self.skill_manager.config['skills']['blacklisted_skills']}")
+    #     # self.skill_manager.load_priority()
 
     def _wait_for_internet_connection(self):
         if get_neon_skills_config().get("wait_for_internet", True):
