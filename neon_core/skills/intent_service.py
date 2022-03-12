@@ -65,7 +65,7 @@ class NeonIntentService(IntentService):
 
         set_default_lang(self.language_config["internal"])
 
-        self._setup_converse_handlers()
+        # self._setup_converse_handlers()
 
         self.parser_service = TextParsersService(self.bus)
         self.parser_service.start()
@@ -75,28 +75,31 @@ class NeonIntentService(IntentService):
         else:
             self.transcript_service = None
 
-    def _setup_converse_handlers(self):
-        self.bus.on('skill.converse.error', self.handle_converse_error)
-        self.bus.on('skill.converse.activate_skill',
-                    self.handle_activate_skill)
-        self.bus.on('skill.converse.deactivate_skill',
-                    self.handle_deactivate_skill)
-        # backwards compat
-        self.bus.on('active_skill_request',
-                    self.handle_activate_skill)
+    def shutdown(self):
+        self.parser_service.shutdown()
 
-    def handle_activate_skill(self, message):
-        self.add_active_skill(message.data['skill_id'])
+    # def _setup_converse_handlers(self):
+    #     self.bus.on('skill.converse.error', self.handle_converse_error)
+    #     self.bus.on('skill.converse.activate_skill',
+    #                 self.handle_activate_skill)
+    #     self.bus.on('skill.converse.deactivate_skill',
+    #                 self.handle_deactivate_skill)
+    #     # backwards compat
+    #     self.bus.on('active_skill_request',
+    #                 self.handle_activate_skill)
+    #
+    # def handle_activate_skill(self, message):
+    #     self.add_active_skill(message.data['skill_id'])
+    #
+    # def handle_deactivate_skill(self, message):
+    #     self.remove_active_skill(message.data['skill_id'])
 
-    def handle_deactivate_skill(self, message):
-        self.remove_active_skill(message.data['skill_id'])
-
-    def reset_converse(self, message):
-        """Let skills know there was a problem with speech recognition"""
-        lang = message.data.get('lang', "en-us")
-        set_default_lang(lang)
-        for skill in copy(self.active_skills):
-            self.do_converse([], skill[0], lang, message)
+    # def reset_converse(self, message):
+    #     """Let skills know there was a problem with speech recognition"""
+    #     lang = message.data.get('lang', "en-us")
+    #     set_default_lang(lang)
+    #     for skill in copy(self.active_skills):
+    #         self.do_converse([], skill[0], lang, message)
 
     def _save_utterance_transcription(self, message):
         """
@@ -117,15 +120,18 @@ class NeonIntentService(IntentService):
                                                                   timestamp, audio)
             message.context["audio_file"] = audio_file
 
-    def _get_parsers_service_context(self, message, lang):
+    def _get_parsers_service_context(self, message: Message):
         """
         Pipe utterance thorough text parsers to get more metadata.
         Utterances may be modified by any parser and context overwritten
+        :param message: Message to parse
         """
         utterances = message.data.get('utterances', [])
+        lang = message.data.get('lang')
         for parser in self.parser_service.modules:
             # mutate utterances and retrieve extra data
-            utterances, data = self.parser_service.parse(parser, utterances, lang)
+            utterances, data = self.parser_service.parse(parser, utterances,
+                                                         lang)
             # update message context with extra data
             message.context = merge_dict(message.context, data)
         message.data["utterances"] = utterances
@@ -145,7 +151,8 @@ class NeonIntentService(IntentService):
         try:
             # Get language of the utterance
             lang = get_full_lang_code(
-                message.data.get('lang', self.language_config["user"]))
+                message.data.get('lang') or self.language_config["user"])
+            message.data["lang"] = lang
 
             # Add or init timing data
             message.context = message.context or {}
@@ -174,7 +181,7 @@ class NeonIntentService(IntentService):
 
             # Get text parser context
             with stopwatch:
-                self._get_parsers_service_context(message, lang)
+                self._get_parsers_service_context(message)
             message.context["timing"]["text_parsers"] = stopwatch.time
 
             # Catch empty utterances after parser service
@@ -187,29 +194,28 @@ class NeonIntentService(IntentService):
                 return
 
             # now pass our modified message to mycroft-lib
-            message.data["lang"] = lang
             # TODO: Consider how to implement 'and' parsing and converse here DM
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
 
-    def _converse(self, utterances, lang, message):
-        """
-        Wraps the actual converse method to add timing data
-
-        Args:
-            utterances (list):  list of utterances
-            lang (string):      4 letter ISO language code
-            message (Message):  message to use to generate reply
-
-        Returns:
-            IntentMatch if handled otherwise None.
-        """
-        stopwatch = Stopwatch()
-        with stopwatch:
-            match = super()._converse(utterances, lang, message)
-        message.context["timing"]["check_converse"] = stopwatch.time
-        if match:
-            LOG.info(f"converse handling response: {match.skill_id}")
-        return match
+    # def _converse(self, utterances, lang, message):
+    #     """
+    #     Wraps the actual converse method to add timing data
+    #
+    #     Args:
+    #         utterances (list):  list of utterances
+    #         lang (string):      4 letter ISO language code
+    #         message (Message):  message to use to generate reply
+    #
+    #     Returns:
+    #         IntentMatch if handled otherwise None.
+    #     """
+    #     stopwatch = Stopwatch()
+    #     with stopwatch:
+    #         match = super()._converse(utterances, lang, message)
+    #     message.context["timing"]["check_converse"] = stopwatch.time
+    #     if match:
+    #         LOG.info(f"converse handling response: {match.skill_id}")
+    #     return match
 
