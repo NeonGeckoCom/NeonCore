@@ -28,6 +28,8 @@ from mycroft_bus_client import Message
 from neon_core.messagebus import get_messagebus
 from os.path import abspath
 
+# TODO: Deprecate this module
+
 
 def ensure_uri(s):
     """

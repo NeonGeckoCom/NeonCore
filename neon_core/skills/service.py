@@ -24,6 +24,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import time
+from typing import Optional
 
 from neon_utils.configuration_utils import get_neon_skills_config, \
     get_neon_lang_config, get_neon_local_config
@@ -66,9 +67,14 @@ def on_stopping():
 
 
 class NeonSkillService:
-    def __init__(self, alive_hook=on_alive, started_hook=on_started,
-                 ready_hook=on_ready, error_hook=on_error,
-                 stopping_hook=on_stopping, watchdog=None):
+    def __init__(self,
+                 alive_hook: callable = on_alive,
+                 started_hook: callable = on_started,
+                 ready_hook: callable = on_ready,
+                 error_hook: callable = on_error,
+                 stopping_hook: callable = on_stopping,
+                 watchdog: Optional[callable] = None,
+                 config: Optional[dict] = None):
         self.bus = None
         self.skill_manager = None
         self.event_scheduler = None
@@ -79,7 +85,7 @@ class NeonSkillService:
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
-        skill_config = get_neon_skills_config()
+        skill_config = config or get_neon_skills_config()
         if skill_config.get("run_gui_file_server"):
             self.http_server = start_qml_http_server(
                 skill_config["directory"])

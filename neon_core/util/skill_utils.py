@@ -121,9 +121,12 @@ def install_skills_default(config: dict = None):
     clear_github_token()
 
 
-def get_remote_entries(url):
-    """ parse url and return a list of SkillEntry,
-     expects 1 skill per line, can be a skill_id or url"""
+def get_remote_entries(url: str):
+    """
+    Parse a skill list at a given URL
+    :param url: URL of skill list to parse (one skill per line)
+    :returns: list of skills by name, url, and/or ID
+    """
     r = SESSION.get(url)
     if not r.ok:
         LOG.warning(f"Cached response returned: {r.status_code}")

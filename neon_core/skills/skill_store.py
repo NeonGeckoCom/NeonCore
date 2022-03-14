@@ -22,6 +22,8 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from collections.abc import Iterable
+from typing import List, Optional, Generator, Union
 
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
@@ -55,6 +57,9 @@ class SkillsStore:
                 self.schedule_sync()
 
     def schedule_sync(self):
+        """
+        Use the EventScheduler to update osm with updated appstore data
+        """
         # every X hours
         interval = 60 * 60 * self.config["appstore_sync_interval"]
         when = datetime.now() + timedelta(seconds=interval)
@@ -63,6 +68,9 @@ class SkillsStore:
                                                 name="appstores.sync")
 
     def schedule_update(self):
+        """
+        Use the EventScheduler to update default skills
+        """
         # every X hours
         interval = 60 * 60 * self.config["auto_update_interval"]
         when = datetime.now() + timedelta(seconds=interval)
@@ -71,7 +79,11 @@ class SkillsStore:
                                                 name="default_skills.update")
 
     def handle_update(self, _):
+        """
+        Scheduled action to update installed skills
+        """
         try:
+            # TODO: Include non-default installed skills?
             self.install_default_skills(update=True)
         except Exception as e:
             if check_online():
@@ -83,9 +95,13 @@ class SkillsStore:
                 LOG.error("no internet, skipped skills update")
 
     def handle_sync_appstores(self, _):
+        """
+        Scheduled action to update OSM appstore listings
+        """
         try:
             self.osm.sync_appstores()
         except Exception as e:
+            # TODO: OSM should raise more specific exceptions
             if check_online():
                 # if there is internet log the error
                 LOG.exception(e)
@@ -98,6 +114,9 @@ class SkillsStore:
         self.scheduler.shutdown()
 
     def load_osm(self):
+        """
+        Get an authenticated instance of OSM if not disabled
+        """
         if self.disabled:
             return None
         osm = OVOSSkillsManager()
@@ -150,6 +169,9 @@ class SkillsStore:
         return self._default_skills
 
     def authenticate_neon(self):
+        """
+        Enable and authenticate the Neon skills store
+        """
         self.osm.enable_appstore("neon")
         neon = self.osm.get_appstore("neon")
         neon_token = self.config.get("neon_token")
@@ -159,10 +181,18 @@ class SkillsStore:
             neon.authenticate(bootstrap=False)
 
     def deauthenticate_neon(self):
+        """
+        Clear authentication for the Neon skills store
+        """
         neon = self.osm.get_appstore("neon")
         neon.clear_authentication()
 
-    def get_skill_entry(self, skill):
+    def get_skill_entry(self, skill: str) -> Optional[SkillEntry]:
+        """
+        Build a SkillEntry object from the passed skill URL or ID
+        :param skill: str skill to search
+        :returns best match of input skill or None
+        """
         if "http" in skill:
             if "/neongeckocom/" in skill.lower():
                 # TODO: This is just patching OSM updates DM
@@ -178,17 +208,27 @@ class SkillsStore:
                 else:
                     entry = SkillEntry.from_github_url(skill)
                 return entry
+            elif isinstance(store_skill, SkillEntry):
+                return store_skill
             elif isinstance(store_skill, list):
                 return store_skill[0]
-            else:
-                return store_skill
+            elif isinstance(store_skill, Generator):
+                # Return the first item
+                for skill in store_skill:
+                    return skill
         elif "." in skill:
-            return self.osm.search_skills_by_id(skill)
+            # Return the first item
+            for skill in self.osm.search_skills_by_id(skill):
+                return skill
         return None
 
-    def get_remote_entries(self, url):
-        """ parse url and return a list of SkillEntry,
-         expects 1 skill per line, can be a skill_id or url"""
+    def get_remote_entries(self, url: str) -> List[str]:
+        """
+        Wraps a call to `neon_core.util.skill_utils.get_remote_entries` to
+        include authentication.
+        :param url: URL of skill list to parse (one skill per line)
+        :returns: list of skills by name, url, and/or ID
+        """
         authenticated = False
         if repo_is_neon(url):
             self.authenticate_neon()
@@ -198,30 +238,45 @@ class SkillsStore:
             self.deauthenticate_neon()
         return skills_list
 
-    def _parse_config_entry(self, entry):
+    def _parse_config_entry(self, entry: Union[list, str]) -> List[SkillEntry]:
         """
-        entry can be
-         - an url (str) to download essential skill list
-             - can be a list of skill repo urls, or skill_ids
-         - list (list) of names (str)
-         - list (list) of skill_urls (str)
+        Parse a config value into a list of SkillEntry objects
+        :param entry: Configuration value, one of:
+             - str url of a skill list of skill repo urls, or skill_ids
+             - list of skill IDs (str)
+             - list of skill_urls (str)
+        :returns: list of parsed SkillEntry objects
         """
         if self.disabled:
+            LOG.warning("Ignoring parse request as SkillStore is disabled")
             return []
         if isinstance(entry, str):
             if not entry.startswith("http"):
-                raise ValueError  # TODO new exception
+                raise ValueError(f"passed entry not a valid URL or list: "
+                                 f"{entry}")
             skills = self.get_remote_entries(entry)
         elif isinstance(entry, list):
             skills = entry
         else:
-            raise ValueError("invalid configuration entry")
-        for idx, skill in enumerate(skills):
-            skills[idx] = self.get_skill_entry(skill)
-        skills = [s for s in skills if s]
-        return skills
+            raise ValueError(f"invalid configuration entry: {entry}")
 
-    def install_skill(self, skill_entry, folder=None, *args, **kwargs):
+        skill_entries = list()
+        for skill in skills:
+            entry = self.get_skill_entry(skill)
+            if entry:
+                skill_entries.append(entry)
+
+        return skill_entries
+
+    def install_skill(self, skill_entry: SkillEntry,
+                      folder: Optional[str] = None, *args, **kwargs) -> bool:
+        """
+        Install a SkillEntry to a local directory.
+        args/kwargs are passed to `skill_entry.install`
+        :param skill_entry: SkillEntry to install
+        :param folder: Skill installation directory (default self.skills_dir)
+        :returns: True if skill is installed or updated
+        """
         if self.disabled:
             return False
         self.authenticate_neon()

@@ -49,6 +49,8 @@ from neon_core.skills.decorators import AbortEvent, \
     AbortQuestion, killable_event
 from mycroft.skills import MycroftSkill
 
+# TODO: Deprecate this module
+
 
 class UserReply(str, Enum):
     YES = "yes"
