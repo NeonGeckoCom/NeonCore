@@ -30,13 +30,15 @@ import wave
 from copy import deepcopy
 from time import time
 
+import mycroft.skills.intent_service
 from mock import Mock
+from mock.mock import patch
 from mycroft_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 
-from neon_core import NeonIntentService
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from neon_core import NeonIntentService
 
 
 class TestIntentService(unittest.TestCase):
@@ -111,11 +113,27 @@ class TestIntentService(unittest.TestCase):
         self.assertTrue(all([p for p in valid_parsers if p in
                         self.intent_service.parser_service.loaded_modules]))
 
-    def test_handle_utterance(self):
-        pass
+    @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
+    def test_handle_utterance(self, patched):
+        intent_service = NeonIntentService(self.bus)
 
-    def test_converse(self):
-        pass
+        test_message_invalid = Message("test", {"utterances": [' ', '  ']})
+        intent_service.handle_utterance(test_message_invalid)
+        patched.assert_not_called()
+
+        test_message_valid = Message("test", {"utterances": ["test", "tests"]})
+        intent_service.handle_utterance(test_message_valid)
+
+        patched.assert_called_once_with(test_message_valid)
+        self.assertIn("lang", test_message_valid.data)
+        self.assertIn('-', test_message_valid.data['lang'])  # full code
+        self.assertIsInstance(test_message_valid.context["timing"], dict)
+        self.assertIsInstance(test_message_valid.context["user_profiles"],
+                              list)
+        self.assertIsInstance(test_message_valid.context["username"], str)
+
+        intent_service.shutdown()
+
 
 if __name__ == "__main__":
     unittest.main()
