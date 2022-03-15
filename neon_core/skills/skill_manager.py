@@ -23,6 +23,9 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from os import makedirs
+from os.path import isdir, expanduser
+
 from neon_utils.configuration_utils import get_neon_skills_config
 from neon_utils.log_utils import LOG
 
@@ -40,8 +43,13 @@ class NeonSkillManager(SkillManager):
     def __init__(self, *args, **kwargs):
         config = kwargs.pop("config") if "config" in kwargs else \
             get_neon_skills_config()
+        config["directory"] = expanduser(config["directory"])
         super().__init__(*args, **kwargs)
         self.skill_config = config
+        if not isdir(self.skill_config["directory"]):
+            LOG.warning("Creating requested skill directory")
+            makedirs(self.skill_config["directory"])
+
         self.skill_downloader = SkillsStore(
             skills_dir=self.skill_config["directory"],
             config=self.skill_config, bus=self.bus)
