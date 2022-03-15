@@ -245,8 +245,9 @@ class TestSkillStore(unittest.TestCase):
 
     def test_get_skill_entry(self):
         # TODO: Implement skills by ID after fixing in OSM
+        # TODO: Support missing branch specs
         from ovos_skills_manager import SkillEntry
-        url = "https://github.com/OpenVoiceOS/skill-ovos-homescreen"
+        url = "https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"
         # skill_id = "skill-ovos-homescreen.openvoiceos"
         url_entry = self.skill_store.get_skill_entry(url)
         self.assertIsInstance(url_entry, SkillEntry)
