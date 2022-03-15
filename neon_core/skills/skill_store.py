@@ -206,23 +206,22 @@ class SkillsStore:
                 store_skill = None
             else:
                 store_skill = self.osm.search_skills_by_url(skill)
-            if not store_skill:
-                # skill is not in any appstore
-                if "/neon" in skill.lower() and "github" in skill:
-                    self.authenticate_neon()
-                    entry = SkillEntry.from_github_url(skill)
-                    self.deauthenticate_neon()
-                else:
-                    entry = SkillEntry.from_github_url(skill)
-                return entry
-            elif isinstance(store_skill, SkillEntry):
-                return store_skill
-            elif isinstance(store_skill, list):
-                return store_skill[0]
-            elif isinstance(store_skill, Generator):
-                # Return the first item
-                for skill in store_skill:
-                    return skill
+                if isinstance(store_skill, SkillEntry):
+                    return store_skill
+                elif isinstance(store_skill, list):
+                    return store_skill[0]
+                elif isinstance(store_skill, Generator):
+                    # Return the first item
+                    for s in store_skill:
+                        return s
+            # skill is not in any appstore
+            if "/neon" in skill.lower() and "github" in skill:
+                self.authenticate_neon()
+                entry = SkillEntry.from_github_url(skill)
+                self.deauthenticate_neon()
+            else:
+                entry = SkillEntry.from_github_url(skill)
+            return entry
         elif "." in skill:
             # Return the first item
             for skill in self.osm.search_skills_by_id(skill):

@@ -176,7 +176,7 @@ class TestSkillStore(unittest.TestCase):
 
         from neon_core.skills.skill_store import SkillsStore
 
-        cls.essential = ["https://github.com/OpenVoiceOS/skill-ovos-homescreen"]
+        cls.essential = ["https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"]
         cls.config = {
             "disable_osm": False,
             "auto_update": True,
@@ -267,6 +267,7 @@ class TestSkillStore(unittest.TestCase):
     def test_parse_config_entry(self):
         # TODO: Implement skills by ID after fixing in OSM
         from ovos_skills_manager import SkillEntry
+        self.skill_store.osm.disable_appstore("local")
 
         valid_entry_url = self.config["default_skills"]
         valid_entry_list_url = self.config["essential_skills"]
@@ -292,7 +293,7 @@ class TestSkillStore(unittest.TestCase):
         essential_entries = \
             self.skill_store._parse_config_entry(valid_entry_list_url)
         self.assertIsInstance(essential_entries, list)
-        self.assertEqual(len(essential_entries), 1)
+        self.assertEqual(len(essential_entries), 1, essential_entries)
         self.assertIsInstance(essential_entries[0], SkillEntry)
 
         # list_entries = \
