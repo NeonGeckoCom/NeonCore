@@ -29,13 +29,16 @@ import unittest
 import wave
 from copy import deepcopy
 from os.path import join, dirname
-from time import time
+from threading import Thread, Event
+from time import time, sleep
 
+import mycroft.skills.skill_manager
 from mock import Mock
 from mock.mock import patch
 from mycroft_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 
+import neon_utils.messagebus_utils
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core import NeonIntentService
@@ -335,7 +338,51 @@ class TestSkillStore(unittest.TestCase):
 
 
 class TestSkillService(unittest.TestCase):
-    pass
+    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    def test_neon_skills_service(self, run):
+        from neon_core.skills.service import NeonSkillService
+        from neon_core.skills.skill_manager import NeonSkillManager
+        from mycroft.util.process_utils import ProcessState
+
+        config = {
+            "disable_osm": False,
+            "auto_update": True,
+            "directory": join(dirname(__file__), "skill_module_skills"),
+            "run_gui_file_server": True
+        }
+
+        started = Event()
+
+        def started_hook():
+            started.set()
+
+        alive_hook = Mock()
+        ready_hook = Mock()
+        error_hook = Mock()
+        stopping_hook = Mock()
+        service = NeonSkillService(alive_hook, started_hook, ready_hook,
+                                   error_hook, stopping_hook, config=config)
+        self.assertIsNotNone(service.http_server)
+        self.assertEqual(service.config, config)
+        service.bus = FakeBus()
+        service.bus.connected_event = Event()
+        skills_thread = Thread(target=service.start, daemon=True)
+        skills_thread.start()
+
+        started.wait(30)
+        run.assert_called_once()
+
+        self.assertIsInstance(service.skill_manager, NeonSkillManager)
+        service.skill_manager.status.state = ProcessState.ALIVE
+        sleep(1)
+        alive_hook.assert_called_once()
+        service.skill_manager.status.state = ProcessState.READY
+        sleep(1)
+        ready_hook.assert_called_once()
+
+        service.shutdown()
+        stopping_hook.assert_called_once()
+        skills_thread.join(10)
 
 
 if __name__ == "__main__":
