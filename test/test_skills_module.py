@@ -228,10 +228,12 @@ class TestSkillStore(unittest.TestCase):
         self.assertIsInstance(self.skill_store.load_osm(), OVOSSkillsManager)
 
     def test_essential_skills(self):
+        self.assertFalse(self.skill_store.disabled)
         self.assertEqual(len(self.skill_store.essential_skills),
                          len(self.essential))
 
     def test_default_skills(self):
+        self.assertFalse(self.skill_store.disabled)
         self.assertIsInstance(self.skill_store.default_skills, list)
         self.assertGreater(len(self.skill_store.default_skills), 0)
 

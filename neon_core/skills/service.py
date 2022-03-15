@@ -107,8 +107,8 @@ class NeonSkillService:
         SkillApi.connect_bus(self.bus)
         self.skill_manager = NeonSkillManager(self.bus, self.watchdog,
                                               config=self.config)
-        self.status.set_started()
         self.skill_manager.start()
+        self.status.set_started()
 
         # TODO: These should be event-based in Mycroft/OVOS
         while not self.skill_manager.is_alive():
