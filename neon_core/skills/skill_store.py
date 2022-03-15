@@ -22,18 +22,19 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-from collections.abc import Iterable
-from typing import List, Optional, Generator, Union
 
+from os import makedirs
+from os.path import isdir
+from typing import List, Optional, Generator, Union
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
-from neon_utils import LOG
+from neon_utils.logger import LOG
 from neon_utils.net_utils import check_online
 from neon_utils.authentication_utils import repo_is_neon
 from neon_utils.configuration_utils import get_neon_skills_config
 from datetime import datetime, timedelta
-
 from neon_utils.messagebus_utils import get_messagebus
+
 from neon_core.util.skill_utils import get_remote_entries
 from mycroft.skills.event_scheduler import EventSchedulerInterface
 
@@ -117,6 +118,12 @@ class SkillsStore:
         """
         Get an authenticated instance of OSM if not disabled
         """
+        from ovos_utils.skills import get_skills_folder
+        osm_skill_dir = get_skills_folder()
+        if osm_skill_dir != self.skills_dir:
+            LOG.warning(f"OSM configured local skills: {osm_skill_dir}")
+            if not isdir(osm_skill_dir):
+                makedirs(osm_skill_dir)
         if self.disabled:
             return None
         osm = OVOSSkillsManager()
