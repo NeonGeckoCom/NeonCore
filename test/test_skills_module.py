@@ -22,7 +22,7 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+import importlib
 import os
 import sys
 import unittest
@@ -32,13 +32,11 @@ from os.path import join, dirname
 from threading import Thread, Event
 from time import time, sleep
 
-import mycroft.skills.skill_manager
 from mock import Mock
 from mock.mock import patch
 from mycroft_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 
-import neon_utils.messagebus_utils
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from neon_core import NeonIntentService
@@ -173,7 +171,11 @@ class TestSkillStore(unittest.TestCase):
         mocked_scheduler = MockEventSchedulerInterface
         mycroft.skills.event_scheduler.EventSchedulerInterface = \
             mocked_scheduler
+        import neon_core.skills.skill_store
+        importlib.reload(neon_core.skills.skill_store)
+
         from neon_core.skills.skill_store import SkillsStore
+
         cls.essential = ["https://github.com/OpenVoiceOS/skill-ovos-homescreen"]
         cls.config = {
             "disable_osm": False,
@@ -226,7 +228,8 @@ class TestSkillStore(unittest.TestCase):
         self.assertIsInstance(self.skill_store.load_osm(), OVOSSkillsManager)
 
     def test_essential_skills(self):
-        self.assertEqual(self.skill_store.essential_skills, self.essential)
+        self.assertEqual(len(self.skill_store.essential_skills),
+                         len(self.essential))
 
     def test_default_skills(self):
         self.assertIsInstance(self.skill_store.default_skills, list)
