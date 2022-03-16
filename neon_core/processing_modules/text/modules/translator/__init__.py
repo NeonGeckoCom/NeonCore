@@ -49,7 +49,8 @@ class UtteranceTranslator(TextParser):
                     LOG.debug(f"Detected language: {detected_lang}")
                 if detected_lang != self.language_config["internal"].split("-")[0]:
                     utterances[idx] = self.translator.translate(original,
-                                                                self.language_config["internal"], lang or detected_lang)
+                                                                self.language_config["internal"], lang.split('-', 1)[0]
+                                                                or detected_lang)
                 # add language metadata to context
                 metadata += [{
                     "source_lang": lang or self.language_config['internal'],
