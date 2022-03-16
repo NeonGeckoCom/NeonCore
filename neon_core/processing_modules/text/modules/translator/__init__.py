@@ -37,19 +37,23 @@ class UtteranceTranslator(TextParser):
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
 
-    def parse(self, utterances, lang="en-us"):
+    def parse(self, utterances, lang=None):
         metadata = []
         for idx, ut in enumerate(utterances):
             try:
                 original = ut
                 detected_lang = self.lang_detector.detect(original)
-                LOG.debug("Detected language: {lang}".format(lang=detected_lang))
+                if lang and detected_lang != lang.split('-', 1)[0]:
+                    LOG.warning(f"Specified lang: {lang} but detected {detected_lang}")
+                else:
+                    LOG.debug(f"Detected language: {detected_lang}")
                 if detected_lang != self.language_config["internal"].split("-")[0]:
                     utterances[idx] = self.translator.translate(original,
-                                                                self.language_config["internal"])
+                                                                self.language_config["internal"], lang.split('-', 1)[0]
+                                                                or detected_lang)
                 # add language metadata to context
                 metadata += [{
-                    "source_lang": lang,
+                    "source_lang": lang or self.language_config['internal'],
                     "detected_lang": detected_lang,
                     "internal": self.language_config["internal"],
                     "was_translated": detected_lang != self.language_config["internal"].split("-")[0],
