@@ -1,6 +1,6 @@
 # This workflow will run unit tests
 
-name: Test Utilities
+name: Test Core Modules
 on:
   push:
   workflow_dispatch:
@@ -119,3 +119,12 @@ jobs:
         with:
           name: language-test-results
           path: tests/language-test-results.xml
+
+      - name: Test Skills Module
+        run: |
+          pytest test/test_skills_module.py --doctest-modules --junitxml=tests/skills-module-test-results.xml
+      - name: Upload Language test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: skills-module-test-results
+          path: tests/skills-module-test-results.xml

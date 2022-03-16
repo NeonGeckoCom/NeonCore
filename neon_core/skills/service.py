@@ -24,10 +24,10 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import time
+from typing import Optional
 
 from neon_utils.configuration_utils import get_neon_skills_config, \
     get_neon_lang_config, get_neon_local_config
-from neon_utils.net_utils import check_online
 from neon_utils import LOG
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
@@ -66,9 +66,14 @@ def on_stopping():
 
 
 class NeonSkillService:
-    def __init__(self, alive_hook=on_alive, started_hook=on_started,
-                 ready_hook=on_ready, error_hook=on_error,
-                 stopping_hook=on_stopping, watchdog=None):
+    def __init__(self,
+                 alive_hook: callable = on_alive,
+                 started_hook: callable = on_started,
+                 ready_hook: callable = on_ready,
+                 error_hook: callable = on_error,
+                 stopping_hook: callable = on_stopping,
+                 watchdog: Optional[callable] = None,
+                 config: Optional[dict] = None):
         self.bus = None
         self.skill_manager = None
         self.event_scheduler = None
@@ -79,10 +84,10 @@ class NeonSkillService:
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
-        skill_config = get_neon_skills_config()
-        if skill_config.get("run_gui_file_server"):
+        self.config = config or get_neon_skills_config()
+        if self.config.get("run_gui_file_server"):
             self.http_server = start_qml_http_server(
-                skill_config["directory"])
+                self.config["directory"])
         else:
             self.http_server = None
 
@@ -100,13 +105,12 @@ class NeonSkillService:
         self.event_scheduler = EventScheduler(self.bus)
         self.status = ProcessStatus('skills', self.bus, self.callbacks)
         SkillApi.connect_bus(self.bus)
-        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
-        self.status.set_started()
-        # self._wait_for_internet_connection()
-        # # TODO can this be removed? its a hack around msm requiring internet...
-        # if self.skill_manager is None:
-        #     self._initialize_skill_manager()
+        self.skill_manager = NeonSkillManager(self.bus, self.watchdog,
+                                              config=self.config)
         self.skill_manager.start()
+        self.status.set_started()
+
+        # TODO: These should be event-based in Mycroft/OVOS
         while not self.skill_manager.is_alive():
             time.sleep(0.1)
         self.status.set_alive()
@@ -156,12 +160,12 @@ class NeonSkillService:
     #     LOG.info(f"Blacklisted={self.skill_manager.config['skills']['blacklisted_skills']}")
     #     # self.skill_manager.load_priority()
 
-    def _wait_for_internet_connection(self):
-        if get_neon_skills_config().get("wait_for_internet", True):
-            while not check_online():
-                time.sleep(1)
-        else:
-            LOG.info("Online check disabled, device may be offline")
+    # def _wait_for_internet_connection(self):
+    #     if get_neon_skills_config().get("wait_for_internet", True):
+    #         while not check_online():
+    #             time.sleep(1)
+    #     else:
+    #         LOG.info("Online check disabled, device may be offline")
 
     def shutdown(self):
         LOG.info('Shutting down Skills service')

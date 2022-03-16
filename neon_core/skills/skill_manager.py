@@ -23,6 +23,9 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from os import makedirs
+from os.path import isdir, expanduser
+
 from neon_utils.configuration_utils import get_neon_skills_config
 from neon_utils.log_utils import LOG
 
@@ -32,15 +35,24 @@ from mycroft.util import connected
 from mycroft.skills.skill_manager import SkillManager
 
 SKILL_MAIN_MODULE = '__init__.py'
+# TODO: deprecate `SKILL_MAIN_MODULE`?
 
 
 class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
+        config = kwargs.pop("config") if "config" in kwargs else \
+            get_neon_skills_config()
+        config["directory"] = expanduser(config["directory"])
         super().__init__(*args, **kwargs)
-        self.skill_config = kwargs.get("config") or get_neon_skills_config()
-        self.skill_downloader = SkillsStore(skills_dir=self.skill_config["directory"], config=self.skill_config,
-                                            bus=self.bus)
+        self.skill_config = config
+        if not isdir(self.skill_config["directory"]):
+            LOG.warning("Creating requested skill directory")
+            makedirs(self.skill_config["directory"])
+
+        self.skill_downloader = SkillsStore(
+            skills_dir=self.skill_config["directory"],
+            config=self.skill_config, bus=self.bus)
         self.skill_downloader.skills_dir = self.skill_config["directory"]
 
     def download_or_update_defaults(self):
@@ -62,12 +74,3 @@ class NeonSkillManager(SkillManager):
         """Load skills and update periodically from disk and internet."""
         self.download_or_update_defaults()
         super().run()
-
-    def _emit_converse_error(self, message, skill_id, error_msg):
-        if hasattr(super(), "_emit_converse_error"):
-            super()._emit_converse_error(message, skill_id, error_msg)
-        # Also emit the old error message to keep compatibility and for any
-        # listener on the bus
-        reply = message.reply('skill.converse.error',
-                              data=dict(skill_id=skill_id, error=error_msg))
-        self.bus.emit(reply)
