@@ -102,7 +102,10 @@ def run_skills(install_skills):
     from neon_core.skills.__main__ import main
     if install_skills:
         click.echo(f"Handling installation of skills in: {install_skills}")
-        install_local_skills(install_skills)
+        try:
+            install_local_skills(install_skills)
+        except ValueError as e:
+            click.echo(f"Skill Installation Failed: {e}")
     click.echo("Starting Skills Service")
     main()
     click.echo("Skills Service Shutdown")
