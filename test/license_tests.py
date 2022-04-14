@@ -16,14 +16,19 @@ license_overrides = {
     "precise-runner": "Apache-2.0",
     'soupsieve': 'MIT',
     'setuptools': 'MIT',
-    'sonopy': 'Apache-2.0'
+    'sonopy': 'Apache-2.0',
+    "ovos_skill_installer": "MIT",
+    "python-dateutil": "Apache-2.0"
 }
 # explicitly allow these packages that would fail otherwise
-whitelist = ["neon-audio",
+whitelist = ["neon-core",
+             "neon-audio",
              "neon-speech",
              "neon-gui",
              "neon-messagebus",
-             "neon-api-proxy"]
+             "neon_api_proxy",
+             # "python-vlc"  # This may be installed optionally
+             ]
 
 # validation flags
 allow_nonfree = False
