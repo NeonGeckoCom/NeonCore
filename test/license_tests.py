@@ -10,10 +10,20 @@ license_overrides = {
     'yt-dlp': "Unlicense",
     'pyxdg': 'GPL-2.0',
     'ptyprocess': 'ISC license',
-    'psutil': 'BSD3'
+    'psutil': 'BSD3',
+    'pyaudio': 'MIT',
+    'petact': 'MIT',
+    "precise-runner": "Apache-2.0",
+    'soupsieve': 'MIT',
+    'setuptools': 'MIT',
+    'sonopy': 'Apache-2.0'
 }
 # explicitly allow these packages that would fail otherwise
-whitelist = []
+whitelist = ["neon-audio",
+             "neon-speech",
+             "neon-gui",
+             "neon-messagebus",
+             "neon-api-proxy"]
 
 # validation flags
 allow_nonfree = False
