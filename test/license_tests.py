@@ -18,7 +18,8 @@ license_overrides = {
     'setuptools': 'MIT',
     'sonopy': 'Apache-2.0',
     "ovos-skill-installer": "MIT",
-    "python-dateutil": "Apache-2.0"
+    "python-dateutil": "Apache-2.0",
+    "pyparsing": "MIT"
 }
 # explicitly allow these packages that would fail otherwise
 whitelist = ["neon-core",
@@ -26,7 +27,7 @@ whitelist = ["neon-core",
              "neon-speech",
              "neon-gui",
              "neon-messagebus",
-             "neon-api-proxy",
+             "neon-api-proxy"
              # "python-vlc"  # This may be installed optionally
              ]
 
