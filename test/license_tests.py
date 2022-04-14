@@ -26,7 +26,7 @@ whitelist = ["neon-core",
              "neon-speech",
              "neon-gui",
              "neon-messagebus",
-             "neon_api_proxy",
+             "neon-api-proxy",
              # "python-vlc"  # This may be installed optionally
              ]
 
