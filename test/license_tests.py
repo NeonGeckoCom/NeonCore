@@ -17,7 +17,7 @@ license_overrides = {
     'soupsieve': 'MIT',
     'setuptools': 'MIT',
     'sonopy': 'Apache-2.0',
-    "ovos_skill_installer": "MIT",
+    "ovos-skill-installer": "MIT",
     "python-dateutil": "Apache-2.0"
 }
 # explicitly allow these packages that would fail otherwise
