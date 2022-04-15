@@ -1,5 +1,6 @@
 
 # Table of Contents
+0. [Quick Start](#quick-start)
 1. [Optional Service Account Setup](#optional-service-account-setup)  
    * [a. Google Cloud Speech](#a-google-cloud-speech-setup)  
    * [b. Amazon Polly and Translate](#b-amazon-polly-and-translate-setup)
@@ -11,14 +12,93 @@
    * [a. Activating the venv](#a-activating-the-venv)
    * [c. Running Tests](#c-running-tests)  
    * [d. Troubleshooting](#d-troubleshooting)  
-6. [Making Changes](#making-code-changes)  
+5. [Making Changes](#making-code-changes)  
    * [a. System Overview](#a-system-overview)  
    * [b. Creating a Skill](#b-creating-a-skill)   
-8. [Removing and re-installing Neon](#removing-and-re-installing-neon-ai)  
+6. [Removing and re-installing Neon](#removing-and-re-installing-neon-ai)  
 
 # Welcome to Neon AI
 Neon AI is an open source voice assistant. Follow these instructions to start using Neon on your computer. If you are 
 using a Raspberry Pi, you may use the prebuilt image available [on our website](https://neon.ai/DownloadNeonAI).
+
+# Quick Start
+The fastest method for getting started with Neon is to run the modules in Docker containers.
+The `docker` directory contains everything you need to run Neon Core with default skills.
+
+## a. Prerequisite Setup
+You will need `docker` and `docker-compose` available. Docker provides updated guides for installing 
+[docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
+Neon Core is only tested on Ubuntu, but should be compatible with any linux distribution that uses
+[PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/).
+
+## b. Running Neon
+You can clone the repository, or just copy the `docker` directory contents onto your local system; this document will 
+assume that the repository is cloned to: `~/NeonCore`.
+
+You can start all core modules with:
+```shell
+# cd into the directory containing docker-compose.yml
+cd ~/NeonCore/docker
+docker-compose up -d
+```
+
+Stop all modules with:
+```shell
+# cd into the directory containing docker-compose.yml
+cd ~/NeonCore/docker
+docker-compose down
+```
+
+### Optional GUI
+The Mycroft GUI is an optional component that can be run on Linux host systems.
+The GUI is available with instructions [on GitHub](https://github.com/MycroftAI/mycroft-gui)
+
+## c. Interacting with Neon
+With the containers running, you can interact with Neon by voice (i.e. "hey Neon, what time is it?"), or using one of 
+our CLI utilities, like [mana](https://pypi.org/project/neon-mana-utils/) or the 
+[neon_cli_client](https://pypi.org/project/neon-cli-client/).
+You can view module logs via docker with:
+
+```shell
+docker logs -f neon-skills      # skills module
+docker logs -f neon-speech      # voice module (STT and WW)
+docker logs -f neon-audio       # audio module (TTS)
+docker logs -f neon-gui         # gui module (Optional)
+docker logs -f neon-messagebus  # messagebus module (includes signal manager)
+```
+
+## d. Skill Development
+By default, the skills container includes a set of default skills to provide base functionality.
+You can pass a local skill directory into the skills container to develop skills and have them
+reloaded in real-time for testing. Just set the environment variable `NEON_SKILLS_DIR` before starting
+the skills module. Dependency installation is handled on container start automatically.
+
+```shell
+export NEON_SKILLS_DIR=~/PycharmProjects/SKILLS
+cd ~/NeonCore/docker
+docker-compose up
+```
+
+To run the skills module without any bundled skills, the image referenced in `docker-compose.yml` can be changed from:
+
+```yaml
+  neon-skills:
+    container_name: neon-skills
+    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
+```
+to:
+```yaml
+  neon-skills:
+    container_name: neon-skills
+    image: ghcr.io/neongeckocom/neon_skills:dev
+```
+
+## e. Configuration
+The `ngi_local_conf.yml` file included in the `docker` directory contains a default configuration
+that may be modified to specify different plugins and other runtime settings.
+The `docker` directory is mounted read-only to `/config` in each of the containers,
+so model files may be placed there and the configuration updated to use different STT/TTS plugins with
+local models.
 
 # Optional Service Account Setup
 There are several online services that may be used with Neon. Speech-to-Text (STT) and Text-to-Speech (TTS) may be run 

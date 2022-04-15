@@ -25,12 +25,13 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 from mycroft.lock import Lock
 from mycroft.util import wait_for_exit_signal, reset_sigint_handler
 from neon_messagebus.service import NeonBusService
 from neon_core.skills.service import NeonSkillService
 from neon_gui.service import NeonGUIService
-from time import sleep
+from neon_speech.service import NeonSpeechClient
 
 
 reset_sigint_handler()
@@ -51,9 +52,16 @@ gui.start()
 skills = NeonSkillService()
 skills.start()
 
+speech = NeonSpeechClient()
+speech.start()
+
 wait_for_exit_signal()
 
+speech.shutdown()
 skills.shutdown()
 gui.shutdown()
 bus.shutdown()
+
+# TODO: Add audio service when implemented DM
+
 lock.delete()
