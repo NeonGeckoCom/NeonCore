@@ -35,8 +35,7 @@ services:
     - /dev/snd:/dev/snd
   neon-skills:
     container_name: neon-skills
-#    image: &image_neon_skills ghcr.io/neongeckocom/neon_skills-default_skills:dev
-    image: neon_skills-default_skills:latest
+    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
     networks:
     - neon-core
     ports:
