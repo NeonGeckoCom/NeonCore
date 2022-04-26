@@ -1,2 +1,2 @@
-neon-core-server @ git+https://github.com/NeonGeckoCom/neon-core-server
+#neon-core-server @ git+https://github.com/NeonGeckoCom/neon-core-server
 neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_controller
