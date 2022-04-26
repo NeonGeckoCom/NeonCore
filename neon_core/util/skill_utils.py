@@ -85,7 +85,6 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         token_set = True
         set_github_token(config["neon_token"])
         LOG.info(f"Added token to request headers: {config.get('neon_token')}")
-    LOG.info(f"Neon Core headers={SESSION.headers}")
     for url in skills_to_install:
         try:
             normalized_url = normalize_github_url(url)
@@ -99,7 +98,7 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             else:
                 LOG.warning(f"Requested Skill not in Neon skill store ({url})")
                 entry = osm.skill_entry_from_url(url)
-                LOG.info(entry.json)
+                LOG.debug(entry.json)
 
             osm.install_skill(entry, skill_dir)
             if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
