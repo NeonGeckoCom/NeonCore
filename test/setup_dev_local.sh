@@ -38,7 +38,7 @@ export devMode=true         # false will enable fullscreen gui, isolated directo
 export autoStart=false      # enables neonAI to run at login of installUser
 export autoUpdate=false     # enables neonAI to check for updates at runtime
 export devName=${HOSTNAME}  # device name used to identify uploads
-export installServer=false  # enables neonAI server module
+export installServer=true   # enables neonAI server module
 
 export sttModule="deepspeech_stream_local"
 export ttsModule="neon_tts_mimic"

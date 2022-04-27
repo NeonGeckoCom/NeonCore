@@ -39,7 +39,7 @@ export devMode=false         # false will enable fullscreen gui, isolated direct
 export autoStart=false      # enables neonAI to run at login of installUser
 export autoUpdate=false     # enables neonAI to check for updates at runtime
 export devName=${HOSTNAME}  # device name used to identify uploads
-export installServer=false  # enables neonAI server module
+export installServer=true   # enables neonAI server module
 
 export sttModule="google_cloud_streaming"
 export ttsModule="amazon"

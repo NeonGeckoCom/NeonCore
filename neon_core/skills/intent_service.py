@@ -72,10 +72,12 @@ class NeonIntentService(IntentService):
         self.parser_service = TextParsersService(self.bus)
         self.parser_service.start()
 
+        self.transcript_service = None
         if Transcribe:
-            self.transcript_service = Transcribe()
-        else:
-            self.transcript_service = None
+            try:
+                self.transcript_service = Transcribe()
+            except Exception as e:
+                LOG.exception(e)
 
     def shutdown(self):
         self.parser_service.shutdown()
