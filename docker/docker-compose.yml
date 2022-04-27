@@ -1,0 +1,77 @@
+version: '3.1'
+networks:
+  neon-core:
+volumes:
+  config:
+    driver_opts:
+      type: none-config
+      o: bind
+      device: ./
+services:
+  neon-messagebus:
+    container_name: neon-messagebus
+    image: ghcr.io/neongeckocom/neon_messagebus:dev
+    ports:
+    - 8181:8181
+    networks:
+      neon-core:
+        aliases:
+        - messagebus
+    volumes:
+    - config:/config:ro
+  neon-speech:
+    container_name: neon-speech
+    image: ghcr.io/neongeckocom/neon_speech:dev
+    networks:
+    - neon-core
+    volumes:
+    - config:/config:ro
+    - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
+    environment:
+    - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
+    - PULSE_COOKIE=/root/.config/pulse/cookie
+    devices:
+    - /dev/snd:/dev/snd
+  neon-skills:
+    container_name: neon-skills
+    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
+    networks:
+    - neon-core
+    ports:
+    - 8000:8000
+    volumes:
+    - config:/config:ro
+    - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
+    - ${NEON_SKILLS_DIR}:/skills:ro
+    environment:
+    - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
+    - PULSE_COOKIE=/root/.config/pulse/cookie
+    devices:
+    - /dev/snd:/dev/snd
+  neon-audio:
+    container_name: neon-audio
+    image: ghcr.io/neongeckocom/neon_audio:dev
+    networks:
+    - neon-core
+    volumes:
+    - config:/config:ro
+    - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
+    environment:
+    - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
+    - PULSE_COOKIE=/root/.config/pulse/cookie
+    devices:
+    - /dev/snd:/dev/snd
+  neon-gui:
+    container_name: neon-gui
+    image: ghcr.io/neongeckocom/neon_gui:dev
+    networks:
+      neon-core:
+        aliases:
+        - gui
+    ports:
+    - 18181:18181
+    volumes:
+    - config:/config:ro
