@@ -1,5 +1,5 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.2a51
+ovos-core[skills_lgpl]~=0.0.3
 # TODO: Update to stable version
 
 # utils
