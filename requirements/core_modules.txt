@@ -1,6 +1,4 @@
-ovos-core[audio-backend,PHAL,tts,skills_lgpl,gui,bus]~=0.0.3
-SpeechRecognition~=3.8.1
-PyAudio~=0.2.11
+ovos-core[all]~=0.0.3
 ovos-ww-plugin-pocketsphinx~=0.1.2
 
 # neon core modules
