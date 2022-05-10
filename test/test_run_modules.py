@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -24,7 +27,6 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import sys
 import unittest
 
 from multiprocessing import Process
@@ -32,9 +34,7 @@ from time import time, sleep
 from mycroft_bus_client import MessageBusClient, Message
 from neon_speech.__main__ import main as neon_speech_main
 from neon_audio.__main__ import main as neon_audio_main
-
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.messagebus.service.__main__ import main as messagebus_service
+from neon_messagebus.service import NeonBusService
 
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
@@ -48,7 +48,8 @@ class TestModules(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.bus_thread = Process(target=messagebus_service, daemon=False)
+        cls.messagebus_service = NeonBusService()
+        cls.messagebus_service.start()
         cls.speech_thread = Process(target=neon_speech_main, daemon=False)
         cls.audio_thread = Process(target=neon_audio_main, daemon=False)
         cls.bus_thread.start()
@@ -61,7 +62,7 @@ class TestModules(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         cls.bus.close()
-        cls.bus_thread.terminate()
+        cls.messagebus_service.shutdown()
         cls.speech_thread.terminate()
         cls.audio_thread.terminate()
 

@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -36,14 +39,14 @@ export devMode=false         # false will enable fullscreen gui, isolated direct
 export autoStart=false      # enables neonAI to run at login of installUser
 export autoUpdate=false     # enables neonAI to check for updates at runtime
 export devName=${HOSTNAME}  # device name used to identify uploads
-export installServer=false  # enables neonAI server module
+export installServer=true   # enables neonAI server module
 
 export sttModule="google_cloud_streaming"
 export ttsModule="amazon"
 
 localDeps="false"
 installGui="false"
-options=()
+options=("core_modules")
 options+=("test")
 if [ "${localDeps}" == "true" ]; then
   options+=("local")
@@ -99,12 +102,14 @@ fi
 
 
 echo "${GITHUB_TOKEN}">~/token.txt
-pip install --upgrade pip==21.2.4
+pip install --upgrade pip~=21.3
 pip install wheel
 
 cd "${sourceDir}" || exit 10
 pip install ".${optStr}"  # --use-deprecated=legacy-resolver
 
+# TODO: This is patching an issue with config paths containing `NeonCore/NeonCore`; patch in devMode setup DM
+export NEON_CONFIG_PATH="${sourceDir}"
 neon-config-import
 
 # Install Default Skills

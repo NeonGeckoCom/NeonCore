@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -22,36 +25,3 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-"""
-    Mycroft display service.
-
-    This handles display of pictures
-
-    TODO videos
-    TODO multiple displays
-"""
-from neon_core.configuration import Configuration
-from neon_core.messagebus import get_messagebus
-from mycroft.util import reset_sigint_handler, wait_for_exit_signal, \
-    create_echo_function, check_for_signal
-from mycroft.util.log import LOG
-from neon_core.display import DisplayService
-
-
-def main():
-    """ Main function. Run when file is invoked. """
-    reset_sigint_handler()
-    check_for_signal("isSpeaking")
-    bus = get_messagebus()  # Connect to the Mycroft Messagebus
-    Configuration.set_config_update_handlers(bus)
-
-    LOG.info("Starting Display Services")
-    bus.on('message', create_echo_function('Display', ['mycroft.display.service']))
-
-    display = DisplayService(bus)  # Connect audio service instance to message bus
-
-    wait_for_exit_signal()
-    display.shutdown()
-
-
-main()

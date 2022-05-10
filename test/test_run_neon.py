@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -26,15 +29,14 @@
 import os.path
 import sys
 import unittest
-import pytest
 
 from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
+from neon_utils.configuration_utils import get_neon_local_config
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.run_neon import start_neon, stop_neon
 
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 
@@ -42,15 +44,27 @@ AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "aud
 class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        # Blacklist skills to prevent logged errors
+        local_conf = get_neon_local_config()
+        local_conf["skills"]["blacklist"] = \
+            local_conf["skills"]["blacklist"].extend(
+                ["skill-ovos-homescreen.openvoiceos",
+                 "skill-balena-wifi-setup.openvoiceos"])
+        local_conf.write_changes()
+
+        from neon_core.run_neon import start_neon
+
         cls.process = Process(target=start_neon, daemon=False)
         cls.process.start()
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
         cls.bus.connected_event.wait()
-        cls.bus.wait_for_message("mycroft.ready", 360)
+        cls.bus.wait_for_message("mycroft.ready", 600)
 
     @classmethod
     def tearDownClass(cls) -> None:
+        from neon_core.run_neon import stop_neon
+
         try:
             cls.bus.emit(Message("neon.shutdown"))
             cls.bus.close()
@@ -75,7 +89,14 @@ class TestRunNeon(unittest.TestCase):
         bus.close()
 
     def test_speech_module(self):
+        # TODO: Remove this after readiness is better defined DM
+        i = 0
         response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+        while not response.data['status'] and i < 10:
+            LOG.warning(f"Speech not ready when core reported ready!")
+            sleep(5)
+            response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+            i += 1
         self.assertTrue(response.data['status'])
 
         context = {"client": "tester",
@@ -138,6 +159,7 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(response, Message)
         loaded_skills = response.data
         self.assertIsInstance(loaded_skills, dict)
+        self.assertGreater(len(loaded_skills.keys()), 1)
 
     # TODO: Test user utterance -> response
 

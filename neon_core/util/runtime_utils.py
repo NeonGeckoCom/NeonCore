@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -22,27 +25,15 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-""" Message bus service for mycroft-core
-
-The message bus facilitates inter-process communication between mycroft-core
-processes. It implements a websocket server so can also be used by external
-systems to integrate with the Mycroft system.
-"""
-from mycroft.lock import Lock  # creates/supports PID locking file
-from mycroft.util import wait_for_exit_signal, reset_sigint_handler
-from neon_core.messagebus.service import NeonBusService
 
 
-def main():
-    reset_sigint_handler()
-    # Create PID file, prevent multiple instances of this service
-    lock = Lock("bus")
-    # TODO debug should be False by default
-    service = NeonBusService(debug=True, daemonic=True)
-    service.start()
-    wait_for_exit_signal()
-    service.shutdown()
+def use_neon_core(func):
+    """
+    Wrapper to ensure call originates from neon_core for stack checks.
+    This is used for ovos-utils config platform detection which uses the stack
+    to determine which module config to return.
+    """
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
 
-
-if __name__ == "__main__":
-    main()

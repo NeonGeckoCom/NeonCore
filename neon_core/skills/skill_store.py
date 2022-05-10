@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -23,19 +26,20 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from os import makedirs
+from os.path import isdir
+from typing import List, Optional, Generator, Union
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
-# from neon_core.configuration import Configuration
-from neon_core.messagebus import get_messagebus
-from neon_core.util.skill_utils import get_remote_entries
-from mycroft.skills.event_scheduler import EventSchedulerInterface
-from mycroft.util import connected
-from mycroft.util.log import LOG
-# from os.path import expanduser
-from datetime import datetime, timedelta
-
+from neon_utils.logger import LOG
+from neon_utils.net_utils import check_online
 from neon_utils.authentication_utils import repo_is_neon
 from neon_utils.configuration_utils import get_neon_skills_config
+from datetime import datetime, timedelta
+from neon_utils.messagebus_utils import get_messagebus
+
+from neon_core.util.skill_utils import get_remote_entries
+from mycroft.skills.event_scheduler import EventSchedulerInterface
 
 
 class SkillsStore:
@@ -57,6 +61,9 @@ class SkillsStore:
                 self.schedule_sync()
 
     def schedule_sync(self):
+        """
+        Use the EventScheduler to update osm with updated appstore data
+        """
         # every X hours
         interval = 60 * 60 * self.config["appstore_sync_interval"]
         when = datetime.now() + timedelta(seconds=interval)
@@ -65,6 +72,9 @@ class SkillsStore:
                                                 name="appstores.sync")
 
     def schedule_update(self):
+        """
+        Use the EventScheduler to update default skills
+        """
         # every X hours
         interval = 60 * 60 * self.config["auto_update_interval"]
         when = datetime.now() + timedelta(seconds=interval)
@@ -73,10 +83,14 @@ class SkillsStore:
                                                 name="default_skills.update")
 
     def handle_update(self, _):
+        """
+        Scheduled action to update installed skills
+        """
         try:
+            # TODO: Include non-default installed skills?
             self.install_default_skills(update=True)
         except Exception as e:
-            if connected():
+            if check_online():
                 # if there is internet log the error
                 LOG.exception(e)
                 LOG.error("skills update failed")
@@ -85,10 +99,14 @@ class SkillsStore:
                 LOG.error("no internet, skipped skills update")
 
     def handle_sync_appstores(self, _):
+        """
+        Scheduled action to update OSM appstore listings
+        """
         try:
             self.osm.sync_appstores()
         except Exception as e:
-            if connected():
+            # TODO: OSM should raise more specific exceptions
+            if check_online():
                 # if there is internet log the error
                 LOG.exception(e)
                 LOG.error("appstore sync failed")
@@ -100,6 +118,15 @@ class SkillsStore:
         self.scheduler.shutdown()
 
     def load_osm(self):
+        """
+        Get an authenticated instance of OSM if not disabled
+        """
+        from ovos_utils.skills import get_skills_folder
+        osm_skill_dir = get_skills_folder()
+        if osm_skill_dir != self.skills_dir:
+            LOG.warning(f"OSM configured local skills: {osm_skill_dir}")
+            if not isdir(osm_skill_dir):
+                makedirs(osm_skill_dir)
         if self.disabled:
             return None
         osm = OVOSSkillsManager()
@@ -152,6 +179,9 @@ class SkillsStore:
         return self._default_skills
 
     def authenticate_neon(self):
+        """
+        Enable and authenticate the Neon skills store
+        """
         self.osm.enable_appstore("neon")
         neon = self.osm.get_appstore("neon")
         neon_token = self.config.get("neon_token")
@@ -161,36 +191,53 @@ class SkillsStore:
             neon.authenticate(bootstrap=False)
 
     def deauthenticate_neon(self):
+        """
+        Clear authentication for the Neon skills store
+        """
         neon = self.osm.get_appstore("neon")
         neon.clear_authentication()
 
-    def get_skill_entry(self, skill):
+    def get_skill_entry(self, skill: str) -> Optional[SkillEntry]:
+        """
+        Build a SkillEntry object from the passed skill URL or ID
+        :param skill: str skill to search
+        :returns best match of input skill or None
+        """
         if "http" in skill:
             if "/neongeckocom/" in skill.lower():
                 # TODO: This is just patching OSM updates DM
                 store_skill = None
             else:
                 store_skill = self.osm.search_skills_by_url(skill)
-            if not store_skill:
-                # skill is not in any appstore
-                if "/neon" in skill.lower() and "github" in skill:
-                    self.authenticate_neon()
-                    entry = SkillEntry.from_github_url(skill)
-                    self.deauthenticate_neon()
-                else:
-                    entry = SkillEntry.from_github_url(skill)
-                return entry
-            elif isinstance(store_skill, list):
-                return store_skill[0]
+                if isinstance(store_skill, SkillEntry):
+                    return store_skill
+                elif isinstance(store_skill, list):
+                    return store_skill[0]
+                elif isinstance(store_skill, Generator):
+                    # Return the first item
+                    for s in store_skill:
+                        return s
+            # skill is not in any appstore
+            if "/neon" in skill.lower() and "github" in skill:
+                self.authenticate_neon()
+                entry = SkillEntry.from_github_url(skill)
+                self.deauthenticate_neon()
             else:
-                return store_skill
+                entry = SkillEntry.from_github_url(skill)
+            return entry
         elif "." in skill:
-            return self.osm.search_skills_by_id(skill)
+            # Return the first item
+            for skill in self.osm.search_skills_by_id(skill):
+                return skill
         return None
 
-    def get_remote_entries(self, url):
-        """ parse url and return a list of SkillEntry,
-         expects 1 skill per line, can be a skill_id or url"""
+    def get_remote_entries(self, url: str) -> List[str]:
+        """
+        Wraps a call to `neon_core.util.skill_utils.get_remote_entries` to
+        include authentication.
+        :param url: URL of skill list to parse (one skill per line)
+        :returns: list of skills by name, url, and/or ID
+        """
         authenticated = False
         if repo_is_neon(url):
             self.authenticate_neon()
@@ -200,30 +247,45 @@ class SkillsStore:
             self.deauthenticate_neon()
         return skills_list
 
-    def _parse_config_entry(self, entry):
+    def _parse_config_entry(self, entry: Union[list, str]) -> List[SkillEntry]:
         """
-        entry can be
-         - an url (str) to download essential skill list
-             - can be a list of skill repo urls, or skill_ids
-         - list (list) of names (str)
-         - list (list) of skill_urls (str)
+        Parse a config value into a list of SkillEntry objects
+        :param entry: Configuration value, one of:
+             - str url of a skill list of skill repo urls, or skill_ids
+             - list of skill IDs (str)
+             - list of skill_urls (str)
+        :returns: list of parsed SkillEntry objects
         """
         if self.disabled:
+            LOG.warning("Ignoring parse request as SkillStore is disabled")
             return []
         if isinstance(entry, str):
             if not entry.startswith("http"):
-                raise ValueError  # TODO new exception
+                raise ValueError(f"passed entry not a valid URL or list: "
+                                 f"{entry}")
             skills = self.get_remote_entries(entry)
         elif isinstance(entry, list):
             skills = entry
         else:
-            raise ValueError("invalid configuration entry")
-        for idx, skill in enumerate(skills):
-            skills[idx] = self.get_skill_entry(skill)
-        skills = [s for s in skills if s]
-        return skills
+            raise ValueError(f"invalid configuration entry: {entry}")
 
-    def install_skill(self, skill_entry, folder=None, *args, **kwargs):
+        skill_entries = list()
+        for skill in skills:
+            entry = self.get_skill_entry(skill)
+            if entry:
+                skill_entries.append(entry)
+
+        return skill_entries
+
+    def install_skill(self, skill_entry: SkillEntry,
+                      folder: Optional[str] = None, *args, **kwargs) -> bool:
+        """
+        Install a SkillEntry to a local directory.
+        args/kwargs are passed to `skill_entry.install`
+        :param skill_entry: SkillEntry to install
+        :param folder: Skill installation directory (default self.skills_dir)
+        :returns: True if skill is installed or updated
+        """
         if self.disabled:
             return False
         self.authenticate_neon()

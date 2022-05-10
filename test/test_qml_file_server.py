@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -23,4 +26,27 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mycroft.enclosure import *
+import os
+import sys
+import unittest
+import requests
+
+from socketserver import TCPServer
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+from neon_core.util.qml_file_server import start_qml_http_server
+
+
+class SkillFileServerTests(unittest.TestCase):
+
+    def test_start_file_server(self):
+        server = start_qml_http_server('/')
+        self.assertIsInstance(server, TCPServer)
+        resp = requests.get("http://localhost:8000")
+        self.assertTrue(resp.ok)
+        self.assertIn("<title>Directory listing for /</title>", resp.text)
+        server.shutdown()
+
+
+if __name__ == '__main__':
+    unittest.main()

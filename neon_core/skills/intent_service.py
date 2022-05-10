@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -30,13 +33,14 @@ from neon_core.configuration import Configuration
 from neon_core.language import get_lang_config
 from neon_core.processing_modules.text import TextParsersService
 
-from copy import copy
 from mycroft_bus_client import Message
 from neon_utils.message_utils import get_message_user
 from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
-from neon_utils.configuration_utils import get_neon_device_type
+from neon_utils.configuration_utils import get_neon_device_type,\
+    get_neon_user_config
 from ovos_utils.json_helper import merge_dict
+from lingua_franca.parse import get_full_lang_code
 
 from mycroft.configuration.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
@@ -44,9 +48,11 @@ from mycroft.skills.intent_service import IntentService
 
 try:
     if get_neon_device_type() == "server":
-        from neon_transcripts_controller.transcript_db_manager import TranscriptDBManager as Transcribe
+        from neon_transcripts_controller.transcript_db_manager import\
+            TranscriptDBManager as Transcribe
     else:
-        from neon_transcripts_controller.transcript_file_manager import TranscriptFileManager as Transcribe
+        from neon_transcripts_controller.transcript_file_manager import\
+            TranscriptFileManager as Transcribe
 except ImportError:
     Transcribe = None
 
@@ -57,44 +63,29 @@ class NeonIntentService(IntentService):
         self.config = Configuration.get().get('context', {})
         self.language_config = get_lang_config()
 
+        self.default_user = get_neon_user_config()
+
         set_default_lang(self.language_config["internal"])
 
-        self._setup_converse_handlers()
+        # self._setup_converse_handlers()
 
         self.parser_service = TextParsersService(self.bus)
         self.parser_service.start()
 
+        self.transcript_service = None
         if Transcribe:
-            self.transcript_service = Transcribe()
-        else:
-            self.transcript_service = None
+            try:
+                self.transcript_service = Transcribe()
+            except Exception as e:
+                LOG.exception(e)
 
-    def _setup_converse_handlers(self):
-        self.bus.on('skill.converse.error', self.handle_converse_error)
-        self.bus.on('skill.converse.activate_skill',
-                    self.handle_activate_skill)
-        self.bus.on('skill.converse.deactivate_skill',
-                    self.handle_deactivate_skill)
-        # backwards compat
-        self.bus.on('active_skill_request',
-                    self.handle_activate_skill)
-
-    def handle_activate_skill(self, message):
-        self.add_active_skill(message.data['skill_id'])
-
-    def handle_deactivate_skill(self, message):
-        self.remove_active_skill(message.data['skill_id'])
-
-    def reset_converse(self, message):
-        """Let skills know there was a problem with speech recognition"""
-        lang = message.data.get('lang', "en-us")
-        set_default_lang(lang)
-        for skill in copy(self.active_skills):
-            self.do_converse([], skill[0], lang, message)
+    def shutdown(self):
+        self.parser_service.shutdown()
 
     def _save_utterance_transcription(self, message):
         """
-        Record a user utterance with the transcript_service. Adds the `audio_file` context to message context.
+        Record a user utterance with the transcript_service.
+        Adds the `audio_file` context to message context.
 
         Args:
             message (Message): message associated with user input
@@ -105,21 +96,25 @@ class NeonIntentService(IntentService):
             if audio:
                 audio = wave.open(audio, 'r')
                 audio = audio.readframes(audio.getnframes())
-            timestamp = message.context["timing"].get("transcribed", time.time())
-            audio_file = self.transcript_service.write_transcript(get_message_user(message),
-                                                                  message.data.get('utterances', [''])[0],
-                                                                  timestamp, audio)
+            timestamp = message.context["timing"].get("transcribed",
+                                                      time.time())
+            audio_file = self.transcript_service.write_transcript(
+                get_message_user(message),
+                message.data.get('utterances', [''])[0], timestamp, audio)
             message.context["audio_file"] = audio_file
 
-    def _get_parsers_service_context(self, message, lang):
+    def _get_parsers_service_context(self, message: Message):
         """
         Pipe utterance thorough text parsers to get more metadata.
         Utterances may be modified by any parser and context overwritten
+        :param message: Message to parse
         """
         utterances = message.data.get('utterances', [])
+        lang = message.data.get('lang')
         for parser in self.parser_service.modules:
             # mutate utterances and retrieve extra data
-            utterances, data = self.parser_service.parse(parser, utterances, lang)
+            utterances, data = self.parser_service.parse(parser, utterances,
+                                                         lang)
             # update message context with extra data
             message.context = merge_dict(message.context, data)
         message.data["utterances"] = utterances
@@ -138,7 +133,9 @@ class NeonIntentService(IntentService):
 
         try:
             # Get language of the utterance
-            lang = message.data.get('lang', self.language_config["user"])
+            lang = get_full_lang_code(
+                message.data.get('lang') or self.language_config["user"])
+            message.data["lang"] = lang
 
             # Add or init timing data
             message.context = message.context or {}
@@ -147,14 +144,22 @@ class NeonIntentService(IntentService):
                 message.context["timing"] = {}
             message.context["timing"]["handle_utterance"] = time.time()
 
-            # Make sure there is a `transcribed` timestamp (should have been added in speech module)
+            # Ensure user profile data is present
+            if "user_profiles" not in message.context:
+                message.context["user_profiles"] = [self.default_user.content]
+                message.context["username"] = \
+                    self.default_user.content["user"]["username"]
+
+            # Make sure there is a `transcribed` timestamp
             if not message.context["timing"].get("transcribed"):
-                message.context["timing"]["transcribed"] = message.context["timing"]["handle_utterance"]
+                message.context["timing"]["transcribed"] = \
+                    message.context["timing"]["handle_utterance"]
 
             stopwatch = Stopwatch()
 
-            # TODO: Consider saving transcriptions after text parsers cleanup utterance. This should retain the raw
-            #       transcription, in addition to the one modified by the parsers DM
+            # TODO: Consider saving transcriptions after text parsers cleanup
+            #  utterance. This should retain the raw transcription, in addition
+            #  to the one modified by the parsers DM
             # Write out text and audio transcripts if service is available
             with stopwatch:
                 self._save_utterance_transcription(message)
@@ -162,42 +167,28 @@ class NeonIntentService(IntentService):
 
             # Get text parser context
             with stopwatch:
-                self._get_parsers_service_context(message, lang)
+                self._get_parsers_service_context(message)
             message.context["timing"]["text_parsers"] = stopwatch.time
 
             # Catch empty utterances after parser service
-            if len([u for u in message.data["utterances"] if u.strip()]) == 0:
+            if len([u for u in message.data.get("utterances", [])
+                    if u.strip()]) == 0:
                 LOG.debug("Received empty utterance!!")
-                reply = message.reply('intent_aborted',
-                                      {'utterances': message.data.get('utterances', []),
-                                       'lang': lang})
+                reply = \
+                    message.reply('intent_aborted',
+                                  {'utterances': message.data.get('utterances',
+                                                                  []),
+                                   'lang': lang})
                 self.bus.emit(reply)
                 return
 
-            # now pass our modified message to mycroft-lib
-            message.data["lang"] = lang
-            # TODO: Consider how to implement 'and' parsing and converse here DM
+            # TODO: Try the original lang and fallback to translation
+            # If translated, make sure message.data['lang'] is updated
+            if message.context.get("translation_data",
+                                   [{}])[0].get("was_translated"):
+                message.data["lang"] = self.language_config["internal"]
+            # now pass our modified message to Mycroft
+            # TODO: Consider how to implement 'and' parsing and converse DM
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
-
-    def _converse(self, utterances, lang, message):
-        """
-        Wraps the actual converse method to add timing data
-
-        Args:
-            utterances (list):  list of utterances
-            lang (string):      4 letter ISO language code
-            message (Message):  message to use to generate reply
-
-        Returns:
-            IntentMatch if handled otherwise None.
-        """
-        stopwatch = Stopwatch()
-        with stopwatch:
-            match = super()._converse(utterances, lang, message)
-        message.context["timing"]["check_converse"] = stopwatch.time
-        if match:
-            LOG.info(f"converse handling response: {match.skill_id}")
-        return match
-

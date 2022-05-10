@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -123,8 +126,8 @@ def _stop_all_core_processes():
     procs = {p.pid: p.cmdline() for p in psutil.process_iter()}
     for pid, cmdline in procs.items():
         if cmdline and (any(pname in cmdline[-1] for pname in ("mycroft.messagebus.service", "neon_speech_client",
-                                                               "neon_audio_client", "neon_core.messagebus.service",
-                                                               "neon_core.skills", "neon_core.gui",
+                                                               "neon_audio_client", "neon_messagebus_service",
+                                                               "neon_core.skills", "neon_core.gui", "neon_gui_service",
                                                                "neon_core_server", "neon_enclosure_client",
                                                                "neon_core_client", "mycroft-gui-app",
                                                                "NGI.utilities.gui", "run_neon.py")
@@ -155,7 +158,8 @@ def start_neon():
     _stop_all_core_processes()
     _cycle_logs()
 
-    _start_process(["python3", "-m", "neon_core.messagebus.service"]) or STOP_MODULES.set()
+    _start_process(["neon_messagebus_service"]) or STOP_MODULES.set()
+    bus.connected_event.wait()
     _start_process("neon_speech_client") or STOP_MODULES.set()
     _start_process("neon_audio_client") or STOP_MODULES.set()
     _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
@@ -167,7 +171,7 @@ def start_neon():
             _start_process("mycroft-gui-app")
         _start_process("neon_enclosure_client")
         # _start_process("neon_core_client")
-        _start_process(["python3", "-m", "neon_core.gui"])
+        _start_process(["neon_gui_service"])
 
     try:
         STOP_MODULES.wait()

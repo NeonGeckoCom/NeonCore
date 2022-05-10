@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -22,24 +25,27 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-import time
 
-from mycroft.skills.api import SkillApi
-from mycroft.skills.event_scheduler import EventScheduler
-from mycroft.skills.msm_wrapper import MsmException
-from mycroft.util import start_message_bus_client
-from mycroft.configuration.locale import set_default_lang, set_default_tz
-from mycroft.util.log import LOG
-from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
+import time
+from typing import Optional
+
+from neon_utils.configuration_utils import get_neon_skills_config, \
+    get_neon_lang_config, get_neon_local_config
+from neon_utils import LOG
+from neon_utils.metrics_utils import announce_connection
+from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
+from neon_utils.messagebus_utils import get_messagebus
+
 from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
-from neon_utils.configuration_utils import get_neon_skills_config, \
-    get_neon_lang_config, get_neon_local_config
-from neon_utils.net_utils import check_online
-
 from neon_core.util.diagnostic_utils import report_metric
-from neon_utils.metrics_utils import announce_connection
+from neon_core.util.qml_file_server import start_qml_http_server
+
+from mycroft.skills.api import SkillApi
+from mycroft.skills.event_scheduler import EventScheduler
+from mycroft.configuration.locale import set_default_lang, set_default_tz
+from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
 
 def on_started():
@@ -63,9 +69,14 @@ def on_stopping():
 
 
 class NeonSkillService:
-    def __init__(self, alive_hook=on_alive, started_hook=on_started,
-                 ready_hook=on_ready, error_hook=on_error,
-                 stopping_hook=on_stopping, watchdog=None):
+    def __init__(self,
+                 alive_hook: callable = on_alive,
+                 started_hook: callable = on_started,
+                 ready_hook: callable = on_ready,
+                 error_hook: callable = on_error,
+                 stopping_hook: callable = on_stopping,
+                 watchdog: Optional[callable] = None,
+                 config: Optional[dict] = None):
         self.bus = None
         self.skill_manager = None
         self.event_scheduler = None
@@ -76,6 +87,12 @@ class NeonSkillService:
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
+        self.config = config or get_neon_skills_config()
+        if self.config.get("run_gui_file_server"):
+            self.http_server = start_qml_http_server(
+                self.config["directory"])
+        else:
+            self.http_server = None
 
     def start(self):
         # config = Configuration.get()
@@ -84,18 +101,19 @@ class NeonSkillService:
         # Set the default timezone to match the configured one
         set_default_tz()
 
-        self.bus = self.bus or start_message_bus_client("SKILLS")
+        self.bus = self.bus or get_messagebus()
+        init_signal_bus(self.bus)
+        init_signal_handlers()
         self._register_intent_services()
         self.event_scheduler = EventScheduler(self.bus)
         self.status = ProcessStatus('skills', self.bus, self.callbacks)
         SkillApi.connect_bus(self.bus)
-        self._initialize_skill_manager()
-        self.status.set_started()
-        self._wait_for_internet_connection()
-        # TODO can this be removed? its a hack around msm requiring internet...
-        if self.skill_manager is None:
-            self._initialize_skill_manager()
+        self.skill_manager = NeonSkillManager(self.bus, self.watchdog,
+                                              config=self.config)
         self.skill_manager.start()
+        self.status.set_started()
+
+        # TODO: These should be event-based in Mycroft/OVOS
         while not self.skill_manager.is_alive():
             time.sleep(0.1)
         self.status.set_alive()
@@ -118,10 +136,8 @@ class NeonSkillService:
             LOG.info("Metrics reporting disabled")
 
     def _register_intent_services(self):
-        """Start up the all intent services and connect them as needed.
-
-        Arguments:
-            bus: messagebus client to register the services on
+        """
+        Start up the all intent services and connect them as needed.
         """
         service = NeonIntentService(self.bus)
         # Register handler to trigger fallback system
@@ -131,31 +147,28 @@ class NeonSkillService:
         )
         return service
 
-    def _initialize_skill_manager(self):
-        """Create a thread that monitors the loaded skills, looking for updates
+    # def _initialize_skill_manager(self):
+    #     """Create a thread that monitors the loaded skills, looking for updates
+    #
+    #     Returns:
+    #         SkillManager instance or None if it couldn't be initialized
+    #     """
+    #     self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
+    #
+    #     # # TODO: This config patching should be handled in neon_utils
+    #     # self.skill_manager.config["skills"]["priority_skills"] = \
+    #     #     self.skill_manager.config["skills"].get("priority") or \
+    #     #     self.skill_manager.config["skills"]["priority_skills"]
+    #     LOG.info(f"Priority={self.skill_manager.config['skills']['priority_skills']}")
+    #     LOG.info(f"Blacklisted={self.skill_manager.config['skills']['blacklisted_skills']}")
+    #     # self.skill_manager.load_priority()
 
-        Returns:
-            SkillManager instance or None if it couldn't be initialized
-        """
-        try:
-            self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
-            self.skill_manager.load_priority()
-        except MsmException:
-            # skill manager couldn't be created, wait for network connection and
-            # retry
-            self.skill_manager = None
-            LOG.info(
-                'MSM is uninitialized and requires network connection to fetch '
-                'skill information\nWill retry after internet connection is '
-                'established.'
-            )
-
-    def _wait_for_internet_connection(self):
-        if get_neon_skills_config().get("wait_for_internet", True):
-            while not check_online():
-                time.sleep(1)
-        else:
-            LOG.info("Online check disabled, device may be offline")
+    # def _wait_for_internet_connection(self):
+    #     if get_neon_skills_config().get("wait_for_internet", True):
+    #         while not check_online():
+    #             time.sleep(1)
+    #     else:
+    #         LOG.info("Online check disabled, device may be offline")
 
     def shutdown(self):
         LOG.info('Shutting down Skills service')
@@ -163,6 +176,10 @@ class NeonSkillService:
             self.status.set_stopping()
         if self.event_scheduler is not None:
             self.event_scheduler.shutdown()
+
+        if self.http_server is not None:
+            self.http_server.shutdown()
+
         # Terminate all running threads that update skills
         if self.skill_manager is not None:
             self.skill_manager.stop()

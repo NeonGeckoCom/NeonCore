@@ -1,0 +1,51 @@
+{
+    "title": "OSM Test Skill",
+    "url": "https://github.com/OpenVoiceOS/tskill-osm_parsing",
+    "summary": "Skill used to test OSM Parsing",
+    "short_description": "Skill used to test OSM Parsing",
+    "description": "This is a skill description",
+    "examples": [
+        "do something cool"
+    ],
+    "desktopFile": false,
+    "warning": "",
+    "systemDeps": false,
+    "requirements": {
+        "python": [
+            "json-requirements"
+        ],
+        "system": {
+            "all": [
+                "json-pkg"
+            ]
+        },
+        "skill": [
+            "json-skill"
+        ]
+    },
+    "incompatible_skills": [],
+    "platforms": [
+        "i386",
+        "x86_64",
+        "ia64",
+        "arm64",
+        "arm"
+    ],
+    "branch": "v0.2.1",
+    "license": "BSD",
+    "icon": "https://0000.us/klatchat/app/files/neon_images/icons/neon_skill.png",
+    "category": "Daily",
+    "categories": [
+        "Daily",
+        "Productivity"
+    ],
+    "tags": [
+        "NeonGecko",
+        "OVOS",
+        "Test",
+        "NotARealSkill"
+    ],
+    "skillname": "OSM Test Skill",
+    "authorname": "OpenVoiceOS",
+    "foldername": "not-a-skill"
+}

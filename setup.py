@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -71,6 +74,7 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=get_requirements('requirements.txt'),
     extras_require={
+        "core_modules": get_requirements("core_modules.txt"),
         "client": get_requirements("client.txt"),
         "server": get_requirements("server.txt"),
         "dev": get_requirements("dev.txt"),
@@ -78,7 +82,8 @@ setup(
         "remote": get_requirements("remote_speech_processing.txt"),
         "vision": get_requirements("vision.txt"),
         "test": get_requirements("test.txt"),
-        "pi": get_requirements("pi.txt")
+        "pi": get_requirements("pi.txt"),
+        "docker": get_requirements("docker.txt")
     },
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*', 'res/text/*/*.voc', 'res/text/*/*.dialog',
@@ -87,9 +92,8 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'neon_messagebus_service=neon_core.messagebus.service.__main__:main',
+            'neon=neon_core.cli:neon_core_cli',
             'neon_skills_service=neon_core.skills.__main__:main',
-            'neon_gui_service=neon_core.gui.__main__:main',
             'neon-install-default-skills=neon_core.util.skill_utils:install_skills_default',
             'neon-upload-diagnostics=neon_core.util.diagnostic_utils:cli_send_diags',
             'neon-start=neon_core.run_neon:start_neon',

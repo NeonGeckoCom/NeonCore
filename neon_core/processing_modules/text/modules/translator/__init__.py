@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -37,19 +40,23 @@ class UtteranceTranslator(TextParser):
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
 
-    def parse(self, utterances, lang="en-us"):
+    def parse(self, utterances, lang=None):
         metadata = []
         for idx, ut in enumerate(utterances):
             try:
                 original = ut
                 detected_lang = self.lang_detector.detect(original)
-                LOG.debug("Detected language: {lang}".format(lang=detected_lang))
+                if lang and detected_lang != lang.split('-', 1)[0]:
+                    LOG.warning(f"Specified lang: {lang} but detected {detected_lang}")
+                else:
+                    LOG.debug(f"Detected language: {detected_lang}")
                 if detected_lang != self.language_config["internal"].split("-")[0]:
                     utterances[idx] = self.translator.translate(original,
-                                                                self.language_config["internal"])
+                                                                self.language_config["internal"], lang.split('-', 1)[0]
+                                                                or detected_lang)
                 # add language metadata to context
                 metadata += [{
-                    "source_lang": lang,
+                    "source_lang": lang or self.language_config['internal'],
                     "detected_lang": detected_lang,
                     "internal": self.language_config["internal"],
                     "was_translated": detected_lang != self.language_config["internal"].split("-")[0],

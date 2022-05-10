@@ -1,6 +1,9 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -22,12 +25,14 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 from mycroft.lock import Lock
 from mycroft.util import wait_for_exit_signal, reset_sigint_handler
-from neon_core.messagebus.service import NeonBusService
+from neon_messagebus.service import NeonBusService
 from neon_core.skills.service import NeonSkillService
-from neon_core.gui.service import NeonGUIService
-from time import sleep
+from neon_gui.service import NeonGUIService
+from neon_speech.service import NeonSpeechClient
+
 
 reset_sigint_handler()
 # Create PID file, prevent multiple instances of this service
@@ -37,6 +42,7 @@ lock = Lock("NeonCore")
 # launch websocket listener
 bus = NeonBusService(daemonic=True)
 bus.start()
+bus.started.wait(30)
 
 # launch GUI websocket listener
 gui = NeonGUIService(daemonic=True)
@@ -46,8 +52,16 @@ gui.start()
 skills = NeonSkillService()
 skills.start()
 
+speech = NeonSpeechClient()
+speech.start()
+
 wait_for_exit_signal()
 
+speech.shutdown()
 skills.shutdown()
 gui.shutdown()
 bus.shutdown()
+
+# TODO: Add audio service when implemented DM
+
+lock.delete()

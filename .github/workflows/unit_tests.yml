@@ -1,6 +1,6 @@
 # This workflow will run unit tests
 
-name: Test Utilities
+name: Test Core Modules
 on:
   push:
   workflow_dispatch:
@@ -26,7 +26,7 @@ jobs:
   util_tests:
     strategy:
       matrix:
-        python-version: [ 3.6, 3.7, 3.8 ]
+        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -39,23 +39,46 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
-          pip install -r requirements/requirements.txt
-          pip install -r requirements/test.txt
+          pip install wheel
+          pip install . -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
+
       - name: Test Skill Utils
         run: |
-          pytest test/test_skill_utils.py
+          pytest test/test_skill_utils.py --doctest-modules --junitxml=tests/skill-utils-test-results.xml
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
-      - name: Test Language
+      - name: Upload Skill Utils test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: skill-utils-test-results
+          path: tests/skill-utils-test-results.xml
+
+      - name: Test Diagnostic Utils
         run: |
-          pytest test/test_language.py
+          pytest test/test_diagnostic_utils.py --doctest-modules --junitxml=tests/diagnostic-utils-test-results.xml
+        env:
+          GITHUB_TOKEN: ${{secrets.neon_token}}
+      - name: Upload Diagnostic Utils test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: diagnostic-utils-test-results
+          path: tests/diagnostic-utils-test-results.xml
+
+      - name: Test QML File Server
+        run: |
+          pytest test/test_qml_file_server.py --doctest-modules --junitxml=tests/qml-file-server-test-results.xml
+      - name: Upload QML File Server test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: qml-file-server-test-results
+          path: tests/qml-file-server-test-results.xml
 
   unit_tests:
     strategy:
       matrix:
-        python-version: [ 3.6, 3.7, 3.8 ]
+        python-version: [ 3.6, 3.7, 3.8, 3.9, '3.10' ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -68,10 +91,40 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
-          pip install -r requirements/requirements.txt
-          pip install -r requirements/test.txt
+          pip install wheel
+          pip install . -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
+
       - name: Test Configuration Module
         run: |
-          pytest test/test_configuration.py
+          pytest test/test_configuration.py --doctest-modules --junitxml=tests/configuration-test-results.xml
+      - name: Upload Configuration test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: configuration-test-results
+          path: tests/configuration-test-results.xml
+      - name: Upload config file
+        uses: actions/upload-artifact@v2
+        with:
+          name: ovos.conf
+          path: ~/.config/OpenVoiceOS/ovos.conf
+        if: always()
+
+      - name: Test Language
+        run: |
+          pytest test/test_language.py --doctest-modules --junitxml=tests/language-test-results.xml
+      - name: Upload Language test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: language-test-results
+          path: tests/language-test-results.xml
+
+      - name: Test Skills Module
+        run: |
+          pytest test/test_skills_module.py --doctest-modules --junitxml=tests/skills-module-test-results.xml
+      - name: Upload Language test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: skills-module-test-results
+          path: tests/skills-module-test-results.xml

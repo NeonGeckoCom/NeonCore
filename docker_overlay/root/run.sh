@@ -1,6 +1,10 @@
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+#!/bin/bash
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -23,16 +27,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neon_core.gui.service import NeonGUIService
-from mycroft.util import wait_for_exit_signal
-
-
-def main():
-    gui = NeonGUIService(daemonic=True)
-    gui.start()
-    wait_for_exit_signal()
-    gui.shutdown()
-
-
-if __name__ == "__main__":
-    main()
+# Plugin installation must occur in a separate thread, before module load, for the entry point to be loaded.
+neon install-skill-requirements /skills
+neon run-skills

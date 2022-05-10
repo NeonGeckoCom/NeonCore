@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# # NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
-# # All trademark and other rights reserved by their respective owners
-# # Copyright 2008-2021 Neongecko.com Inc.
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# All trademark and other rights reserved by their respective owners
+# Copyright 2008-2022 Neongecko.com Inc.
+# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
+# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
+# BSD-3 License
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -265,7 +268,7 @@ doInstall(){
     fi
 
   # Build optional dependency string for pip installation
-    options=()
+    options=("core_modules")
     if [ "${localDeps}" == "true" ]; then
       if [ "${arm}" == "true" ]; then
         echo "Local Dependencies not supported on ARM; remote STT/TTS will be used."
@@ -334,7 +337,7 @@ doInstall(){
     fi
 
     echo "${GITHUB_TOKEN}">~/token.txt
-    pip install --upgrade pip~=21.1.0
+    pip install --upgrade pip~=21.3
     pip install wheel
     pip install "${pipStr}"
     neon-config-import
