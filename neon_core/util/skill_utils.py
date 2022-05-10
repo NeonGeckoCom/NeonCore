@@ -82,7 +82,12 @@ def _write_pip_constraints_to_file(output_file: str = None):
         makedirs(dirname(output_file))
 
     with open(output_file, 'w+') as f:
-        f.write('\n'.join(get_package_dependencies("neon-core")))
+        constraints = get_package_dependencies("neon-core")
+        constraints = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
+                       else c for c in constraints]
+        LOG.debug(f"Got package constraints: {constraints}")
+        f.write('\n'.join(constraints))
+    LOG.info(f"Wrote core constraints to file: {output_file}")
 
 
 def set_osm_constraints_file(constraints_file: str):
