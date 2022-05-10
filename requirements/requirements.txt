@@ -1,7 +1,5 @@
 # mycroft
 ovos-core[skills_lgpl]~=0.0.3
-# TODO: Update to stable version
-
 # utils
 neon-utils~=0.16
 ovos_utils~=0.0.20
