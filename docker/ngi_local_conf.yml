@@ -121,13 +121,14 @@ session:
   ttl: 180
 tts:
   module: coqui
-  package_spec: neon-tts-plugin-coqui
+  package_spec: neon-tts-plugin-coqui~=0.1
   mozilla: {request_url: http://0.0.0.0:5002/api/tts?}
   mozilla_remote: {api_url: https://mtts.2022.us/api/tts}
   mimic: {voice: ap}
   mimic2: {lang: en-us, url: https://mimic-api.mycroft.ai/synthesize?text=}
 stt:
   module: deepspeech_stream_local
+  package_spec: neon-stt-plugin-deepspeech_stream_local~=1.0
 logs:
   blacklist: [enclosure.mouth.viseme, enclosure.mouth.display]
 device:
