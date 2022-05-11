@@ -222,19 +222,19 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
         raise ValueError(f"{local_skills_dir} is not a valid directory")
     installed_skills = list()
     for skill in listdir(local_skills_dir):
-        if not isdir(skill):
+        skill_dir = join(local_skills_dir, skill)
+        if not isdir(skill_dir):
             continue
-        if not isfile(join(skill, "__init__.py")):
+        if not isfile(join(skill_dir, "__init__.py")):
             continue
         LOG.debug(f"Attempting installation of {skill}")
         try:
-            entry = SkillEntry.from_directory(join(local_skills_dir, skill),
-                                              github_token)
+            entry = SkillEntry.from_directory(skill_dir, github_token)
             _install_skill_dependencies(entry)
             installed_skills.append(skill)
         except Exception as e:
             LOG.error(f"Exception while installing {skill}")
-            LOG.error(e)
+            LOG.exception(e)
     if local_skills_dir not in \
             get_neon_skills_config().get("extra_directories", []):
         LOG.error(f"{local_skills_dir} not found in configuration")
