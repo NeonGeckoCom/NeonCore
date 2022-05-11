@@ -99,6 +99,10 @@ def _write_pip_constraints_to_file(output_file: str = None):
 
 
 def set_osm_constraints_file(constraints_file: str):
+    """
+    Sets the DEFAULT_CONSTRAINTS param for OVOS Skills Manager.
+    :param constraints_file: path to valid constraints file for neon-core
+    """
     if not constraints_file:
         raise ValueError("constraints_file not defined")
     import ovos_skills_manager.requirements
