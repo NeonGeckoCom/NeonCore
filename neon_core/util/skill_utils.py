@@ -36,7 +36,7 @@ import requests
 from os import listdir, makedirs
 from tempfile import mkdtemp
 from shutil import rmtree
-from os.path import expanduser, join, isdir, dirname
+from os.path import expanduser, join, isdir, dirname, isfile
 
 from ovos_skills_manager.requirements import install_system_deps, pip_install
 from ovos_skills_manager.skill_entry import SkillEntry
@@ -223,7 +223,9 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
     installed_skills = list()
     for skill in listdir(local_skills_dir):
         if not isdir(skill):
-            pass
+            continue
+        if not isfile(join(skill, "__init__.py")):
+            continue
         LOG.debug(f"Attempting installation of {skill}")
         try:
             entry = SkillEntry.from_directory(join(local_skills_dir, skill),
