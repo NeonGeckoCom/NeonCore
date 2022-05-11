@@ -28,13 +28,15 @@
 
 import json
 import os.path
+import re
+from copy import copy
 
 import requests
 
-from os import listdir
+from os import listdir, makedirs
 from tempfile import mkdtemp
 from shutil import rmtree
-from os.path import expanduser, join, isdir
+from os.path import expanduser, join, isdir, dirname
 
 from ovos_skills_manager.requirements import install_system_deps, pip_install
 from ovos_skills_manager.skill_entry import SkillEntry
@@ -70,6 +72,43 @@ def get_neon_skills_data(skill_meta_repository: str = "https://github.com/neonge
     return skills_data
 
 
+def _write_pip_constraints_to_file(output_file: str = None):
+    """
+    Writes out a constraints file for OSM to use to prevent broken dependencies
+    :param output_file: path to constraints file to write
+    """
+    from neon_utils.packaging_utils import get_package_dependencies
+
+    output_file = output_file or '/etc/mycroft/constraints.txt'
+    if not isdir(dirname(output_file)):
+        makedirs(dirname(output_file))
+
+    with open(output_file, 'w+') as f:
+        constraints = get_package_dependencies("neon-core")
+        for c in copy(constraints):
+            try:
+                constraint = re.split('[^a-zA-Z0-9_-]', c, 1)[0] or c
+                constraints.extend(get_package_dependencies(constraint))
+            except ModuleNotFoundError:
+                LOG.warning(f"Ignoring uninstalled dependency: {constraint}")
+        constraints = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
+                       else c for c in constraints if '@' not in c]
+        LOG.debug(f"Got package constraints: {constraints}")
+        f.write('\n'.join(constraints))
+    LOG.info(f"Wrote core constraints to file: {output_file}")
+
+
+def set_osm_constraints_file(constraints_file: str):
+    """
+    Sets the DEFAULT_CONSTRAINTS param for OVOS Skills Manager.
+    :param constraints_file: path to valid constraints file for neon-core
+    """
+    if not constraints_file:
+        raise ValueError("constraints_file not defined")
+    import ovos_skills_manager.requirements
+    ovos_skills_manager.requirements.DEFAULT_CONSTRAINTS = constraints_file
+
+
 def install_skills_from_list(skills_to_install: list, config: dict = None):
     """
     Installs the passed list of skill URLs
@@ -85,6 +124,13 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         token_set = True
         set_github_token(config["neon_token"])
         LOG.info(f"Added token to request headers: {config.get('neon_token')}")
+    try:
+        _write_pip_constraints_to_file()
+    except PermissionError:
+        from ovos_utils.xdg_utils import xdg_data_home
+        constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
+        _write_pip_constraints_to_file(constraints_file)
+        set_osm_constraints_file(constraints_file)
     for url in skills_to_install:
         try:
             normalized_url = normalize_github_url(url)
@@ -104,6 +150,10 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
                 LOG.error(f"Failed to install: "
                           f"{os.path.join(skill_dir, entry.uuid)}")
+                if entry.download(skill_dir):
+                    LOG.info(f"Downloaded failed skill: {entry.uuid}")
+                else:
+                    LOG.error(f"Failed to download: {entry.uuid}")
             else:
                 LOG.info(f"Installed {url} to {skill_dir}")
         except Exception as e:
