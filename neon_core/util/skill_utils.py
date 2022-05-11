@@ -146,6 +146,10 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
                 LOG.error(f"Failed to install: "
                           f"{os.path.join(skill_dir, entry.uuid)}")
+                if entry.download(skill_dir):
+                    LOG.info(f"Downloaded failed skill: {entry.uuid}")
+                else:
+                    LOG.error(f"Failed to download: {entry.uuid}")
             else:
                 LOG.info(f"Installed {url} to {skill_dir}")
         except Exception as e:
