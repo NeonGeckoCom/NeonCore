@@ -28,6 +28,8 @@
 
 import json
 import os.path
+import re
+from copy import copy
 
 import requests
 
@@ -83,8 +85,14 @@ def _write_pip_constraints_to_file(output_file: str = None):
 
     with open(output_file, 'w+') as f:
         constraints = get_package_dependencies("neon-core")
+        for c in copy(constraints):
+            try:
+                constraint = re.split('[^a-zA-Z0-9_-]', c, 1)[0] or c
+                constraints.extend(get_package_dependencies(constraint))
+            except ModuleNotFoundError:
+                LOG.warning(f"Ignoring uninstalled dependency: {constraint}")
         constraints = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
-                       else c for c in constraints]
+                       else c for c in constraints if '@' not in c]
         LOG.debug(f"Got package constraints: {constraints}")
         f.write('\n'.join(constraints))
     LOG.info(f"Wrote core constraints to file: {output_file}")

@@ -165,20 +165,20 @@ class SkillUtilsTests(unittest.TestCase):
         from neon_utils.packaging_utils import get_package_dependencies
         real_deps = get_package_dependencies("neon-core")
         real_deps = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
-                     else c for c in real_deps]
+                     else c for c in real_deps if '@' not in c]
         test_outfile = os.path.join(os.path.dirname(__file__),
                                     "constraints.txt")
         _write_pip_constraints_to_file(test_outfile)
         with open(test_outfile) as f:
             read_deps = f.read().split('\n')
-        self.assertEqual(read_deps, real_deps)
+        self.assertTrue(all((d in read_deps for d in real_deps)))
 
         try:
             _write_pip_constraints_to_file()
             self.assertTrue(os.path.isfile("/etc/mycroft/constraints.txt"))
             with open("/etc/mycroft/constraints.txt") as f:
                 deps = f.read().split('\n')
-            self.assertEqual(deps, real_deps)
+            self.assertTrue(all((d in deps for d in real_deps)))
         except Exception as e:
             self.assertIsInstance(e, PermissionError)
         os.remove(test_outfile)
