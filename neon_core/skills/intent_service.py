@@ -29,6 +29,8 @@
 import time
 import wave
 
+from mycroft.skills.intent_services import ConverseService
+
 from neon_core.configuration import Configuration
 from neon_core.language import get_lang_config
 from neon_core.processing_modules.text import TextParsersService
@@ -60,6 +62,7 @@ except ImportError:
 class NeonIntentService(IntentService):
     def __init__(self, bus):
         super().__init__(bus)
+        self.converse = NeonConverseService(bus)
         self.config = Configuration.get().get('context', {})
         self.language_config = get_lang_config()
 
@@ -193,3 +196,12 @@ class NeonIntentService(IntentService):
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
+
+
+class NeonConverseService(ConverseService):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def _collect_converse_skills(self):
+        # TODO: Patching bug in ovos-core 0.0.3
+        return self.get_active_skills()
