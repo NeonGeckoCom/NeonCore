@@ -39,6 +39,7 @@ from mycroft_bus_client import Message
 from neon_utils.message_utils import get_message_user
 from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
+from neon_utils.user_utils import apply_local_user_profile_updates
 from neon_utils.configuration_utils import get_neon_device_type,\
     get_neon_user_config
 from ovos_utils.json_helper import merge_dict
@@ -66,7 +67,9 @@ class NeonIntentService(IntentService):
         self.config = Configuration.get().get('context', {})
         self.language_config = get_lang_config()
 
-        self.default_user = get_neon_user_config()
+        # Initialize default user to inject into incoming messages
+        self._default_user = get_neon_user_config()
+        self._default_user['user']['username'] = "local"
 
         set_default_lang(self.language_config["internal"])
 
@@ -81,6 +84,15 @@ class NeonIntentService(IntentService):
                 self.transcript_service = Transcribe()
             except Exception as e:
                 LOG.exception(e)
+
+        self.bus.on("neon.profile_update", self.handle_profile_update)
+
+    def handle_profile_update(self, message):
+        updated_profile = message.data.get("profile")
+        if updated_profile["user"]["username"] == \
+                self._default_user["user"]["username"]:
+            apply_local_user_profile_updates(updated_profile,
+                                             self._default_user)
 
     def shutdown(self):
         self.parser_service.shutdown()
@@ -149,9 +161,9 @@ class NeonIntentService(IntentService):
 
             # Ensure user profile data is present
             if "user_profiles" not in message.context:
-                message.context["user_profiles"] = [self.default_user.content]
+                message.context["user_profiles"] = [self._default_user.content]
                 message.context["username"] = \
-                    self.default_user.content["user"]["username"]
+                    self._default_user.content["user"]["username"]
 
             # Make sure there is a `transcribed` timestamp
             if not message.context["timing"].get("transcribed"):
