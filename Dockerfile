@@ -36,3 +36,7 @@ CMD ["/root/run.sh"]
 
 FROM base as default_skills
 RUN neon-install-default-skills
+
+# TODO: Below patching skill-alerts dependency
+RUN pip uninstall lingua-franca -y
+RUN pip install --force-reinstall ovos-lingua-franca~=0.4
