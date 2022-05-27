@@ -199,10 +199,16 @@ def _install_skill_dependencies(skill: SkillEntry):
     :param skill: Skill to install dependencies for
     """
     sys_deps = skill.requirements.get("system")
-    requirements = skill.requirements.get("python")
+    requirements = copy(skill.requirements.get("python"))
     if sys_deps:
         install_system_deps(sys_deps)
     if requirements:
+        invalid = [r for r in requirements if r.startswith("lingua-franca")]
+        if any(invalid):
+            for dep in invalid:
+                LOG.warning(f"{dep} is not valid under this core"
+                            f" and will be ignored")
+                requirements.remove(dep)
         pip_install(requirements)
     LOG.info(f"Installed dependencies for {skill.skill_folder}")
 
