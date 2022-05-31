@@ -31,7 +31,7 @@ import os
 import shutil
 import sys
 import unittest
-from copy import deepcopy
+from copy import deepcopy, copy
 
 from importlib import reload
 from mock.mock import Mock
@@ -159,6 +159,14 @@ class SkillUtilsTests(unittest.TestCase):
         install_system_deps.assert_called_once()
         install_system_deps.assert_called_with(
             entry.json["requirements"]["system"])
+
+        invalid_dep_json = entry.json
+        invalid_dep_json['requirements']['python'].append('lingua-franca')
+        invalid_entry = SkillEntry.from_json(invalid_dep_json)
+        _install_skill_dependencies(invalid_entry)
+        valid_deps = invalid_entry.json['requirements']['python']
+        valid_deps.remove('lingua-franca')
+        pip_install.assert_called_with(valid_deps)
 
     def test_write_pip_constraints_to_file(self):
         from neon_core.util.skill_utils import _write_pip_constraints_to_file
