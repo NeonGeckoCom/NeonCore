@@ -217,14 +217,11 @@ sttSpokenOpts: {Afrikaans: af-ZA, Amharic: am-ET, Armenian: hy-AM, Azerbaijani: 
   Korean: ko-KR, Taiwanese: zh-TW, 'Chinese, Cantonese': yue-Hant-HK, Japanese: ja-JP,
   'Chinese, Mandarin': zh}
 MQ:
-  server: mq.2022.us
+  server: api.neon.ai
   users:
     mq_handler:
       user: neon_api_utils
       password: Klatchat2021
-    neon_chat_api:
-      user: neon_ai
-      password: n30nn30n
 language:
   boost: false
   core_lang: en-us
