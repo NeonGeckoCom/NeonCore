@@ -6,7 +6,7 @@ volumes:
     driver_opts:
       type: config
       o: bind
-      device: ./
+      device: ${NEON_CONFIG_PATH}
 services:
   neon-messagebus:
     container_name: neon-messagebus
