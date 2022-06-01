@@ -138,3 +138,21 @@ def get_core_version() -> str:
                        "(NeonGecko)"
     mycroft.version.CORE_VERSION_STR = core_version_str
     return core_version_str
+
+
+def setup_resolve_resource_file():
+    """
+    Override default resolve_resource_file to include resources in neon-core.
+    Priority: neon-utils, neon-core, ~/.local/share/neon, ~/.neon, mycroft-core
+    """
+    from neon_utils.file_utils import resolve_neon_resource_file
+    from mycroft.util.file_utils import resolve_resource_file
+
+    def patched_resolve_resource_file(res_name):
+        resource = resolve_neon_resource_file(res_name) or \
+                   resolve_resource_file(res_name)
+        return resource
+
+    import mycroft.util
+    mycroft.util.file_utils.resolve_resource_file = \
+        patched_resolve_resource_file

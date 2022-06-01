@@ -26,24 +26,30 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 import sys
+import unittest
 
-from neon_core.config import init_config, get_core_version, \
-    setup_resolve_resource_file
-from os.path import dirname
+from os.path import join, isfile
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
-NEON_ROOT_PATH = dirname(__file__)
-sys.path.append(NEON_ROOT_PATH)
-init_config()
-CORE_VERSION_STR = get_core_version()
-setup_resolve_resource_file()
+class ResourceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        pass
 
-from neon_core.skills import NeonSkill, NeonFallbackSkill
-from neon_core.skills.intent_service import NeonIntentService
+    def test_skill_resolver(self):
+        import neon_core  # Ensure neon_core is imported
+        from mycroft.util.file_utils import resolve_resource_file
+        res = resolve_resource_file(join('text', 'en-us', 'yes.voc'))
+        self.assertTrue(isfile(res))
+        res = resolve_resource_file(join('text', 'en-us', 'neon.voc'))
+        self.assertTrue(isfile(res))
+        # res = resolve_resource_file(join('text', 'en', 'yes.voc'))
+        # self.assertTrue(isfile(res))
 
-__all__ = ['NEON_ROOT_PATH',
-           'NeonIntentService',
-           'NeonSkill',
-           'NeonFallbackSkill',
-           'CORE_VERSION_STR']
+
+if __name__ == '__main__':
+    unittest.main()
