@@ -40,15 +40,33 @@ class ResourceTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         pass
 
-    def test_skill_resolver(self):
+    def test_resolve_resource_file(self):
         import neon_core  # Ensure neon_core is imported
         from mycroft.util.file_utils import resolve_resource_file
-        res = resolve_resource_file(join('text', 'en-us', 'yes.voc'))
-        self.assertTrue(isfile(res))
-        res = resolve_resource_file(join('text', 'en-us', 'neon.voc'))
-        self.assertTrue(isfile(res))
-        # res = resolve_resource_file(join('text', 'en', 'yes.voc'))
-        # self.assertTrue(isfile(res))
+        for file in ("hey-neon.pb", "hey-neon.pb.params"):
+            self.assertTrue(isfile(resolve_resource_file(join("precise_models",
+                                                              file))))
+        for file in ("acknowledge.mp3", "beep.wav", "loaded.wav",
+                     "start_listening.wav"):
+            self.assertTrue(isfile(resolve_resource_file(join("snd",
+                                                              file))))
+        for file in ("neon_logo.png", "SYSTEM_AnimatedImageFrame.qml",
+                     "SYSTEM_HtmlFrame.qml", "SYSTEM_TextFrame.qml",
+                     "SYSTEM_UrlFrame.qml", "WebViewHtmlFrame.qml",
+                     "WebViewUrlFrame.qml"):
+            self.assertTrue(isfile(resolve_resource_file(join("ui",
+                                                              file))))
+        for file in ("cancel.voc", "i didn't catch that.dialog",
+                     "neon.voc", "no.voc", "not.loaded.dialog",
+                     "not connected to the internet.dialog",
+                     "phonetic_spellings.txt", "skill.error.dialog",
+                     "skills updated.dialog", "yes.voc"):
+            self.assertTrue(isfile(resolve_resource_file(join("text", "en-us",
+                                                              file))))
+
+        for lang in ("en-au", "en-us", "en-uk", "ua-uk", "ru-ru"):
+            self.assertTrue(isfile(resolve_resource_file(join("text", lang,
+                                                              "neon.voc"))))
 
 
 if __name__ == '__main__':
