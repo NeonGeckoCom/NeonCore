@@ -9,7 +9,6 @@ env:
 jobs:
   build_and_publish_docker:
     runs-on: ubuntu-latest
-    needs: increment_version
     permissions:
       contents: read
       packages: write
