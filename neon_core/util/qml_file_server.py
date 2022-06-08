@@ -34,7 +34,7 @@ from tempfile import gettempdir
 from os.path import isdir, join, dirname
 from threading import Thread, Event
 
-_HTTP_SERVER = None
+_HTTP_SERVER: socketserver.TCPServer = None
 
 
 class QmlFileHandler(http.server.SimpleHTTPRequestHandler):
@@ -58,13 +58,13 @@ def start_qml_http_server(skills_dir: str, port: int = 8000):
 
     served_skills_dir = join(qml_dir, "skills")
     served_system_dir = join(qml_dir, "system")
-    if os.path.exists(served_skills_dir):
+    if os.path.exists(served_skills_dir) or os.path.islink(served_skills_dir):
         os.remove(served_skills_dir)
-    if os.path.exists(served_system_dir):
+    if os.path.exists(served_system_dir) or os.path.islink(served_skills_dir):
         os.remove(served_system_dir)
 
-    os.symlink(skills_dir, join(qml_dir, "skills"))
-    os.symlink(system_dir, join(qml_dir, "system"))
+    os.symlink(skills_dir, served_skills_dir)
+    os.symlink(system_dir, served_system_dir)
     started_event = Event()
     http_daemon = Thread(target=_initialize_http_server,
                          args=(started_event, qml_dir, port),

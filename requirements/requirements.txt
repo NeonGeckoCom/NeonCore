@@ -1,12 +1,12 @@
 # mycroft
 ovos-core[skills_lgpl]~=0.0.3
-# TODO: Update to stable version
-
 # utils
-neon-utils~=0.16
+neon-utils~=0.17,>=0.17.3
 ovos_utils~=0.0.20
 ovos-skills-manager~=0.0.10
 ovos-plugin-manager~=0.0.16
+
+psutil~=5.6
 
 # default plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2

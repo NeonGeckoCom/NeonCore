@@ -1,3 +1,0 @@
-# These are just patching default skill dependencies
-ifaddr~=0.1
-pyjokes

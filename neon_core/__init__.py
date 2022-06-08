@@ -28,7 +28,8 @@
 
 import sys
 
-from neon_core.config import init_config, get_core_version
+from neon_core.config import init_config, get_core_version, \
+    setup_resolve_resource_file
 from os.path import dirname
 
 
@@ -36,7 +37,7 @@ NEON_ROOT_PATH = dirname(__file__)
 sys.path.append(NEON_ROOT_PATH)
 init_config()
 CORE_VERSION_STR = get_core_version()
-
+setup_resolve_resource_file()
 
 from neon_core.skills import NeonSkill, NeonFallbackSkill
 from neon_core.skills.intent_service import NeonIntentService

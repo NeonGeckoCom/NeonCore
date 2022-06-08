@@ -31,7 +31,7 @@ import os
 import shutil
 import sys
 import unittest
-from copy import deepcopy
+from copy import deepcopy, copy
 
 from importlib import reload
 from mock.mock import Mock
@@ -68,25 +68,29 @@ class SkillUtilsTests(unittest.TestCase):
 
     def test_get_remote_entries(self):
         from neon_core.util.skill_utils import get_remote_entries
-        from ovos_skills_manager.session import set_github_token, clear_github_token
+        from ovos_skills_manager.session import set_github_token,\
+            clear_github_token
         set_github_token(SKILL_CONFIG["neon_token"])
         skills_list = get_remote_entries(SKILL_CONFIG["default_skills"])
         clear_github_token()
         self.assertIsInstance(skills_list, list)
         self.assertTrue(len(skills_list) > 0)
-        self.assertTrue(all(skill.startswith("https://github.com") for skill in skills_list))
+        self.assertTrue(all(skill.startswith("https://github.com")
+                            for skill in skills_list))
 
     def test_install_skills_from_list_no_auth(self):
         from neon_core.util.skill_utils import install_skills_from_list
         install_skills_from_list(TEST_SKILLS_NO_AUTH, SKILL_CONFIG)
-        skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
+        skill_dirs = [d for d in os.listdir(SKILL_DIR)
+                      if os.path.isdir(os.path.join(SKILL_DIR, d))]
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_NO_AUTH))
         self.assertIn("alerts.neon.neongeckocom", skill_dirs)
 
     def test_install_skills_from_list_with_auth(self):
         from neon_core.util.skill_utils import install_skills_from_list
         install_skills_from_list(TEST_SKILLS_WITH_AUTH, SKILL_CONFIG)
-        skill_dirs = [d for d in os.listdir(SKILL_DIR) if os.path.isdir(os.path.join(SKILL_DIR, d))]
+        skill_dirs = [d for d in os.listdir(SKILL_DIR)
+                      if os.path.isdir(os.path.join(SKILL_DIR, d))]
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_WITH_AUTH))
         self.assertIn("i-like-brands.neon.neongeckocom", skill_dirs)
 
@@ -127,7 +131,6 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(installed, os.listdir(local_skills_dir))
         self.assertEqual(num_installed, install_deps.call_count)
 
-
     def test_install_skill_dependencies(self):
         # Patch dependency installation
         import ovos_skills_manager.requirements
@@ -156,6 +159,44 @@ class SkillUtilsTests(unittest.TestCase):
         install_system_deps.assert_called_once()
         install_system_deps.assert_called_with(
             entry.json["requirements"]["system"])
+
+        invalid_dep_json = entry.json
+        invalid_dep_json['requirements']['python'].append('lingua-franca')
+        invalid_entry = SkillEntry.from_json(invalid_dep_json)
+        _install_skill_dependencies(invalid_entry)
+        valid_deps = invalid_entry.json['requirements']['python']
+        valid_deps.remove('lingua-franca')
+        pip_install.assert_called_with(valid_deps)
+
+    def test_write_pip_constraints_to_file(self):
+        from neon_core.util.skill_utils import _write_pip_constraints_to_file
+        from neon_utils.packaging_utils import get_package_dependencies
+        real_deps = get_package_dependencies("neon-core")
+        real_deps = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
+                     else c for c in real_deps if '@' not in c]
+        test_outfile = os.path.join(os.path.dirname(__file__),
+                                    "constraints.txt")
+        _write_pip_constraints_to_file(test_outfile)
+        with open(test_outfile) as f:
+            read_deps = f.read().split('\n')
+        self.assertTrue(all((d in read_deps for d in real_deps)))
+
+        try:
+            _write_pip_constraints_to_file()
+            self.assertTrue(os.path.isfile("/etc/mycroft/constraints.txt"))
+            with open("/etc/mycroft/constraints.txt") as f:
+                deps = f.read().split('\n')
+            self.assertTrue(all((d in deps for d in real_deps)))
+        except Exception as e:
+            self.assertIsInstance(e, PermissionError)
+        os.remove(test_outfile)
+
+    def test_set_osm_constraints_file(self):
+        import ovos_skills_manager.requirements
+        from neon_core.util.skill_utils import set_osm_constraints_file
+        set_osm_constraints_file(__file__)
+        self.assertEqual(ovos_skills_manager.requirements.DEFAULT_CONSTRAINTS,
+                         __file__)
 
 
 if __name__ == '__main__':

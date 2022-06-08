@@ -121,7 +121,7 @@ session:
   ttl: 180
 tts:
   module: coqui
-  package_spec: neon-tts-plugin-coqui~=0.1
+  package_spec: neon-tts-plugin-coqui~=0.2
   mozilla: {request_url: http://0.0.0.0:5002/api/tts?}
   mozilla_remote: {api_url: https://mtts.2022.us/api/tts}
   mimic: {voice: ap}
