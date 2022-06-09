@@ -373,13 +373,13 @@ class TestSkillService(unittest.TestCase):
         error_hook = Mock()
         stopping_hook = Mock()
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
-                                   error_hook, stopping_hook, config=config)
+                                   error_hook, stopping_hook, config=config,
+                                   daemonic=True)
         self.assertIsNotNone(service.http_server)
         self.assertEqual(service.config, config)
         service.bus = FakeBus()
         service.bus.connected_event = Event()
-        skills_thread = Thread(target=service.start, daemon=True)
-        skills_thread.start()
+        service.start()
 
         started.wait(30)
         run.assert_called_once()
@@ -394,7 +394,7 @@ class TestSkillService(unittest.TestCase):
 
         service.shutdown()
         stopping_hook.assert_called_once()
-        skills_thread.join(10)
+        service.join(10)
 
 
 if __name__ == "__main__":
