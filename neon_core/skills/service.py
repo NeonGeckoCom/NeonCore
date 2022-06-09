@@ -27,8 +27,9 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import time
-from typing import Optional
 
+from typing import Optional
+from threading import Thread
 from neon_utils.configuration_utils import get_neon_skills_config, \
     get_neon_lang_config, get_neon_local_config
 from neon_utils import LOG
@@ -68,7 +69,7 @@ def on_stopping():
     LOG.info('Skills service is shutting down...')
 
 
-class NeonSkillService:
+class NeonSkillService(Thread):
     def __init__(self,
                  alive_hook: callable = on_alive,
                  started_hook: callable = on_started,
@@ -76,7 +77,9 @@ class NeonSkillService:
                  error_hook: callable = on_error,
                  stopping_hook: callable = on_stopping,
                  watchdog: Optional[callable] = None,
-                 config: Optional[dict] = None):
+                 config: Optional[dict] = None, daemonic: bool = False):
+        Thread.__init__(self)
+        self.setDaemon(daemonic)
         self.bus = None
         self.skill_manager = None
         self.event_scheduler = None
@@ -94,7 +97,7 @@ class NeonSkillService:
         else:
             self.http_server = None
 
-    def start(self):
+    def run(self):
         # config = Configuration.get()
         # Set the active lang to match the configured one
         set_default_lang(get_neon_lang_config().get('internal', 'en-us'))
@@ -106,7 +109,8 @@ class NeonSkillService:
         init_signal_handlers()
         self._register_intent_services()
         self.event_scheduler = EventScheduler(self.bus)
-        self.status = ProcessStatus('skills', self.bus, self.callbacks)
+        self.status = ProcessStatus('skills', self.bus, self.callbacks,
+                                    namespace="neon")
         SkillApi.connect_bus(self.bus)
         self.skill_manager = NeonSkillManager(self.bus, self.watchdog,
                                               config=self.config)
@@ -146,29 +150,6 @@ class NeonSkillService:
             FallbackSkill.make_intent_failure_handler(self.bus)
         )
         return service
-
-    # def _initialize_skill_manager(self):
-    #     """Create a thread that monitors the loaded skills, looking for updates
-    #
-    #     Returns:
-    #         SkillManager instance or None if it couldn't be initialized
-    #     """
-    #     self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
-    #
-    #     # # TODO: This config patching should be handled in neon_utils
-    #     # self.skill_manager.config["skills"]["priority_skills"] = \
-    #     #     self.skill_manager.config["skills"].get("priority") or \
-    #     #     self.skill_manager.config["skills"]["priority_skills"]
-    #     LOG.info(f"Priority={self.skill_manager.config['skills']['priority_skills']}")
-    #     LOG.info(f"Blacklisted={self.skill_manager.config['skills']['blacklisted_skills']}")
-    #     # self.skill_manager.load_priority()
-
-    # def _wait_for_internet_connection(self):
-    #     if get_neon_skills_config().get("wait_for_internet", True):
-    #         while not check_online():
-    #             time.sleep(1)
-    #     else:
-    #         LOG.info("Online check disabled, device may be offline")
 
     def shutdown(self):
         LOG.info('Shutting down Skills service')
