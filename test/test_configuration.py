@@ -38,14 +38,15 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 class ConfigurationTests(unittest.TestCase):
+    CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
+
     @classmethod
     def setUpClass(cls) -> None:
-        cls.config_path = os.path.join(os.path.dirname(__file__), "config")
-        os.environ["XDG_CONFIG_HOME"] = cls.config_path
+        os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
 
         import neon_core
         assert isinstance(neon_core.CORE_VERSION_STR, str)
-        assert os.path.exists(os.path.join(cls.config_path,
+        assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
                                            "OpenVoiceOS", "ovos.conf"))
 
         from neon_core.util.runtime_utils import use_neon_core
@@ -57,7 +58,7 @@ class ConfigurationTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        shutil.rmtree(cls.config_path)
+        shutil.rmtree(cls.CONFIG_PATH)
         os.environ.pop("XDG_CONFIG_HOME")
 
     def test_neon_core_config_init(self):
