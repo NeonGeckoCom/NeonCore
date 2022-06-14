@@ -1,5 +1,5 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.4a19
+ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a24
 # utils
 neon-utils~=0.17,>=0.17.3
 ovos_utils~=0.0.20
