@@ -104,11 +104,16 @@ jobs:
         with:
           name: configuration-test-results
           path: tests/configuration-test-results.xml
-      - name: Upload config file
+      - name: Upload ovos config file
         uses: actions/upload-artifact@v2
         with:
           name: ovos.conf
-          path: ~/.config/OpenVoiceOS/ovos.conf
+          path: /home/runner/work/NeonCore/NeonCore/test/config/OpenVoiceOS/ovos.conf
+      - name: Upload neon config file
+        uses: actions/upload-artifact@v2
+        with:
+          name: neon.conf
+          path: /home/runner/work/NeonCore/NeonCore/test/config/neon/neon.conf
         if: always()
 
       - name: Test Language
