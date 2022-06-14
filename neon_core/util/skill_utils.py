@@ -169,7 +169,7 @@ def install_skills_default(config: dict = None):
     Installs default skills from passed or default configuration
     """
     config = config or Configuration().get("skills")
-    skills_list = config["default_skills"]
+    skills_list = config.get("default_skills")
     if isinstance(skills_list, str):
         skills_list = get_remote_entries(skills_list)
     assert isinstance(skills_list, list)
