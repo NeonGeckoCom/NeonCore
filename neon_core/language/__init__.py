@@ -30,15 +30,17 @@ import os
 
 from ovos_plugin_manager.language import load_lang_detect_plugin, \
     load_tx_plugin
-from neon_utils.configuration_utils import get_neon_lang_config, LOG
+from neon_utils.logger import LOG
 from neon_core.configuration import Configuration, get_private_keys
 
 
 def get_lang_config():
-    config = Configuration.get()
+    config = Configuration()
     lang_config = config.get("language", {})
-    lang_config["internal"] = lang_config.get("internal") or config.get("lang") or "en-us"
-    lang_config["user"] = lang_config.get("user") or config.get("lang") or "en-us"
+    lang_config["internal"] = lang_config.get("internal") or \
+        config.get("lang") or "en-us"
+    lang_config["user"] = lang_config.get("user") or \
+        config.get("lang") or "en-us"
     return lang_config
 
 
@@ -72,8 +74,9 @@ class TranslatorFactory:
 
     @staticmethod
     def create(module=None):
-        config = get_neon_lang_config()
-        module = module or config.get("translation_module", "libretranslate_plug")
+        config = Configuration().get("language", {})
+        module = module or config.get("translation_module",
+                                      "libretranslate_plug")
         if module not in DetectorFactory.CLASSES:
             # plugin!
             clazz = load_tx_plugin(module)
@@ -91,8 +94,9 @@ class DetectorFactory:
 
     @staticmethod
     def create(module=None):
-        config = get_neon_lang_config()
-        module = module or config.get("detection_module", "libretranslate_detection_plug")
+        config = Configuration().get("language", {})
+        module = module or config.get("detection_module",
+                                      "libretranslate_detection_plug")
 
         if module not in DetectorFactory.CLASSES:
             # plugin!

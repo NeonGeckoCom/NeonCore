@@ -27,9 +27,8 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from os import makedirs
-from os.path import isdir, expanduser
+from os.path import isdir
 
-from neon_utils.configuration_utils import get_neon_skills_config
 from neon_utils.log_utils import LOG
 
 from neon_core.skills.skill_store import SkillsStore
@@ -44,11 +43,8 @@ SKILL_MAIN_MODULE = '__init__.py'
 class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
-        config = kwargs.pop("config") if "config" in kwargs else \
-            get_neon_skills_config()
-        config["directory"] = expanduser(config["directory"])
         super().__init__(*args, **kwargs)
-        self.skill_config = config
+        self.skill_config = self.config.get("skills")
         if not isdir(self.skill_config["directory"]):
             LOG.warning("Creating requested skill directory")
             makedirs(self.skill_config["directory"])

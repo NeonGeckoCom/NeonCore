@@ -30,8 +30,9 @@ import time
 
 from typing import Optional
 from threading import Thread
-from neon_utils.configuration_utils import get_neon_skills_config, \
-    get_neon_lang_config, get_neon_local_config
+
+from mycroft.configuration import Configuration
+
 from neon_utils import LOG
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
@@ -90,7 +91,10 @@ class NeonSkillService(Thread):
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
-        self.config = config or get_neon_skills_config()
+        if config:
+            # TODO: Write updates
+            pass
+        self.config = Configuration()
         if self.config.get("run_gui_file_server"):
             self.http_server = start_qml_http_server(
                 self.config["directory"])
@@ -98,9 +102,10 @@ class NeonSkillService(Thread):
             self.http_server = None
 
     def run(self):
-        # config = Configuration.get()
+        config = Configuration()
         # Set the active lang to match the configured one
-        set_default_lang(get_neon_lang_config().get('internal', 'en-us'))
+        set_default_lang(config.get("language", {}).get('internal') or
+                         config.get("lang") or "en-us")
         # Set the default timezone to match the configured one
         set_default_tz()
 
@@ -133,7 +138,7 @@ class NeonSkillService(Thread):
         def handle_metric(message):
             report_metric(message.data.pop("name"), **message.data)
 
-        if get_neon_local_config()['prefFlags']['metrics']:
+        if self.config.get("server", {}).get('metrics'):
             LOG.info("Metrics reporting enabled")
             self.bus.on("neon.metric", handle_metric)
         else:

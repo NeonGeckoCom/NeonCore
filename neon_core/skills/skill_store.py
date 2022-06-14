@@ -34,17 +34,17 @@ from ovos_skills_manager.skill_entry import SkillEntry
 from neon_utils.logger import LOG
 from neon_utils.net_utils import check_online
 from neon_utils.authentication_utils import repo_is_neon
-from neon_utils.configuration_utils import get_neon_skills_config
 from datetime import datetime, timedelta
 from neon_utils.messagebus_utils import get_messagebus
 
 from neon_core.util.skill_utils import get_remote_entries
 from mycroft.skills.event_scheduler import EventSchedulerInterface
+from mycroft.configuration import Configuration
 
 
 class SkillsStore:
     def __init__(self, skills_dir, config=None, bus=None):
-        self.config = config or get_neon_skills_config()
+        self.config = config or Configuration().get("skills")
         self.disabled = self.config.get("disable_osm", False)
         self.skills_dir = skills_dir
         self.osm = self.load_osm()

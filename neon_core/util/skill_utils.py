@@ -44,11 +44,13 @@ from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION, set_github_token, clear_github_token
 from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url, download_url_from_github_url
 from ovos_skill_installer import download_extract_zip
-from neon_utils.configuration_utils import get_neon_skills_config
-from neon_utils import LOG
+from neon_utils.logger import LOG
+
+from mycroft.configuration import Configuration
 
 
-def get_neon_skills_data(skill_meta_repository: str = "https://github.com/neongeckocom/neon_skills",
+def get_neon_skills_data(skill_meta_repository: str =
+                         "https://github.com/neongeckocom/neon_skills",
                          branch: str = "master",
                          repo_metadata_path: str = "skill_metadata") -> dict:
     """
@@ -115,7 +117,7 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param skills_to_install: list of skill URLs to install
     :param config: optional dict configuration
     """
-    config = config or get_neon_skills_config()
+    config = config or Configuration().get("skills")
     skill_dir = expanduser(config["directory"])
     osm = OVOSSkillsManager()
     skills_catalog = get_neon_skills_data()
@@ -166,7 +168,7 @@ def install_skills_default(config: dict = None):
     """
     Installs default skills from passed or default configuration
     """
-    config = config or get_neon_skills_config()
+    config = config or Configuration().get("skills")
     skills_list = config["default_skills"]
     if isinstance(skills_list, str):
         skills_list = get_remote_entries(skills_list)
@@ -222,7 +224,7 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
     :param local_skills_dir: Directory to install skills from
     :returns: list of installed skill directories
     """
-    github_token = get_neon_skills_config()["neon_token"]
+    github_token = Configuration().get("skills", {}).get("neon_token")
     local_skills_dir = expanduser(local_skills_dir)
     if not isdir(local_skills_dir):
         raise ValueError(f"{local_skills_dir} is not a valid directory")
@@ -242,6 +244,6 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
             LOG.error(f"Exception while installing {skill}")
             LOG.exception(e)
     if local_skills_dir not in \
-            get_neon_skills_config().get("extra_directories", []):
+            Configuration().get("skills", {}).get("extra_directories", []):
         LOG.error(f"{local_skills_dir} not found in configuration")
     return installed_skills
