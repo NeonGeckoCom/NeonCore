@@ -30,9 +30,10 @@ import os
 import shutil
 import sys
 import unittest
-from pprint import pformat
 
+from pprint import pformat
 from neon_utils.logger import LOG
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
@@ -44,15 +45,15 @@ class ConfigurationTests(unittest.TestCase):
 
         import neon_core
         assert isinstance(neon_core.CORE_VERSION_STR, str)
-
-        # from mycroft.configuration.config import USER_CONFIG
-        # assert USER_CONFIG == cls.config_path
+        assert os.path.exists(os.path.join(cls.config_path,
+                                           "OpenVoiceOS", "ovos.conf"))
 
         from neon_core.util.runtime_utils import use_neon_core
         from ovos_utils.configuration import get_ovos_config
         ovos_config = use_neon_core(get_ovos_config)()
         LOG.info(pformat(ovos_config))
         assert ovos_config['config_filename'] == 'neon.conf'
+        assert os.path.basename(ovos_config['default_config_path']) == "neon.conf"
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -65,16 +66,18 @@ class ConfigurationTests(unittest.TestCase):
         from neon_core.configuration import Configuration
         from neon_core.util.runtime_utils import use_neon_core
 
-        neon_compat_config = Configuration.get()
-        neon_config = use_neon_core(get_mycroft_compatible_config)()
-        for key, val in neon_config.items():
+        configuration = Configuration()
+        deprecated_neon_config = use_neon_core(get_mycroft_compatible_config)()
+        for key, val in deprecated_neon_config.items():
             if isinstance(val, dict):
                 for k, v in val.items():
                     if not isinstance(v, dict):
-                        self.assertEqual(neon_compat_config[key][k],
-                                         v, neon_compat_config[key])
+                        LOG.info(v)
+                        self.assertEqual(configuration[key][k],
+                                         v, configuration[key])
             else:
-                self.assertEqual(neon_compat_config[key], val)
+                LOG.info(key)
+                self.assertEqual(configuration[key], val)
 
     def test_ovos_core_config_init(self):
         from neon_utils.configuration_utils import \
@@ -82,7 +85,7 @@ class ConfigurationTests(unittest.TestCase):
         from mycroft.configuration import Configuration as MycroftConfig
         from neon_core.util.runtime_utils import use_neon_core
 
-        mycroft_config = MycroftConfig.get()
+        mycroft_config = MycroftConfig()
         neon_config = use_neon_core(get_mycroft_compatible_config)()
         for key, val in neon_config.items():
             if isinstance(val, dict):

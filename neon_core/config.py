@@ -36,11 +36,19 @@ def init_config():
     """
     from neon_utils.configuration_utils import \
         write_mycroft_compatible_config, init_config_dir
+
+    # First validate envvars, initialize `ovos.conf`, and set default config to
+    # bundled neon.conf
     init_config_dir()
 
-    # Write Mycroft-compat conf file
+    # Write Mycroft-compat conf file with yml config values
     neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
     write_mycroft_compatible_config(neon_config_path)
+
+    # Tell config module to get changes we just wrote
+    from mycroft.configuration.config import Configuration
+    for config in Configuration.xdg_configs:
+        config.reload()
     # TODO: Move old config file so this only happens 1x
 
 
