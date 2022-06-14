@@ -46,8 +46,8 @@ class ConfigurationTests(unittest.TestCase):
 
         import neon_core
         assert isinstance(neon_core.CORE_VERSION_STR, str)
-        # assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
-        #                                    "OpenVoiceOS", "ovos.conf"))
+        assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
+                                           "OpenVoiceOS", "ovos.conf"))
 
         from neon_core.util.runtime_utils import use_neon_core
         from ovos_utils.configuration import get_ovos_config
