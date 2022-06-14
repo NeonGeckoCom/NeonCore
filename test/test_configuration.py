@@ -27,6 +27,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import shutil
 import sys
 import unittest
 from pprint import pformat
@@ -38,22 +39,25 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 class ConfigurationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        from ovos_config_assistant.config_helpers import \
-            get_ovos_config, get_ovos_default_config_paths
-        ovos_config = os.path.expanduser("~/.config/OpenVoiceOS/ovos.conf")
-        if os.path.isfile(ovos_config):
-            os.remove(ovos_config)
-        assert get_ovos_default_config_paths() == []
+        cls.config_path = os.path.join(os.path.dirname(__file__), "config")
+        os.environ["XDG_CONFIG_HOME"] = cls.config_path
 
         import neon_core
-        from neon_core.util.runtime_utils import use_neon_core
-
         assert isinstance(neon_core.CORE_VERSION_STR, str)
-        assert len(use_neon_core(get_ovos_default_config_paths)()) == 1
-        LOG.info(use_neon_core(get_ovos_default_config_paths)())
+
+        # from mycroft.configuration.config import USER_CONFIG
+        # assert USER_CONFIG == cls.config_path
+
+        from neon_core.util.runtime_utils import use_neon_core
+        from ovos_utils.configuration import get_ovos_config
         ovos_config = use_neon_core(get_ovos_config)()
         LOG.info(pformat(ovos_config))
         assert ovos_config['config_filename'] == 'neon.conf'
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        shutil.rmtree(cls.config_path)
+        os.environ.pop("XDG_CONFIG_HOME")
 
     def test_neon_core_config_init(self):
         from neon_utils.configuration_utils import \
@@ -90,7 +94,6 @@ class ConfigurationTests(unittest.TestCase):
                 self.assertEqual(mycroft_config[key], val)
 
     def test_signal_dir(self):
-        self.assertIsNotNone(os.environ.get("MYCROFT_SYSTEM_CONFIG"))
         from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
         from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
         from mycroft.util.signal import get_ipc_directory as mycroft_ipc_dir
