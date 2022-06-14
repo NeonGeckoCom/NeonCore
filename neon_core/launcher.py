@@ -28,40 +28,54 @@
 
 from mycroft.lock import Lock
 from mycroft.util import wait_for_exit_signal, reset_sigint_handler
+
+from neon_audio.service import NeonPlaybackService
 from neon_messagebus.service import NeonBusService
 from neon_core.skills.service import NeonSkillService
 from neon_gui.service import NeonGUIService
 from neon_speech.service import NeonSpeechClient
 
 
-reset_sigint_handler()
-# Create PID file, prevent multiple instances of this service
-# TODO should also detect old services Locks
-lock = Lock("NeonCore")
+def main():
+    reset_sigint_handler()
+    # Create PID file, prevent multiple instances of this service
+    # TODO should also detect old services Locks
+    lock = Lock("NeonCore")
 
-# launch websocket listener
-bus = NeonBusService(daemonic=True)
-bus.start()
-bus.started.wait(30)
+    # launch websocket listener
+    bus = NeonBusService(daemonic=True)
+    bus.start()
+    bus.started.wait(30)
 
-# launch GUI websocket listener
-gui = NeonGUIService(daemonic=True)
-gui.start()
+    # launch GUI websocket listener
+    gui = NeonGUIService(daemonic=True)
+    gui.start()
 
-# launch skills service
-skills = NeonSkillService()
-skills.start()
+    # launch skills service
+    skills = NeonSkillService(daemonic=True)
+    skills.start()
 
-speech = NeonSpeechClient()
-speech.start()
+    # launch speech service
+    speech = NeonSpeechClient(daemonic=True)
+    speech.start()
 
-wait_for_exit_signal()
+    # launch audio playback service
+    audio = NeonPlaybackService(daemonic=True)
+    audio.start()
 
-speech.shutdown()
-skills.shutdown()
-gui.shutdown()
-bus.shutdown()
+    wait_for_exit_signal()
 
-# TODO: Add audio service when implemented DM
+    for service in (audio, speech, skills, gui, bus):
+        service.shutdown()
+        if service.is_alive():
+            print(f"{service} not shutdown")
+        try:
+            service.join()
+        except Exception as e:
+            print(e)
+    lock.delete()
+    print("Stopped!!")
 
-lock.delete()
+
+if __name__ == "__main__":
+    main()
