@@ -98,21 +98,6 @@ class ConfigurationTests(unittest.TestCase):
             else:
                 self.assertEqual(mycroft_config[key], val)
 
-    def test_signal_dir(self):
-        test_config_dir = os.path.join(os.path.dirname(__file__), "config")
-        os.makedirs(test_config_dir, exist_ok=True)
-        os.environ["XDG_CONFIG_HOME"] = test_config_dir
-
-        from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
-        from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
-        from mycroft.util.signal import get_ipc_directory as mycroft_ipc_dir
-
-        from neon_core.util.runtime_utils import use_neon_core
-
-        self.assertEqual(neon_ipc_dir, use_neon_core(ovos_ipc_dir)())
-        self.assertEqual(neon_ipc_dir,
-                         use_neon_core(mycroft_ipc_dir)())
-
     def test_patch_config(self):
         from os.path import join
         import json
