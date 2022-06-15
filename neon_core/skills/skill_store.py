@@ -123,7 +123,7 @@ class SkillsStore:
         """
         from ovos_utils.skills import get_skills_folder
         osm_skill_dir = get_skills_folder()
-        if osm_skill_dir != self.skills_dir:
+        if osm_skill_dir and osm_skill_dir != self.skills_dir:
             LOG.warning(f"OSM configured local skills: {osm_skill_dir}")
             if not isdir(osm_skill_dir):
                 makedirs(osm_skill_dir)

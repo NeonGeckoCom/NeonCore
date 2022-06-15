@@ -366,11 +366,13 @@ class TestSkillService(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
+        import neon_core
 
     @classmethod
     def tearDownClass(cls) -> None:
         os.environ.pop("XDG_CONFIG_HOME")
-        shutil.rmtree(cls.config_dir)
+        if os.path.exists(cls.config_dir):
+            shutil.rmtree(cls.config_dir)
 
     @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
     @patch("mycroft.skills.skill_manager.SkillManager.run")
