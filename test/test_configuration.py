@@ -74,11 +74,9 @@ class ConfigurationTests(unittest.TestCase):
             if isinstance(val, dict):
                 for k, v in val.items():
                     if not isinstance(v, dict):
-                        LOG.info(v)
                         self.assertEqual(configuration[key][k],
                                          v, configuration[key])
             else:
-                LOG.info(key)
                 self.assertEqual(configuration[key], val)
 
     def test_ovos_core_config_init(self):
