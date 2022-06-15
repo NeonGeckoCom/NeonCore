@@ -31,3 +31,17 @@ from mycroft.configuration.config import Configuration
 
 def get_private_keys():
     return Configuration.get(remote=False).get("keys", {})
+
+
+def patch_config(config: dict = None):
+    """
+    Write the specified speech configuration to the global config file
+    :param config: Mycroft-compatible configuration override
+    """
+    from mycroft.configuration import USER_CONFIG, LocalConf
+
+    config = config or dict()
+    local_config = LocalConf(USER_CONFIG)
+    local_config.update(config)
+    local_config.store()
+    Configuration().reload()
