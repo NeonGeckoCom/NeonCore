@@ -23,7 +23,7 @@ jobs:
           mkdir -p ~/.local/share/neon
           echo ${GOOGLE_KEY}>~/.local/share/neon/google.json
           echo ${AWS_CREDS}>~/.local/share/neon/aws.json
-          bash test/setup_remote.sh ${NEON_TOKEN}
+          bash test/legacy_setup_remote.sh ${NEON_TOKEN}
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
           GOOGLE_KEY: ${{secrets.google_api_key}}
@@ -60,7 +60,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Setup Core
         run: |
-          bash test/setup_dev_local.sh ${NEON_TOKEN}
+          bash test/legacy_setup_dev_local.sh ${NEON_TOKEN}
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
