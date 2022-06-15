@@ -121,7 +121,7 @@ session:
   ttl: 180
 tts:
   module: coqui
-  package_spec: neon-tts-plugin-coqui~=0.2
+  package_spec: neon-tts-plugin-coqui~=0.3
   mozilla: {request_url: http://0.0.0.0:5002/api/tts?}
   mozilla_remote: {api_url: https://mtts.2022.us/api/tts}
   mimic: {voice: ap}
@@ -217,11 +217,14 @@ sttSpokenOpts: {Afrikaans: af-ZA, Amharic: am-ET, Armenian: hy-AM, Azerbaijani: 
   Korean: ko-KR, Taiwanese: zh-TW, 'Chinese, Cantonese': yue-Hant-HK, Japanese: ja-JP,
   'Chinese, Mandarin': zh}
 MQ:
-  server: api.neon.ai
+  server: mq.2022.us
   users:
     mq_handler:
       user: neon_api_utils
       password: Klatchat2021
+    neon_chat_api:
+      user: neon_ai
+      password: n30nn30n
 language:
   boost: false
   core_lang: en-us
