@@ -47,8 +47,7 @@ def init_config():
 
     # Tell config module to get changes we just wrote
     from mycroft.configuration.config import Configuration
-    for config in Configuration.xdg_configs:
-        config.reload()
+    Configuration().reload()
     # TODO: Move old config file so this only happens 1x
 
 

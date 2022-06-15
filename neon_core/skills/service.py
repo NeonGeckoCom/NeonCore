@@ -92,12 +92,13 @@ class NeonSkillService(Thread):
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
         if config:
-            # TODO: Write updates
-            pass
+            LOG.info("Updating global config with passed config")
+            from neon_core.configuration import patch_config
+            patch_config(config)
         self.config = Configuration()
-        if self.config.get("run_gui_file_server"):
+        if self.config["skills"].get("run_gui_file_server"):
             self.http_server = start_qml_http_server(
-                self.config["directory"])
+                self.config["skills"]["directory"])
         else:
             self.http_server = None
 
@@ -117,8 +118,7 @@ class NeonSkillService(Thread):
         self.status = ProcessStatus('skills', self.bus, self.callbacks,
                                     namespace="neon")
         SkillApi.connect_bus(self.bus)
-        self.skill_manager = NeonSkillManager(self.bus, self.watchdog,
-                                              config=self.config)
+        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
         self.skill_manager.start()
         self.status.set_started()
 

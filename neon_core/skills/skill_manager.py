@@ -44,7 +44,7 @@ class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.skill_config = self.config.get("skills")
+        self.skill_config = dict(self.config).get("skills")
         if not isdir(self.skill_config["directory"]):
             LOG.warning("Creating requested skill directory")
             makedirs(self.skill_config["directory"])
