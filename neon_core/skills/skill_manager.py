@@ -27,8 +27,8 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from os import makedirs
-from os.path import isdir
-
+from os.path import isdir, join
+from ovos_utils.xdg_utils import xdg_data_home
 from neon_utils.log_utils import LOG
 
 from neon_core.skills.skill_store import SkillsStore
@@ -45,14 +45,17 @@ class NeonSkillManager(SkillManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.skill_config = dict(self.config).get("skills")
-        if not isdir(self.skill_config["directory"]):
+        skill_dir = self.skill_config.get("directory") or \
+            self.skill_config.get("extra_directories", [None])[0] or \
+            join(xdg_data_home(), "neon", "skills")
+        if not isdir(skill_dir):
             LOG.warning("Creating requested skill directory")
-            makedirs(self.skill_config["directory"])
+            makedirs(skill_dir)
 
         self.skill_downloader = SkillsStore(
-            skills_dir=self.skill_config["directory"],
+            skills_dir=skill_dir,
             config=self.skill_config, bus=self.bus)
-        self.skill_downloader.skills_dir = self.skill_config["directory"]
+        self.skill_downloader.skills_dir = skill_dir
 
     def download_or_update_defaults(self):
         # on launch only install if missing, updates handled separately
