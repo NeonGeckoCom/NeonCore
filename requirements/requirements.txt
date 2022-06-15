@@ -1,5 +1,6 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a24
+# ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a24
+ovos-core[skills_lgpl] @ git+https://github.com/OpenVoiceOS/ovos-core@FIX_ConfigInitBug
 # utils
 # neon-utils~=0.17,>=0.17.3
 neon-utils @ git+https://github.com/neondaniel/neon-skill-utils@FEAT_MycroftConfigCompat
