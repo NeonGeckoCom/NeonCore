@@ -37,7 +37,7 @@ from os import listdir, makedirs
 from tempfile import mkdtemp
 from shutil import rmtree
 from os.path import expanduser, join, isdir, dirname, isfile
-
+from ovos_utils.xdg_utils import xdg_data_home
 from ovos_skills_manager.requirements import install_system_deps, pip_install
 from ovos_skills_manager.skill_entry import SkillEntry
 from ovos_skills_manager.osm import OVOSSkillsManager
@@ -118,7 +118,10 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param config: optional dict configuration
     """
     config = config or Configuration().get("skills")
-    skill_dir = expanduser(config["directory"])
+    skill_dir = expanduser(config.get("extra_directories")[0] if
+                           config.get("extra_directories") else
+                           config.get("directory") or
+                           join(xdg_data_home(), "neon", "skills"))
     osm = OVOSSkillsManager()
     skills_catalog = get_neon_skills_data()
     token_set = False
@@ -129,7 +132,6 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     try:
         _write_pip_constraints_to_file()
     except PermissionError:
-        from ovos_utils.xdg_utils import xdg_data_home
         constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
         _write_pip_constraints_to_file(constraints_file)
         set_osm_constraints_file(constraints_file)
