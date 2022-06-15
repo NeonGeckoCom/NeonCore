@@ -29,41 +29,8 @@
 from os.path import join
 from neon_utils import LOG
 
-from mycroft.dialog import MustacheDialogRenderer, load_dialogs
+from mycroft.dialog import MustacheDialogRenderer, load_dialogs, get
 from mycroft.util import resolve_resource_file
-
-
-def get(phrase, lang=None, context=None):
-    """
-    Looks up a resource file for the given phrase.  If no file
-    is found, the requested phrase is returned as the string.
-    This will use the default language for translations.
-
-    Args:
-        phrase (str): resource phrase to retrieve/translate
-        lang (str): the language to use
-        context (dict): values to be inserted into the string
-
-    Returns:
-        str: a randomized and/or translated version of the phrase
-    """
-
-    if not lang:
-        from neon_core.configuration import Configuration
-        conf = Configuration.get()
-        lang = conf.get("internal_lang") or conf.get("lang")
-
-    filename = join('text', lang.lower(), phrase + '.dialog')
-    template = resolve_resource_file(filename)
-    if not template:
-        LOG.debug("Resource file not found: {}".format(filename))
-        return phrase
-
-    stache = MustacheDialogRenderer()
-    stache.load_template_file("template", template)
-    if not context:
-        context = {}
-    return stache.render("template", context)
 
 
 def get_all(phrase, lang=None, context=None):
