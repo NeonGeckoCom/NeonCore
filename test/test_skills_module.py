@@ -387,7 +387,7 @@ class TestSkillService(unittest.TestCase):
         config = {"skills": {
                 "disable_osm": False,
                 "auto_update": True,
-                "directory": join(dirname(__file__), "skill_module_skills"),
+                # "directory": join(dirname(__file__), "skill_module_skills"),
                 "run_gui_file_server": True
             }
         }
