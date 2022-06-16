@@ -404,6 +404,8 @@ class TestSkillService(unittest.TestCase):
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
                                    error_hook, stopping_hook, config=config,
                                    daemonic=True)
+        print(config["skills"])
+        print(service.config['skills'])
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills'].keys()))
         service.bus = FakeBus()

@@ -98,7 +98,6 @@ class NeonSkillService(Thread):
             LOG.info("Updating global config with passed config")
             from neon_core.configuration import patch_config
             patch_config(config)
-            self.config.reload()
 
     def run(self):
         # Set the active lang to match the configured one
