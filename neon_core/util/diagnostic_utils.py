@@ -28,8 +28,6 @@
 
 import json
 import socket
-import glob
-import os
 
 from neon_utils import LOG
 from neon_utils.metrics_utils import report_metric

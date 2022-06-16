@@ -64,38 +64,15 @@ class ConfigurationTests(unittest.TestCase):
         os.environ.pop("XDG_CONFIG_HOME")
 
     def test_neon_core_config_init(self):
-        from neon_utils.configuration_utils import \
-            get_mycroft_compatible_config
         from neon_core.configuration import Configuration
+        from mycroft.configuration import Configuration as MycroftConfig
+        from ovos_utils.configuration import read_mycroft_config
         from neon_core.util.runtime_utils import use_neon_core
 
         configuration = Configuration()
-        deprecated_neon_config = use_neon_core(get_mycroft_compatible_config)()
-        for key, val in deprecated_neon_config.items():
-            if isinstance(val, dict):
-                for k, v in val.items():
-                    if not isinstance(v, dict):
-                        self.assertEqual(configuration[key][k],
-                                         v, configuration[key])
-            else:
-                self.assertEqual(configuration[key], val)
-
-    def test_ovos_core_config_init(self):
-        from neon_utils.configuration_utils import \
-            get_mycroft_compatible_config
-        from mycroft.configuration import Configuration as MycroftConfig
-        from neon_core.util.runtime_utils import use_neon_core
-
-        mycroft_config = MycroftConfig()
-        neon_config = use_neon_core(get_mycroft_compatible_config)()
-        for key, val in neon_config.items():
-            if isinstance(val, dict):
-                for k, v in val.items():
-                    if not isinstance(v, dict):
-                        self.assertEqual(mycroft_config[key][k],
-                                         v, mycroft_config[key])
-            else:
-                self.assertEqual(mycroft_config[key], val)
+        self.assertIsInstance(configuration, dict)
+        self.assertEqual(configuration, use_neon_core(MycroftConfig)())
+        self.assertEqual(configuration, use_neon_core(read_mycroft_config)())
 
     def test_patch_config(self):
         from os.path import join
