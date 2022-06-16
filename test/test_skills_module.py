@@ -156,7 +156,8 @@ class TestSkillManager(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        import neon_core
+        from neon_core.configuration import patch_config
+        patch_config({"skills": {"auto_update": True}})
 
     @classmethod
     def tearDownClass(cls) -> None:
