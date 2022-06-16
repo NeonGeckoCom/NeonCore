@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  remote (legacy):
+  legacy-remote:
     strategy:
       matrix:
         python-version: [ 3.9 ]
@@ -46,7 +46,7 @@ jobs:
           name: core-logs-remote-${{ matrix.python-version }}
           path: ~/.local/share/neon/logs/*.log
         if: always()
-  dev_local (legacy):
+  legacy-dev_local:
     strategy:
       matrix:
         python-version: [ 3.8 ]
