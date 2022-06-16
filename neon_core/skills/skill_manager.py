@@ -45,9 +45,14 @@ class NeonSkillManager(SkillManager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.skill_config = dict(self.config).get("skills")
+
+        # Go through legacy config params to locate the default skill directory
         skill_dir = self.skill_config.get("directory") or \
-            self.skill_config.get("extra_directories", [None])[0] or \
+            self.skill_config.get("extra_directories")
+        skill_dir = skill_dir[0] if isinstance(skill_dir, list) and \
+            len(skill_dir) > 0 else skill_dir or \
             join(xdg_data_home(), "neon", "skills")
+
         if not isdir(skill_dir):
             LOG.warning("Creating requested skill directory")
             makedirs(skill_dir)
