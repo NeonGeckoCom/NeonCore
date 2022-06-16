@@ -99,6 +99,8 @@ class NeonSkillService(Thread):
             from neon_core.configuration import patch_config
             patch_config(config)
             self.config.reload()
+            assert all((self.config["skills"][x] == config["skills"][x]
+                        for x in config["skills"]))
 
     def run(self):
         # Set the active lang to match the configured one

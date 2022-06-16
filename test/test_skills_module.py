@@ -369,6 +369,8 @@ class TestSkillService(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
+        if os.path.exists(cls.config_dir):
+            shutil.rmtree(cls.config_dir)
         import neon_core
 
     @classmethod
@@ -407,7 +409,7 @@ class TestSkillService(unittest.TestCase):
         print(config["skills"])
         print(service.config['skills'])
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
-                            for x in config['skills'].keys()))
+                            for x in config['skills']))
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()

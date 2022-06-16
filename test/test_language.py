@@ -29,11 +29,11 @@
 import os
 import sys
 import unittest
+import shutil
 
 from ovos_plugin_manager.templates.language import LanguageDetector, LanguageTranslator
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.language import *
 
 
 resolved_languages = {
@@ -46,13 +46,27 @@ resolved_languages = {
 
 
 class LanguageTests(unittest.TestCase):
+    CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if os.path.exists(cls.CONFIG_PATH):
+            shutil.rmtree(cls.CONFIG_PATH)
+        os.environ.pop("XDG_CONFIG_HOME")
+
     def test_get_lang_config(self):
+        from neon_core.language import get_lang_config
         config = get_lang_config()
         self.assertIsInstance(config, dict)
         self.assertIsInstance(config['internal'], str)
         self.assertIsInstance(config['user'], str)
 
     def test_get_language_dir_valid(self):
+        from neon_core.language import get_language_dir
         base_dir = os.path.join(os.path.dirname(__file__), "lang_res")
         self.assertEqual(get_language_dir(base_dir), os.path.join(base_dir, "en-us"))
         for search, result in resolved_languages.items():
@@ -64,17 +78,20 @@ class LanguageTests(unittest.TestCase):
         # self.assertEqual(get_language_dir(base_dir, "es"), os.path.join(base_dir, "es-es"))
 
     def test_get_language_dir_invalid(self):
+        from neon_core.language import get_language_dir
         base_dir = os.path.join(os.path.dirname(__file__), "lang_res")
         self.assertEqual(get_language_dir(base_dir, "ru"), os.path.join(base_dir, "ru"))
         self.assertEqual(get_language_dir(base_dir, "ru-ru"), os.path.join(base_dir, "ru-ru"))
 
     def test_translator(self):
+        from neon_core.language import TranslatorFactory
         translator = TranslatorFactory.create("libretranslate_plug")
         self.assertIsInstance(translator, LanguageTranslator)
         output = translator.translate("hello", "es-es", "en-us")
         self.assertEqual(output.lower(), "hola")
 
     def test_detector(self):
+        from neon_core.language import DetectorFactory
         detector = DetectorFactory.create("libretranslate_detection_plug")
         self.assertIsInstance(detector, LanguageDetector)
         lang = detector.detect("hello")
