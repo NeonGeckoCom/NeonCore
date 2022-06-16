@@ -58,51 +58,51 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
         configs = None
 
     # Get Logs
-    logs_dir = os.path.expanduser(local_configuration["dirVars"]["logsDir"])
-    startup_log = os.path.join(logs_dir, "start.log")
-    if os.path.isfile(startup_log):
-        with open(startup_log, 'r') as start:
-            startup = start.read()
-            # Catch a very large log and take last 100000 chars, rounded to a full line
-            if len(startup) > 100000:
-                startup = startup[-100000:].split("\n", 1)[1]
-    else:
-        startup = None
-    if allow_logs:
-        logs = dict()
-        try:
-            LOG.info(f"Reading logs from: {logs_dir}")
-            for log in glob.glob(f'{logs_dir}/*.log'):
-                if os.path.basename(log) == "start.log":
-                    pass
-                with open(log, 'r') as f:
-                    contents = f.read()
-                    # Catch a very large log and take last 100000 chars, rounded to a full line
-                    if len(contents) > 100000:
-                        contents = contents[-100000:].split("\n", 1)[1]
-                    logs[os.path.basename(os.path.splitext(log)[0])] = contents
-            # TODO: + last few archived logs, testing logs DM
-        except Exception as e:
-            LOG.error(e)
-    else:
-        logs = None
+    # logs_dir = os.path.expanduser(local_configuration["dirVars"]["logsDir"])
+    # startup_log = os.path.join(logs_dir, "start.log")
+    # if os.path.isfile(startup_log):
+    #     with open(startup_log, 'r') as start:
+    #         startup = start.read()
+    #         # Catch a very large log and take last 100000 chars, rounded to a full line
+    #         if len(startup) > 100000:
+    #             startup = startup[-100000:].split("\n", 1)[1]
+    # else:
+    #     startup = None
+    # if allow_logs:
+    #     logs = dict()
+    #     try:
+    #         LOG.info(f"Reading logs from: {logs_dir}")
+    #         for log in glob.glob(f'{logs_dir}/*.log'):
+    #             if os.path.basename(log) == "start.log":
+    #                 pass
+    #             with open(log, 'r') as f:
+    #                 contents = f.read()
+    #                 # Catch a very large log and take last 100000 chars, rounded to a full line
+    #                 if len(contents) > 100000:
+    #                     contents = contents[-100000:].split("\n", 1)[1]
+    #                 logs[os.path.basename(os.path.splitext(log)[0])] = contents
+    #         # TODO: + last few archived logs, testing logs DM
+    #     except Exception as e:
+    #         LOG.error(e)
+    # else:
+    logs = None
 
-    transcript_file = os.path.join(os.path.expanduser(local_configuration["dirVars"]["docsDir"]),
-                                   "csv_files", "full_ts.csv")
-    if allow_transcripts and os.path.isfile(transcript_file):
-        with open(transcript_file, "r") as f:
-            lines = f.readlines()
-            try:
-                transcripts = lines[-500:]
-            except Exception as e:
-                LOG.error(e)
-                transcripts = lines
-            transcripts = "".join(transcripts)
-    else:
-        transcripts = None
+    # transcript_file = os.path.join(os.path.expanduser(local_configuration["dirVars"]["docsDir"]),
+    #                                "csv_files", "full_ts.csv")
+    # if allow_transcripts and os.path.isfile(transcript_file):
+    #     with open(transcript_file, "r") as f:
+    #         lines = f.readlines()
+    #         try:
+    #             transcripts = lines[-500:]
+    #         except Exception as e:
+    #             LOG.error(e)
+    #             transcripts = lines
+    #         transcripts = "".join(transcripts)
+    # else:
+    transcripts = None
 
     data = {"host": socket.gethostname(),
-            "startup": startup,
+            "startup": None,
             "configurations": json.dumps(configs) if configs else None,
             "logs": json.dumps(logs) if logs else None,
             "transcripts": transcripts}
