@@ -175,7 +175,7 @@ class TestSkillManager(unittest.TestCase):
         patched_installer.assert_called_once()
 
         patched_installer.reset_mock()
-        manager.skill_config["auto_update"] = False
+        manager.config["skills"]["auto_update"] = False
         manager.download_or_update_defaults()
         patched_installer.assert_not_called()
         manager.stop()
