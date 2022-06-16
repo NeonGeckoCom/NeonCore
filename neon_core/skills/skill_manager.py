@@ -44,9 +44,17 @@ class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        skill_config = self.config["skills"]
+        skill_dir = self.get_default_skills_dir()
+        self.skill_downloader = SkillsStore(
+            skills_dir=skill_dir,
+            config=self.config["skills"], bus=self.bus)
+        self.skill_downloader.skills_dir = skill_dir
 
-        # Go through legacy config params to locate the default skill directory
+    def get_default_skills_dir(self):
+        """
+        Go through legacy config params to locate the default skill directory
+        """
+        skill_config = self.config["skills"]
         skill_dir = skill_config.get("directory") or \
             skill_config.get("extra_directories")
         skill_dir = skill_dir[0] if isinstance(skill_dir, list) and \
@@ -57,10 +65,7 @@ class NeonSkillManager(SkillManager):
             LOG.warning("Creating requested skill directory")
             makedirs(skill_dir)
 
-        self.skill_downloader = SkillsStore(
-            skills_dir=skill_dir,
-            config=skill_config, bus=self.bus)
-        self.skill_downloader.skills_dir = skill_dir
+        return skill_dir
 
     def download_or_update_defaults(self):
         # on launch only install if missing, updates handled separately

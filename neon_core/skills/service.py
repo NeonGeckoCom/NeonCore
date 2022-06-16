@@ -83,6 +83,7 @@ class NeonSkillService(Thread):
         self.setDaemon(daemonic)
         self.bus = None
         self.skill_manager = None
+        self.http_server = None
         self.event_scheduler = None
         self.status = None
         self.watchdog = watchdog
@@ -96,17 +97,11 @@ class NeonSkillService(Thread):
             from neon_core.configuration import patch_config
             patch_config(config)
         self.config = Configuration()
-        if self.config["skills"].get("run_gui_file_server"):
-            self.http_server = start_qml_http_server(
-                self.config["skills"]["directory"])
-        else:
-            self.http_server = None
 
     def run(self):
-        config = Configuration()
         # Set the active lang to match the configured one
-        set_default_lang(config.get("language", {}).get('internal') or
-                         config.get("lang") or "en-us")
+        set_default_lang(self.config.get("language", {}).get('internal') or
+                         self.config.get("lang") or "en-us")
         # Set the default timezone to match the configured one
         set_default_tz()
 
@@ -120,6 +115,11 @@ class NeonSkillService(Thread):
         SkillApi.connect_bus(self.bus)
         self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
         self.skill_manager.start()
+
+        skill_dir = self.skill_manager.get_default_skills_dir()
+        if self.config["skills"].get("run_gui_file_server"):
+            self.http_server = start_qml_http_server(skill_dir)
+
         self.status.set_started()
 
         # TODO: These should be event-based in Mycroft/OVOS
