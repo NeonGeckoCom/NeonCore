@@ -92,11 +92,13 @@ class NeonSkillService(Thread):
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
+        self.config = Configuration()
+
         if config:
             LOG.info("Updating global config with passed config")
             from neon_core.configuration import patch_config
             patch_config(config)
-        self.config = Configuration()
+            self.config.reload()
 
     def run(self):
         # Set the active lang to match the configured one
