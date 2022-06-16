@@ -30,6 +30,7 @@ import os
 import shutil
 import sys
 import unittest
+from copy import deepcopy
 
 from pprint import pformat
 from neon_utils.logger import LOG
@@ -106,8 +107,8 @@ class ConfigurationTests(unittest.TestCase):
 
         from neon_core.util.runtime_utils import use_neon_core
         from neon_utils.configuration_utils import init_config_dir
-
         use_neon_core(init_config_dir)()
+        from mycroft.configuration import Configuration
 
         with open(join(test_config_dir, "OpenVoiceOS", 'ovos.conf')) as f:
             ovos_conf = json.load(f)
@@ -123,8 +124,30 @@ class ConfigurationTests(unittest.TestCase):
         self.assertTrue(os.path.isfile(conf_file))
         with open(conf_file) as f:
             config = json.load(f)
+        for k in config:
+            if isinstance(k, dict):
+                for s in k:
+                    self.assertEqual(config[k][s], Configuration()[k][s],
+                                     Configuration()[k][s])
+            else:
+                self.assertEqual(config[k], Configuration()[k],
+                                 Configuration()[k])
 
         self.assertTrue(config['new_key']['val'])
+
+        test_config = deepcopy(config)
+        test_config['skills']['auto_update'] = \
+            not test_config['skills']['auto_update']
+        valid_val = test_config['skills']['auto_update']
+        self.assertNotEqual(config, test_config)
+        patch_config(test_config)
+        conf_file = os.path.join(test_config_dir, 'neon',
+                                 'neon.conf')
+        with open(conf_file) as f:
+            config = json.load(f)
+        self.assertEqual(config, test_config)
+        self.assertEqual(config['skills']['auto_update'], valid_val)
+        self.assertEqual(config, Configuration())
         shutil.rmtree(test_config_dir)
         # os.environ.pop("XDG_CONFIG_HOME")
 

@@ -26,7 +26,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from os.path import join
+from os.path import join, isfile, dirname
+from os import getenv
 from ovos_utils.xdg_utils import xdg_config_home
 
 
@@ -43,12 +44,18 @@ def init_config():
 
     # Write Mycroft-compat conf file with yml config values
     neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
-    write_mycroft_compatible_config(neon_config_path)
 
-    # Tell config module to get changes we just wrote
-    from mycroft.configuration.config import Configuration
-    Configuration().reload()
-    # TODO: Move old config file so this only happens 1x
+    if isfile(join(getenv("NEON_CONFIG_PATH"), "ngi_local_conf.yml")):
+        write_mycroft_compatible_config(neon_config_path)
+        # TODO: Move old config file so this only happens 1x
+    elif not isfile(neon_config_path):
+        # TODO: This is unnecessary except for unit tests
+        import shutil
+        shutil.copyfile(join(dirname(__file__), "configuration", "neon.conf"),
+                        neon_config_path)
+        # Tell config module to get changes we just wrote
+        from mycroft.configuration.config import Configuration
+        Configuration().reload()
 
 
 def get_core_version() -> str:
