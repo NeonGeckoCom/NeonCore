@@ -113,6 +113,7 @@ class ConfigurationTests(unittest.TestCase):
         self.assertTrue(config['new_key']['val'])
 
         test_config = deepcopy(config)
+        test_config["new_key"]["val"] = False
         test_config['skills']['auto_update'] = \
             not test_config['skills']['auto_update']
         valid_val = test_config['skills']['auto_update']
@@ -124,7 +125,9 @@ class ConfigurationTests(unittest.TestCase):
             config = json.load(f)
         self.assertEqual(config, test_config)
         self.assertEqual(config['skills']['auto_update'], valid_val)
+        self.assertFalse(config['new_key']['val'])
         self.assertEqual(config, Configuration())
+
         shutil.rmtree(test_config_dir)
         # os.environ.pop("XDG_CONFIG_HOME")
 
