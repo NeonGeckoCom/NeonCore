@@ -42,6 +42,6 @@ def patch_config(config: dict = None):
 
     config = config or dict()
     local_config = LocalConf(USER_CONFIG)
-    local_config.update(config)
+    local_config.merge(config)
     local_config.store()
     Configuration().reload()
