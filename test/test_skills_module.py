@@ -410,8 +410,9 @@ class TestSkillService(unittest.TestCase):
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
-
         started.wait(30)
+
+        self.assertTrue(service.config['skills']['auto_update'])
         install_default.assert_called_once()
         run.assert_called_once()
 

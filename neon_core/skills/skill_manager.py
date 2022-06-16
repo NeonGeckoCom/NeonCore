@@ -44,11 +44,11 @@ class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.skill_config = dict(self.config).get("skills")
+        skill_config = self.config["skills"]
 
         # Go through legacy config params to locate the default skill directory
-        skill_dir = self.skill_config.get("directory") or \
-            self.skill_config.get("extra_directories")
+        skill_dir = skill_config.get("directory") or \
+            skill_config.get("extra_directories")
         skill_dir = skill_dir[0] if isinstance(skill_dir, list) and \
             len(skill_dir) > 0 else skill_dir or \
             join(xdg_data_home(), "neon", "skills")
@@ -59,13 +59,13 @@ class NeonSkillManager(SkillManager):
 
         self.skill_downloader = SkillsStore(
             skills_dir=skill_dir,
-            config=self.skill_config, bus=self.bus)
+            config=skill_config, bus=self.bus)
         self.skill_downloader.skills_dir = skill_dir
 
     def download_or_update_defaults(self):
         # on launch only install if missing, updates handled separately
         # if osm is disabled in .conf this does nothing
-        if self.skill_config["auto_update"]:
+        if self.config["skills"].get("auto_update"):
             try:
                 self.skill_downloader.install_default_skills()
             except Exception as e:

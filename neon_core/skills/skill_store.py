@@ -44,7 +44,7 @@ from mycroft.configuration import Configuration
 
 class SkillsStore:
     def __init__(self, skills_dir, config=None, bus=None):
-        self.config = config or Configuration().get("skills")
+        self.config = config or Configuration()["skills"]
         self.disabled = self.config.get("disable_osm", False)
         self.skills_dir = skills_dir
         self.osm = self.load_osm()
