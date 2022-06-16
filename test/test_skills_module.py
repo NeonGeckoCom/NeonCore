@@ -175,7 +175,7 @@ class TestSkillManager(unittest.TestCase):
         patched_installer.assert_called_once()
 
         patched_installer.reset_mock()
-        manager.config["skills"]["auto_update"] = False
+        manager.config.update({"skills": {"auto_update": False}})
         manager.download_or_update_defaults()
         patched_installer.assert_not_called()
         manager.stop()
@@ -404,14 +404,13 @@ class TestSkillService(unittest.TestCase):
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
                                    error_hook, stopping_hook, config=config,
                                    daemonic=True)
-        self.assertIsNotNone(service.http_server)
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills'].keys()))
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
         started.wait(30)
-
+        self.assertIsNotNone(service.http_server)
         self.assertTrue(service.config['skills']['auto_update'])
         install_default.assert_called_once()
         run.assert_called_once()
