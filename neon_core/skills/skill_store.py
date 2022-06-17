@@ -208,15 +208,18 @@ class SkillsStore:
                 # TODO: This is just patching OSM updates DM
                 store_skill = None
             else:
-                store_skill = self.osm.search_skills_by_url(skill)
-                if isinstance(store_skill, SkillEntry):
-                    return store_skill
-                elif isinstance(store_skill, list):
-                    return store_skill[0]
-                elif isinstance(store_skill, Generator):
-                    # Return the first item
-                    for s in store_skill:
-                        return s
+                try:
+                    store_skill = self.osm.search_skills_by_url(skill)
+                    if isinstance(store_skill, SkillEntry):
+                        return store_skill
+                    elif isinstance(store_skill, list):
+                        return store_skill[0]
+                    elif isinstance(store_skill, Generator):
+                        # Return the first item
+                        for s in store_skill:
+                            return s
+                except Exception as e:
+                    LOG.error(f"OSM Error: {e}")
             # skill is not in any appstore
             if "/neon" in skill.lower() and "github" in skill:
                 self.authenticate_neon()
