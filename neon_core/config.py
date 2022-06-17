@@ -44,7 +44,6 @@ def init_config():
 
     # Write Mycroft-compat conf file with yml config values
     neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
-
     if isfile(join(getenv("NEON_CONFIG_PATH"), "ngi_local_conf.yml")):
         write_mycroft_compatible_config(neon_config_path)
         # TODO: Move old config file so this only happens 1x

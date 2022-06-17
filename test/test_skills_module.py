@@ -52,6 +52,79 @@ class MockEventSchedulerInterface(Mock):
         super().__init__()
 
 
+class TestSkillService(unittest.TestCase):
+    config_dir = join(dirname(__file__), "test_config")
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        os.environ["XDG_CONFIG_HOME"] = cls.config_dir
+        if os.path.exists(cls.config_dir):
+            shutil.rmtree(cls.config_dir)
+        from neon_core.config import init_config
+        init_config()
+        assert os.path.isdir(cls.config_dir)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        os.environ.pop("XDG_CONFIG_HOME")
+        if os.path.exists(cls.config_dir):
+            shutil.rmtree(cls.config_dir)
+
+    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    def test_neon_skills_service(self, run, install_default):
+        from neon_core.skills.service import NeonSkillService
+        from neon_core.skills.skill_manager import NeonSkillManager
+        from mycroft.util.process_utils import ProcessState
+
+        config = {"skills": {
+                "disable_osm": False,
+                "auto_update": True,
+                "directory": join(dirname(__file__), "skill_module_skills"),
+                "run_gui_file_server": True
+            }
+        }
+
+        started = Event()
+
+        def started_hook():
+            started.set()
+
+        alive_hook = Mock()
+        ready_hook = Mock()
+        error_hook = Mock()
+        stopping_hook = Mock()
+        service = NeonSkillService(alive_hook, started_hook, ready_hook,
+                                   error_hook, stopping_hook, config=config,
+                                   daemonic=True)
+        from mycroft.configuration import Configuration
+        self.assertEqual(service.config, Configuration())
+        print(config["skills"])
+        print(service.config['skills'])
+        self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
+                            for x in config['skills']))
+        service.bus = FakeBus()
+        service.bus.connected_event = Event()
+        service.start()
+        started.wait(30)
+        self.assertIsNotNone(service.http_server)
+        self.assertTrue(service.config['skills']['auto_update'])
+        install_default.assert_called_once()
+        run.assert_called_once()
+
+        self.assertIsInstance(service.skill_manager, NeonSkillManager)
+        service.skill_manager.status.state = ProcessState.ALIVE
+        sleep(1)
+        alive_hook.assert_called_once()
+        service.skill_manager.status.state = ProcessState.READY
+        sleep(1)
+        ready_hook.assert_called_once()
+
+        service.shutdown()
+        stopping_hook.assert_called_once()
+        service.join(10)
+
+
 class TestIntentService(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
@@ -156,8 +229,8 @@ class TestSkillManager(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        from neon_core.configuration import patch_config
-        patch_config({"skills": {"auto_update": True}})
+        from neon_core.config import init_config
+        init_config()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -168,6 +241,9 @@ class TestSkillManager(unittest.TestCase):
     @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
     @patch("mycroft.skills.skill_manager.SkillManager.run")
     def test_download_or_update_defaults(self, patched_run, patched_installer):
+        from neon_core.configuration import patch_config
+        patch_config({"skills": {"auto_update": True}})
+
         from neon_core.skills.skill_manager import NeonSkillManager
         manager = NeonSkillManager(FakeBus())
         manager.run()
@@ -361,77 +437,6 @@ class TestSkillStore(unittest.TestCase):
         self.assertEqual(install_skill.call_count, len(skills))
 
         self.skill_store.install_skill = real_install_skill
-
-
-class TestSkillService(unittest.TestCase):
-    config_dir = join(dirname(__file__), "test_config")
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        if os.path.exists(cls.config_dir):
-            shutil.rmtree(cls.config_dir)
-        import neon_core
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        os.environ.pop("XDG_CONFIG_HOME")
-        if os.path.exists(cls.config_dir):
-            shutil.rmtree(cls.config_dir)
-
-    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_neon_skills_service(self, run, install_default):
-        from neon_core.skills.service import NeonSkillService
-        from neon_core.skills.skill_manager import NeonSkillManager
-        from mycroft.util.process_utils import ProcessState
-
-        config = {"skills": {
-                "disable_osm": False,
-                "auto_update": True,
-                "directory": join(dirname(__file__), "skill_module_skills"),
-                "run_gui_file_server": True
-            }
-        }
-
-        started = Event()
-
-        def started_hook():
-            started.set()
-
-        alive_hook = Mock()
-        ready_hook = Mock()
-        error_hook = Mock()
-        stopping_hook = Mock()
-        service = NeonSkillService(alive_hook, started_hook, ready_hook,
-                                   error_hook, stopping_hook, config=config,
-                                   daemonic=True)
-        from mycroft.configuration import Configuration
-        self.assertEqual(service.config, Configuration())
-        print(config["skills"])
-        print(service.config['skills'])
-        self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
-                            for x in config['skills']))
-        service.bus = FakeBus()
-        service.bus.connected_event = Event()
-        service.start()
-        started.wait(30)
-        self.assertIsNotNone(service.http_server)
-        self.assertTrue(service.config['skills']['auto_update'])
-        install_default.assert_called_once()
-        run.assert_called_once()
-
-        self.assertIsInstance(service.skill_manager, NeonSkillManager)
-        service.skill_manager.status.state = ProcessState.ALIVE
-        sleep(1)
-        alive_hook.assert_called_once()
-        service.skill_manager.status.state = ProcessState.READY
-        sleep(1)
-        ready_hook.assert_called_once()
-
-        service.shutdown()
-        stopping_hook.assert_called_once()
-        service.join(10)
 
 
 if __name__ == "__main__":
