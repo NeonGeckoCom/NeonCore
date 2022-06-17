@@ -266,6 +266,8 @@ class TestSkillStore(unittest.TestCase):
         "appstore_sync_interval": 1,
         "neon_token": None,
         "essential_skills": essential,
+        "install_default": True,
+        "install_essential": True,
         "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/"
                           "neon_skills/TEST_ShortSkillsList/skill_lists/"
                           "TEST-SHORTLIST"
