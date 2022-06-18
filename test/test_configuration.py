@@ -54,8 +54,8 @@ class ConfigurationTests(unittest.TestCase):
         from ovos_utils.configuration import get_ovos_config
         ovos_config = use_neon_core(get_ovos_config)()
         LOG.info(pformat(ovos_config))
-        assert ovos_config['config_filename'] == 'neon.conf'
-        assert os.path.basename(ovos_config['default_config_path']) == "neon.conf"
+        assert ovos_config['config_filename'] == 'neon.yaml'
+        assert os.path.basename(ovos_config['default_config_path']) == "neon.yaml"
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -97,7 +97,7 @@ class ConfigurationTests(unittest.TestCase):
         test_config = {"new_key": {'val': True}}
         patch_config(test_config)
         conf_file = os.path.join(test_config_dir, 'neon',
-                                 'neon.conf')
+                                 'neon.yaml')
         self.assertTrue(os.path.isfile(conf_file))
         with open(conf_file) as f:
             config = json.load(f)
@@ -120,7 +120,7 @@ class ConfigurationTests(unittest.TestCase):
         self.assertNotEqual(config, test_config)
         patch_config(test_config)
         conf_file = os.path.join(test_config_dir, 'neon',
-                                 'neon.conf')
+                                 'neon.yaml')
         with open(conf_file) as f:
             config = json.load(f)
         self.assertEqual(config, test_config)
