@@ -106,7 +106,7 @@ cd "${sourceDir}" || exit 10
 pip install ".${optStr}"  # --use-deprecated=legacy-resolver
 
 export NEON_CONFIG_PATH="${sourceDir}"
-export NEON_LOG_DIR="~/test/logs"
+export logsDir="~/test/logs"
 neon-config-import
 
 # Install Default Skills

@@ -27,31 +27,44 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from os.path import join, isfile, dirname
-from os import getenv
+from os import getenv, environ
 from ovos_utils.xdg_utils import xdg_config_home
+from neon_utils.configuration_utils import get_config_dir
+from neon_utils.logger import LOG
+
+
+def _check_legacy_config():
+    """
+    Check if there is a legacy yml config file spec and return the path
+    """
+    valid_dir = get_config_dir()
+    environ["NEON_CONFIG_PATH"] = getenv("NEON_CONFIG_PATH") or valid_dir
+    return join(getenv("NEON_CONFIG_PATH"), "ngi_local_conf.yml")
 
 
 def init_config():
     """
     Initialize all configuration methods to read from the same config
     """
-    from neon_utils.configuration_utils import \
-        write_mycroft_compatible_config, init_config_dir
+    from neon_utils.configuration_utils import init_config_dir
+
+    # Get the legacy config file path before anything else
+    old_config = _check_legacy_config()
 
     # First validate envvars, initialize `ovos.conf`, and set default config to
     # bundled neon.conf
     init_config_dir()
 
     # Write Mycroft-compat conf file with yml config values
-    neon_config_path = join(xdg_config_home(), "neon", "neon.conf")
-    if isfile(join(getenv("NEON_CONFIG_PATH"), "ngi_local_conf.yml")):
-        write_mycroft_compatible_config(neon_config_path)
-        # TODO: Move old config file so this only happens 1x
-    elif not isfile(neon_config_path):
-        # TODO: This is unnecessary except for unit tests
+    neon_config_path = join(xdg_config_home(), "neon", "neon.yaml")
+    if isfile(old_config):
         import shutil
-        shutil.copyfile(join(dirname(__file__), "configuration", "neon.conf"),
-                        neon_config_path)
+        from neon_utils.configuration_utils import migrate_ngi_config
+        migrate_ngi_config(old_config, neon_config_path)
+        LOG.warning(f"archiving config: {old_config}")
+        shutil.move(old_config,
+                    join(dirname(old_config), "ngi_local_conf.bak"))
+
         # Tell config module to get changes we just wrote
         from mycroft.configuration.config import Configuration
         Configuration().reload()
