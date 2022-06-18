@@ -63,7 +63,14 @@ class NeonSkillManager(SkillManager):
 
         if not isdir(skill_dir):
             LOG.warning("Creating requested skill directory")
-            makedirs(skill_dir)
+            try:
+                makedirs(skill_dir)
+            except Exception as e:
+                LOG.error(e)
+                if skill_dir != join(xdg_data_home(), "neon", "skills"):
+                    skill_dir = join(xdg_data_home(), "neon", "skills")
+                    LOG.warning("Using XDG skills directory")
+                    makedirs(skill_dir, exist_ok=True)
 
         return skill_dir
 
