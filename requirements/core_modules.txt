@@ -1,5 +1,4 @@
-#ovos-core[all]~=0.0.3,>=0.0.4a24
-ovos-core[all] @ git+https://github.com/OpenVoiceOS/ovos-core@FIX_ConfigInitBug
+ovos-core[all]~=0.0.3,>=0.0.4a29
 ovos-ww-plugin-pocketsphinx~=0.1.2
 
 # neon core modules
