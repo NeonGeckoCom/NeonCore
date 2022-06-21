@@ -30,8 +30,9 @@ import os
 import shutil
 import sys
 import unittest
-from copy import deepcopy
+import yaml
 
+from copy import deepcopy
 from pprint import pformat
 from neon_utils.logger import LOG
 
@@ -100,7 +101,7 @@ class ConfigurationTests(unittest.TestCase):
                                  'neon.yaml')
         self.assertTrue(os.path.isfile(conf_file))
         with open(conf_file) as f:
-            config = json.load(f)
+            config = yaml.safe_load(f)
         for k in config:
             if isinstance(k, dict):
                 for s in k:
@@ -114,19 +115,20 @@ class ConfigurationTests(unittest.TestCase):
 
         test_config = deepcopy(config)
         test_config["new_key"]["val"] = False
-        test_config['skills']['auto_update'] = \
-            not test_config['skills']['auto_update']
+        test_config['skills'] = \
+            {'auto_update': not Configuration()['skills']['auto_update']}
         valid_val = test_config['skills']['auto_update']
         self.assertNotEqual(config, test_config)
         patch_config(test_config)
         conf_file = os.path.join(test_config_dir, 'neon',
                                  'neon.yaml')
         with open(conf_file) as f:
-            config = json.load(f)
+            config = yaml.safe_load(f)
         self.assertEqual(config, test_config)
         self.assertEqual(config['skills']['auto_update'], valid_val)
         self.assertFalse(config['new_key']['val'])
-        self.assertEqual(config, Configuration())
+        self.assertEqual(config['skills']['auto_update'],
+                         Configuration()['skills']['auto_update'])
 
         shutil.rmtree(test_config_dir)
         # os.environ.pop("XDG_CONFIG_HOME")
