@@ -76,7 +76,7 @@ def get_core_version() -> str:
     NOTE: `init_config` should be called before this method
     """
     from neon_core.configuration import Configuration
-    Configuration.load_config_stack(cache=True, remote=False)
+    Configuration.load_all_configs({"disable_remote_config": True})
 
     # patch version string to allow downstream to know where it is running
     import mycroft.version
