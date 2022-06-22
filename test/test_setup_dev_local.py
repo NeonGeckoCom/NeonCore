@@ -52,7 +52,7 @@ class TestSetupDevLocal(unittest.TestCase):
 
     def test_installed_skills(self):
         self.assertEqual(xdg_data_home(), os.path.expanduser("~/.local/share"))
-        skill_dir = os.path.join(xdg_data_home(), "neon", "skills")
+        skill_dir = os.path.join(str(xdg_data_home()), "neon", "skills")
         self.assertTrue(os.path.isdir(skill_dir))
         self.assertGreater(len(os.listdir(skill_dir)), 0)
 

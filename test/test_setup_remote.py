@@ -52,7 +52,7 @@ class TestSetupRemote(unittest.TestCase):
             import neon_test_utils
 
     def test_installed_skills(self):
-        self.assertEqual(xdg_data_home(), os.path.expanduser("~/.local/share"))
+        self.assertEqual(str(xdg_data_home()), os.path.expanduser("~/.local/share"))
         skill_dir = os.path.join(xdg_data_home(), "neon", "skills")
         self.assertTrue(os.path.isdir(skill_dir))
         self.assertGreater(len(os.listdir(skill_dir)), 0)
