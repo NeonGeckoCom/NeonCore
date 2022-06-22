@@ -91,6 +91,6 @@ jobs:
       - name: Upload Configuration
         uses: actions/upload-artifact@v2
         with:
-          name: configuration-remote-${{ matrix.python-version }}
+          name: configuration-dev-local-${{ matrix.python-version }}
           path: ~/.config/neon/neon.yaml
         if: always()
