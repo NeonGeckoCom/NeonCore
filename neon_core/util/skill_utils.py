@@ -118,10 +118,13 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param config: optional dict configuration
     """
     config = config or Configuration()["skills"]
+    LOG.info(f"extra_directories={config.get('extra_directories')}")
+    LOG.info(f"directory={config.get('directory')}")
     skill_dir = expanduser(config.get("extra_directories")[0] if
                            config.get("extra_directories") else
                            config.get("directory") or
                            join(xdg_data_home(), "neon", "skills"))
+    LOG.info(f"skill_dir={skill_dir}")
     osm = OVOSSkillsManager()
     skills_catalog = get_neon_skills_data()
     token_set = False
