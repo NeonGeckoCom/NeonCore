@@ -122,7 +122,8 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     LOG.info(f"directory={config.get('directory')}")
     skill_dir = expanduser(config.get("extra_directories")[0] if
                            config.get("extra_directories") else
-                           config.get("directory") or
+                           config.get("directory") if config.get("directory")
+                           and config["directory"] != "skills" else
                            join(xdg_data_home(), "neon", "skills"))
     LOG.info(f"skill_dir={skill_dir}")
     osm = OVOSSkillsManager()
