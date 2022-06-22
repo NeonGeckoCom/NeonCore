@@ -30,6 +30,7 @@ import os
 import unittest
 
 from neon_core.util.runtime_utils import use_neon_core
+from ovos_utils.xdg_utils import xdg_data_home
 
 
 class TestSetupDevLocal(unittest.TestCase):
@@ -50,7 +51,8 @@ class TestSetupDevLocal(unittest.TestCase):
         import neon_cli
 
     def test_installed_skills(self):
-        skill_dir = os.path.expanduser("~/.local/share/neon/skills")
+        self.assertEqual(xdg_data_home(), os.path.expanduser("~/.local/share"))
+        skill_dir = os.path.join(xdg_data_home(), "neon", "skills")
         self.assertTrue(os.path.isdir(skill_dir))
         self.assertGreater(len(os.listdir(skill_dir)), 0)
 
