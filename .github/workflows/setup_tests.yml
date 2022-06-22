@@ -46,6 +46,12 @@ jobs:
           name: core-logs-remote-${{ matrix.python-version }}
           path: ~/.local/share/neon/logs/*.log
         if: always()
+      - name: Upload Configuration
+        uses: actions/upload-artifact@v2
+        with:
+          name: configuration-remote-${{ matrix.python-version }}
+          path: ~/.local/share/neon/neon.yaml
+        if: always()
   legacy-dev_local:
     strategy:
       matrix:
@@ -81,4 +87,10 @@ jobs:
         with:
           name: core-logs-dev-local-${{ matrix.python-version }}
           path: ~/test/logs/*.log
+        if: always()
+      - name: Upload Configuration
+        uses: actions/upload-artifact@v2
+        with:
+          name: configuration-remote-${{ matrix.python-version }}
+          path: ~/.local/share/neon/neon.yaml
         if: always()
