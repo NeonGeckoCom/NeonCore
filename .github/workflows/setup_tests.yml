@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: configuration-remote-${{ matrix.python-version }}
-          path: ~/.local/share/neon/neon.yaml
+          path: ~/.config/neon/neon.yaml
         if: always()
   legacy-dev_local:
     strategy:
@@ -92,5 +92,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: configuration-remote-${{ matrix.python-version }}
-          path: ~/.local/share/neon/neon.yaml
+          path: ~/.config/neon/neon.yaml
         if: always()
