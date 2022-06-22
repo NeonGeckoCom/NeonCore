@@ -117,7 +117,7 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param skills_to_install: list of skill URLs to install
     :param config: optional dict configuration
     """
-    config = config or Configuration().get("skills")
+    config = config or Configuration()["skills"]
     skill_dir = expanduser(config.get("extra_directories")[0] if
                            config.get("extra_directories") else
                            config.get("directory") or
@@ -164,13 +164,14 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             LOG.error(e)
     if token_set:
         clear_github_token()
+    LOG.info(f"Installed skills to: {skill_dir}")
 
 
 def install_skills_default(config: dict = None):
     """
     Installs default skills from passed or default configuration
     """
-    config = config or Configuration().get("skills")
+    config = config or Configuration()["skills"]
     skills_list = config.get("default_skills")
     if isinstance(skills_list, str):
         skills_list = get_remote_entries(skills_list)
