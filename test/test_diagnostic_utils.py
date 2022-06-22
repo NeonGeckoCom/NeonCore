@@ -40,20 +40,18 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 class DiagnosticUtilsTests(unittest.TestCase):
+    config_dir = os.path.join(os.path.dirname(__file__), "test_config")
+    report_metric = Mock()
+
     @classmethod
     def setUpClass(cls) -> None:
-        cls.report_metric = Mock()
-        cls.config_dir = os.path.join(os.path.dirname(__file__), "test_config")
-        os.makedirs(cls.config_dir)
+        os.makedirs(cls.config_dir, exist_ok=True)
 
         os.environ["NEON_CONFIG_PATH"] = cls.config_dir
+        os.environ["XDG_CONFIG_HOME"] = cls.config_dir
         test_dir = os.path.join(os.path.dirname(__file__), "diagnostic_files")
-        local_config = get_neon_local_config()
-        local_config["dirVars"]["diagsDir"] = test_dir
-        local_config["dirVars"]["docsDir"] = test_dir
-        local_config["dirVars"]["logsDir"] = test_dir
-        local_config["dirVars"]["diagsDir"] = test_dir
-        local_config.write_changes()
+        from neon_core.configuration import patch_config
+        patch_config({"logDir": test_dir})
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -75,7 +73,7 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.assertIsInstance(data, dict)
         self.assertIsInstance(data["host"], str)
         self.assertIsInstance(data["configurations"], str)
-        # self.assertIsInstance(data["logs"], str)
+        self.assertIsInstance(data["logs"], str)
         # self.assertIsInstance(data["transcripts"], str)
 
     def test_send_diagnostics_no_extras(self):
@@ -101,7 +99,7 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.assertIsInstance(data, dict)
         self.assertIsInstance(data["host"], str)
         self.assertIsNone(data["configurations"])
-        # self.assertIsInstance(data["logs"], str)
+        self.assertIsInstance(data["logs"], str)
         self.assertIsNone(data["transcripts"])
 
     def test_send_diagnostics_allow_transcripts(self):

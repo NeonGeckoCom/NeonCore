@@ -28,10 +28,17 @@
 
 import json
 import socket
+import glob
+
+from os.path import join, isfile, basename, splitext
+from os import getenv
+from json_database import xdg_data_home, xdg_config_home
 
 from neon_utils import LOG
 from neon_utils.metrics_utils import report_metric
 from neon_utils.configuration_utils import NGIConfig
+
+from mycroft.configuration import Configuration
 
 
 def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True):
@@ -46,44 +53,49 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
     """
     LOG.info(f"Sending Diagnostics: logs={allow_logs} transcripts={allow_transcripts} config={allow_config}")
     # Get Configurations
-    local_configuration = NGIConfig("ngi_local_conf").content
+    if isfile(join(xdg_config_home(), "neon", "ngi_local_conf.yml")):
+        local_configuration = NGIConfig("ngi_local_conf").content
+    else:
+        local_configuration = None
     user_configuration = NGIConfig("ngi_user_info").content
     # auth_configuration = NGIConfig("ngi_auth_vars").content
     if allow_config:
         configs = {"local": local_configuration,
-                   "user": user_configuration}
+                   "user": user_configuration,
+                   "core": Configuration()}
     else:
         configs = None
 
     # Get Logs
-    # logs_dir = os.path.expanduser(local_configuration["dirVars"]["logsDir"])
-    # startup_log = os.path.join(logs_dir, "start.log")
-    # if os.path.isfile(startup_log):
-    #     with open(startup_log, 'r') as start:
-    #         startup = start.read()
-    #         # Catch a very large log and take last 100000 chars, rounded to a full line
-    #         if len(startup) > 100000:
-    #             startup = startup[-100000:].split("\n", 1)[1]
-    # else:
-    #     startup = None
-    # if allow_logs:
-    #     logs = dict()
-    #     try:
-    #         LOG.info(f"Reading logs from: {logs_dir}")
-    #         for log in glob.glob(f'{logs_dir}/*.log'):
-    #             if os.path.basename(log) == "start.log":
-    #                 pass
-    #             with open(log, 'r') as f:
-    #                 contents = f.read()
-    #                 # Catch a very large log and take last 100000 chars, rounded to a full line
-    #                 if len(contents) > 100000:
-    #                     contents = contents[-100000:].split("\n", 1)[1]
-    #                 logs[os.path.basename(os.path.splitext(log)[0])] = contents
-    #         # TODO: + last few archived logs, testing logs DM
-    #     except Exception as e:
-    #         LOG.error(e)
-    # else:
-    logs = None
+    logs_dir = Configuration().get('logDir') or join(xdg_data_home(),
+                                                     "neon", "logs")
+    startup_log = join(logs_dir, "start.log")
+    if isfile(startup_log):
+        with open(startup_log, 'r') as start:
+            startup = start.read()
+            # Catch a very large log and take last 100000 chars, rounded to a full line
+            if len(startup) > 100000:
+                startup = startup[-100000:].split("\n", 1)[1]
+    else:
+        startup = None
+    if allow_logs:
+        logs = dict()
+        try:
+            LOG.info(f"Reading logs from: {logs_dir}")
+            for log in glob.glob(f'{logs_dir}/*.log'):
+                if basename(log) == "start.log":
+                    pass
+                with open(log, 'r') as f:
+                    contents = f.read()
+                    # Catch a very large log and take last 100000 chars, rounded to a full line
+                    if len(contents) > 100000:
+                        contents = contents[-100000:].split("\n", 1)[1]
+                    logs[basename(splitext(log)[0])] = contents
+            # TODO: + last few archived logs, testing logs DM
+        except Exception as e:
+            LOG.error(e)
+    else:
+        logs = None
 
     # transcript_file = os.path.join(os.path.expanduser(local_configuration["dirVars"]["docsDir"]),
     #                                "csv_files", "full_ts.csv")
