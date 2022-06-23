@@ -186,6 +186,13 @@ network_tests:
   web_url: https://www.google.com
   ncsi_endpoint: http://www.msftncsi.com/ncsi.txt
   ncsi_expected_text: Microsoft NCSI
+MQ:
+  server: mq.2021.us
+  port: 5672
+    users:
+      mq_handler:
+        user: neon_api_utils
+        password: Klatchat2021
 # Debug/Metrics
 opt_in: false
 debug: false
