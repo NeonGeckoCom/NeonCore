@@ -67,7 +67,7 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
         configs = None
 
     # Get Logs
-    logs_dir = Configuration().get('logDir') or join(xdg_data_home(),
+    logs_dir = Configuration().get('log_dir') or join(xdg_data_home(),
                                                      "neon", "logs")
     startup_log = join(logs_dir, "start.log")
     if isfile(startup_log):

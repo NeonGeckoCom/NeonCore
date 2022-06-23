@@ -51,7 +51,7 @@ class DiagnosticUtilsTests(unittest.TestCase):
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
         test_dir = os.path.join(os.path.dirname(__file__), "diagnostic_files")
         from neon_core.configuration import patch_config
-        patch_config({"logDir": test_dir})
+        patch_config({"log_dir": test_dir})
 
     @classmethod
     def tearDownClass(cls) -> None:
