@@ -189,10 +189,10 @@ network_tests:
 MQ:
   server: mq.2021.us
   port: 5672
-    users:
-      mq_handler:
-        user: neon_api_utils
-        password: Klatchat2021
+  users:
+    mq_handler:
+      user: neon_api_utils
+      password: Klatchat2021
 # Debug/Metrics
 opt_in: false
 debug: false
