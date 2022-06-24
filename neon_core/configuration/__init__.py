@@ -27,6 +27,11 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from mycroft.configuration.config import Configuration
+# from neon_configuration.config import Configuration
+"""
+Neon modules should import config from this module since module_overrides will
+result in different configurations depending on originating module.
+"""
 
 
 def get_private_keys():

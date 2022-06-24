@@ -72,7 +72,8 @@ listener:
   wake_word_upload:
     disable: false
     url: https://training.mycroft.ai/precise/upload
-  wake_word_enabled: false
+  wake_word_enabled: true  # TODO: Deprecate and replace with `continuous_listen`
+  continuous_listen: false
   VAD:
     silence_method: vad_and_ratio
     speech_seconds: 0.1
@@ -193,6 +194,9 @@ MQ:
     mq_handler:
       user: neon_api_utils
       password: Klatchat2021
+signal:
+  use_signal_files: true
+  max_wait_seconds: 300
 # Debug/Metrics
 opt_in: false
 debug: false

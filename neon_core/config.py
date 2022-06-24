@@ -58,6 +58,7 @@ def init_config():
     # Write Mycroft-compat conf file with yml config values
     neon_config_path = join(xdg_config_home(), "neon", "neon.yaml")
     if isfile(old_config):
+        LOG.error(f"found legacy config file: {old_config}")
         import shutil
         from neon_utils.configuration_utils import migrate_ngi_config
         migrate_ngi_config(old_config, neon_config_path)
