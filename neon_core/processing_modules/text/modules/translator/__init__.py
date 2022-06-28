@@ -29,8 +29,8 @@
 from neon_core.processing_modules.text import TextParser
 from neon_core.language import DetectorFactory, TranslatorFactory
 
-from mycroft.configuration import Configuration
-from mycroft.util.log import LOG
+from ovos_config import Configuration
+from neon_utils.logger import LOG
 
 
 class UtteranceTranslator(TextParser):

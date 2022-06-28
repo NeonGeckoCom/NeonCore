@@ -38,7 +38,7 @@ from neon_utils import LOG
 from neon_utils.metrics_utils import report_metric
 from neon_utils.configuration_utils import NGIConfig
 
-from mycroft.configuration import Configuration
+from ovos_config.config import Configuration
 
 
 def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True):

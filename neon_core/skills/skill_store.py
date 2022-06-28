@@ -39,7 +39,7 @@ from neon_utils.messagebus_utils import get_messagebus
 
 from neon_core.util.skill_utils import get_remote_entries
 from mycroft.skills.event_scheduler import EventSchedulerInterface
-from mycroft.configuration import Configuration
+from ovos_config.config import Configuration
 
 
 class SkillsStore:

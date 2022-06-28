@@ -46,7 +46,7 @@ from ovos_skills_manager.github import normalize_github_url, get_branch_from_git
 from ovos_skill_installer import download_extract_zip
 from neon_utils.logger import LOG
 
-from mycroft.configuration import Configuration
+from ovos_config.config import Configuration
 
 
 def get_neon_skills_data(skill_meta_repository: str =

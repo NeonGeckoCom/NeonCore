@@ -44,7 +44,7 @@ from neon_utils.configuration_utils import get_neon_user_config
 from ovos_utils.json_helper import merge_dict
 from lingua_franca.parse import get_full_lang_code
 
-from mycroft.configuration.locale import set_default_lang
+from ovos_config.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
 
 

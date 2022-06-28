@@ -31,9 +31,8 @@ import time
 from typing import Optional
 from threading import Thread
 
-from mycroft.configuration import Configuration
-
-from neon_utils import LOG
+from ovos_config.config import Configuration
+from ovos_utils.log import LOG
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 from neon_utils.messagebus_utils import get_messagebus
@@ -46,7 +45,7 @@ from neon_core.util.qml_file_server import start_qml_http_server
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
-from mycroft.configuration.locale import set_default_lang, set_default_tz
+from ovos_config.locale import set_default_lang, set_default_tz
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
 

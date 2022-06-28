@@ -67,7 +67,7 @@ def init_config():
                     join(dirname(old_config), "ngi_local_conf.bak"))
 
         # Tell config module to get changes we just wrote
-        from mycroft.configuration.config import Configuration
+        from ovos_config.config import Configuration
         Configuration().reload()
 
 

@@ -37,7 +37,7 @@ from subprocess import Popen, STDOUT
 
 import sys
 
-from mycroft.configuration import Configuration
+from ovos_config.config import Configuration
 from mycroft_bus_client import MessageBusClient, Message
 from ovos_utils.gui import is_gui_running
 from ovos_utils.xdg_utils import xdg_config_home, xdg_data_home
