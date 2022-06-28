@@ -536,11 +536,10 @@ Skills Service
 docker run -d \
 --name=neon_skills \
 --network=host \
--v ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro \
+-v ~/.config/pulse/cookie:/tmp/pulse_cookie:ro \
 -v ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro \
--v ${NEON_CONFIG_DIR}:/config \
 --device=/dev/snd:/dev/snd \
 -e PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native \
+-e PULSE_COOKIE=/tmp/pulse_cookie \
 neon_skills
 ```
->*Note:* The above example assumes `NEON_CONFIG_DIR` contains valid configuration

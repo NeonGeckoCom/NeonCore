@@ -1,0 +1,46 @@
+skills:
+  run_gui_file_server: true
+  wait_for_internet: false
+  directory: /default_skills
+  extra_directories:
+  - /default_skills
+  - /skills
+  upload_skill_manifest: false
+  blacklisted_skills: []
+  priority_skills:
+    - skill-about.neongeckocom
+    - skill-date_time.neongeckocom
+    - skill-weather.neongeckocom
+  fallbacks:
+    fallback_priorities: {}
+    fallback_mode: accept_all
+    fallback_whitelist: []
+    fallback_blacklist: []
+  converse:
+    timeout: 300
+    skill_timeouts: {}
+    converse_mode: accept_all
+    converse_whitelist: []
+    converse_blacklist: []
+    converse_activation: accept_all
+    max_activations: -1
+    skill_activations: {}
+    cross_activation: true
+    cross_deactivation: true
+    converse_priorities: {}
+  update_interval: 1.0
+  disable_osm: false
+  appstore_sync_interval: 6
+  auto_update: false
+  auto_update_interval: 24
+  neon_token: ''
+  install_essential: true
+  essential_skills: []
+  install_default: false
+  default_skills: https://raw.githubusercontent.com/NeonGeckoCom/neon_skills/master/skill_lists/DEFAULT-SKILLS-DOCKER
+play_wav_cmdline: "play %1"
+play_mp3_cmdline: "play %1"
+play_ogg_cmdline: "play %1"
+remote-server: "http://localhost:8000"
+gui:
+  run_gui_file_server: true

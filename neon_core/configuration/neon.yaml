@@ -55,7 +55,6 @@ Audio:
       type: ovos_vlc
       active: true
   default-backend: OCP
-confirm_listening: true
 sounds:
   start_listening: snd/start_listening.wav
   end_listening: snd/end_listening.wav
@@ -64,6 +63,7 @@ play_wav_cmdline: play %1
 play_mp3_cmdline: mpg123 %1
 play_ogg_cmdline: ogg123 -q %1
 # Speech Module
+confirm_listening: true
 listener:
   sample_rate: 16000
   mic_meter_ipc: true
@@ -97,21 +97,21 @@ listener:
   instant_listen: false
 hotwords:
   hey neon:
-    module: precise
+    module: ovos-ww-plugin-pocketsphinx
     phonemes: HH EY . N IY AA N .
-    threshold: 1e-90
+    threshold: 1e-20
     lang: en-us
+    sample_rate: 16000
     listen: true
     sound: snd/start_listening.wav
-    local_model_file: hey-neon.pb
   thank you:
-    module: pocketsphinx
+    module: ovos-ww-plugin-pocketsphinx
     phonemes: TH AE NG K . Y UW
     sound: snd/acknowledge.mp3
     threshold: 1e-18
     active: false
   wake up:
-    module: pocketsphinx
+    module: ovos-ww-plugin-pocketsphinx
     phonemes: W EY K . AH P
     threshold: 1e-20
     lang: en-us
