@@ -1,11 +1,13 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a29
+# ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a29
+ovos-core[skills_lgpl] @ git+https://github.com/neonjarbas/ovos-core@refactor/ovos_config_pkg
 # utils
 # neon-utils~=0.17,>=0.17.3
 neon-utils @ git+https://github.com/neondaniel/neon-skill-utils@FEAT_MycroftConfigCompat
 # ovos_utils~=0.0.20
 ovos_utils @ git+https://github.com/neondaniel/ovos_utils@FEAT_YamlConfig
-ovos-config~=0.0
+# ovos-config~=0.0
+ovos-config @ git+https://github.com/openvoiceos/ovos-config@FIX_ConfigConstraints
 ovos-skills-manager~=0.0.10
 ovos-plugin-manager~=0.0.16
 

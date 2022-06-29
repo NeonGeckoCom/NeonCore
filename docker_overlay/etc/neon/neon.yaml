@@ -44,3 +44,5 @@ play_ogg_cmdline: "play %1"
 remote-server: "http://localhost:8000"
 gui:
   run_gui_file_server: true
+ready_settings:
+  - skills
