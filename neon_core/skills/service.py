@@ -117,6 +117,7 @@ class NeonSkillService(Thread):
                                     namespace="neon")
         SkillApi.connect_bus(self.bus)
         self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
+        self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
 
         skill_dir = self.skill_manager.get_default_skills_dir()
