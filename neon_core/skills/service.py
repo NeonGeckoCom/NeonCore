@@ -92,13 +92,44 @@ class NeonSkillService(Thread):
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
         self.config = Configuration()
-
         if config:
             LOG.info("Updating global config with passed config")
             from neon_core.configuration import patch_config
             patch_config(config)
             assert all((self.config["skills"][x] == config["skills"][x]
                         for x in config["skills"]))
+
+        self._init_gui_server()
+
+    def _init_gui_server(self):
+        from os.path import basename, isdir, join
+        from os import symlink, makedirs
+        if not self.config.get("run_gui_file_server"):
+            return
+        directory = self.config.get("directory")
+        if not isdir(directory):
+            makedirs(directory, exist_ok=True)
+        for d in self._get_plugin_skill_dirs():
+            skill_dir = basename(d)
+            if not isdir(join(directory, skill_dir)):
+                symlink(d, join(directory, skill_dir))
+                LOG.debug(f"linked {d} to {directory}")
+
+        self.http_server = start_qml_http_server(directory)
+
+    def _get_plugin_skill_dirs(self):
+        # TODO: Move to standalone util method
+        import importlib.util
+        from os.path import dirname
+        from ovos_plugin_manager.skills import find_skill_plugins
+        skill_dirs = list()
+        plugins = find_skill_plugins()
+        for skill_class in plugins.values():
+            skill_dir = dirname(importlib.util.find_spec(
+                skill_class.__module__).origin)
+            skill_dirs.append(skill_dir)
+        LOG.info(f"Located plugin skill_dirs: {skill_dirs}")
+        return skill_dirs
 
     def run(self):
         # Set the active lang to match the configured one
