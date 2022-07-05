@@ -1,0 +1,3 @@
+ovos-skill-stop @ git+https://github.com/openvoiceos/skill-ovos-stop
+neon-skill-fallback_unknown @ git+https://github.com/neongeckocom/skill-fallback_unknown@FEAT_PythonPackaging
+neon-skill-communication @ git+https://github.com/neongeckocom/skill-communication@FEAT_PythonPackaging

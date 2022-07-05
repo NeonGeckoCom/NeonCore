@@ -31,4 +31,4 @@ RUN chmod ugo+x /root/run.sh
 CMD ["/root/run.sh"]
 
 FROM base as default_skills
-RUN neon-install-default-skills
+RUN pip install .[skills_required,skills_essential]

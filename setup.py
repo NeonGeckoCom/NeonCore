@@ -83,7 +83,9 @@ setup(
         "vision": get_requirements("vision.txt"),
         "test": get_requirements("test.txt"),
         "pi": get_requirements("pi.txt"),
-        "docker": get_requirements("docker.txt")
+        "docker": get_requirements("docker.txt"),
+        "skills_required": get_requirements("skills_required.txt"),
+        "skills_essential": get_requirements("skills_essential.txt")
     },
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*',
