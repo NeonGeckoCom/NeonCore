@@ -104,15 +104,19 @@ class NeonSkillService(Thread):
     def _init_gui_server(self):
         from os.path import basename, isdir, join
         from os import symlink, makedirs
+        from shutil import copytree
         if not self.config.get("run_gui_file_server"):
             return
         directory = self.config.get("directory")
         if not isdir(directory):
             makedirs(directory, exist_ok=True)
         for d in self._get_plugin_skill_dirs():
+            if not isdir(join(d, "ui")):
+                continue
             skill_dir = basename(d)
             if not isdir(join(directory, skill_dir)):
-                symlink(d, join(directory, skill_dir))
+                makedirs(join(directory, skill_dir))
+                copytree(join(d, "ui"), join(directory, skill_dir, "ui"))
                 LOG.debug(f"linked {d} to {directory}")
 
         self.http_server = start_qml_http_server(directory)
