@@ -42,7 +42,6 @@ from mycroft_bus_client import MessageBusClient, Message
 from ovos_utils.gui import is_gui_running
 from ovos_utils.xdg_utils import xdg_config_home, xdg_data_home
 
-from neon_utils.configuration_utils import get_neon_device_type
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, get_log_file_for_module
 from typing.io import IO
 

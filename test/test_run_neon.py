@@ -34,7 +34,6 @@ from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
-from neon_utils.configuration_utils import get_neon_local_config
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
