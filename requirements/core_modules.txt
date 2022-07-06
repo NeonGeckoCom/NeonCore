@@ -2,11 +2,7 @@ ovos-core[all]~=0.0.3,>=0.0.4a29
 ovos-ww-plugin-pocketsphinx~=0.1.2
 
 # neon core modules
-# neon_messagebus~=0.1,>=0.1.2a0
-neon_messagebus @ git+https://github.com/neongeckocom/neon_messagebus@FEAT_MycroftConfigCompat
-# neon_speech~=1.0,>=1.1.1a0
-neon_speech @ git+https://github.com/neongeckocom/neon_speech@FEAT_ConfigurationCompat
-# neon_audio~=1.0,>=1.0.2a0
-neon_audio @ git+https://github.com/neondaniel/neon_audio@FEAT_MycroftConfigCompat
-# neon_gui~=0.1,>=0.1.1a0
-neon_gui @ git+https://github.com/neondaniel/neon_gui@FEAT_RebaseOvosCore
+neon_messagebus~=0.1,>=0.1.2a0
+neon_speech~=1.0,>=1.1.1a0
+neon_audio~=1.0,>=1.0.2a0
+neon_gui~=0.1,>=0.1.1a0
