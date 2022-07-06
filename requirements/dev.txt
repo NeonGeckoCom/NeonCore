@@ -1,2 +1,2 @@
 neon-test-utils @ git+https://github.com/NeonGeckoCom/neon-test-utils
-neon-cli-client~=0.1
+neon-cli-client~=0.1,>=0.1.1a2
