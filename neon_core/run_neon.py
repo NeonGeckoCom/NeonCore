@@ -27,22 +27,19 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import sys
+import psutil
 
 from time import time, sleep
-
-import psutil
 from signal import SIGTERM
 from threading import Event
 from subprocess import Popen, STDOUT
-
-import sys
-
 from ovos_config.config import Configuration
 from mycroft_bus_client import MessageBusClient, Message
 from ovos_utils.gui import is_gui_running
-from ovos_utils.xdg_utils import xdg_config_home, xdg_data_home
-
-from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, get_log_file_for_module
+from ovos_utils.xdg_utils import xdg_data_home
+from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
+    get_log_file_for_module
 from typing.io import IO
 
 LOG_FILES = {}

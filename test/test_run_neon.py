@@ -29,7 +29,8 @@
 import os.path
 import sys
 import unittest
-
+import shutil
+from os.path import join, dirname
 from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
@@ -40,7 +41,7 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
 
 
-class TestRunNeon(unittest.TestCase):
+class TestRunNeonModules(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         from neon_core.configuration import patch_config
@@ -144,6 +145,17 @@ class TestRunNeon(unittest.TestCase):
         self.assertGreater(len(loaded_skills.keys()), 1)
 
     # TODO: Test user utterance -> response
+
+
+class TestRunNeonHelpers(unittest.TestCase):
+    def test_get_log_file_for_module(self):
+        os.environ["XDG_CONFIG_HOME"] = join(dirname(__file__), "config")
+        from neon_core.configuration import patch_config
+        patch_config({"log_dir": dirname(__file__)})
+        from neon_core.run_neon import _get_log_file
+        self.assertEqual(_get_log_file("neon_speech").name,
+                         join(dirname(__file__), "voice.log"))
+        shutil.rmtree(os.environ.pop("XDG_CONFIG_HOME"))
 
 
 if __name__ == '__main__':

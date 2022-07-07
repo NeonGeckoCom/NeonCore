@@ -2,7 +2,7 @@
 ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a34
 # utils
 #neon-utils[network]>=1.0.0a11,<2.0.0
-neon-utils @ git+https://github.com/neondaniel/neon-skill-utils@FIX_ConfigInitModuleReloading
+neon-utils @ git+https://github.com/neondaniel/neon-skill-utils@ORG_DeprecateLogUtils
 ovos_utils~=0.0,>=0.0.23a6
 ovos-config~=0.0,>=0.0.3
 ovos-skills-manager~=0.0.10
