@@ -56,6 +56,3 @@ def patch_config(config: dict = None):
     import mycroft.configuration
     for cfg in mycroft.configuration.Configuration().xdg_configs:
         cfg.reload()
-
-    import ovos_config
-    assert ovos_config.locations.DEFAULT_CONFIG.endswith("neon.yaml")
