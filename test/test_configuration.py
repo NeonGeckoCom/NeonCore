@@ -88,7 +88,10 @@ class ConfigurationTests(unittest.TestCase):
         from neon_utils.configuration_utils import init_config_dir
         use_neon_core(init_config_dir)()
         from mycroft.configuration import Configuration
-
+        from mycroft.configuration.locations import DEFAULT_CONFIG
+        self.assertTrue(DEFAULT_CONFIG.endswith("neon.yaml"))
+        self.assertTrue(Configuration.default.path == DEFAULT_CONFIG,
+                        Configuration.default.path)
         with open(join(test_config_dir, "OpenVoiceOS", 'ovos.conf')) as f:
             ovos_conf = json.load(f)
         self.assertEqual(ovos_conf['submodule_mappings']['neon_core'],
@@ -98,6 +101,7 @@ class ConfigurationTests(unittest.TestCase):
         from neon_core.configuration import patch_config
         test_config = {"new_key": {'val': True}}
         patch_config(test_config)
+        self.assertEqual(Configuration(), use_neon_core(Configuration)())
         conf_file = os.path.join(test_config_dir, 'neon',
                                  'neon.yaml')
         self.assertTrue(os.path.isfile(conf_file))

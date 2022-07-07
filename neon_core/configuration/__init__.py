@@ -27,7 +27,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from ovos_config.config import Configuration
-# from neon_configuration.config import Configuration
+
 """
 Neon modules should import config from this module since module_overrides will
 result in different configurations depending on originating module.
@@ -43,10 +43,18 @@ def patch_config(config: dict = None):
     Write the specified speech configuration to the global config file
     :param config: Mycroft-compatible configuration override
     """
-    from ovos_config import USER_CONFIG, LocalConf
+    from ovos_config.config import LocalConf
+    from ovos_config.locations import USER_CONFIG
 
     config = config or dict()
     local_config = LocalConf(USER_CONFIG)
     local_config.update(config)
     local_config.store()
-    Configuration().reload()
+    for cfg in Configuration().xdg_configs:
+        cfg.reload()
+    import mycroft.configuration
+    for cfg in mycroft.configuration.Configuration().xdg_configs:
+        cfg.reload()
+
+    import ovos_config
+    assert ovos_config.locations.DEFAULT_CONFIG.endswith("neon.yaml")
