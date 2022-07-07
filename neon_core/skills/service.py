@@ -97,7 +97,6 @@ class NeonSkillService(Thread):
             LOG.info("Updating global config with passed config")
             from neon_core.configuration import patch_config
             patch_config(config)
-            self.config.reload()
             assert all((self.config["skills"][x] == config["skills"][x]
                         for x in config["skills"]))
 
