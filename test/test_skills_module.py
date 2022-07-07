@@ -246,6 +246,7 @@ class TestSkillManager(unittest.TestCase):
 
         from neon_core.skills.skill_manager import NeonSkillManager
         manager = NeonSkillManager(FakeBus())
+        self.assertTrue(manager.config["skills"]["auto_update"])
         manager.run()
         patched_run.assert_called_once()
         patched_installer.assert_called_once()
