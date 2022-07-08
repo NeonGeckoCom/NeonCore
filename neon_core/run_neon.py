@@ -215,7 +215,6 @@ def main():
 if __name__ == "__main__":
     from neon_utils.log_utils import get_log_dir
     LOG_DIR = get_log_dir()
-    print(f"LOG_DIR={LOG_DIR}")
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR)
     run_log = open(os.path.join(LOG_DIR, "start.log"), "a+")

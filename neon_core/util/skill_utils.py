@@ -95,7 +95,7 @@ def _write_pip_constraints_to_file(output_file: str = None):
                 LOG.warning(f"Ignoring uninstalled dependency: {constraint}")
         constraints = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
                        else c for c in constraints if '@' not in c]
-        constraints.append('neon-utils>=1.0.0a1')
+        constraints.append('neon-utils>=1.0.0a1')  # TODO: Patching dep. bug
         LOG.debug(f"Got package constraints: {constraints}")
         f.write('\n'.join(constraints))
     LOG.info(f"Wrote core constraints to file: {output_file}")
@@ -213,6 +213,8 @@ def _install_skill_dependencies(skill: SkillEntry):
     if sys_deps:
         install_system_deps(sys_deps)
     if requirements:
+        # Imperfect patching of common conflicts. This code is mostly unused
+        # with implementation of plugin skills though
         invalid = [r for r in requirements if any((r.startswith(x) for x in
                                                    ("lingua-franca",
                                                     "neon-utils")))]

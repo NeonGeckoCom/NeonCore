@@ -27,7 +27,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from os import makedirs
-from os.path import isdir, join
+from os.path import isdir, join, expanduser
 from ovos_utils.xdg_utils import xdg_data_home
 from neon_utils.log_utils import LOG
 
@@ -61,6 +61,7 @@ class NeonSkillManager(SkillManager):
             len(skill_dir) > 0 else skill_dir or \
             join(xdg_data_home(), "neon", "skills")
 
+        skill_dir = expanduser(skill_dir)
         if not isdir(skill_dir):
             LOG.warning("Creating requested skill directory")
             try:

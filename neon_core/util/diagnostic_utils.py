@@ -31,7 +31,6 @@ import socket
 import glob
 
 from os.path import join, isfile, basename, splitext
-from os import getenv
 from json_database import xdg_data_home, xdg_config_home
 
 from neon_utils import LOG
@@ -68,16 +67,16 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
 
     # Get Logs
     logs_dir = Configuration().get('log_dir') or join(xdg_data_home(),
-                                                     "neon", "logs")
+                                                      "neon", "logs")
     startup_log = join(logs_dir, "start.log")
     if isfile(startup_log):
         with open(startup_log, 'r') as start:
-            startup = start.read()
+            startup_text = start.read()
             # Catch a very large log and take last 100000 chars, rounded to a full line
-            if len(startup) > 100000:
-                startup = startup[-100000:].split("\n", 1)[1]
+            if len(startup_text) > 100000:
+                startup_text = startup_text[-100000:].split("\n", 1)[1]
     else:
-        startup = None
+        startup_text = None
     if allow_logs:
         logs = dict()
         try:
@@ -97,6 +96,7 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
     else:
         logs = None
 
+    # TODO: Implement after Transcript Manager re-implementation
     # transcript_file = os.path.join(os.path.expanduser(local_configuration["dirVars"]["docsDir"]),
     #                                "csv_files", "full_ts.csv")
     # if allow_transcripts and os.path.isfile(transcript_file):
@@ -112,7 +112,7 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
     transcripts = None
 
     data = {"host": socket.gethostname(),
-            "startup": None,
+            "startup": startup_text,
             "configurations": json.dumps(configs) if configs else None,
             "logs": json.dumps(logs) if logs else None,
             "transcripts": transcripts}

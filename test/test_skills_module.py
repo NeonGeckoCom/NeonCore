@@ -34,7 +34,7 @@ import unittest
 import wave
 
 from copy import deepcopy
-from os.path import join, dirname
+from os.path import join, dirname, expanduser, isdir
 from threading import Event
 from time import time, sleep
 
@@ -42,7 +42,7 @@ from mock import Mock
 from mock.mock import patch
 from mycroft_bus_client import Message
 from ovos_utils.messagebus import FakeBus
-
+from ovos_utils.xdg_utils import xdg_data_home
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -256,6 +256,45 @@ class TestSkillManager(unittest.TestCase):
         manager.download_or_update_defaults()
         patched_installer.assert_not_called()
         manager.stop()
+
+    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    def test_get_default_skills_dir(self, _, __):
+        from neon_core.skills.skill_manager import NeonSkillManager
+        manager = NeonSkillManager(FakeBus())
+        manager.config = dict(manager.config)  # Override Configuration to test
+
+        # Default, no config
+        manager.config['skills'] = {}
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # Default, empty extra_directories
+        manager.config['skills']['extra_directories'] = []
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # Default, invalid extra_directories
+        manager.config['skills']['extra_directories'] = "/skills"
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # extra_directories valid spec
+        manager.config['skills']['extra_directories'] = '~/skills'
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, expanduser('~/skills'))
+        self.assertTrue(isdir(expanduser("~/skills")))
+
+        # directory invalid spec
+        manager.config['skills']['directory'] = "/skills"
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # directory valid spec
+        manager.config['skills']['directory'] = "~/neon-skills"
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, expanduser('~/neon-skills'))
+        self.assertTrue(isdir(expanduser("~/neon-skills")))
 
 
 class TestSkillStore(unittest.TestCase):
