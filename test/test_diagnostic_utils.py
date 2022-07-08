@@ -34,7 +34,6 @@ import neon_utils.metrics_utils
 
 from mock import Mock
 
-from neon_utils import get_neon_local_config
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 

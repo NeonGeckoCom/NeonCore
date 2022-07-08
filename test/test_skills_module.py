@@ -60,8 +60,8 @@ class TestSkillService(unittest.TestCase):
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
         if os.path.exists(cls.config_dir):
             shutil.rmtree(cls.config_dir)
-        from neon_core.config import init_config
-        init_config()
+        from neon_core import CORE_VERSION_STR
+        assert isinstance(CORE_VERSION_STR, str)
         assert os.path.isdir(cls.config_dir)
 
     @classmethod
