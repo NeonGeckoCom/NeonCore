@@ -58,12 +58,12 @@ class ConfigurationTests(unittest.TestCase):
         assert ovos_config['config_filename'] == 'neon.yaml'
         assert os.path.basename(ovos_config['default_config_path']) == "neon.yaml"
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        # Don't remove config, GH actions uploads these artifacts
-        # if os.path.exists(cls.CONFIG_PATH):
-        #     shutil.rmtree(cls.CONFIG_PATH)
-        os.environ.pop("XDG_CONFIG_HOME")
+    # @classmethod
+    # def tearDownClass(cls) -> None:
+    #     # Don't remove config, GH actions uploads these artifacts
+    #     # if os.path.exists(cls.CONFIG_PATH):
+    #     #     shutil.rmtree(cls.CONFIG_PATH)
+    #     os.environ.pop("XDG_CONFIG_HOME")
 
     def test_neon_core_config_init(self):
         from neon_core.configuration import Configuration
