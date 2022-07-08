@@ -50,9 +50,6 @@ def patch_config(config: dict = None):
     local_config = LocalConf(USER_CONFIG)
     local_config.update(config)
     local_config.store()
-    # TODO: Below patching bug in `Configuration.reload()`
-    for cfg in Configuration().xdg_configs:
-        cfg.reload()
+    Configuration().reload()
     import mycroft.configuration
-    for cfg in mycroft.configuration.Configuration().xdg_configs:
-        cfg.reload()
+    mycroft.configuration.Configuration().reload()

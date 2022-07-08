@@ -26,21 +26,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from os.path import join, isfile, dirname
-from os import getenv, environ
-from ovos_utils.xdg_utils import xdg_config_home
-from neon_utils.configuration_utils import get_config_dir
-from neon_utils.logger import LOG
-
-
-def _check_legacy_config():
-    """
-    Check if there is a legacy yml config file spec and return the path
-    """
-    valid_dir = get_config_dir()
-    environ["NEON_CONFIG_PATH"] = getenv("NEON_CONFIG_PATH") or valid_dir
-    return join(getenv("NEON_CONFIG_PATH"), "ngi_local_conf.yml")
-
 
 def init_config():
     """
@@ -48,27 +33,9 @@ def init_config():
     """
     from neon_utils.configuration_utils import init_config_dir
 
-    # Get the legacy config file path before anything else
-    old_config = _check_legacy_config()
-
-    # First validate envvars, initialize `ovos.conf`, and set default config to
-    # bundled neon.conf
+    # First validate envvars, initialize `ovos.conf`, set default config to
+    # bundled neon.conf and handle any legacy config migration
     init_config_dir()
-
-    # Write Mycroft-compat conf file with yml config values
-    neon_config_path = join(xdg_config_home(), "neon", "neon.yaml")
-    if isfile(old_config):
-        LOG.error(f"found legacy config file: {old_config}")
-        import shutil
-        from neon_utils.configuration_utils import migrate_ngi_config
-        migrate_ngi_config(old_config, neon_config_path)
-        LOG.warning(f"archiving config: {old_config}")
-        shutil.move(old_config,
-                    join(dirname(old_config), "ngi_local_conf.bak"))
-
-        # Tell config module to get changes we just wrote
-        from ovos_config.config import Configuration
-        Configuration().reload()
 
 
 def get_core_version() -> str:
