@@ -229,8 +229,8 @@ class TestSkillManager(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        from neon_core.config import init_config
-        init_config()
+        from neon_core import CORE_VERSION_STR
+        assert isinstance(CORE_VERSION_STR, str)
 
     @classmethod
     def tearDownClass(cls) -> None:
