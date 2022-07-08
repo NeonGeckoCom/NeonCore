@@ -213,8 +213,8 @@ def _install_skill_dependencies(skill: SkillEntry):
         install_system_deps(sys_deps)
     if requirements:
         invalid = [r for r in requirements if any((r.startswith(x) for x in
-                                                   ("lingua_franca",
-                                                    "neon_utils")))]
+                                                   ("lingua-franca",
+                                                    "neon-utils")))]
         if any(invalid):
             for dep in invalid:
                 LOG.warning(f"{dep} is not valid under this core"
