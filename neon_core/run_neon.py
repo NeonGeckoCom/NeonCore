@@ -216,11 +216,12 @@ def main():
 
 
 if __name__ == "__main__":
-    LOG_DIR = Configuration().get("log_dir") or os.path.join(xdg_data_home(),
-                                                             "neon", "logs")
+    LOG_DIR = dict(Configuration()).get("log_dir") or \
+              os.path.join(xdg_data_home(), "neon", "logs")
+    print(f"LOG_DIR={LOG_DIR}")
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR)
-    run_log = open(os.path.join(LOG_DIR, "start.log"), "a+")
-    sys.stdout = run_log
-    sys.stderr = run_log
+    # run_log = open(os.path.join(LOG_DIR, "start.log"), "a+")
+    # sys.stdout = run_log
+    # sys.stderr = run_log
     main()
