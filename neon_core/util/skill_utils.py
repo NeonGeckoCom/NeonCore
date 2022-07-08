@@ -95,6 +95,7 @@ def _write_pip_constraints_to_file(output_file: str = None):
                 LOG.warning(f"Ignoring uninstalled dependency: {constraint}")
         constraints = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
                        else c for c in constraints if '@' not in c]
+        constraints.append('neon-utils>=1.0.0a1')
         LOG.debug(f"Got package constraints: {constraints}")
         f.write('\n'.join(constraints))
     LOG.info(f"Wrote core constraints to file: {output_file}")
