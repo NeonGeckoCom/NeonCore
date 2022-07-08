@@ -102,17 +102,6 @@ jobs:
         with:
           name: configuration-test-results
           path: tests/configuration-test-results.xml
-      - name: Upload ovos config file
-        uses: actions/upload-artifact@v2
-        with:
-          name: ovos.conf
-          path: ${XDG_CONFIG_HOME}/OpenVoiceOS/ovos.conf
-      - name: Upload neon config file
-        uses: actions/upload-artifact@v2
-        with:
-          name: neon.yaml
-          path: ${XDG_CONFIG_HOME}/neon/neon.yaml
-        if: always()
 
       - name: Test Language
         run: |
