@@ -39,7 +39,7 @@ from mycroft_bus_client import MessageBusClient, Message
 from ovos_utils.gui import is_gui_running
 from ovos_utils.xdg_utils import xdg_data_home
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
-    get_log_file_for_module
+    get_log_file_for_module, get_log_dir
 from typing.io import IO
 
 LOG_FILES = {}
@@ -150,7 +150,7 @@ def start_neon():
     bus.on("neon.shutdown", handle_shutdown)
     bus.on("neon.load_modules", handle_load_modules)
     bus.run_in_thread()
-
+    LOG.info(f"log_dir={get_log_dir()}")
     _stop_all_core_processes()
     _cycle_logs()
 

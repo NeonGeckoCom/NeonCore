@@ -86,11 +86,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: core-logs-dev-local-${{ matrix.python-version }}
-          path: ${HOME}/test/logs/*.log
+          path: ~/test/logs/*.log
         if: always()
       - name: Upload Configuration
         uses: actions/upload-artifact@v2
         with:
           name: configuration-dev-local-${{ matrix.python-version }}
-          path: ${HOME}/.config/neon/neon.yaml
+          path: ~/.config/neon/neon.yaml
         if: always()

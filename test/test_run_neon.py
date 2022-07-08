@@ -118,9 +118,12 @@ class TestRunNeonModules(unittest.TestCase):
                                                       {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
                                                       context), context["ident"])
         self.assertEqual(stt_resp.context, context)
-        self.assertIsInstance(stt_resp.data.get("parser_data"), dict)
-        self.assertIsInstance(stt_resp.data.get("transcripts"), list)
-        self.assertIn("stop", stt_resp.data.get("transcripts"))
+        self.assertIsInstance(stt_resp.data.get("parser_data"), dict,
+                              stt_resp.data)
+        self.assertIsInstance(stt_resp.data.get("transcripts"), list,
+                              stt_resp.data)
+        self.assertIn("stop", stt_resp.data.get("transcripts"),
+                      stt_resp.data['transcripts'])
 
     def test_audio_module(self):
         response = self.bus.wait_for_response(Message('mycroft.audio.is_ready'))
