@@ -34,12 +34,10 @@ from time import time, sleep
 from signal import SIGTERM
 from threading import Event
 from subprocess import Popen, STDOUT
-from ovos_config.config import Configuration
 from mycroft_bus_client import MessageBusClient, Message
 from ovos_utils.gui import is_gui_running
-from ovos_utils.xdg_utils import xdg_data_home
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
-    get_log_file_for_module, get_log_dir
+    get_log_file_for_module
 from typing.io import IO
 
 LOG_FILES = {}
@@ -150,7 +148,6 @@ def start_neon():
     bus.on("neon.shutdown", handle_shutdown)
     bus.on("neon.load_modules", handle_load_modules)
     bus.run_in_thread()
-    LOG.info(f"log_dir={get_log_dir()}")
     _stop_all_core_processes()
     _cycle_logs()
 
@@ -175,7 +172,6 @@ def start_neon():
         pass
 
     LOG.info("Stopping all modules")
-    LOG.info(f"log_dir={get_log_dir()}")
 
     for p in PROCESSES.values():
         _stop_process(p)
@@ -217,6 +213,7 @@ def main():
 
 
 if __name__ == "__main__":
+    from neon_utils.log_utils import get_log_dir
     LOG_DIR = get_log_dir()
     print(f"LOG_DIR={LOG_DIR}")
     if not os.path.isdir(LOG_DIR):
