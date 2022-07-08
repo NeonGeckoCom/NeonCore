@@ -27,6 +27,9 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from ovos_config.config import Configuration
+from os.path import exists, isdir, dirname
+from os import makedirs
+from neon_utils.logger import LOG
 
 """
 Neon modules should import config from this module since module_overrides will
@@ -45,6 +48,12 @@ def patch_config(config: dict = None):
     """
     from ovos_config.config import LocalConf
     from ovos_config.locations import USER_CONFIG
+    if not exists(USER_CONFIG):
+        if not isdir(dirname(USER_CONFIG)):
+            LOG.warning(f"Creating config dir: {dirname(USER_CONFIG)}")
+            makedirs(dirname(USER_CONFIG), exist_ok=True)
+        with open(USER_CONFIG, 'w+'):
+            pass
 
     config = config or dict()
     local_config = LocalConf(USER_CONFIG)
