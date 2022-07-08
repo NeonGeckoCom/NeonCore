@@ -27,17 +27,6 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-def init_config():
-    """
-    Initialize all configuration methods to read from the same config
-    """
-    from neon_utils.configuration_utils import init_config_dir
-
-    # First validate envvars, initialize `ovos.conf`, set default config to
-    # bundled neon.conf and handle any legacy config migration
-    init_config_dir()
-
-
 def get_core_version() -> str:
     """
     Get the core version string.
