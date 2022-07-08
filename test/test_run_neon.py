@@ -52,6 +52,7 @@ class TestRunNeonHelpers(unittest.TestCase):
         self.assertEqual(_get_log_file("neon_speech").name,
                          join(dirname(__file__), "voice.log"))
         shutil.rmtree(os.environ.pop("XDG_CONFIG_HOME"))
+        os.environ.pop("XDG_CONFIG_HOME")
 
 
 class TestRunNeonModules(unittest.TestCase):
