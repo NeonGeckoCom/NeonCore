@@ -60,8 +60,9 @@ class ConfigurationTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        if os.path.exists(cls.CONFIG_PATH):
-            shutil.rmtree(cls.CONFIG_PATH)
+        # Don't remove config, GH actions uploads these artifacts
+        # if os.path.exists(cls.CONFIG_PATH):
+        #     shutil.rmtree(cls.CONFIG_PATH)
         os.environ.pop("XDG_CONFIG_HOME")
 
     def test_neon_core_config_init(self):
