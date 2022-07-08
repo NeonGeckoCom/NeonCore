@@ -175,6 +175,7 @@ def start_neon():
         pass
 
     LOG.info("Stopping all modules")
+    LOG.info(f"log_dir={get_log_dir()}")
 
     for p in PROCESSES.values():
         _stop_process(p)
@@ -216,8 +217,7 @@ def main():
 
 
 if __name__ == "__main__":
-    LOG_DIR = os.path.expanduser(dict(Configuration()).get("log_dir") or
-                                 os.path.join(xdg_data_home(), "neon", "logs"))
+    LOG_DIR = get_log_dir()
     print(f"LOG_DIR={LOG_DIR}")
     if not os.path.isdir(LOG_DIR):
         os.makedirs(LOG_DIR)
