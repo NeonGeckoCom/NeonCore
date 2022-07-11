@@ -202,7 +202,8 @@ class NeonIntentService(IntentService):
             if message.context.get("translation_data") and \
                     message.context.get("translation_data")[0].get(
                         "was_translated"):
-                message.data["lang"] = self.language_config["internal"]
+                message.data["lang"] = message.context.get("translation_data")[0].get(
+                        "detected_lang")
             # now pass our modified message to Mycroft
             # TODO: Consider how to implement 'and' parsing and converse DM
             super().handle_utterance(message)

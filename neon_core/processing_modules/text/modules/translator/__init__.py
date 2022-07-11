@@ -29,6 +29,7 @@
 from neon_core.processing_modules.text import TextParser
 from neon_core.language import DetectorFactory, TranslatorFactory
 from mycroft.util.log import LOG
+from neon_core.configuration import Configuration
 
 from neon_utils.configuration_utils import get_neon_lang_config
 
@@ -39,29 +40,32 @@ class UtteranceTranslator(TextParser):
         self.language_config = get_neon_lang_config()
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
+        self.supported_langs = Configuration()['language'].get('intents') or [
+            Configuration()['language'].get("internal") or "en-us"]
 
     def parse(self, utterances, lang=None):
         metadata = []
+
         for idx, ut in enumerate(utterances):
             try:
                 original = ut
                 detected_lang = self.lang_detector.detect(original)
-                if lang and detected_lang != lang.split('-', 1)[0]:
+                if detected_lang != lang.split('-', 1)[0]:
                     LOG.warning(f"Specified lang: {lang} but detected {detected_lang}")
                 else:
                     LOG.debug(f"Detected language: {detected_lang}")
-                if detected_lang != self.language_config["internal"].split("-")[0]:
+                if detected_lang not in self.supported_langs:
                     utterances[idx] = self.translator.translate(
                         original,
                         self.language_config["internal"],
-                        lang.split('-', 1)[0] or detected_lang)
+                        detected_lang)
                     LOG.info(f"Translated utterance to: {utterances[idx]}")
                 # add language metadata to context
                 metadata += [{
-                    "source_lang": lang or self.language_config['internal'],
+                    "source_lang": lang,
                     "detected_lang": detected_lang,
                     "internal": self.language_config["internal"],
-                    "was_translated": detected_lang != self.language_config["internal"].split("-")[0],
+                    "was_translated": lang.split('-', 1)[0] != detected_lang,
                     "raw_utterance": original
                 }]
             except Exception as e:
