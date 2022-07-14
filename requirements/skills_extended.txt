@@ -1,6 +1,6 @@
 neon-skill-audio_record
 neon-skill-custom_conversation
-# neon-skill-instructions
+neon-skill-instructions @ git+https://github.com/neongeckocom/skill-instructions@FEAT_PythonPackaging
 neon-skill-launcher
 neon-skill-messaging
 neon-skill-news
