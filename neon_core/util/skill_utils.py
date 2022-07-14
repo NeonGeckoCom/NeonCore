@@ -37,18 +37,20 @@ from os import listdir, makedirs
 from tempfile import mkdtemp
 from shutil import rmtree
 from os.path import expanduser, join, isdir, dirname, isfile
-
+from ovos_utils.xdg_utils import xdg_data_home
 from ovos_skills_manager.requirements import install_system_deps, pip_install
 from ovos_skills_manager.skill_entry import SkillEntry
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION, set_github_token, clear_github_token
 from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url, download_url_from_github_url
 from ovos_skill_installer import download_extract_zip
-from neon_utils.configuration_utils import get_neon_skills_config
-from neon_utils import LOG
+from neon_utils.logger import LOG
+
+from ovos_config.config import Configuration
 
 
-def get_neon_skills_data(skill_meta_repository: str = "https://github.com/neongeckocom/neon_skills",
+def get_neon_skills_data(skill_meta_repository: str =
+                         "https://github.com/neongeckocom/neon_skills",
                          branch: str = "master",
                          repo_metadata_path: str = "skill_metadata") -> dict:
     """
@@ -93,6 +95,7 @@ def _write_pip_constraints_to_file(output_file: str = None):
                 LOG.warning(f"Ignoring uninstalled dependency: {constraint}")
         constraints = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
                        else c for c in constraints if '@' not in c]
+        constraints.append('neon-utils>=1.0.0a1')  # TODO: Patching dep. bug
         LOG.debug(f"Got package constraints: {constraints}")
         f.write('\n'.join(constraints))
     LOG.info(f"Wrote core constraints to file: {output_file}")
@@ -115,8 +118,15 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param skills_to_install: list of skill URLs to install
     :param config: optional dict configuration
     """
-    config = config or get_neon_skills_config()
-    skill_dir = expanduser(config["directory"])
+    config = config or Configuration()["skills"]
+    LOG.info(f"extra_directories={config.get('extra_directories')}")
+    LOG.info(f"directory={config.get('directory')}")
+    skill_dir = expanduser(config.get("extra_directories")[0] if
+                           config.get("extra_directories") else
+                           config.get("directory") if config.get("directory")
+                           and config["directory"] != "skills" else
+                           join(xdg_data_home(), "neon", "skills"))
+    LOG.info(f"skill_dir={skill_dir}")
     osm = OVOSSkillsManager()
     skills_catalog = get_neon_skills_data()
     token_set = False
@@ -127,7 +137,6 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     try:
         _write_pip_constraints_to_file()
     except PermissionError:
-        from ovos_utils.xdg_utils import xdg_data_home
         constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
         _write_pip_constraints_to_file(constraints_file)
         set_osm_constraints_file(constraints_file)
@@ -160,14 +169,15 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
             LOG.error(e)
     if token_set:
         clear_github_token()
+    LOG.info(f"Installed skills to: {skill_dir}")
 
 
 def install_skills_default(config: dict = None):
     """
     Installs default skills from passed or default configuration
     """
-    config = config or get_neon_skills_config()
-    skills_list = config["default_skills"]
+    config = config or Configuration()["skills"]
+    skills_list = config.get("default_skills")
     if isinstance(skills_list, str):
         skills_list = get_remote_entries(skills_list)
     assert isinstance(skills_list, list)
@@ -203,7 +213,11 @@ def _install_skill_dependencies(skill: SkillEntry):
     if sys_deps:
         install_system_deps(sys_deps)
     if requirements:
-        invalid = [r for r in requirements if r.startswith("lingua-franca")]
+        # Imperfect patching of common conflicts. This code is mostly unused
+        # with implementation of plugin skills though
+        invalid = [r for r in requirements if any((r.startswith(x) for x in
+                                                   ("lingua-franca",
+                                                    "neon-utils")))]
         if any(invalid):
             for dep in invalid:
                 LOG.warning(f"{dep} is not valid under this core"
@@ -222,7 +236,7 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
     :param local_skills_dir: Directory to install skills from
     :returns: list of installed skill directories
     """
-    github_token = get_neon_skills_config()["neon_token"]
+    github_token = Configuration().get("skills", {}).get("neon_token")
     local_skills_dir = expanduser(local_skills_dir)
     if not isdir(local_skills_dir):
         raise ValueError(f"{local_skills_dir} is not a valid directory")
@@ -242,6 +256,6 @@ def install_local_skills(local_skills_dir: str = "/skills") -> list:
             LOG.error(f"Exception while installing {skill}")
             LOG.exception(e)
     if local_skills_dir not in \
-            get_neon_skills_config().get("extra_directories", []):
+            Configuration().get("skills", {}).get("extra_directories", []):
         LOG.error(f"{local_skills_dir} not found in configuration")
     return installed_skills

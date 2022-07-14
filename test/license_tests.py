@@ -19,7 +19,8 @@ license_overrides = {
     'sonopy': 'Apache-2.0',
     "ovos-skill-installer": "MIT",
     "python-dateutil": "Apache-2.0",
-    "pyparsing": "MIT"
+    "pyparsing": "MIT",
+    "exceptiongroup": "MIT"
 }
 # explicitly allow these packages that would fail otherwise
 whitelist = ["neon-core",

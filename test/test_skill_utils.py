@@ -161,11 +161,13 @@ class SkillUtilsTests(unittest.TestCase):
             entry.json["requirements"]["system"])
 
         invalid_dep_json = entry.json
-        invalid_dep_json['requirements']['python'].append('lingua-franca')
+        invalid_dep_json['requirements']['python'].extend(
+            ['lingua-franca', 'neon-utils[network]~=0.6'])
         invalid_entry = SkillEntry.from_json(invalid_dep_json)
         _install_skill_dependencies(invalid_entry)
         valid_deps = invalid_entry.json['requirements']['python']
         valid_deps.remove('lingua-franca')
+        valid_deps.remove('neon-utils[network]~=0.6')
         pip_install.assert_called_with(valid_deps)
 
     def test_write_pip_constraints_to_file(self):

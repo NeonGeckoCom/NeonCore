@@ -1,0 +1,9 @@
+websocket:
+  host: neon-messagebus
+gui_websocket:
+  host: neon-gui
+ready_settings:
+  - skills
+  - speech
+  - audio
+  - gui

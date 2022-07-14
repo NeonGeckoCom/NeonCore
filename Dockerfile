@@ -28,10 +28,6 @@ RUN pip install wheel && \
 COPY docker_overlay/ /
 RUN chmod ugo+x /root/run.sh
 
-# TODO: Below link is patching a bug in the homescreen skill/ovos-utils
-RUN mkdir /opt/mycroft && \
-    ln -s /root/.local/share/neon/skills /opt/mycroft/skills
-
 CMD ["/root/run.sh"]
 
 FROM base as default_skills

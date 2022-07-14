@@ -30,9 +30,9 @@ import time
 
 from typing import Optional
 from threading import Thread
-from neon_utils.configuration_utils import get_neon_skills_config, \
-    get_neon_lang_config, get_neon_local_config
-from neon_utils import LOG
+
+from ovos_config.config import Configuration
+from ovos_utils.log import LOG
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 from neon_utils.messagebus_utils import get_messagebus
@@ -45,7 +45,7 @@ from neon_core.util.qml_file_server import start_qml_http_server
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
-from mycroft.configuration.locale import set_default_lang, set_default_tz
+from ovos_config.locale import set_default_lang, set_default_tz
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
 
@@ -82,6 +82,7 @@ class NeonSkillService(Thread):
         self.setDaemon(daemonic)
         self.bus = None
         self.skill_manager = None
+        self.http_server = None
         self.event_scheduler = None
         self.status = None
         self.watchdog = watchdog
@@ -90,17 +91,19 @@ class NeonSkillService(Thread):
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
-        self.config = config or get_neon_skills_config()
-        if self.config.get("run_gui_file_server"):
-            self.http_server = start_qml_http_server(
-                self.config["directory"])
-        else:
-            self.http_server = None
+        self.config = Configuration()
+
+        if config:
+            LOG.info("Updating global config with passed config")
+            from neon_core.configuration import patch_config
+            patch_config(config)
+            assert all((self.config["skills"][x] == config["skills"][x]
+                        for x in config["skills"]))
 
     def run(self):
-        # config = Configuration.get()
         # Set the active lang to match the configured one
-        set_default_lang(get_neon_lang_config().get('internal', 'en-us'))
+        set_default_lang(self.config.get("language", {}).get('internal') or
+                         self.config.get("lang") or "en-us")
         # Set the default timezone to match the configured one
         set_default_tz()
 
@@ -112,9 +115,14 @@ class NeonSkillService(Thread):
         self.status = ProcessStatus('skills', self.bus, self.callbacks,
                                     namespace="neon")
         SkillApi.connect_bus(self.bus)
-        self.skill_manager = NeonSkillManager(self.bus, self.watchdog,
-                                              config=self.config)
+        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
+        self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
+
+        skill_dir = self.skill_manager.get_default_skills_dir()
+        if self.config["skills"].get("run_gui_file_server"):
+            self.http_server = start_qml_http_server(skill_dir)
+
         self.status.set_started()
 
         # TODO: These should be event-based in Mycroft/OVOS
@@ -133,7 +141,7 @@ class NeonSkillService(Thread):
         def handle_metric(message):
             report_metric(message.data.pop("name"), **message.data)
 
-        if get_neon_local_config()['prefFlags']['metrics']:
+        if self.config.get("server", {}).get('metrics'):
             LOG.info("Metrics reporting enabled")
             self.bus.on("neon.metric", handle_metric)
         else:

@@ -34,17 +34,17 @@ from ovos_skills_manager.skill_entry import SkillEntry
 from neon_utils.logger import LOG
 from neon_utils.net_utils import check_online
 from neon_utils.authentication_utils import repo_is_neon
-from neon_utils.configuration_utils import get_neon_skills_config
 from datetime import datetime, timedelta
 from neon_utils.messagebus_utils import get_messagebus
 
 from neon_core.util.skill_utils import get_remote_entries
 from mycroft.skills.event_scheduler import EventSchedulerInterface
+from ovos_config.config import Configuration
 
 
 class SkillsStore:
     def __init__(self, skills_dir, config=None, bus=None):
-        self.config = config or get_neon_skills_config()
+        self.config = config or Configuration()["skills"]
         self.disabled = self.config.get("disable_osm", False)
         self.skills_dir = skills_dir
         self.osm = self.load_osm()
@@ -123,7 +123,7 @@ class SkillsStore:
         """
         from ovos_utils.skills import get_skills_folder
         osm_skill_dir = get_skills_folder()
-        if osm_skill_dir != self.skills_dir:
+        if osm_skill_dir and osm_skill_dir != self.skills_dir:
             LOG.warning(f"OSM configured local skills: {osm_skill_dir}")
             if not isdir(osm_skill_dir):
                 makedirs(osm_skill_dir)
@@ -208,15 +208,18 @@ class SkillsStore:
                 # TODO: This is just patching OSM updates DM
                 store_skill = None
             else:
-                store_skill = self.osm.search_skills_by_url(skill)
-                if isinstance(store_skill, SkillEntry):
-                    return store_skill
-                elif isinstance(store_skill, list):
-                    return store_skill[0]
-                elif isinstance(store_skill, Generator):
-                    # Return the first item
-                    for s in store_skill:
-                        return s
+                try:
+                    store_skill = self.osm.search_skills_by_url(skill)
+                    if isinstance(store_skill, SkillEntry):
+                        return store_skill
+                    elif isinstance(store_skill, list):
+                        return store_skill[0]
+                    elif isinstance(store_skill, Generator):
+                        # Return the first item
+                        for s in store_skill:
+                            return s
+                except Exception as e:
+                    LOG.error(f"OSM Error: {e}")
             # skill is not in any appstore
             if "/neon" in skill.lower() and "github" in skill:
                 self.authenticate_neon()

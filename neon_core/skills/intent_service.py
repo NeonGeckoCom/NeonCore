@@ -40,24 +40,23 @@ from neon_utils.message_utils import get_message_user
 from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
 from neon_utils.user_utils import apply_local_user_profile_updates
-from neon_utils.configuration_utils import get_neon_device_type,\
-    get_neon_user_config
+from neon_utils.configuration_utils import get_neon_user_config
 from ovos_utils.json_helper import merge_dict
 from lingua_franca.parse import get_full_lang_code
 
-from mycroft.configuration.locale import set_default_lang
+from ovos_config.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
 
 
-try:
-    if get_neon_device_type() == "server":
-        from neon_transcripts_controller.transcript_db_manager import\
-            TranscriptDBManager as Transcribe
-    else:
-        from neon_transcripts_controller.transcript_file_manager import\
-            TranscriptFileManager as Transcribe
-except ImportError:
-    Transcribe = None
+# try:
+#     if get_neon_device_type() == "server":
+#         from neon_transcripts_controller.transcript_db_manager import\
+#             TranscriptDBManager as Transcribe
+#     else:
+#         from neon_transcripts_controller.transcript_file_manager import\
+#             TranscriptFileManager as Transcribe
+# except ImportError:
+Transcribe = None
 
 
 class NeonIntentService(IntentService):

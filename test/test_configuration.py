@@ -27,79 +27,116 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import shutil
 import sys
 import unittest
-from pprint import pformat
+import yaml
 
+from copy import deepcopy
+from pprint import pformat
 from neon_utils.logger import LOG
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 class ConfigurationTests(unittest.TestCase):
+    CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
+
     @classmethod
     def setUpClass(cls) -> None:
-        from ovos_config_assistant.config_helpers import \
-            get_ovos_config, get_ovos_default_config_paths
-        ovos_config = os.path.expanduser("~/.config/OpenVoiceOS/ovos.conf")
-        if os.path.isfile(ovos_config):
-            os.remove(ovos_config)
-        assert get_ovos_default_config_paths() == []
+        os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
 
         import neon_core
-        from neon_core.util.runtime_utils import use_neon_core
-
         assert isinstance(neon_core.CORE_VERSION_STR, str)
-        assert len(use_neon_core(get_ovos_default_config_paths)()) == 1
-        LOG.info(use_neon_core(get_ovos_default_config_paths)())
+        assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
+                                           "OpenVoiceOS", "ovos.conf"))
+
+        from neon_core.util.runtime_utils import use_neon_core
+        from ovos_utils.configuration import get_ovos_config
         ovos_config = use_neon_core(get_ovos_config)()
         LOG.info(pformat(ovos_config))
-        assert ovos_config['config_filename'] == 'neon.conf'
+        assert ovos_config['config_filename'] == 'neon.yaml'
+        assert os.path.basename(ovos_config['default_config_path']) == "neon.yaml"
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if os.path.exists(cls.CONFIG_PATH):
+            shutil.rmtree(cls.CONFIG_PATH)
+        os.environ.pop("XDG_CONFIG_HOME")
 
     def test_neon_core_config_init(self):
-        from neon_utils.configuration_utils import \
-            get_mycroft_compatible_config
         from neon_core.configuration import Configuration
-        from neon_core.util.runtime_utils import use_neon_core
-
-        neon_compat_config = Configuration.get()
-        neon_config = use_neon_core(get_mycroft_compatible_config)()
-        for key, val in neon_config.items():
-            if isinstance(val, dict):
-                for k, v in val.items():
-                    if not isinstance(v, dict):
-                        self.assertEqual(neon_compat_config[key][k],
-                                         v, neon_compat_config[key])
-            else:
-                self.assertEqual(neon_compat_config[key], val)
-
-    def test_ovos_core_config_init(self):
-        from neon_utils.configuration_utils import \
-            get_mycroft_compatible_config
         from mycroft.configuration import Configuration as MycroftConfig
+        # TODO: Replace test after ovos_utils YML config compat.
+        from ovos_utils.configuration import read_mycroft_config
         from neon_core.util.runtime_utils import use_neon_core
 
-        mycroft_config = MycroftConfig.get()
-        neon_config = use_neon_core(get_mycroft_compatible_config)()
-        for key, val in neon_config.items():
-            if isinstance(val, dict):
-                for k, v in val.items():
-                    if not isinstance(v, dict):
-                        self.assertEqual(mycroft_config[key][k],
-                                         v, mycroft_config[key])
+        configuration = Configuration()
+        self.assertIsInstance(configuration, dict)
+        self.assertEqual(configuration, use_neon_core(MycroftConfig)())
+        # self.assertEqual(configuration, use_neon_core(read_mycroft_config)())
+
+    def test_patch_config(self):
+        from os.path import join
+        import json
+
+        test_config_dir = os.path.join(os.path.dirname(__file__), "config")
+        os.makedirs(test_config_dir, exist_ok=True)
+        os.environ["XDG_CONFIG_HOME"] = test_config_dir
+
+        from neon_core.util.runtime_utils import use_neon_core
+        from neon_utils.configuration_utils import init_config_dir
+        use_neon_core(init_config_dir)()
+        from mycroft.configuration import Configuration
+        from mycroft.configuration.locations import DEFAULT_CONFIG
+        self.assertTrue(DEFAULT_CONFIG.endswith("neon.yaml"))
+        self.assertTrue(Configuration.default.path == DEFAULT_CONFIG,
+                        Configuration.default.path)
+        with open(join(test_config_dir, "OpenVoiceOS", 'ovos.conf')) as f:
+            ovos_conf = json.load(f)
+        self.assertEqual(ovos_conf['submodule_mappings']['neon_core'],
+                         "neon_core")
+        self.assertIsInstance(ovos_conf['module_overrides']['neon_core'], dict)
+
+        from neon_core.configuration import patch_config
+        test_config = {"new_key": {'val': True}}
+        patch_config(test_config)
+        self.assertEqual(Configuration(), use_neon_core(Configuration)())
+        conf_file = os.path.join(test_config_dir, 'neon',
+                                 'neon.yaml')
+        self.assertTrue(os.path.isfile(conf_file))
+        with open(conf_file) as f:
+            config = yaml.safe_load(f)
+        for k in config:
+            if isinstance(k, dict):
+                for s in k:
+                    self.assertEqual(config[k][s], Configuration()[k][s],
+                                     Configuration()[k][s])
             else:
-                self.assertEqual(mycroft_config[key], val)
+                self.assertEqual(config[k], Configuration()[k],
+                                 Configuration()[k])
 
-    def test_signal_dir(self):
-        self.assertIsNotNone(os.environ.get("MYCROFT_SYSTEM_CONFIG"))
-        from neon_utils.skill_override_functions import IPC_DIR as neon_ipc_dir
-        from ovos_utils.signal import get_ipc_directory as ovos_ipc_dir
-        from mycroft.util.signal import get_ipc_directory as mycroft_ipc_dir
+        self.assertTrue(config['new_key']['val'])
 
-        from neon_core.util.runtime_utils import use_neon_core
+        test_config = deepcopy(config)
+        test_config["new_key"]["val"] = False
+        test_config['skills'] = \
+            {'auto_update': not Configuration()['skills']['auto_update']}
+        valid_val = test_config['skills']['auto_update']
+        self.assertNotEqual(config, test_config)
+        patch_config(test_config)
+        conf_file = os.path.join(test_config_dir, 'neon',
+                                 'neon.yaml')
+        with open(conf_file) as f:
+            config = yaml.safe_load(f)
+        self.assertEqual(config, test_config)
+        self.assertEqual(config['skills']['auto_update'], valid_val)
+        self.assertFalse(config['new_key']['val'])
+        self.assertEqual(config['skills']['auto_update'],
+                         Configuration()['skills']['auto_update'])
 
-        self.assertEqual(neon_ipc_dir, use_neon_core(ovos_ipc_dir)())
-        self.assertEqual(neon_ipc_dir,
-                         use_neon_core(mycroft_ipc_dir)())
+        shutil.rmtree(test_config_dir)
+        # os.environ.pop("XDG_CONFIG_HOME")
 
 
 if __name__ == '__main__':

@@ -27,9 +27,8 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from os import makedirs
-from os.path import isdir, expanduser
-
-from neon_utils.configuration_utils import get_neon_skills_config
+from os.path import isdir, join, expanduser
+from ovos_utils.xdg_utils import xdg_data_home
 from neon_utils.log_utils import LOG
 
 from neon_core.skills.skill_store import SkillsStore
@@ -44,24 +43,42 @@ SKILL_MAIN_MODULE = '__init__.py'
 class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
-        config = kwargs.pop("config") if "config" in kwargs else \
-            get_neon_skills_config()
-        config["directory"] = expanduser(config["directory"])
         super().__init__(*args, **kwargs)
-        self.skill_config = config
-        if not isdir(self.skill_config["directory"]):
-            LOG.warning("Creating requested skill directory")
-            makedirs(self.skill_config["directory"])
-
+        skill_dir = self.get_default_skills_dir()
         self.skill_downloader = SkillsStore(
-            skills_dir=self.skill_config["directory"],
-            config=self.skill_config, bus=self.bus)
-        self.skill_downloader.skills_dir = self.skill_config["directory"]
+            skills_dir=skill_dir,
+            config=self.config["skills"], bus=self.bus)
+        self.skill_downloader.skills_dir = skill_dir
+
+    def get_default_skills_dir(self):
+        """
+        Go through legacy config params to locate the default skill directory
+        """
+        skill_config = self.config["skills"]
+        skill_dir = skill_config.get("directory") or \
+            skill_config.get("extra_directories")
+        skill_dir = skill_dir[0] if isinstance(skill_dir, list) and \
+            len(skill_dir) > 0 else skill_dir or \
+            join(xdg_data_home(), "neon", "skills")
+
+        skill_dir = expanduser(skill_dir)
+        if not isdir(skill_dir):
+            LOG.warning("Creating requested skill directory")
+            try:
+                makedirs(skill_dir)
+            except Exception as e:
+                LOG.error(e)
+                if skill_dir != join(xdg_data_home(), "neon", "skills"):
+                    skill_dir = join(xdg_data_home(), "neon", "skills")
+                    LOG.warning("Using XDG skills directory")
+                    makedirs(skill_dir, exist_ok=True)
+
+        return skill_dir
 
     def download_or_update_defaults(self):
         # on launch only install if missing, updates handled separately
         # if osm is disabled in .conf this does nothing
-        if self.skill_config["auto_update"]:
+        if self.config["skills"].get("auto_update"):
             try:
                 self.skill_downloader.install_default_skills()
             except Exception as e:

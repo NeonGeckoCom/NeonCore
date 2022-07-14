@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ github.head_ref }}
       - name: Setup Python
         uses: actions/setup-python@v1
         with:
@@ -26,7 +24,7 @@ jobs:
   util_tests:
     strategy:
       matrix:
-        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        python-version: [ 3.7, 3.8, 3.9, '3.10' ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -78,7 +76,7 @@ jobs:
   unit_tests:
     strategy:
       matrix:
-        python-version: [ 3.6, 3.7, 3.8, 3.9, '3.10' ]
+        python-version: [ 3.7, 3.8, 3.9, '3.10' ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -104,12 +102,6 @@ jobs:
         with:
           name: configuration-test-results
           path: tests/configuration-test-results.xml
-      - name: Upload config file
-        uses: actions/upload-artifact@v2
-        with:
-          name: ovos.conf
-          path: ~/.config/OpenVoiceOS/ovos.conf
-        if: always()
 
       - name: Test Language
         run: |

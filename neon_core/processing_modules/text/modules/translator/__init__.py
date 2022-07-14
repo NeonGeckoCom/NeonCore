@@ -28,15 +28,15 @@
 
 from neon_core.processing_modules.text import TextParser
 from neon_core.language import DetectorFactory, TranslatorFactory
-from mycroft.util.log import LOG
 
-from neon_utils.configuration_utils import get_neon_lang_config
+from ovos_config import Configuration
+from neon_utils.logger import LOG
 
 
 class UtteranceTranslator(TextParser):
     def __init__(self, name="utterance_translator", priority=5):
         super().__init__(name, priority)
-        self.language_config = get_neon_lang_config()
+        self.language_config = Configuration().get("language")
         self.lang_detector = DetectorFactory.create()
         self.translator = TranslatorFactory.create()
 
