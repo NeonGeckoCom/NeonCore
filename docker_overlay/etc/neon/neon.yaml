@@ -1,9 +1,7 @@
 skills:
   run_gui_file_server: true
   wait_for_internet: false
-  directory: /default_skills
   extra_directories:
-  - /default_skills
   - /skills
   upload_skill_manifest: false
   blacklisted_skills: []
