@@ -33,6 +33,7 @@ import http.server
 from tempfile import gettempdir
 from os.path import isdir, join, dirname
 from threading import Thread, Event
+from neon_utils.logger import LOG
 
 _HTTP_SERVER: socketserver.TCPServer = None
 
@@ -54,16 +55,21 @@ def start_qml_http_server(skills_dir: str, port: int = 8000):
     system_dir = join(dirname(dirname(__file__)), "res")
 
     qml_dir = join(gettempdir(), "neon", "qml")
-    os.makedirs(qml_dir, exist_ok=True)
+    if not isdir(qml_dir):
+        os.makedirs(qml_dir)
 
     served_skills_dir = join(qml_dir, "skills")
     served_system_dir = join(qml_dir, "system")
-    if os.path.exists(served_skills_dir) or os.path.islink(served_skills_dir):
-        os.remove(served_skills_dir)
+
+    # If serving from a temporary linked directory, create a fresh symlink
+    if skills_dir != served_skills_dir:
+        LOG.info(f"Linking {skills_dir} to {served_skills_dir}")
+        if os.path.exists(served_skills_dir) or os.path.islink(served_skills_dir):
+            os.remove(served_skills_dir)
+        os.symlink(skills_dir, served_skills_dir)
+
     if os.path.exists(served_system_dir) or os.path.islink(served_skills_dir):
         os.remove(served_system_dir)
-
-    os.symlink(skills_dir, served_skills_dir)
     os.symlink(system_dir, served_system_dir)
     started_event = Event()
     http_daemon = Thread(target=_initialize_http_server,

@@ -28,9 +28,13 @@
 
 import time
 
+from tempfile import gettempdir
+from os import listdir
+from os.path import isdir, dirname
 from typing import Optional
 from threading import Thread
 
+from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
 from neon_utils.metrics_utils import announce_connection
@@ -45,7 +49,6 @@ from neon_core.util.qml_file_server import start_qml_http_server
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
-from ovos_config.locale import set_default_lang, set_default_tz
 from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
 
@@ -96,35 +99,45 @@ class NeonSkillService(Thread):
             LOG.info("Updating global config with passed config")
             from neon_core.configuration import patch_config
             patch_config(config)
-            assert all((self.config["skills"][x] == config["skills"][x]
-                        for x in config["skills"]))
-
-        self._init_gui_server()
 
     def _init_gui_server(self):
         from os.path import basename, isdir, join
         from os import symlink, makedirs
-        from shutil import copytree
-        if not self.config.get("run_gui_file_server"):
+        # from shutil import copytree
+        if not self.config["skills"].get("run_gui_file_server"):
             return
-        directory = self.config.get("directory")
+        directory = join(gettempdir(), "neon", "qml", "skills")
         if not isdir(directory):
             makedirs(directory, exist_ok=True)
-        for d in self._get_plugin_skill_dirs():
+        for d in self._get_skill_dirs() + self._get_plugin_skill_dirs():
             if not isdir(join(d, "ui")):
                 continue
             skill_dir = basename(d)
             if not isdir(join(directory, skill_dir)):
                 makedirs(join(directory, skill_dir))
-                copytree(join(d, "ui"), join(directory, skill_dir, "ui"))
-                LOG.debug(f"linked {d} to {directory}")
+                symlink(join(d, "ui"), join(directory, skill_dir, "ui"))
+                LOG.info(f"linked {d}/ui to {directory}/{skill_dir}/ui")
 
         self.http_server = start_qml_http_server(directory)
 
-    def _get_plugin_skill_dirs(self):
+    def _get_skill_dirs(self) -> list:
+        """
+        Get a list of paths to every loaded skill
+        """
+        skill_dirs = []
+        if self.config["skills"].get("directory") and \
+                isdir(self.config["skills"]["directory"]):
+            skill_dirs.extend(listdir(self.config["skills"]["directory"]))
+        for d in self.config["skills"].get("extra_directories"):
+            if d and isdir(d):
+                skill_dirs.extend(listdir(d))
+        return skill_dirs
+
+    @staticmethod
+    def _get_plugin_skill_dirs() -> list:
+
         # TODO: Move to standalone util method
         import importlib.util
-        from os.path import dirname
         from ovos_plugin_manager.skills import find_skill_plugins
         skill_dirs = list()
         plugins = find_skill_plugins()
@@ -154,9 +167,7 @@ class NeonSkillService(Thread):
         self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
 
-        skill_dir = self.skill_manager.get_default_skills_dir()
-        if self.config["skills"].get("run_gui_file_server"):
-            self.http_server = start_qml_http_server(skill_dir)
+        self._init_gui_server()
 
         self.status.set_started()
 
