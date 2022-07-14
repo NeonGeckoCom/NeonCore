@@ -1,0 +1,11 @@
+neon-skill-audio_record
+neon-skill-custom_conversation
+# neon-skill-instructions
+neon-skill-launcher
+neon-skill-messaging
+neon-skill-news
+# neon-skill-recipes
+neon-skill-synonyms
+neon-skill-translation
+neon-skill-avmusic
+neon-skill-camera

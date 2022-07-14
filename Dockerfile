@@ -31,4 +31,4 @@ RUN chmod ugo+x /root/run.sh
 CMD ["/root/run.sh"]
 
 FROM base as default_skills
-RUN pip install .[skills_required,skills_essential]
+RUN pip install .[skills_required,skills_essential,skills_default,skills_extended]

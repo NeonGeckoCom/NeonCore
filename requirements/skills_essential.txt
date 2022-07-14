@@ -1,6 +1,5 @@
-ovos-skill-homescreen @ git+https://github.com/openvoiceos/skill-ovos-homescreen@TEST_SimpleHomescreen
-neon-skill-about @ git+https://github.com/neongeckocom/skill-about@FEAT_PythonPackaging
-neon-skill-date_time @ git+https://github.com/neongeckocom/skill-date_time@FEAT_PythonPackaging
-neon-skill-demo @ git+https://github.com/neongeckocom/skill-demo@FEAT_PythonPackaging
-neon-skill-device_controls @ git+https://github.com/neongeckocom/skill-device_controls@FEAT_PythonPackaging
-neon-skill-ip_address @ git+https://github.com/neongeckocom/skill-ip_address@FEAT_PythonPackaging
+neon-skill-about
+neon-skill-date_time
+# neon-skill-demo
+neon-skill-device_controls
+neon-skill-ip_address
