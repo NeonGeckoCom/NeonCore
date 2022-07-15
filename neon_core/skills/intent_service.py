@@ -35,7 +35,7 @@ from neon_core.configuration import Configuration
 from neon_core.language import get_lang_config
 from neon_core.processing_modules.text import TextParsersService
 
-from mycroft_bus_client import Message
+from mycroft_bus_client import Message, MessageBusClient
 from neon_utils.message_utils import get_message_user
 from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
@@ -43,7 +43,6 @@ from neon_utils.user_utils import apply_local_user_profile_updates
 from neon_utils.configuration_utils import get_neon_user_config
 from ovos_utils.json_helper import merge_dict
 from lingua_franca.parse import get_full_lang_code
-
 from ovos_config.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
 
@@ -60,7 +59,7 @@ Transcribe = None
 
 
 class NeonIntentService(IntentService):
-    def __init__(self, bus):
+    def __init__(self, bus: MessageBusClient):
         super().__init__(bus)
         self.converse = NeonConverseService(bus)
         self.config = Configuration.get().get('context', {})
@@ -204,6 +203,7 @@ class NeonIntentService(IntentService):
                 message.data["lang"] = self.language_config["internal"]
             # now pass our modified message to Mycroft
             # TODO: Consider how to implement 'and' parsing and converse DM
+            LOG.info(message.data.get('utterances'))
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
