@@ -1,8 +1,7 @@
 # mycroft
 ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a34
 # utils
-#neon-utils[network]>=1.0.0a14,<2.0.0
-neon-utils[network]@git+https://github.com/neondaniel/neon-skill-utils@ORG_DeprecateLogUtils
+neon-utils[network]>=1.0.0a17,<2.0.0
 ovos_utils~=0.0,>=0.0.23a6
 ovos-config~=0.0,>=0.0.4a1
 ovos-skills-manager~=0.0.10
