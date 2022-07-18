@@ -68,7 +68,7 @@ def start_qml_http_server(skills_dir: str, port: int = 8000):
             os.remove(served_skills_dir)
         os.symlink(skills_dir, served_skills_dir)
 
-    if os.path.exists(served_system_dir) or os.path.islink(served_skills_dir):
+    if os.path.exists(served_system_dir) or os.path.islink(served_system_dir):
         os.remove(served_system_dir)
     os.symlink(system_dir, served_system_dir)
     started_event = Event()
