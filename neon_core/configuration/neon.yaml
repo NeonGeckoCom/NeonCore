@@ -96,6 +96,8 @@ listener:
   recording_timeout_with_silence: 3.0
   instant_listen: false
 hotwords:
+  hey mycroft:
+    active: false
   hey neon:
     module: ovos-ww-plugin-pocketsphinx
     phonemes: HH EY . N IY AA N .
