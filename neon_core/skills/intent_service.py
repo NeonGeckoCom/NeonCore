@@ -204,8 +204,6 @@ class NeonIntentService(IntentService):
             # now pass our modified message to Mycroft
             # TODO: Consider how to implement 'and' parsing and converse DM
             LOG.info(message.data.get('utterances'))
-            LOG.info(self.bus.emitter._events.get("recognizer_loop:utterance",
-                                                  dict()).values())
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
