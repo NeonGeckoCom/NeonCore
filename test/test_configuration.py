@@ -68,13 +68,14 @@ class ConfigurationTests(unittest.TestCase):
         from neon_core.configuration import Configuration
         from mycroft.configuration import Configuration as MycroftConfig
         # TODO: Replace test after ovos_utils YML config compat.
-        from ovos_utils.configuration import read_mycroft_config
+        from ovos_config.config import read_mycroft_config
         from neon_core.util.runtime_utils import use_neon_core
 
         configuration = Configuration()
+        self.assertEqual(os.path.basename(Configuration.default), "neon.yaml")
         self.assertIsInstance(configuration, dict)
         self.assertEqual(configuration, use_neon_core(MycroftConfig)())
-        # self.assertEqual(configuration, use_neon_core(read_mycroft_config)())
+        self.assertEqual(configuration, use_neon_core(read_mycroft_config)())
 
     def test_patch_config(self):
         from os.path import join
