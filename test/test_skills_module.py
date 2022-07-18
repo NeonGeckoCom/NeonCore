@@ -126,11 +126,11 @@ class TestSkillService(unittest.TestCase):
 
 
 class TestIntentService(unittest.TestCase):
+    bus = FakeBus()
+
     @classmethod
     def setUpClass(cls) -> None:
         from neon_core import NeonIntentService
-
-        cls.bus = FakeBus()
         cls.intent_service = NeonIntentService(cls.bus)
 
     @classmethod
@@ -201,16 +201,13 @@ class TestIntentService(unittest.TestCase):
 
     @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
     def test_handle_utterance(self, patched):
-        from neon_core import NeonIntentService
-
-        intent_service = NeonIntentService(self.bus)
 
         test_message_invalid = Message("test", {"utterances": [' ', '  ']})
-        intent_service.handle_utterance(test_message_invalid)
+        self.intent_service.handle_utterance(test_message_invalid)
         patched.assert_not_called()
 
         test_message_valid = Message("test", {"utterances": ["test", "tests"]})
-        intent_service.handle_utterance(test_message_valid)
+        self.intent_service.handle_utterance(test_message_valid)
 
         patched.assert_called_once_with(test_message_valid)
         self.assertIn("lang", test_message_valid.data)
@@ -220,7 +217,11 @@ class TestIntentService(unittest.TestCase):
                               list)
         self.assertIsInstance(test_message_valid.context["username"], str)
 
-        intent_service.shutdown()
+        message = Message('recognizer_loop:utterance',
+                          {'utterances': ['test']}, {})
+        patched.reset_mock()
+        self.bus.emit(message)
+        patched.assert_called_once_with(message)
 
 
 class TestSkillManager(unittest.TestCase):

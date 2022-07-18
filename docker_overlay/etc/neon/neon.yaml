@@ -7,10 +7,7 @@ skills:
   - /skills
   upload_skill_manifest: false
   blacklisted_skills: []
-  priority_skills:
-    - skill-about.neongeckocom
-    - skill-date_time.neongeckocom
-    - skill-weather.neongeckocom
+  priority_skills: []
   fallbacks:
     fallback_priorities: {}
     fallback_mode: accept_all
