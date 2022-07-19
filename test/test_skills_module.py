@@ -97,16 +97,15 @@ class TestSkillService(unittest.TestCase):
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
                                    error_hook, stopping_hook, config=config,
                                    daemonic=True)
-        from mycroft.configuration import Configuration
+        from neon_core.configuration import Configuration
         self.assertEqual(service.config, Configuration())
-        print(config["skills"])
-        print(service.config['skills'])
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills']))
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
         started.wait(30)
+        self.assertTrue(service.config['skills']['run_gui_file_server'])
         self.assertIsNotNone(service.http_server)
         self.assertTrue(service.config['skills']['auto_update'])
         install_default.assert_called_once()

@@ -94,11 +94,12 @@ class NeonSkillService(Thread):
                                            on_ready=ready_hook,
                                            on_error=error_hook,
                                            on_stopping=stopping_hook)
-        self.config = Configuration()
+        # Apply any passed config values and load Configuration
         if config:
             LOG.info("Updating global config with passed config")
             from neon_core.configuration import patch_config
             patch_config(config)
+        self.config = Configuration()
 
     def _init_gui_server(self):
         from os.path import basename, isdir, join
@@ -117,7 +118,6 @@ class NeonSkillService(Thread):
                 makedirs(join(directory, skill_dir))
                 symlink(join(d, "ui"), join(directory, skill_dir, "ui"))
                 LOG.info(f"linked {d}/ui to {directory}/{skill_dir}/ui")
-
         self.http_server = start_qml_http_server(directory)
 
     def _get_skill_dirs(self) -> list:
@@ -128,7 +128,7 @@ class NeonSkillService(Thread):
         if self.config["skills"].get("directory") and \
                 isdir(self.config["skills"]["directory"]):
             skill_dirs.extend(listdir(self.config["skills"]["directory"]))
-        for d in self.config["skills"].get("extra_directories"):
+        for d in self.config["skills"].get("extra_directories") or []:
             if d and isdir(d):
                 skill_dirs.extend(listdir(d))
         return skill_dirs
@@ -155,9 +155,15 @@ class NeonSkillService(Thread):
         # Set the default timezone to match the configured one
         set_default_tz()
 
+        # Setup signal manager
         self.bus = self.bus or get_messagebus()
         init_signal_bus(self.bus)
         init_signal_handlers()
+
+        # Setup GUI File Server
+        self._init_gui_server()
+
+        # Setup Intents and Skill Manager
         self._register_intent_services()
         self.event_scheduler = EventScheduler(self.bus)
         self.status = ProcessStatus('skills', self.bus, self.callbacks,
@@ -167,11 +173,11 @@ class NeonSkillService(Thread):
         self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
 
-        self._init_gui_server()
-
+        # Update status
         self.status.set_started()
 
         # TODO: These should be event-based in Mycroft/OVOS
+        # Wait for skill manager to start up
         while not self.skill_manager.is_alive():
             time.sleep(0.1)
         self.status.set_alive()
