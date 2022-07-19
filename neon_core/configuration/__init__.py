@@ -38,7 +38,7 @@ result in different configurations depending on originating module.
 
 
 def get_private_keys():
-    return Configuration.get(remote=False).get("keys", {})
+    return Configuration().get("keys", {})
 
 
 def patch_config(config: dict = None):

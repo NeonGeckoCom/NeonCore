@@ -124,6 +124,7 @@ class NeonSkillService(Thread):
         """
         Get a list of paths to every loaded skill
         """
+        # TODO: Update to import from ovos_utils after #55
         skill_dirs = []
         if self.config["skills"].get("directory") and \
                 isdir(self.config["skills"]["directory"]):
@@ -135,8 +136,7 @@ class NeonSkillService(Thread):
 
     @staticmethod
     def _get_plugin_skill_dirs() -> list:
-
-        # TODO: Move to standalone util method
+        # TODO: Update to import from ovos_utils after #55
         import importlib.util
         from ovos_plugin_manager.skills import find_skill_plugins
         skill_dirs = list()
