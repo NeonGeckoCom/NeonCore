@@ -102,6 +102,9 @@ class NeonSkillService(Thread):
         self.config = Configuration()
 
     def _init_gui_server(self):
+        """
+        If configured, start the local file server to serve QML resources
+        """
         from os.path import basename, isdir, join
         from os import symlink, makedirs
         # from shutil import copytree

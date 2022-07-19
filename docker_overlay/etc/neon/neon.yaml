@@ -2,6 +2,7 @@ skills:
   run_gui_file_server: true
   wait_for_internet: false
   extra_directories:
+  - /default_skills
   - /skills
   upload_skill_manifest: false
   blacklisted_skills: []
@@ -32,7 +33,9 @@ skills:
   install_essential: true
   essential_skills: []
   install_default: false
-  default_skills: https://raw.githubusercontent.com/NeonGeckoCom/neon_skills/master/skill_lists/DEFAULT-SKILLS-DOCKER
+  default_skills:
+  # TODO: Defaults are just patching skills not yet pip installable
+  - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
 play_wav_cmdline: "play %1"
 play_mp3_cmdline: "play %1"
 play_ogg_cmdline: "play %1"

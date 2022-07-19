@@ -32,3 +32,5 @@ CMD ["/root/run.sh"]
 
 FROM base as default_skills
 RUN pip install .[skills_required,skills_essential,skills_default,skills_extended]
+# TODO: Default skill installation is a temporary step until all skills are pip installable
+RUN neon-install-default-skills
