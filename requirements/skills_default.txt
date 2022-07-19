@@ -1,4 +1,4 @@
-ovos-skill-homescreen @ git+https://github.com/openvoiceos/skill-ovos-homescreen@TEST_SimpleHomescreen
+ovos-skill-homescreen-lite @ git+https://github.com/openvoiceos/skill-homescreen-lite@TEST_SimpleHomescreen
 skill-ddg @ git+https://github.com/openvoiceos/skill-ddg
 neon-skill-alerts
 neon-skill-caffeinewiz
