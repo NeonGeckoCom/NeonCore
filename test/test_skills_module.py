@@ -97,16 +97,15 @@ class TestSkillService(unittest.TestCase):
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
                                    error_hook, stopping_hook, config=config,
                                    daemonic=True)
-        from mycroft.configuration import Configuration
+        from neon_core.configuration import Configuration
         self.assertEqual(service.config, Configuration())
-        print(config["skills"])
-        print(service.config['skills'])
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills']))
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
         started.wait(30)
+        self.assertTrue(service.config['skills']['run_gui_file_server'])
         self.assertIsNotNone(service.http_server)
         self.assertTrue(service.config['skills']['auto_update'])
         install_default.assert_called_once()
@@ -123,6 +122,37 @@ class TestSkillService(unittest.TestCase):
         service.shutdown()
         stopping_hook.assert_called_once()
         service.join(10)
+
+    @patch("ovos_utils.skills.locations.get_plugin_skills")
+    @patch("ovos_utils.skills.locations.get_skill_directories")
+    def test_get_skill_dirs(self, skill_dirs, plugin_skills):
+        from neon_core.skills.service import NeonSkillService
+
+        test_dir = join(dirname(__file__), "get_skill_dirs_skills")
+        skill_dirs.return_value = [join(test_dir, "extra_dir_1"),
+                                   join(test_dir, "extra_dir_2")]
+        plugin_skills.return_value = ([join(test_dir, "plugins",
+                                            "skill-plugin")],
+                                      ["skill-plugin.neongeckocom"])
+
+        skill_dirs = NeonSkillService()._get_skill_dirs()
+        # listdir doesn't guarantee order, base skill directory order matters
+        self.assertEqual(set(skill_dirs),
+                         {join(test_dir, "plugins", "skill-plugin"),
+                          join(test_dir, "extra_dir_1",
+                               "skill-test-1.neongeckocom"),
+                          join(test_dir, "extra_dir_1",
+                               "skill-test-2.neongeckocom"),
+                          join(test_dir, "extra_dir_1",
+                               "skill-test-3.neongeckocom"),
+                          join(test_dir, "extra_dir_2",
+                               "skill-test-1.neongeckocom")
+                          })
+        self.assertEqual(skill_dirs[0],
+                         join(test_dir, "plugins", "skill-plugin"))
+        self.assertEqual(skill_dirs[-1],
+                         join(test_dir, "extra_dir_2",
+                              "skill-test-1.neongeckocom"))
 
 
 class TestIntentService(unittest.TestCase):

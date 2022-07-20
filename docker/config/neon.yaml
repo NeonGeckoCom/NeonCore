@@ -2,6 +2,8 @@ websocket:
   host: neon-messagebus
 gui_websocket:
   host: neon-gui
+gui:
+  idle_display_skill: skill-homescreen-lite.openvoiceos
 ready_settings:
   - skills
   - speech

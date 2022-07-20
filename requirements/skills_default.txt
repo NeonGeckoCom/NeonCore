@@ -1,0 +1,16 @@
+ovos-skill-homescreen-lite @ git+https://github.com/openvoiceos/skill-homescreen-lite@TEST_SimpleHomescreen
+skill-ddg @ git+https://github.com/openvoiceos/skill-ddg
+neon-skill-alerts
+neon-skill-caffeinewiz
+neon-skill-data_controls
+neon-skill-fallback_wolfram_alpha
+neon-skill-personal
+neon-skill-speak
+neon-skill-speed_test
+neon-skill-spelling
+neon-skill-stock
+neon-skill-support_helper
+# neon-skill-update
+neon-skill-user_settings
+neon-skill-weather
+neon-skill-wikipedia
