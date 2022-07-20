@@ -30,13 +30,14 @@ import time
 
 from tempfile import gettempdir
 from os import listdir
-from os.path import isdir, dirname
+from os.path import isdir, dirname, join
 from typing import Optional
 from threading import Thread
 
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
+from ovos_utils.skills.locations import get_plugin_skills, get_skill_directories
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 from neon_utils.messagebus_utils import get_messagebus
@@ -113,7 +114,7 @@ class NeonSkillService(Thread):
         directory = join(gettempdir(), "neon", "qml", "skills")
         if not isdir(directory):
             makedirs(directory, exist_ok=True)
-        for d in self._get_skill_dirs() + self._get_plugin_skill_dirs():
+        for d in reversed(self._get_skill_dirs()):
             if not isdir(join(d, "ui")):
                 continue
             skill_dir = basename(d)
@@ -125,31 +126,14 @@ class NeonSkillService(Thread):
 
     def _get_skill_dirs(self) -> list:
         """
-        Get a list of paths to every loaded skill
+        Get a list of paths to every loaded skill in load order (priority last)
         """
-        # TODO: Update to import from ovos_utils after #55
-        skill_dirs = []
-        if self.config["skills"].get("directory") and \
-                isdir(self.config["skills"]["directory"]):
-            skill_dirs.extend(listdir(self.config["skills"]["directory"]))
-        for d in self.config["skills"].get("extra_directories") or []:
-            if d and isdir(d):
-                skill_dirs.extend(listdir(d))
-        return skill_dirs
+        plugin_dirs, _ = get_plugin_skills()
+        skill_base_dirs = get_skill_directories(self.config)
 
-    @staticmethod
-    def _get_plugin_skill_dirs() -> list:
-        # TODO: Update to import from ovos_utils after #55
-        import importlib.util
-        from ovos_plugin_manager.skills import find_skill_plugins
-        skill_dirs = list()
-        plugins = find_skill_plugins()
-        for skill_class in plugins.values():
-            skill_dir = dirname(importlib.util.find_spec(
-                skill_class.__module__).origin)
-            skill_dirs.append(skill_dir)
-        LOG.info(f"Located plugin skill_dirs: {skill_dirs}")
-        return skill_dirs
+        skill_dirs = [join(base_dir, d) for base_dir in skill_base_dirs
+                      for d in listdir(base_dir)]
+        return plugin_dirs + skill_dirs
 
     def run(self):
         # Set the active lang to match the configured one
