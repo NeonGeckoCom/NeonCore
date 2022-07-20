@@ -147,18 +147,24 @@ class NeonSkillService(Thread):
         init_signal_bus(self.bus)
         init_signal_handlers()
 
-        # Setup GUI File Server
-        self._init_gui_server()
-
         # Setup Intents and Skill Manager
         self._register_intent_services()
         self.event_scheduler = EventScheduler(self.bus)
         self.status = ProcessStatus('skills', self.bus, self.callbacks,
                                     namespace="neon")
         SkillApi.connect_bus(self.bus)
+        LOG.info("Starting Skill Manager")
         self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
         self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
+        LOG.info("Skill Manager started")
+
+        # Setup GUI File Server
+        try:
+            self._init_gui_server()
+        except Exception as e:
+            # Allow service to start if GUI file server fails
+            LOG.exception(e)
 
         # Update status
         self.status.set_started()
