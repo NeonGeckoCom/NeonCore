@@ -14,6 +14,9 @@ tts:
   module: coqui
   fallback_module: amazon_polly
 language:
+  supported_langs:
+    # List any languages here to handle natively in intent parsing
+    - en
   internal: en-us
   user: en-us
   detection_module: libretranslate_detection_plug
