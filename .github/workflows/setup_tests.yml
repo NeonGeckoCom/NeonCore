@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  core_modules:
+  core_and_skills:
     strategy:
       matrix:
         python-version: [ 3.7, 3.8, 3.9, '3.10' ]
@@ -21,7 +21,7 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt update
-          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
+          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3-dev
           pip install wheel
       - name: Test Core Module Installation
         run: |
