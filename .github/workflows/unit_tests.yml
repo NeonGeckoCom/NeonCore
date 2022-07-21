@@ -21,12 +21,6 @@ jobs:
       - name: Build Distribution Packages
         run: |
           python setup.py bdist_wheel
-      - name: Test Install with Skills
-        run: |
-          sudo apt update
-          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
-          pip install wheel
-          pip install .[core_modules,dev,local,remote,vision,test,pi,docker,skills_required,skills_essential,skills_default,skills_extended]
   util_tests:
     strategy:
       matrix:
