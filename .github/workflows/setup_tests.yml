@@ -6,6 +6,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  core_and_skills:
+    strategy:
+      matrix:
+        python-version: [ 3.7, 3.8, 3.9 ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3-dev
+          pip install wheel
+      - name: Test Core Module Installation
+        run: |
+          pip install .[core_modules]
+      - name: Test Skills Installation
+        run: |
+          pip install .[skills_required,skills_essential,skills_default,skills_extended]
   legacy-remote:
     strategy:
       matrix:
