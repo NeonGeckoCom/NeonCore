@@ -2,6 +2,7 @@
 ovos-core[skills_lgpl]~=0.0.3,>=0.0.4a38
 # utils
 neon-utils[network,configuration]~=1.0,>=1.0.2a0
+neon-transformers~=0.1
 ovos_utils~=0.0,>=0.0.23
 ovos-config~=0.0,>=0.0.4
 ovos-skills-manager~=0.0.10,>=0.0.11a5
@@ -11,6 +12,7 @@ psutil~=5.6
 
 # default plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
+neon-utterance-translator-plugin~=0.1,>=0.1.1a0
 
 # text parser modules
 RAKEkeywords~=0.2

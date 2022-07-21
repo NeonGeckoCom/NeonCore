@@ -115,14 +115,14 @@ class NeonIntentService(IntentService):
                 message.data.get('utterances', [''])[0], timestamp, audio)
             message.context["audio_file"] = audio_file
 
-    def _get_parsers_service_context(self, message: Message, lang):
+    def _get_parsers_service_context(self, message: Message, lang: str):
         """
         Pipe utterance thorough text parsers to get more metadata.
         Utterances may be modified by any parser and context overwritten
         :param message: Message to parse
         """
         utterances = message.data.get('utterances', [])
-        message.context["lang"] = lang or message.data.get('lang')
+        message.context["lang"] = lang
         utterances, message.context = self.transformers.transform(utterances, message.context)
         message.data["utterances"] = utterances
         return message
