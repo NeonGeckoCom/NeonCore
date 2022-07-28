@@ -26,6 +26,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from fnmatch import translate
 import time
 import wave
 
@@ -44,6 +45,7 @@ from neon_utils.configuration_utils import get_neon_device_type,\
     get_neon_user_config
 from ovos_utils.json_helper import merge_dict
 from lingua_franca.parse import get_full_lang_code
+from neon_utterance_plugin_translator import UtteranceTranslator
 
 from mycroft.configuration.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
@@ -77,6 +79,8 @@ class NeonIntentService(IntentService):
 
         self.parser_service = TextParsersService(self.bus)
         self.parser_service.start()
+
+        self.translator = UtteranceTranslator()
 
         self.transcript_service = None
         if Transcribe:
@@ -199,10 +203,13 @@ class NeonIntentService(IntentService):
 
             # TODO: Try the original lang and fallback to translation
             # If translated, make sure message.data['lang'] is updated
-            if message.context.get("translation_data") and \
-                    message.context.get("translation_data")[0].get(
-                        "was_translated"):
-                message.data["lang"] = self.language_config["internal"]
+            transformed_utterance, metadata = self.translator.transform(message.data.get("utterances", []), self.config)
+
+            transformed_utterance, metadata = self.translator.transform(message.data.get('utterances',
+                                                                  []), message.context)
+            message.data["utterances"] = transformed_utterance
+            message.context = merge_dict(message.context, metadata)
+            
             # now pass our modified message to Mycroft
             # TODO: Consider how to implement 'and' parsing and converse DM
             super().handle_utterance(message)
