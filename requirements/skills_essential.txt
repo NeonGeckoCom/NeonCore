@@ -1,5 +1,5 @@
 neon-skill-about
 neon-skill-date_time
-# neon-skill-demo
+neon-skill-demo @ git+https://github.com/neongeckocom/skill-demo@FEAT_LocalDemo
 neon-skill-device_controls
 neon-skill-ip_address
