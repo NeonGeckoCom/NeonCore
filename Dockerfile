@@ -5,6 +5,18 @@ LABEL vendor=neon.ai \
 
 ENV NEON_CONFIG_PATH /config
 
+RUN  apt-get update && \
+     apt-get install -y \
+     curl \
+     gpg
+
+RUN  curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | \
+     gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/mycroft-desktop.gpg --import - && \
+     chmod a+r /etc/apt/trusted.gpg.d/mycroft-desktop.gpg && \
+     echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" \
+     > /etc/apt/sources.list.d/mycroft-mimic.list
+
+
 RUN apt-get update && \
     apt-get install -y \
     gcc \
@@ -16,8 +28,16 @@ RUN apt-get update && \
     portaudio19-dev \
     libsndfile1 \
     libpulse-dev \
+    alsa-utils \
+    libasound2-plugins \
+    pulseaudio-utils \
     ffmpeg \
-    git  # TODO: git required for getting scripts, skill should be refactored to remove this dependency
+    mimic \
+    sox \
+    git
+
+# TODO: git required for getting scripts, skill should be refactored to remove this dependency
+# TODO: sox, mimic required for demo skill, audio service should be refactored to handle TTS engines/voices in request
 
 ADD . /neon_core
 WORKDIR /neon_core
