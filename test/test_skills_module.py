@@ -209,7 +209,7 @@ class TestIntentService(unittest.TestCase):
         mod_1.priority = 2
         mod_1.transform = mod_1_parse
         mod_2 = Mock()
-        mod_2.priority = 100
+        mod_2.priority = 1
         mod_2.transform = mod_2_parse
         self.intent_service.transformers.loaded_modules = \
             {"test_mod_1": mod_1,
@@ -220,7 +220,7 @@ class TestIntentService(unittest.TestCase):
         self.assertEqual(len(test_message.data['utterances']),
                          len(utterances) + 2)
 
-        mod_2.priority = 1
+        mod_2.priority = 100
         self.intent_service._get_parsers_service_context(test_message, lang)
         self.assertEqual(test_message.context["parser_context"], "mod_1")
         self.intent_service.transformers.loaded_modules = real_modules
