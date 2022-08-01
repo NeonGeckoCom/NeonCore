@@ -33,7 +33,7 @@ from mycroft.skills.intent_services import ConverseService
 
 from neon_core.configuration import Configuration
 from neon_core.language import get_lang_config
-from neon_core.processing_modules.text import TextParsersService
+from neon_transformers.text_transformers import UtteranceTransformersService
 
 from mycroft_bus_client import Message, MessageBusClient
 from neon_utils.message_utils import get_message_user
@@ -73,8 +73,7 @@ class NeonIntentService(IntentService):
 
         # self._setup_converse_handlers()
 
-        self.parser_service = TextParsersService(self.bus)
-        self.parser_service.start()
+        self.transformers = UtteranceTransformersService(self.bus)
 
         self.transcript_service = None
         if Transcribe:
@@ -93,7 +92,7 @@ class NeonIntentService(IntentService):
                                              self._default_user)
 
     def shutdown(self):
-        self.parser_service.shutdown()
+        self.transformers.shutdown()
 
     def _save_utterance_transcription(self, message):
         """
@@ -116,21 +115,17 @@ class NeonIntentService(IntentService):
                 message.data.get('utterances', [''])[0], timestamp, audio)
             message.context["audio_file"] = audio_file
 
-    def _get_parsers_service_context(self, message: Message):
+    def _get_parsers_service_context(self, message: Message, lang: str):
         """
         Pipe utterance thorough text parsers to get more metadata.
         Utterances may be modified by any parser and context overwritten
         :param message: Message to parse
         """
         utterances = message.data.get('utterances', [])
-        lang = message.data.get('lang')
-        for parser in self.parser_service.modules:
-            # mutate utterances and retrieve extra data
-            utterances, data = self.parser_service.parse(parser, utterances,
-                                                         lang)
-            # update message context with extra data
-            message.context = merge_dict(message.context, data)
+        message.context["lang"] = lang
+        utterances, message.context = self.transformers.transform(utterances, message.context)
         message.data["utterances"] = utterances
+        return message
 
     def handle_utterance(self, message):
         """
@@ -180,7 +175,7 @@ class NeonIntentService(IntentService):
 
             # Get text parser context
             with stopwatch:
-                self._get_parsers_service_context(message)
+                message = self._get_parsers_service_context(message, lang)
             message.context["timing"]["text_parsers"] = stopwatch.time
 
             # Catch empty utterances after parser service

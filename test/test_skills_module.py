@@ -189,7 +189,7 @@ class TestIntentService(unittest.TestCase):
             assert_called_with(None, test_message.data["utterances"][0],
                                transcribe_time, audio)
 
-    def test_get_parsers_service_context(self):
+    def test_get_transformers_service_context(self):
         utterances = ["test 1", "test one"]
         lang = "en-us"
         test_message = Message("recognizer_loop:utterance",
@@ -204,30 +204,30 @@ class TestIntentService(unittest.TestCase):
             utterances.append("mod 2 parsed")
             return utterances, {"parser_context": "mod_2"}
 
-        real_modules = self.intent_service.parser_service.loaded_modules
+        real_modules = self.intent_service.transformers.loaded_modules
         mod_1 = Mock()
         mod_1.priority = 2
-        mod_1.parse = mod_1_parse
+        mod_1.transform = mod_1_parse
         mod_2 = Mock()
-        mod_2.priority = 100
-        mod_2.parse = mod_2_parse
-        self.intent_service.parser_service.loaded_modules = \
-            {"test_mod_1": {"instance": mod_1},
-             "test_mod_2": {"instance": mod_2}}
-        self.intent_service._get_parsers_service_context(test_message)
+        mod_2.priority = 1
+        mod_2.transform = mod_2_parse
+        self.intent_service.transformers.loaded_modules = \
+            {"test_mod_1": mod_1,
+             "test_mod_2": mod_2}
+        self.intent_service._get_parsers_service_context(test_message, lang)
         self.assertEqual(test_message.context["parser_context"], "mod_2")
         self.assertNotEqual(utterances, test_message.data['utterances'])
         self.assertEqual(len(test_message.data['utterances']),
                          len(utterances) + 2)
 
-        mod_2.priority = 1
-        self.intent_service._get_parsers_service_context(test_message)
+        mod_2.priority = 100
+        self.intent_service._get_parsers_service_context(test_message, lang)
         self.assertEqual(test_message.context["parser_context"], "mod_1")
-        self.intent_service.parser_service.loaded_modules = real_modules
+        self.intent_service.transformers.loaded_modules = real_modules
 
         valid_parsers = {"cancel", "entity_parser", "translator"}
         self.assertTrue(all([p for p in valid_parsers if p in
-                        self.intent_service.parser_service.loaded_modules]))
+                        self.intent_service.transformers.loaded_modules]))
 
     @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
     def test_handle_utterance(self, patched):
