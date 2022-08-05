@@ -31,6 +31,10 @@ You will need `docker` and `docker-compose` available. Docker provides updated g
 Neon Core is only tested on Ubuntu, but should be compatible with any linux distribution that uses
 [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/).
 
+> *Note*: By default, only the `root` user has permissions to interact with Docker under Ubuntu.
+> To allow the current user to modify Docker containers, you can add them to the `docker` group with:
+> `sudo usermod -aG docker $USER`
+
 ## b. Running Neon
 You can clone the repository, or just copy the `docker` directory contents onto your local system; this document will 
 assume that the repository is cloned to: `~/NeonCore`.
