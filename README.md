@@ -33,7 +33,7 @@ Neon Core is only tested on Ubuntu, but should be compatible with any linux dist
 
 > *Note*: By default, only the `root` user has permissions to interact with Docker under Ubuntu.
 > To allow the current user to modify Docker containers, you can add them to the `docker` group with:
-> `sudo usermod -aG docker $USER`
+> `sudo usermod -aG docker $USER && newgrp`
 
 ## b. Running Neon
 You can clone the repository, or just copy the `docker` directory contents onto your local system; this document will 
