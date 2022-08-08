@@ -39,6 +39,9 @@ Neon Core is only tested on Ubuntu, but should be compatible with any linux dist
 You can clone the repository, or just copy the `docker` directory contents onto your local system; this document will 
 assume that the repository is cloned to: `~/NeonCore`.
 
+> *Note*: The `docker` directory includes required hidden files. If you copy files, make sure to include any hidden
+> files. In must Ubuntu distros, you can toggle hidden file visibility in the file explorer with `CTRL` + `h`.
+
 You can start all core modules with:
 ```shell
 # cd into the directory containing docker-compose.yml
@@ -55,7 +58,7 @@ docker-compose down
 
 ### Optional GUI
 The Mycroft GUI is an optional component that can be run on Linux host systems.
-The GUI is available with instructions [on GitHub](https://github.com/MycroftAI/mycroft-gui)
+The GUI is available with instructions [on GitHub](https://github.com/OpenVoiceOS/mycroft-gui)
 
 ## c. Interacting with Neon
 With the containers running, you can interact with Neon by voice (i.e. "hey Neon, what time is it?"), or using one of 
@@ -98,7 +101,7 @@ to:
 ```
 
 ## e. Configuration
-The `ngi_local_conf.yml` file included in the `docker` directory contains a default configuration
+The `neon.yaml` file included in the `docker` directory contains a default configuration
 that may be modified to specify different plugins and other runtime settings.
 The `docker` directory is mounted read-only to `/config` in each of the containers,
 so model files may be placed there and the configuration updated to use different STT/TTS plugins with
