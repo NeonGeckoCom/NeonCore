@@ -1,5 +1,7 @@
 deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
 vosk @ https://github.com/alphacep/vosk-api/releases/download/v0.3.30/vosk-0.3.30-py3-none-linux_aarch64.whl
 neon-cli-client~=0.1,>=0.1.1a2
+ovos-stt-plugin-vosk~=0.1
 
 ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2
+ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system
