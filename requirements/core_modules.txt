@@ -1,4 +1,3 @@
-ovos-core[all]~=0.0.4
 ovos-ww-plugin-pocketsphinx~=0.1.2
 
 # neon core modules
