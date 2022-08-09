@@ -58,7 +58,7 @@ docker-compose down
 
 ### Optional GUI
 The Mycroft GUI is an optional component that can be run on Linux host systems.
-The GUI is available with instructions [on GitHub](https://github.com/OpenVoiceOS/mycroft-gui)
+The GUI is available with instructions [on GitHub](https://github.com/MycroftAI/mycroft-gui)
 
 ## c. Interacting with Neon
 With the containers running, you can interact with Neon by voice (i.e. "hey Neon, what time is it?"), or using one of 
