@@ -9,3 +9,4 @@ ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-sy
 ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa
 pyalsaaudio~=0.9  # TODO: Patching plugin dependency
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
+ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
