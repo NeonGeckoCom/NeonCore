@@ -12,9 +12,8 @@ ovos-phal-plugin-balena-wifi
 ovos-phal-plugin-network-manager
 ovos-phal-plugin-wifi-setup
 
-ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2
+ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2@FIX_FanSpeedCommand
 ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system
-ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa
-pyalsaaudio~=0.9  # TODO: Patching plugin dependency
+ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa@FIX_Dependencies
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
-ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
+# ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
