@@ -38,7 +38,7 @@ jobs:
       - name: Setup Python 3.7
         uses: actions/setup-python@v1
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.7
       - name: Install System Dependencies
         run: |
           sudo add-apt-repository -y ppa:deadsnakes/ppa
