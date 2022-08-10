@@ -4,7 +4,14 @@ neon-cli-client~=0.1,>=0.1.1a2
 ovos-stt-plugin-vosk~=0.1
 ovos-ww-plugin-vosk~=0.1
 
-ovos-phal-plugin-brightness-controll-rpi
+ovos-phal-plugin-brightness-control-rpi
+ovos-phal-plugin-notification-widgets
+ovos-phal-plugin-color-scheme-manager
+ovos-phal-plugin-configuration-provider
+ovos-phal-plugin-balena-wifi
+ovos-phal-plugin-network-manager
+ovos-phal-plugin-wifi-setup
+
 ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2
 ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system
 ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa
