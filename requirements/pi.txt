@@ -15,5 +15,7 @@ ovos-phal-plugin-wifi-setup
 ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2@FIX_FanSpeedCommand
 ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system
 ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa@FIX_Dependencies
-ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
 # ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
+
+# TODO Homescreen advertises itself as mycroft-homescreen when pip installed, so we're not pip installing it
+# ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
