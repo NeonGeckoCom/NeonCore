@@ -48,6 +48,15 @@ jobs:
           sudo apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3.7-dev python3.7-venv mimic || exit 1
       - name: Install Core
         run: pip install .[core_modules,skills_required,skills_essential,skills_default,skills_extended,local]
+      - name: Test chroot build
+        uses: pguyot/arm-runner-action@v2
+        with:
+          debug: true
+          base_image: https://2222.us/app/files/neon_images/pi/ubuntu_22_04.img.xz
+          cpu: aarch64
+          copy_repository_path: /core
+          commands: |
+            bash /core/test/pi_setup.sh
 
   legacy-remote:
     strategy:
