@@ -41,10 +41,10 @@ apt update
 apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3.7-dev python3.7-venv mimic espeak-ng || exit 1
 
 # Configure venv for deepspeech compat.
-
 cd /core || exit 10
 python3.7 -m venv "/core/venv" || exit 11
 . /core/venv/bin/activate
+
 pip install --upgrade pip wheel
 pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi,local]" || exit 11
 
