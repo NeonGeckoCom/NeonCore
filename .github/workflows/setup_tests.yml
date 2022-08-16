@@ -37,7 +37,6 @@ jobs:
       - name: Test chroot installation
         uses: pguyot/arm-runner-action@v2
         with:
-          debug: true
           optimize_image: false
           base_image: https://2222.us/app/files/neon_images/pi/ubuntu_22_04.img.xz
           cpu: cortex-a53
@@ -45,9 +44,8 @@ jobs:
           commands: |
             bash /core/test/pi_setup.sh
             . /core/venv/bin/activate
-            neon-audio init-plugin
-            neon-speech init-plugin
-          # TODO: Test module load, etc.
+            neon-audio init-plugin -p coqui
+            neon-speech init-plugin -p deepspeech_stream_local
 
   legacy-remote:
     strategy:
