@@ -44,6 +44,7 @@ jobs:
           copy_repository_path: /core
           commands: |
             bash /core/test/pi_setup.sh
+            source /core/venv/bin/activate
             neon-audio init-plugin
             neon-speech init-plugin
           # TODO: Test module load, etc.
