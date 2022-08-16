@@ -31,18 +31,21 @@ jobs:
           pip install .[skills_required,skills_essential,skills_default,skills_extended]
   pi_image:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v2
       - name: Test chroot installation
         uses: pguyot/arm-runner-action@v2
         with:
           debug: true
+          optimize_image: false
           base_image: https://2222.us/app/files/neon_images/pi/ubuntu_22_04.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
             bash /core/test/pi_setup.sh
+            neon-audio init-plugin
+            neon-speech init-plugin
           # TODO: Test module load, etc.
 
   legacy-remote:

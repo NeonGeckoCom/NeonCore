@@ -47,4 +47,3 @@ python3.7 -m venv "/core/venv" || exit 11
 
 pip install --upgrade pip wheel
 pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi,local]" || exit 11
-
