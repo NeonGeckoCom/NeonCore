@@ -53,7 +53,7 @@ jobs:
         with:
           debug: true
           base_image: https://2222.us/app/files/neon_images/pi/ubuntu_22_04.img.xz
-          cpu: aarch64
+          cpu: cortex-a53
           copy_repository_path: /core
           commands: |
             bash /core/test/pi_setup.sh
