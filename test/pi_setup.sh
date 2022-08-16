@@ -27,7 +27,12 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Override DNS resolver
+rm /etc/resolv.conf
+echo "nameserver 1.1.1.1" | tee /etc/resolv.conf
+
 # install system packages
+apt update
 add-apt-repository -y ppa:deadsnakes/ppa
 apt install -y curl
 curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
