@@ -32,8 +32,9 @@ from tempfile import gettempdir
 from os import listdir
 from os.path import isdir, dirname, join
 from typing import Optional
-from threading import Thread
+from threading import Thread, Event
 
+from mycroft_bus_client import Message
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
@@ -130,7 +131,7 @@ class NeonSkillService(Thread):
         """
         plugin_dirs, _ = get_plugin_skills()
         skill_base_dirs = get_skill_directories(self.config)
-
+        # TODO: Get ovos_plugin_common_play too
         skill_dirs = [join(base_dir, d) for base_dir in skill_base_dirs
                       for d in listdir(base_dir)]
         return plugin_dirs + skill_dirs
@@ -176,6 +177,21 @@ class NeonSkillService(Thread):
         self.status.set_alive()
         while not self.skill_manager.is_all_loaded():
             time.sleep(0.1)
+
+        # Check for setup skill activity
+        setup_status = self.bus.wait_for_response(
+            Message("ovos.setup.state"))
+        if setup_status and setup_status.data.get('state') == "SELECTING_WIFI":
+            wifi_event = Event()
+
+            def _wifi_done(_):
+                wifi_event.set()
+            self.bus.once("ovos.wifi.setup.completed", _wifi_done)
+            self.bus.once("ovos.phal.plugin.skip.setup", _wifi_done)
+            # Wait up to 5 minutes for wifi completion
+            if not wifi_event.wait(300):
+                LOG.warning("Timed out waiting for wifi setup")
+
         self.status.set_ready()
         announce_connection()
 
