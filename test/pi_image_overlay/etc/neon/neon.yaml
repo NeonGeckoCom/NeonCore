@@ -1,0 +1,181 @@
+play_wav_cmdline: "play %1"
+play_mp3_cmdline: "play %1"
+play_ogg_cmdline: "play %1"
+tts:
+  module: coqui
+  fallback_module: ovos-tts-plugin-mimic
+Audio:
+  backends:
+    OCP:
+      type: ovos_common_play
+      active: true
+      dbus_type: system
+    simple:
+      type: ovos_audio_simple
+      active: true
+    vlc:
+      type: ovos_vlc
+      active: false
+  default-backend: OCP
+audio_parsers:
+  blacklist:
+  - gender
+stt:
+  module: deepspeech_stream_local
+  fallback_module: ovos-stt-plugin-vosk
+  vosk:
+    model: /home/neon/.config/neon/vosk-model-small-en-us-0.15
+  deepspeech_stream_local:
+    model_file: /root/.local/share/neon/deepspeech-0.9.3-models.tflite
+    scorer_file: /root/.local/share/neon/deepspeech-0.9.3-models.scorer
+  ovos-stt-plugin-server:
+    url: https://stt.openvoiceos.com/stt
+confirm_listening: true
+listener:
+  sample_rate: 16000
+  mic_meter_ipc: false
+  record_wake_words: false
+  save_utterances: false
+  wake_word_upload:
+    disable: false
+    url: https://training.mycroft.ai/precise/upload
+  wake_word_enabled: true  # TODO: Deprecate and replace with `continuous_listen`
+  continuous_listen: false
+  VAD:
+    silence_method: vad_and_ratio
+    speech_seconds: 0.1
+    silence_seconds: 0.5
+    before_seconds: 0.5
+    min_seconds: 1
+    max_current_ratio_threshold: 2
+    initial_energy_threshold: 1000.0
+    module: ''
+    ovos-vad-plugin-silero:
+      threshold: 0.2
+    ovos-vad-plugin-webrtcvad:
+      vad_mode: 3
+  mute_during_output: true
+  duck_while_listening: 0.3
+  phoneme_duration: 120
+  multiplier: 1.0
+  energy_ratio: 1.5
+  recording_timeout: 10.0
+  recording_timeout_with_silence: 3.0
+  instant_listen: false
+hotwords:
+  hey mycroft:
+    active: false
+  wake up:
+    active: false
+  hey neon:
+    module: ovos-ww-plugin-vosk
+    listen: true
+    debug: false
+    model_folder: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
+    samples:
+      - hey neon
+      - hey neil
+      - hey near
+      - hey now
+      - hey india
+      - hey me or
+      - hey moron
+      - kenya
+      - the neon
+      - a neon
+      - the indian
+      - india
+sounds:
+  start_listening: snd/start_listening.wav
+  end_listening: snd/end_listening.wav
+  acknowledge: snd/acknowledge.mp3
+gui_websocket:
+  host: 0.0.0.0
+  base_port: 18181
+  route: /gui
+  ssl: false
+websocket:
+  host: 0.0.0.0
+  port: 8181
+  route: /core
+  ssl: false
+  allow_self_signed: false
+  ssl_cert:
+  ssl_key:
+  shared_connection: true
+gui:
+  idle_display_skill: skill-ovos-homescreen.openvoiceos
+  extension: smartspeaker
+  run_gui_file_server: false
+  generic:
+    homescreen_supported: true
+MQ:
+  server: mq.2021.us
+  port: 25672
+  users:
+    mq_handler:
+      user: neon_api_utils
+      password: Klatchat2021
+signal:
+  max_wait_seconds: 300
+skills:
+  run_gui_file_server: false
+  wait_for_internet: false
+  extra_directories:
+    - /home/neon/.local/share/neon/skills
+  upload_skill_manifest: false
+  blacklisted_skills: []
+  priority_skills: []
+  fallbacks:
+    fallback_priorities: {}
+    fallback_mode: accept_all
+    fallback_whitelist: []
+    fallback_blacklist: []
+  converse:
+    timeout: 300
+    skill_timeouts: {}
+    converse_mode: accept_all
+    converse_whitelist: []
+    converse_blacklist: []
+    converse_activation: accept_all
+    max_activations: -1
+    skill_activations: {}
+    cross_activation: true
+    cross_deactivation: true
+    converse_priorities: {}
+  update_interval: 1.0
+  disable_osm: false
+  appstore_sync_interval: 6
+  auto_update: false
+  auto_update_interval: 24
+  neon_token: ''
+  install_essential: true
+  essential_skills: []
+  install_default: false
+  default_skills:
+  # TODO: Defaults are just patching skills not yet pip installable
+  - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
+  - https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main
+PHAL:
+  ovos-PHAL-plugin-balena-wifi:
+    debug: false
+    ssid: Neon
+    psk:
+    color: '#ff8600'
+    portal: start dot neon dot ai
+    device: Neon Device
+ready_settings:
+  - skills
+  - speech
+  - audio
+  - gui
+system:
+  protected_keys:
+    remote:
+      - gui_websocket:host
+      - websocket:host
+    user:
+      - gui_websocket:host
+      - websocket:host
+log_dir: /home/neon/logs/
+debug: True
