@@ -3,8 +3,7 @@ ovos-core[skills_lgpl]~=0.0.4
 # utils
 neon-utils[network,configuration]~=1.0,>=1.0.3a3
 neon-transformers~=0.1
-# ovos_utils~=0.0,>=0.0.23
-ovos_utils @ git+https://github.com/neondaniel/ovos_utils@FIX_HandleMemoryTempfileExceptions
+ovos_utils~=0.0,>=0.0.24a2
 ovos-config~=0.0,>=0.0.4
 ovos-skills-manager~=0.0,>=0.0.11
 ovos-plugin-manager~=0.0.16,>=0.0.19a1
