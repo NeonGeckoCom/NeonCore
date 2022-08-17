@@ -1,6 +1,3 @@
 neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_controller
 
-# wake word plugins
-chatterbox-wake-word-plugin-dummy~=0.1
-ovos-ww-plugin-pocketsphinx~=0.1,>=0.1.1
-ovos-ww-plugin-precise~=0.1
+ovos-ww-plugin-vosk~=0.1
