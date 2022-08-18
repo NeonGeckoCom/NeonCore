@@ -208,8 +208,8 @@ class NeonSkillService(Thread):
         return service
 
     def handle_wifi_setup_completed(self, _):
-        # Patching OVOS behavior since we loaded skills offline\
-        time.sleep(3)
+        # Skills have been loaded, allow some time for time sync service
+        time.sleep(10)
         self.bus.emit(Message("system.display.homescreen"))
 
     def register_wifi_setup_events(self):
