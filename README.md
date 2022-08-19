@@ -31,9 +31,16 @@ You will need `docker` and `docker-compose` available. Docker provides updated g
 Neon Core is only tested on Ubuntu, but should be compatible with any linux distribution that uses
 [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/).
 
+> *Note*: By default, only the `root` user has permissions to interact with Docker under Ubuntu.
+> To allow the current user to modify Docker containers, you can add them to the `docker` group with:
+> `sudo usermod -aG docker $USER && newgrp`
+
 ## b. Running Neon
 You can clone the repository, or just copy the `docker` directory contents onto your local system; this document will 
 assume that the repository is cloned to: `~/NeonCore`.
+
+> *Note*: The `docker` directory includes required hidden files. If you copy files, make sure to include any hidden
+> files. In must Ubuntu distros, you can toggle hidden file visibility in the file explorer with `CTRL` + `h`.
 
 You can start all core modules with:
 ```shell
@@ -94,7 +101,7 @@ to:
 ```
 
 ## e. Configuration
-The `ngi_local_conf.yml` file included in the `docker` directory contains a default configuration
+The `neon.yaml` file included in the `docker` directory contains a default configuration
 that may be modified to specify different plugins and other runtime settings.
 The `docker` directory is mounted read-only to `/config` in each of the containers,
 so model files may be placed there and the configuration updated to use different STT/TTS plugins with
