@@ -5,8 +5,7 @@ neon-utils[network,configuration]~=1.0,>=1.0.2
 neon-transformers~=0.1
 ovos_utils~=0.0,>=0.0.23
 ovos-config~=0.0,>=0.0.4
-ovos-skills-manager~=0.0,>=0.0.11a5
-# TODO: Increment to OSM 0.0.11
+ovos-skills-manager~=0.0,>=0.0.11
 ovos-plugin-manager~=0.0.16
 
 psutil~=5.6
