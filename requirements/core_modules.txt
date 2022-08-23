@@ -5,7 +5,5 @@ ovos-ww-plugin-pocketsphinx~=0.1.2
 neon_messagebus~=0.2
 neon_gui~=1.0
 neon_enclosure~=1.0
-neon_speech~=1.0,>=1.1.1a7
-# TODO: Increment to neon_speech~=2.0
-neon_audio~=1.0,>=1.0.2a10
-# TODO: Increment to neon_audio~=1.1
+neon_speech~=2.0
+neon_audio~=1.1
