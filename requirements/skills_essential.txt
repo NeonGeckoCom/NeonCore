@@ -1,5 +1,5 @@
-neon-skill-about
-neon-skill-date_time
-neon-skill-demo
-neon-skill-device_controls
-neon-skill-ip_address
+neon-skill-about~=0.0.1
+neon-skill-date_time~=0.0.1
+neon-skill-demo~=0.0.1
+neon-skill-device_controls~=0.0.1
+neon-skill-ip_address~=0.0.2
