@@ -29,12 +29,12 @@
 import os.path
 import sys
 import unittest
-
+import shutil
+from os.path import join, dirname
 from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
 from mycroft_bus_client import MessageBusClient, Message
-from neon_utils.configuration_utils import get_neon_local_config
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -44,13 +44,12 @@ AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "aud
 class TestRunNeon(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        from neon_core.configuration import patch_config
         # Blacklist skills to prevent logged errors
-        local_conf = get_neon_local_config()
-        local_conf["skills"]["blacklist"] = \
-            local_conf["skills"]["blacklist"].extend(
-                ["skill-ovos-homescreen.openvoiceos",
-                 "skill-balena-wifi-setup.openvoiceos"])
-        local_conf.write_changes()
+        patch_config({
+            "skills": {"blacklist": [
+                "skill-ovos-homescreen.openvoiceos",
+                "skill-balena-wifi-setup.openvoiceos"]}})
 
         from neon_core.run_neon import start_neon
 
@@ -59,7 +58,7 @@ class TestRunNeon(unittest.TestCase):
         cls.bus = MessageBusClient()
         cls.bus.run_in_thread()
         cls.bus.connected_event.wait()
-        cls.bus.wait_for_message("mycroft.ready", 600)
+        cls.bus.wait_for_message("mycroft.ready", 300)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -106,9 +105,12 @@ class TestRunNeon(unittest.TestCase):
                                                       {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
                                                       context), context["ident"])
         self.assertEqual(stt_resp.context, context)
-        self.assertIsInstance(stt_resp.data.get("parser_data"), dict)
-        self.assertIsInstance(stt_resp.data.get("transcripts"), list)
-        self.assertIn("stop", stt_resp.data.get("transcripts"))
+        self.assertIsInstance(stt_resp.data.get("parser_data"), dict,
+                              stt_resp.data)
+        self.assertIsInstance(stt_resp.data.get("transcripts"), list,
+                              stt_resp.data)
+        self.assertIn("stop", stt_resp.data.get("transcripts"),
+                      stt_resp.data['transcripts'])
 
     def test_audio_module(self):
         response = self.bus.wait_for_response(Message('mycroft.audio.is_ready'))
@@ -128,28 +130,12 @@ class TestRunNeon(unittest.TestCase):
         self.assertIsInstance(resp, dict)
         self.assertEqual(resp.get("sentence"), text)
 
-    # TODO: Define some generic enclosure events to test
-    # def test_enclosure_module(self):
-    #     resp = self.bus.wait_for_response(Message("mycroft.volume.get"))
-    #     self.assertIsInstance(resp, Message)
-    #     vol = resp.data.get("percent")
-    #     mute = resp.data.get("muted")
-    #
-    #     self.assertIsInstance(vol, float)
-    #     self.assertIsInstance(mute, bool)
-
     # TODO: Implement transcribe tests when transcribe module is updated
     # def test_transcribe_module(self):
     #     resp = self.bus.wait_for_response(Message("get_transcripts"))
     #     self.assertIsInstance(resp, Message)
     #     matches = resp.data.get("transcripts")
     #     self.assertIsInstance(matches, list)
-
-    # def test_client_module(self):
-    #     resp = self.bus.wait_for_response(Message("neon.client.update_brands"), "neon.server.update_brands.response")
-    #     self.assertIsInstance(resp, Message)
-    #     data = resp.data
-    #     self.assertIsInstance(data["success"], bool)
 
     def test_skills_module(self):
         response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))

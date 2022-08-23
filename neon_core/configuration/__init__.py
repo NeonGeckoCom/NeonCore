@@ -26,8 +26,39 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mycroft.configuration.config import Configuration
+from ovos_config.config import Configuration
+from os.path import exists, isdir, dirname
+from os import makedirs
+from neon_utils.logger import LOG
+
+"""
+Neon modules should import config from this module since module_overrides will
+result in different configurations depending on originating module.
+"""
 
 
 def get_private_keys():
-    return Configuration.get(remote=False).get("keys", {})
+    return Configuration().get("keys", {})
+
+
+def patch_config(config: dict = None):
+    """
+    Write the specified speech configuration to the global config file
+    :param config: Mycroft-compatible configuration override
+    """
+    from ovos_config.config import LocalConf
+    from ovos_config.locations import USER_CONFIG
+    if not exists(USER_CONFIG):
+        if not isdir(dirname(USER_CONFIG)):
+            LOG.warning(f"Creating config dir: {dirname(USER_CONFIG)}")
+            makedirs(dirname(USER_CONFIG), exist_ok=True)
+        with open(USER_CONFIG, 'w+'):
+            pass
+
+    config = config or dict()
+    local_config = LocalConf(USER_CONFIG)
+    local_config.update(config)
+    local_config.store()
+    Configuration().reload()
+    import mycroft.configuration
+    mycroft.configuration.Configuration().reload()

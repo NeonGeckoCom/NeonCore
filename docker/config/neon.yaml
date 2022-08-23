@@ -1,0 +1,17 @@
+play_wav_cmdline: "play %1"
+play_mp3_cmdline: "play %1"
+play_ogg_cmdline: "play %1"
+websocket:
+  host: neon-messagebus
+gui_websocket:
+  host: neon-gui
+gui:
+  idle_display_skill: skill-homescreen-lite.openvoiceos
+ready_settings:
+  - skills
+  - speech
+  - audio
+  - gui
+#MQ:
+#  server: mq.2021.us
+#  port: 25672

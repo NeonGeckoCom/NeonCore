@@ -1,0 +1,2 @@
+# TTS Plugin configured for Demo Skill
+ovos-tts-plugin-mimic

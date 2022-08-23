@@ -1,15 +1,18 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.3
+ovos-core[skills_lgpl]~=0.0.4
 # utils
-neon-utils~=0.17,>=0.17.3
-ovos_utils~=0.0.20
-ovos-skills-manager~=0.0.10
+neon-utils[network,configuration]~=1.0,>=1.0.2
+neon-transformers~=0.1
+ovos_utils~=0.0,>=0.0.23
+ovos-config~=0.0,>=0.0.4
+ovos-skills-manager~=0.0,>=0.0.11
 ovos-plugin-manager~=0.0.16
 
 psutil~=5.6
 
 # default plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
+neon-utterance-translator-plugin~=0.1
 
 # text parser modules
 RAKEkeywords~=0.2

@@ -1,3 +1,4 @@
+# TODO: Handle XDG_CONFIG_HOME envvar for persistent mounted config
 version: '3.1'
 networks:
   neon-core:
@@ -26,11 +27,11 @@ services:
     - neon-core
     volumes:
     - config:/config:ro
-    - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
-    - PULSE_COOKIE=/root/.config/pulse/cookie
+    - PULSE_COOKIE=/tmp/pulse_cookie
     devices:
     - /dev/snd:/dev/snd
   neon-skills:
@@ -41,13 +42,13 @@ services:
     ports:
     - 8000:8000
     volumes:
-    - config:/config:ro
-    - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    - config:/config:rw
+    - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - ${NEON_SKILLS_DIR}:/skills:ro
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
-    - PULSE_COOKIE=/root/.config/pulse/cookie
+    - PULSE_COOKIE=/tmp/pulse_cookie
     devices:
     - /dev/snd:/dev/snd
   neon-audio:
@@ -57,11 +58,14 @@ services:
     - neon-core
     volumes:
     - config:/config:ro
-    - ~/.config/pulse/cookie:/root/.config/pulse/cookie:ro
+    - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
+    - /run/dbus/system_dbus_socket:/run/dbus/system_dbus_socket:rw
+    - /tmp/.X11-unix:/tmp/.X11-unix:ro
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
-    - PULSE_COOKIE=/root/.config/pulse/cookie
+    - PULSE_COOKIE=/tmp/pulse_cookie
+    - DISPLAY=${DISPLAY}
     devices:
     - /dev/snd:/dev/snd
   neon-gui:

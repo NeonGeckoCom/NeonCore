@@ -6,10 +6,33 @@ on:
   workflow_dispatch:
 
 jobs:
-  remote:
+  core_and_skills:
     strategy:
       matrix:
-        python-version: [ 3.7, 3.9 ]
+        python-version: [ 3.7, 3.8, 3.9 ]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3-dev
+          pip install wheel
+      - name: Test Core Module Installation
+        run: |
+          pip install .[core_modules]
+      - name: Test Skills Installation
+        run: |
+          pip install .[skills_required,skills_essential,skills_default,skills_extended]
+  legacy-remote:
+    strategy:
+      matrix:
+        python-version: [ 3.9 ]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -23,7 +46,7 @@ jobs:
           mkdir -p ~/.local/share/neon
           echo ${GOOGLE_KEY}>~/.local/share/neon/google.json
           echo ${AWS_CREDS}>~/.local/share/neon/aws.json
-          bash test/setup_remote.sh ${NEON_TOKEN}
+          bash test/legacy_setup_remote.sh ${NEON_TOKEN}
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
           GOOGLE_KEY: ${{secrets.google_api_key}}
@@ -46,7 +69,13 @@ jobs:
           name: core-logs-remote-${{ matrix.python-version }}
           path: ~/.local/share/neon/logs/*.log
         if: always()
-  dev_local:
+      - name: Upload Configuration
+        uses: actions/upload-artifact@v2
+        with:
+          name: configuration-remote-${{ matrix.python-version }}
+          path: ~/.config/neon/neon.yaml
+        if: always()
+  legacy-dev_local:
     strategy:
       matrix:
         python-version: [ 3.8 ]
@@ -60,7 +89,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Setup Core
         run: |
-          bash test/setup_dev_local.sh ${NEON_TOKEN}
+          bash test/legacy_setup_dev_local.sh ${NEON_TOKEN}
         env:
           NEON_TOKEN: ${{secrets.neon_token}}
       - name: Test Core Setup
@@ -80,5 +109,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: core-logs-dev-local-${{ matrix.python-version }}
-          path: test/logs/*.log
+          path: ~/test/logs/*.log
+        if: always()
+      - name: Upload Configuration
+        uses: actions/upload-artifact@v2
+        with:
+          name: configuration-dev-local-${{ matrix.python-version }}
+          path: ~/.config/neon/neon.yaml
         if: always()

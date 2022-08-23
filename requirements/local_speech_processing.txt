@@ -1,2 +1,2 @@
-neon-stt-plugin-deepspeech-stream-local~=0.1
-neon-tts-plugin-mimic~=0.1,>=0.1.7
+neon-stt-plugin-deepspeech-stream-local~=1.1
+neon-tts-plugin-mimic~=0.1,>=0.1.8

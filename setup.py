@@ -83,11 +83,17 @@ setup(
         "vision": get_requirements("vision.txt"),
         "test": get_requirements("test.txt"),
         "pi": get_requirements("pi.txt"),
-        "docker": get_requirements("docker.txt")
+        "docker": get_requirements("docker.txt"),
+        "skills_required": get_requirements("skills_required.txt"),
+        "skills_essential": get_requirements("skills_essential.txt"),
+        "skills_default": get_requirements("skills_default.txt"),
+        "skills_extended": get_requirements("skills_extended.txt")
     },
     packages=find_packages(include=['neon_core*']),
-    package_data={'neon_core': ['res/precise_models/*', 'res/snd/*', 'res/text/*/*.voc', 'res/text/*/*.dialog',
-                                'res/ui/*.qml', 'res/ui/*.png', 'res/*', 'configuration/*.conf']
+    package_data={'neon_core': ['res/precise_models/*', 'res/snd/*',
+                                'res/text/*/*.voc', 'res/text/*/*.dialog',
+                                'res/ui/*.qml', 'res/ui/*.png', 'res/*',
+                                'configuration/*']
                   },
     include_package_data=True,
     entry_points={

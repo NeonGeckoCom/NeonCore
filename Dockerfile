@@ -5,6 +5,18 @@ LABEL vendor=neon.ai \
 
 ENV NEON_CONFIG_PATH /config
 
+RUN  apt-get update && \
+     apt-get install -y \
+     curl \
+     gpg
+
+RUN  curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | \
+     gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/mycroft-desktop.gpg --import - && \
+     chmod a+r /etc/apt/trusted.gpg.d/mycroft-desktop.gpg && \
+     echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" \
+     > /etc/apt/sources.list.d/mycroft-mimic.list
+
+
 RUN apt-get update && \
     apt-get install -y \
     gcc \
@@ -16,8 +28,16 @@ RUN apt-get update && \
     portaudio19-dev \
     libsndfile1 \
     libpulse-dev \
+    alsa-utils \
+    libasound2-plugins \
+    pulseaudio-utils \
     ffmpeg \
-    git  # TODO: git required for getting scripts, skill should be refactored to remove this dependency
+    mimic \
+    sox \
+    git
+
+# TODO: git required for getting scripts, skill should be refactored to remove this dependency
+# TODO: sox, mimic required for demo skill, audio service should be refactored to handle TTS engines/voices in request
 
 ADD . /neon_core
 WORKDIR /neon_core
@@ -28,11 +48,9 @@ RUN pip install wheel && \
 COPY docker_overlay/ /
 RUN chmod ugo+x /root/run.sh
 
-# TODO: Below link is patching a bug in the homescreen skill/ovos-utils
-RUN mkdir /opt/mycroft && \
-    ln -s /root/.local/share/neon/skills /opt/mycroft/skills
-
 CMD ["/root/run.sh"]
 
 FROM base as default_skills
+RUN pip install .[skills_required,skills_essential,skills_default,skills_extended]
+# TODO: Default skill installation is a temporary step until all skills are pip installable
 RUN neon-install-default-skills

@@ -27,24 +27,18 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import sys
+import psutil
 
 from time import time, sleep
-
-import psutil
 from signal import SIGTERM
 from threading import Event
 from subprocess import Popen, STDOUT
-
-import sys
 from mycroft_bus_client import MessageBusClient, Message
 from ovos_utils.gui import is_gui_running
-
-from neon_utils.configuration_utils import get_neon_device_type
-from neon_utils.log_utils import remove_old_logs, archive_logs, LOG_DIR, LOG, get_log_file_for_module
+from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
+    get_log_file_for_module
 from typing.io import IO
-
-if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR)
 
 LOG_FILES = {}
 PROCESSES = {}
@@ -154,7 +148,6 @@ def start_neon():
     bus.on("neon.shutdown", handle_shutdown)
     bus.on("neon.load_modules", handle_load_modules)
     bus.run_in_thread()
-
     _stop_all_core_processes()
     _cycle_logs()
 
@@ -164,14 +157,14 @@ def start_neon():
     _start_process("neon_audio_client") or STOP_MODULES.set()
     _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
     _start_process("neon_transcripts_controller")
-    if get_neon_device_type() == "server":
-        _start_process("neon_core_server")
-    else:
-        if not is_gui_running():
-            _start_process("mycroft-gui-app")
-        _start_process("neon_enclosure_client")
-        # _start_process("neon_core_client")
-        _start_process(["neon_gui_service"])
+    # if get_neon_device_type() == "server":
+    #     _start_process("neon_core_server")
+    # else:
+    if not is_gui_running():
+        _start_process("mycroft-gui-app")
+    _start_process("neon_enclosure_client")
+    # _start_process("neon_core_client")
+    _start_process(["neon_gui_service"])
 
     try:
         STOP_MODULES.wait()
@@ -220,6 +213,10 @@ def main():
 
 
 if __name__ == "__main__":
+    from neon_utils.log_utils import get_log_dir
+    LOG_DIR = get_log_dir()
+    if not os.path.isdir(LOG_DIR):
+        os.makedirs(LOG_DIR)
     run_log = open(os.path.join(LOG_DIR, "start.log"), "a+")
     sys.stdout = run_log
     sys.stderr = run_log

@@ -25,24 +25,26 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import importlib
 import os
+import shutil
 import sys
 import unittest
 import wave
+
 from copy import deepcopy
-from os.path import join, dirname
-from threading import Thread, Event
+from os.path import join, dirname, expanduser, isdir
+from threading import Event
 from time import time, sleep
 
 from mock import Mock
 from mock.mock import patch
 from mycroft_bus_client import Message
 from ovos_utils.messagebus import FakeBus
-
+from ovos_utils.xdg_utils import xdg_data_home
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core import NeonIntentService
 
 
 class MockEventSchedulerInterface(Mock):
@@ -50,10 +52,115 @@ class MockEventSchedulerInterface(Mock):
         super().__init__()
 
 
-class TestIntentService(unittest.TestCase):
+class TestSkillService(unittest.TestCase):
+    config_dir = join(dirname(__file__), "test_config")
+
     @classmethod
     def setUpClass(cls) -> None:
-        cls.bus = FakeBus()
+        os.environ["XDG_CONFIG_HOME"] = cls.config_dir
+        if os.path.exists(cls.config_dir):
+            shutil.rmtree(cls.config_dir)
+        from neon_core import CORE_VERSION_STR
+        assert isinstance(CORE_VERSION_STR, str)
+        assert os.path.isdir(cls.config_dir)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        os.environ.pop("XDG_CONFIG_HOME")
+        if os.path.exists(cls.config_dir):
+            shutil.rmtree(cls.config_dir)
+
+    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    def test_neon_skills_service(self, run, install_default):
+        from neon_core.skills.service import NeonSkillService
+        from neon_core.skills.skill_manager import NeonSkillManager
+        from mycroft.util.process_utils import ProcessState
+
+        config = {"skills": {
+                "disable_osm": False,
+                "auto_update": True,
+                "directory": join(dirname(__file__), "skill_module_skills"),
+                "run_gui_file_server": True
+            }
+        }
+
+        started = Event()
+
+        def started_hook():
+            started.set()
+
+        alive_hook = Mock()
+        ready_hook = Mock()
+        error_hook = Mock()
+        stopping_hook = Mock()
+        service = NeonSkillService(alive_hook, started_hook, ready_hook,
+                                   error_hook, stopping_hook, config=config,
+                                   daemonic=True)
+        from neon_core.configuration import Configuration
+        self.assertEqual(service.config, Configuration())
+        self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
+                            for x in config['skills']))
+        service.bus = FakeBus()
+        service.bus.connected_event = Event()
+        service.start()
+        started.wait(30)
+        self.assertTrue(service.config['skills']['run_gui_file_server'])
+        self.assertIsNotNone(service.http_server)
+        self.assertTrue(service.config['skills']['auto_update'])
+        install_default.assert_called_once()
+        run.assert_called_once()
+
+        self.assertIsInstance(service.skill_manager, NeonSkillManager)
+        service.skill_manager.status.state = ProcessState.ALIVE
+        sleep(1)
+        alive_hook.assert_called_once()
+        service.skill_manager.status.state = ProcessState.READY
+        sleep(1)
+        ready_hook.assert_called_once()
+
+        service.shutdown()
+        stopping_hook.assert_called_once()
+        service.join(10)
+
+    @patch("ovos_utils.skills.locations.get_plugin_skills")
+    @patch("ovos_utils.skills.locations.get_skill_directories")
+    def test_get_skill_dirs(self, skill_dirs, plugin_skills):
+        from neon_core.skills.service import NeonSkillService
+
+        test_dir = join(dirname(__file__), "get_skill_dirs_skills")
+        skill_dirs.return_value = [join(test_dir, "extra_dir_1"),
+                                   join(test_dir, "extra_dir_2")]
+        plugin_skills.return_value = ([join(test_dir, "plugins",
+                                            "skill-plugin")],
+                                      ["skill-plugin.neongeckocom"])
+
+        skill_dirs = NeonSkillService()._get_skill_dirs()
+        # listdir doesn't guarantee order, base skill directory order matters
+        self.assertEqual(set(skill_dirs),
+                         {join(test_dir, "plugins", "skill-plugin"),
+                          join(test_dir, "extra_dir_1",
+                               "skill-test-1.neongeckocom"),
+                          join(test_dir, "extra_dir_1",
+                               "skill-test-2.neongeckocom"),
+                          join(test_dir, "extra_dir_1",
+                               "skill-test-3.neongeckocom"),
+                          join(test_dir, "extra_dir_2",
+                               "skill-test-1.neongeckocom")
+                          })
+        self.assertEqual(skill_dirs[0],
+                         join(test_dir, "plugins", "skill-plugin"))
+        self.assertEqual(skill_dirs[-1],
+                         join(test_dir, "extra_dir_2",
+                              "skill-test-1.neongeckocom"))
+
+
+class TestIntentService(unittest.TestCase):
+    bus = FakeBus()
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        from neon_core import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
 
     @classmethod
@@ -82,7 +189,7 @@ class TestIntentService(unittest.TestCase):
             assert_called_with(None, test_message.data["utterances"][0],
                                transcribe_time, audio)
 
-    def test_get_parsers_service_context(self):
+    def test_get_transformers_service_context(self):
         utterances = ["test 1", "test one"]
         lang = "en-us"
         test_message = Message("recognizer_loop:utterance",
@@ -97,41 +204,40 @@ class TestIntentService(unittest.TestCase):
             utterances.append("mod 2 parsed")
             return utterances, {"parser_context": "mod_2"}
 
-        real_modules = self.intent_service.parser_service.loaded_modules
+        real_modules = self.intent_service.transformers.loaded_modules
         mod_1 = Mock()
         mod_1.priority = 2
-        mod_1.parse = mod_1_parse
+        mod_1.transform = mod_1_parse
         mod_2 = Mock()
-        mod_2.priority = 100
-        mod_2.parse = mod_2_parse
-        self.intent_service.parser_service.loaded_modules = \
-            {"test_mod_1": {"instance": mod_1},
-             "test_mod_2": {"instance": mod_2}}
-        self.intent_service._get_parsers_service_context(test_message)
+        mod_2.priority = 1
+        mod_2.transform = mod_2_parse
+        self.intent_service.transformers.loaded_modules = \
+            {"test_mod_1": mod_1,
+             "test_mod_2": mod_2}
+        self.intent_service._get_parsers_service_context(test_message, lang)
         self.assertEqual(test_message.context["parser_context"], "mod_2")
         self.assertNotEqual(utterances, test_message.data['utterances'])
         self.assertEqual(len(test_message.data['utterances']),
                          len(utterances) + 2)
 
-        mod_2.priority = 1
-        self.intent_service._get_parsers_service_context(test_message)
+        mod_2.priority = 100
+        self.intent_service._get_parsers_service_context(test_message, lang)
         self.assertEqual(test_message.context["parser_context"], "mod_1")
-        self.intent_service.parser_service.loaded_modules = real_modules
+        self.intent_service.transformers.loaded_modules = real_modules
 
         valid_parsers = {"cancel", "entity_parser", "translator"}
         self.assertTrue(all([p for p in valid_parsers if p in
-                        self.intent_service.parser_service.loaded_modules]))
+                        self.intent_service.transformers.loaded_modules]))
 
     @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
     def test_handle_utterance(self, patched):
-        intent_service = NeonIntentService(self.bus)
 
         test_message_invalid = Message("test", {"utterances": [' ', '  ']})
-        intent_service.handle_utterance(test_message_invalid)
+        self.intent_service.handle_utterance(test_message_invalid)
         patched.assert_not_called()
 
         test_message_valid = Message("test", {"utterances": ["test", "tests"]})
-        intent_service.handle_utterance(test_message_valid)
+        self.intent_service.handle_utterance(test_message_valid)
 
         patched.assert_called_once_with(test_message_valid)
         self.assertIn("lang", test_message_valid.data)
@@ -141,33 +247,105 @@ class TestIntentService(unittest.TestCase):
                               list)
         self.assertIsInstance(test_message_valid.context["username"], str)
 
-        intent_service.shutdown()
+        message = Message('recognizer_loop:utterance',
+                          {'utterances': ['test']}, {})
+        patched.reset_mock()
+        self.bus.emit(message)
+        patched.assert_called_once_with(message)
 
 
 class TestSkillManager(unittest.TestCase):
+    config_dir = join(dirname(__file__), "test_config")
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        os.environ["XDG_CONFIG_HOME"] = cls.config_dir
+        from neon_core import CORE_VERSION_STR
+        assert isinstance(CORE_VERSION_STR, str)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        os.environ.pop("XDG_CONFIG_HOME")
+        if os.path.isdir(cls.config_dir):
+            shutil.rmtree(cls.config_dir)
+
     @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
     @patch("mycroft.skills.skill_manager.SkillManager.run")
     def test_download_or_update_defaults(self, patched_run, patched_installer):
+        from neon_core.configuration import patch_config
+        patch_config({"skills": {"auto_update": True}})
+
         from neon_core.skills.skill_manager import NeonSkillManager
-        config = {
-            "disable_osm": False,
-            "auto_update": True,
-            "directory": join(dirname(__file__), "skill_module_skills")
-        }
-        manager = NeonSkillManager(FakeBus(), config=config)
+        manager = NeonSkillManager(FakeBus())
+        self.assertTrue(manager.config["skills"]["auto_update"])
         manager.run()
         patched_run.assert_called_once()
-        self.assertEqual(manager.skill_config, config)
         patched_installer.assert_called_once()
 
         patched_installer.reset_mock()
-        manager.skill_config["auto_update"] = False
+        manager.config.update({"skills": {"auto_update": False}})
         manager.download_or_update_defaults()
         patched_installer.assert_not_called()
         manager.stop()
 
+    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    def test_get_default_skills_dir(self, _, __):
+        from neon_core.skills.skill_manager import NeonSkillManager
+        manager = NeonSkillManager(FakeBus())
+        manager.config = dict(manager.config)  # Override Configuration to test
+
+        # Default, no config
+        manager.config['skills'] = {}
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # Default, empty extra_directories
+        manager.config['skills']['extra_directories'] = []
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # Default, invalid extra_directories
+        manager.config['skills']['extra_directories'] = "/skills"
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # extra_directories valid spec
+        manager.config['skills']['extra_directories'] = '~/skills'
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, expanduser('~/skills'))
+        self.assertTrue(isdir(expanduser("~/skills")))
+
+        # directory invalid spec
+        manager.config['skills']['directory'] = "/skills"
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, join(xdg_data_home(), "neon", "skills"))
+
+        # directory valid spec
+        manager.config['skills']['directory'] = "~/neon-skills"
+        default_dir = manager.get_default_skills_dir()
+        self.assertEqual(default_dir, expanduser('~/neon-skills'))
+        self.assertTrue(isdir(expanduser("~/neon-skills")))
+
 
 class TestSkillStore(unittest.TestCase):
+    essential = ["https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"]
+    config = {
+        "disable_osm": False,
+        "auto_update": True,
+        "auto_update_interval": 1,
+        "appstore_sync_interval": 1,
+        "neon_token": None,
+        "essential_skills": essential,
+        "install_default": True,
+        "install_essential": True,
+        "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/"
+                          "neon_skills/TEST_ShortSkillsList/skill_lists/"
+                          "TEST-SHORTLIST"
+    }
+    skill_dir = join(dirname(__file__), "skill_module_skills")
+    bus = FakeBus()
+
     @classmethod
     def setUpClass(cls) -> None:
         import mycroft.skills.event_scheduler
@@ -178,21 +356,6 @@ class TestSkillStore(unittest.TestCase):
         importlib.reload(neon_core.skills.skill_store)
 
         from neon_core.skills.skill_store import SkillsStore
-
-        cls.essential = ["https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"]
-        cls.config = {
-            "disable_osm": False,
-            "auto_update": True,
-            "auto_update_interval": 1,
-            "appstore_sync_interval": 1,
-            "neon_token": None,
-            "essential_skills": cls.essential,
-            "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/"
-                              "neon_skills/TEST_ShortSkillsList/skill_lists/"
-                              "TEST-SHORTLIST"
-        }
-        cls.skill_dir = join(dirname(__file__), "skill_module_skills")
-        cls.bus = FakeBus()
         cls.skill_store = SkillsStore(cls.skill_dir, cls.config, cls.bus)
 
     @classmethod
@@ -347,54 +510,6 @@ class TestSkillStore(unittest.TestCase):
         self.assertEqual(install_skill.call_count, len(skills))
 
         self.skill_store.install_skill = real_install_skill
-
-
-class TestSkillService(unittest.TestCase):
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_neon_skills_service(self, run):
-        from neon_core.skills.service import NeonSkillService
-        from neon_core.skills.skill_manager import NeonSkillManager
-        from mycroft.util.process_utils import ProcessState
-
-        config = {
-            "disable_osm": False,
-            "auto_update": True,
-            "directory": join(dirname(__file__), "skill_module_skills"),
-            "run_gui_file_server": True
-        }
-
-        started = Event()
-
-        def started_hook():
-            started.set()
-
-        alive_hook = Mock()
-        ready_hook = Mock()
-        error_hook = Mock()
-        stopping_hook = Mock()
-        service = NeonSkillService(alive_hook, started_hook, ready_hook,
-                                   error_hook, stopping_hook, config=config)
-        self.assertIsNotNone(service.http_server)
-        self.assertEqual(service.config, config)
-        service.bus = FakeBus()
-        service.bus.connected_event = Event()
-        skills_thread = Thread(target=service.start, daemon=True)
-        skills_thread.start()
-
-        started.wait(30)
-        run.assert_called_once()
-
-        self.assertIsInstance(service.skill_manager, NeonSkillManager)
-        service.skill_manager.status.state = ProcessState.ALIVE
-        sleep(1)
-        alive_hook.assert_called_once()
-        service.skill_manager.status.state = ProcessState.READY
-        sleep(1)
-        ready_hook.assert_called_once()
-
-        service.shutdown()
-        stopping_hook.assert_called_once()
-        skills_thread.join(10)
 
 
 if __name__ == "__main__":

@@ -28,17 +28,21 @@
 
 import os
 import unittest
-from neon_utils.configuration_utils import get_neon_local_config
+
+from neon_core.util.runtime_utils import use_neon_core
+from ovos_utils.xdg_utils import xdg_data_home
 
 
 class TestSetupDevLocal(unittest.TestCase):
+    @use_neon_core
     def test_config_from_setup(self):
-        local_config = get_neon_local_config()
-        self.assertEqual(local_config["devVars"]["devType"], "server")
-        self.assertTrue(local_config["prefFlags"]["devMode"])
-        self.assertEqual(local_config["stt"]["module"], "deepspeech_stream_local")
-        self.assertEqual(local_config["tts"]["module"], "neon_tts_mimic")
-        self.assertIsInstance(local_config["skills"]["neon_token"], str)
+        from mycroft.configuration import Configuration
+        config = Configuration()
+
+        self.assertTrue(config.get("debug"))
+        self.assertEqual(config["stt"]["module"], "deepspeech_stream_local")
+        self.assertEqual(config["tts"]["module"], "neon_tts_mimic")
+        self.assertIsInstance(config["skills"]["neon_token"], str)
 
     def test_installed_packages(self):
         import neon_tts_plugin_mimic
@@ -47,8 +51,8 @@ class TestSetupDevLocal(unittest.TestCase):
         import neon_cli
 
     def test_installed_skills(self):
-        local_config = get_neon_local_config()
-        skill_dir = os.path.expanduser(local_config["dirVars"]["skillsDir"])
+        self.assertEqual(str(xdg_data_home()), os.path.expanduser("~/.local/share"))
+        skill_dir = os.path.join(str(xdg_data_home()), "neon", "skills")
         self.assertTrue(os.path.isdir(skill_dir))
         self.assertGreater(len(os.listdir(skill_dir)), 0)
 
