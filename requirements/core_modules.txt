@@ -5,5 +5,6 @@ ovos-ww-plugin-pocketsphinx~=0.1.2
 neon_messagebus~=0.2
 neon_gui~=1.0
 neon_enclosure~=1.0
-neon_speech~=2.0,>=2.0.1a0
+# neon_speech~=2.0,>=2.0.1a0
+neon_speech @ git+https://github.com/neongeckocom/neon_speech@FIX_CatchThreadShutdownErrors
 neon_audio~=1.1
