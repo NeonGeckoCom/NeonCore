@@ -106,15 +106,10 @@ hotwords:
     listen: true
     sound: snd/start_listening.wav
     debug: false
-    rule: contains
+    rule: fuzzy
+    lang: en
     samples:
       - hey neon
-      - hey neil
-      - hey near
-      - hey me or
-      - hey moron
-      - the neon
-      - a neon
   thank you:
     module: ovos-ww-plugin-vosk
     sound: snd/acknowledge.mp3
