@@ -15,7 +15,7 @@ ovos-phal-plugin-dashboard
 
 ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2
 ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system
-ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa@FIX_DefaultVolumePercentages
+ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa@FIX_DefaultVolumePrecentages
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
 
 # TODO Homescreen advertises itself as mycroft-homescreen when pip installed, so we're not pip installing it
