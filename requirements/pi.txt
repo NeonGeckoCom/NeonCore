@@ -8,7 +8,7 @@ ovos-phal-plugin-brightness-control-rpi
 ovos-phal-plugin-notification-widgets
 ovos-phal-plugin-color-scheme-manager
 ovos-phal-plugin-configuration-provider
-ovos-phal-plugin-balena-wifi @ git+https://github.com/NeonGeckoCom/neon-phal-plugin-balena-wifi@FEAT_WifiPluginConfig
+ovos-phal-plugin-balena-wifi
 ovos-phal-plugin-network-manager
 ovos-phal-plugin-wifi-setup
 
