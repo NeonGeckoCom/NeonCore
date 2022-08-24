@@ -13,6 +13,6 @@ psutil~=5.6
 # default plugins
 neon-lang-plugin-libretranslate~=0.1,>=0.1.2
 neon-utterance-translator-plugin~=0.1
-
+neon-utterance-normalizer-plugin~=0.0.1,>=0.0.1a0
 # text parser modules
 RAKEkeywords~=0.2
