@@ -2,7 +2,7 @@ deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deep
 vosk @ https://github.com/alphacep/vosk-api/releases/download/v0.3.30/vosk-0.3.30-py3-none-linux_aarch64.whl
 neon-cli-client~=0.1,>=0.1.1a2
 ovos-stt-plugin-vosk~=0.1
-ovos-ww-plugin-vosk~=0.1
+ovos-ww-plugin-vosk~=0.0,>=0.0.4
 
 ovos-phal-plugin-brightness-control-rpi
 ovos-phal-plugin-notification-widgets
