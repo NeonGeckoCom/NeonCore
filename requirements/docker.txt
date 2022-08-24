@@ -5,5 +5,5 @@ ovos-tts-plugin-mimic
 ovos-skill-homescreen-lite @ git+https://github.com/openvoiceos/skill-homescreen-lite
 
 # Support legacy configuration file loading
-neon-utils[configuration]~=1.0,>=1.0.2a0
+neon-utils[configuration]~=1.0,>=1.0.2
 
