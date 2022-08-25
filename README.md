@@ -33,6 +33,7 @@ Neon Core is only tested on Ubuntu, but should be compatible with any linux dist
 
 > *Note*: By default, only the `root` user has permissions to interact with Docker under Ubuntu.
 > To allow the current user to modify Docker containers, you can add them to the `docker` group with:
+> 
 > `sudo usermod -aG docker $USER && newgrp`
 
 ## b. Running Neon
@@ -41,6 +42,13 @@ assume that the repository is cloned to: `~/NeonCore`.
 
 > *Note*: The `docker` directory includes required hidden files. If you copy files, make sure to include any hidden
 > files. In must Ubuntu distros, you can toggle hidden file visibility in the file explorer with `CTRL` + `h`.
+
+> *Note*: If you run `docker` commands with `sudo`, make sure to use the `-E` flag to preserve runtime envvars.
+
+> *Note*: Some Docker implementations don't handle relative paths.
+> If you encounter errors, try updating the paths in `.env` to absolute paths.
+> Also note that any environment variables will override the default values in `.env`.
+> In BASH shells, you can list all current envvars with `env`
 
 You can start all core modules with:
 ```shell

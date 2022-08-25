@@ -12,6 +12,6 @@ ready_settings:
   - speech
   - audio
   - gui
-#MQ:
-#  server: mq.2021.us
-#  port: 25672
+MQ:
+  server: mq.2021.us
+  port: 25672
