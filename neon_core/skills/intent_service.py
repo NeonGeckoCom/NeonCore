@@ -41,12 +41,15 @@ from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
 from neon_utils.user_utils import apply_local_user_profile_updates
 from neon_utils.configuration_utils import get_neon_user_config
-from ovos_utils.json_helper import merge_dict
 from lingua_franca.parse import get_full_lang_code
 from ovos_config.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
+from ovos_plugin_manager.templates.language import LanguageTranslator
 
-
+try:
+    from neon_utterance_translator_plugin import UtteranceTranslator
+except ImportError:
+    UtteranceTranslator = None
 # try:
 #     if get_neon_device_type() == "server":
 #         from neon_transcripts_controller.transcript_db_manager import\
@@ -83,6 +86,24 @@ class NeonIntentService(IntentService):
                 LOG.exception(e)
 
         self.bus.on("neon.profile_update", self.handle_profile_update)
+        self.bus.on("neon.get_languages_skills", self.handle_supported_languages)
+
+    def handle_supported_languages(self, message):
+        """
+        Handle a request for supported skills languages
+        :param message: neon.get_languages_skills request
+        """
+        translate_langs = set()
+        for module in self.transformers.modules:
+            if UtteranceTranslator and isinstance(module, UtteranceTranslator):
+                translator: LanguageTranslator = module.translator
+                if hasattr(translator, 'available_languages'):
+                    translate_langs = translator.available_languages
+        native_langs = self.language_config.get('supported_langs') or ['en']
+        skill_langs = list(native_langs).extend(translate_langs)
+        self.bus.emit(message.response({"skill_langs": skill_langs,
+                                        "native_langs": native_langs,
+                                        "translate_langs": translate_langs}))
 
     def handle_profile_update(self, message):
         updated_profile = message.data.get("profile")
