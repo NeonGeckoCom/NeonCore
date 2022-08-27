@@ -43,6 +43,7 @@ from mock.mock import patch
 from mycroft_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 from ovos_utils.xdg_utils import xdg_data_home
+from ovos_plugin_manager.templates.language import LanguageTranslator
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -50,6 +51,16 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 class MockEventSchedulerInterface(Mock):
     def __init__(self, *_, **__):
         super().__init__()
+
+
+class MockTranslator(LanguageTranslator):
+    def __init__(self):
+        super(MockTranslator, self).__init__()
+        self.supported_langs = []
+
+    @property
+    def available_languages(self) -> set:
+        return set(self.supported_langs)
 
 
 class TestSkillService(unittest.TestCase):
@@ -252,6 +263,56 @@ class TestIntentService(unittest.TestCase):
         patched.reset_mock()
         self.bus.emit(message)
         patched.assert_called_once_with(message)
+
+    def test_handle_supported_languages(self):
+        handled = Event()
+        response: Message = None
+
+        def _handle_languages_response(msg):
+            nonlocal response
+            response = msg
+            handled.set()
+
+        self.bus.on('neon.languages.skills.response',
+                    _handle_languages_response)
+
+        # Patch things
+        real_config = self.intent_service.language_config
+        translator = self.intent_service.transformers.loaded_modules.get(
+            'neon_utterance_translator_plugin')
+        real_plug = translator.translator
+        translator.translator = MockTranslator()
+
+        # Test default intent languages no translation
+        self.intent_service.language_config = {
+            'supported_langs': None
+        }
+        translator.translator.supported_langs = []
+        handled.clear()
+        self.bus.emit(Message('neon.languages.skills'))
+        handled.wait(3)
+        self.assertEqual(response.data['native_langs'], ['en'])
+        self.assertEqual(response.data['translate_langs'], [])
+        self.assertEqual(response.data['skill_langs'], ['en'])
+
+        # Test supported languages and translation
+        translator.translator.supported_langs = ['en', 'pt', 'es']
+        self.intent_service.language_config = {
+            'supported_langs': ['en', 'uk', 'pt']
+        }
+        handled.clear()
+        self.bus.emit(Message('neon.languages.skills'))
+        handled.wait(3)
+        self.assertEqual(response.data['native_langs'], ['en', 'uk', 'pt'])
+        self.assertEqual(set(response.data['translate_langs']),
+                         {'en', 'pt', 'es'})
+        self.assertEqual(set(response.data['skill_langs']),
+                         {'en', 'pt', 'es', 'uk'})
+        self.assertEqual(len(response.data['skill_langs']),
+                         len(set(response.data['skill_langs'])))
+
+        self.intent_service.language_config = real_config
+        translator.translator = real_plug
 
 
 class TestSkillManager(unittest.TestCase):

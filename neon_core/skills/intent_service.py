@@ -86,21 +86,19 @@ class NeonIntentService(IntentService):
                 LOG.exception(e)
 
         self.bus.on("neon.profile_update", self.handle_profile_update)
-        self.bus.on("neon.get_languages_skills", self.handle_supported_languages)
+        self.bus.on("neon.languages.skills", self.handle_supported_languages)
 
     def handle_supported_languages(self, message):
         """
         Handle a request for supported skills languages
         :param message: neon.get_languages_skills request
         """
-        translate_langs = set()
-        for module in self.transformers.modules:
-            if UtteranceTranslator and isinstance(module, UtteranceTranslator):
-                translator: LanguageTranslator = module.translator
-                if hasattr(translator, 'available_languages'):
-                    translate_langs = translator.available_languages
-        native_langs = self.language_config.get('supported_langs') or ['en']
-        skill_langs = list(native_langs).extend(translate_langs)
+        translator = self.transformers.loaded_modules.get('neon_utterance_translator_plugin')
+        translate_langs = list(translator.translator.available_languages) if \
+            translator and translator.translator else list()
+
+        native_langs = list(self.language_config.get('supported_langs') or ['en'])
+        skill_langs = list(set(native_langs + translate_langs))
         self.bus.emit(message.response({"skill_langs": skill_langs,
                                         "native_langs": native_langs,
                                         "translate_langs": translate_langs}))

@@ -1,6 +1,10 @@
 # Plugin Configuration
-text_parsers:
-  blacklist: []
+utterance_transformers:
+  neon_utterance_translator_plugin:
+    active: True
+  neon_utterance_normalizer_plugin:
+    active: True
+
 audio_parsers:
   blacklist:
   - gender
