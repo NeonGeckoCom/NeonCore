@@ -168,15 +168,22 @@ class TestSkillService(unittest.TestCase):
 
 class TestIntentService(unittest.TestCase):
     bus = FakeBus()
+    test_config_dir = join(dirname(__file__), "test_config")
 
     @classmethod
     def setUpClass(cls) -> None:
+        os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
+        from neon_utils.configuration_utils import init_config_dir
+        init_config_dir()
+
         from neon_core import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
 
     @classmethod
     def tearDownClass(cls) -> None:
         cls.intent_service.shutdown()
+        os.environ.pop("XDG_CONFIG_HOME")
+        shutil.rmtree(cls.test_config_dir)
 
     def test_save_utterance_transcription(self):
         self.intent_service.transcript_service = Mock()

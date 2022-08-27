@@ -44,7 +44,6 @@ from neon_utils.configuration_utils import get_neon_user_config
 from lingua_franca.parse import get_full_lang_code
 from ovos_config.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
-from ovos_plugin_manager.templates.language import LanguageTranslator
 
 try:
     from neon_utterance_translator_plugin import UtteranceTranslator
