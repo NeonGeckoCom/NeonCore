@@ -65,7 +65,7 @@ class NeonIntentService(IntentService):
     def __init__(self, bus: MessageBusClient):
         super().__init__(bus)
         self.converse = NeonConverseService(bus)
-        self.config = Configuration.get().get('context', {})
+        self.config = Configuration()
         self.language_config = get_lang_config()
 
         # Initialize default user to inject into incoming messages
@@ -76,7 +76,7 @@ class NeonIntentService(IntentService):
 
         # self._setup_converse_handlers()
 
-        self.transformers = UtteranceTransformersService(self.bus)
+        self.transformers = UtteranceTransformersService(self.bus, self.config)
 
         self.transcript_service = None
         if Transcribe:
