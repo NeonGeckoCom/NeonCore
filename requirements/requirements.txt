@@ -6,7 +6,7 @@ neon-transformers~=0.1
 ovos_utils~=0.0,>=0.0.23
 ovos-config~=0.0,>=0.0.4
 ovos-skills-manager~=0.0,>=0.0.11
-ovos-plugin-manager~=0.0.16
+ovos-plugin-manager~=0.0.16,>=0.0.19a1
 
 psutil~=5.6
 
