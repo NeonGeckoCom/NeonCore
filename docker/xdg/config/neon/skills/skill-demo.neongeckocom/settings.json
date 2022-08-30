@@ -1,0 +1,6 @@
+{
+  "filename": "demo.txt",
+  "prompt_on_start": false,
+  "demo_tts_engine": "ovos-tts-plugin-mimic",
+  "__mycroft_skill_firstrun": false
+}

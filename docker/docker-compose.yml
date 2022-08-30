@@ -8,6 +8,11 @@ volumes:
       type: config
       o: bind
       device: ${NEON_CONFIG_PATH}
+  xdg:
+    driver_opts:
+      type: xdg
+      o: bind
+      device: ${NEON_XDG_PATH}
 services:
   neon-messagebus:
     container_name: neon-messagebus
@@ -29,6 +34,7 @@ services:
     - config:/config:ro
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
+    - xdg:/xdg:rw
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
@@ -36,7 +42,7 @@ services:
     - /dev/snd:/dev/snd
   neon-skills:
     container_name: neon-skills
-    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
+    image: ghcr.io/neongeckocom/neon_skills-default_skills:test
     networks:
     - neon-core
     ports:
@@ -46,9 +52,12 @@ services:
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - ${NEON_SKILLS_DIR}:/skills:ro
+    - xdg:/xdg:rw
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME/xdg/data
     devices:
     - /dev/snd:/dev/snd
   neon-audio:
@@ -62,6 +71,7 @@ services:
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - /run/dbus/system_dbus_socket:/run/dbus/system_dbus_socket:rw
     - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    - xdg:/xdg:rw
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
