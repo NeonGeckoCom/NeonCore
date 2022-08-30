@@ -4,6 +4,8 @@ LABEL vendor=neon.ai \
     ai.neon.name="neon-skills"
 
 ENV NEON_CONFIG_PATH /config
+ENV XDG_CONFIG_HOME /xdg/config
+ENV XDG_DATA_HOME /xdg/data
 
 RUN  apt-get update && \
      apt-get install -y \

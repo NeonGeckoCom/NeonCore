@@ -25,6 +25,10 @@ services:
         - messagebus
     volumes:
     - config:/config:ro
+    - xdg:/xdg:rw
+    environment:
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME/xdg/data
   neon-speech:
     container_name: neon-speech
     image: ghcr.io/neongeckocom/neon_speech:dev
@@ -38,6 +42,8 @@ services:
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME/xdg/data
     devices:
     - /dev/snd:/dev/snd
   neon-skills:
@@ -76,6 +82,8 @@ services:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
     - DISPLAY=${DISPLAY}
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME/xdg/data
     devices:
     - /dev/snd:/dev/snd
   neon-gui:
@@ -89,3 +97,7 @@ services:
     - 18181:18181
     volumes:
     - config:/config:ro
+    - xdg:/xdg:rw
+    environment:
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME/xdg/data
