@@ -52,11 +52,13 @@ class ConfigurationTests(unittest.TestCase):
                                            "OpenVoiceOS", "ovos.conf"))
 
         from neon_core.util.runtime_utils import use_neon_core
-        from ovos_utils.configuration import get_ovos_config
+        from ovos_config.meta import get_ovos_config
+        from neon_core.configuration import Configuration
         ovos_config = use_neon_core(get_ovos_config)()
         LOG.info(pformat(ovos_config))
         assert ovos_config['config_filename'] == 'neon.yaml'
         assert os.path.basename(ovos_config['default_config_path']) == "neon.yaml"
+        assert Configuration.default.path == ovos_config['default_config_path']
 
     @classmethod
     def tearDownClass(cls) -> None:
