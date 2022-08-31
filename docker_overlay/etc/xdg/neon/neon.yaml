@@ -42,10 +42,5 @@ play_ogg_cmdline: "play %1"
 remote-server: "http://localhost:8000"
 gui:
   run_gui_file_server: true
-  idle_display_skill: skill-homescreen-lite.openvoiceos
-websocket:
-  host: neon-messagebus
-gui_websocket:
-  host: neon-gui
 ready_settings:
   - skills
