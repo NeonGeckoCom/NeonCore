@@ -1,6 +1,11 @@
 
 # Table of Contents
 0. [Quick Start](#quick-start)
+   * [a. Prerequisite Setup](#a-prerequisite-setup)
+   * [b. Running Neon](#b-running-neon)
+   * [c. Interacting with Neon](#c-interacting-with-neon)
+   * [d. Skill Development](#d-skill-development)
+   * [e. Persistent Data](#e-persistent-data)
 1. [Optional Service Account Setup](#optional-service-account-setup)  
    * [a. Google Cloud Speech](#a-google-cloud-speech-setup)  
    * [b. Amazon Polly and Translate](#b-amazon-polly-and-translate-setup)
@@ -108,12 +113,18 @@ to:
     image: ghcr.io/neongeckocom/neon_skills:dev
 ```
 
-## e. Configuration
-The `neon.yaml` file included in the `docker` directory contains a default configuration
-that may be modified to specify different plugins and other runtime settings.
-The `docker` directory is mounted read-only to `/config` in each of the containers,
-so model files may be placed there and the configuration updated to use different STT/TTS plugins with
-local models.
+## e. Persistent Data
+The `xdg/config` directory is mounted to each of the Neon containers as `XDG_CONFIG_HOME`.
+`xdg/config/neon/neon.yaml` can be modified to change core configuration values.
+`xdg/config/neon/skills` contains settings files for each loaded skill
+
+The `xdg/data` directory is mounted to each of the Neon containers as `XDG_DATA_HOME`.
+`xdg/data/neon/filesystem` contains skill filesystem files.
+`xdg/data/neon/resources` contains user skill resource files.
+
+> *Note*: When Docker creates files on the host filesystem, they are owned by `root`.
+> In order to modify anything in the `xdg` directory, you may need to take ownership with:
+> `sudo chown -R $USER:$USER xdg`
 
 # Optional Service Account Setup
 There are several online services that may be used with Neon. Speech-to-Text (STT) and Text-to-Speech (TTS) may be run 
