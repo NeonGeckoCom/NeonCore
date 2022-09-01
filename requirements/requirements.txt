@@ -1,5 +1,6 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.4
+# ovos-core[skills_lgpl]~=0.0.4
+ovos-core[skills_lgpl] @ git+https://github.com/openvoiceos/ovos-core@FEAT_ConfigurableAboutGui
 # utils
 neon-utils[network,configuration]~=1.0,>=1.0.3a3
 neon-transformers~=0.1
