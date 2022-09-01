@@ -1,5 +1,4 @@
-# neon-stt-plugin-deepspeech-stream-local~=1.1
-neon-stt-plugin-deepspeech-stream-local @ git+https://github.com/neondaniel/neon-stt-plugin-deepspeech_stream_local@FEAT_HuggingfaceModels
+neon-stt-plugin-deepspeech-stream-local==1.1.1a0
 neon-tts-plugin-coqui~=0.5,>=0.5.1a0
 # TODO: Local language plugin
 
