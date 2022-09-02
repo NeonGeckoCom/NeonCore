@@ -1,7 +1,6 @@
 # neon core modules
 neon_messagebus~=0.2
-# neon_gui~=1.0
-neon_gui @ git+https://github.com/neondaniel/neon_gui@FEAT_AddGuiAboutData
+neon_gui~=1.0,>=1.0.1a1
 neon_enclosure~=1.0
 # neon_speech~=2.0,>=2.0.1a2
 neon_speech @ git+https://github.com/neongeckocom/neon_speech@REF_OvosCoreListeningModes
