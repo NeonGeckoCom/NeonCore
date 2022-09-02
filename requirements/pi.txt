@@ -17,7 +17,7 @@ ovos-phal-plugin-balena-wifi
 ovos-phal-plugin-network-manager
 ovos-phal-plugin-wifi-setup
 ovos-phal-plugin-dashboard
-ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2@FEAT_MuteIndicatorLEDs
+ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2
 ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system
 ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
