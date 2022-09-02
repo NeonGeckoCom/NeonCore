@@ -3,7 +3,7 @@
 ovos-core[skills_lgpl] @ git+https://github.com/openvoiceos/ovos-core@FEAT_ConfigurableAboutGui
 # utils
 neon-utils[network,configuration]~=1.0,>=1.0.3a3
-neon-transformers~=0.1
+neon-transformers~=0.2
 ovos_utils~=0.0,>=0.0.24a2
 ovos-config~=0.0,>=0.0.4
 ovos-skills-manager~=0.0,>=0.0.11
