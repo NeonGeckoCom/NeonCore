@@ -28,7 +28,8 @@ services:
     - xdg:/xdg:rw
     environment:
     - XDG_CONFIG_HOME=/xdg/config
-    - XDG_DATA_HOME/xdg/data
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
   neon-speech:
     container_name: neon-speech
     image: ghcr.io/neongeckocom/neon_speech:dev
@@ -43,7 +44,8 @@ services:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
     - XDG_CONFIG_HOME=/xdg/config
-    - XDG_DATA_HOME/xdg/data
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
     devices:
     - /dev/snd:/dev/snd
   neon-skills:
@@ -63,7 +65,8 @@ services:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
     - XDG_CONFIG_HOME=/xdg/config
-    - XDG_DATA_HOME/xdg/data
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
     devices:
     - /dev/snd:/dev/snd
   neon-audio:
@@ -83,7 +86,8 @@ services:
     - PULSE_COOKIE=/tmp/pulse_cookie
     - DISPLAY=${DISPLAY}
     - XDG_CONFIG_HOME=/xdg/config
-    - XDG_DATA_HOME/xdg/data
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
     devices:
     - /dev/snd:/dev/snd
   neon-gui:
@@ -100,4 +104,5 @@ services:
     - xdg:/xdg:rw
     environment:
     - XDG_CONFIG_HOME=/xdg/config
-    - XDG_DATA_HOME/xdg/data
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
