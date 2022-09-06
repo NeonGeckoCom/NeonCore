@@ -1,4 +1,3 @@
-# TODO: Handle XDG_CONFIG_HOME envvar for persistent mounted config
 version: '3.1'
 networks:
   neon-core:
