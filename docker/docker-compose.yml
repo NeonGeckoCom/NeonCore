@@ -1,4 +1,3 @@
-# TODO: Handle XDG_CONFIG_HOME envvar for persistent mounted config
 version: '3.1'
 networks:
   neon-core:
@@ -8,6 +7,11 @@ volumes:
       type: config
       o: bind
       device: ${NEON_CONFIG_PATH}
+  xdg:
+    driver_opts:
+      type: xdg
+      o: bind
+      device: ${NEON_XDG_PATH}
 services:
   neon-messagebus:
     container_name: neon-messagebus
@@ -20,6 +24,11 @@ services:
         - messagebus
     volumes:
     - config:/config:ro
+    - xdg:/xdg:rw
+    environment:
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
   neon-speech:
     container_name: neon-speech
     image: ghcr.io/neongeckocom/neon_speech:dev
@@ -29,9 +38,13 @@ services:
     - config:/config:ro
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
+    - xdg:/xdg:rw
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
     devices:
     - /dev/snd:/dev/snd
   neon-skills:
@@ -46,9 +59,13 @@ services:
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - ${NEON_SKILLS_DIR}:/skills:ro
+    - xdg:/xdg:rw
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
     devices:
     - /dev/snd:/dev/snd
   neon-audio:
@@ -62,10 +79,14 @@ services:
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - /run/dbus/system_dbus_socket:/run/dbus/system_dbus_socket:rw
     - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    - xdg:/xdg:rw
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
     - DISPLAY=${DISPLAY}
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
     devices:
     - /dev/snd:/dev/snd
   neon-gui:
@@ -79,3 +100,8 @@ services:
     - 18181:18181
     volumes:
     - config:/config:ro
+    - xdg:/xdg:rw
+    environment:
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache

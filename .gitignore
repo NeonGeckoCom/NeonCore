@@ -34,3 +34,9 @@ test_conf.json
 # Neon dev files
 .*.tmp
 ./ngi*.yml
+
+# Docker files
+docker/xdg/*
+docker/skills/*
+docker/config/*
+!docker/config/neon.yaml

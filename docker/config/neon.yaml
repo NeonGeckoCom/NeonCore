@@ -1,6 +1,3 @@
-play_wav_cmdline: "play %1"
-play_mp3_cmdline: "play %1"
-play_ogg_cmdline: "play %1"
 websocket:
   host: neon-messagebus
 gui_websocket:
