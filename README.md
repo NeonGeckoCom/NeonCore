@@ -122,6 +122,10 @@ The `xdg/data` directory is mounted to each of the Neon containers as `XDG_DATA_
 `xdg/data/neon/filesystem` contains skill filesystem files.
 `xdg/data/neon/resources` contains user skill resource files.
 
+The `xdg/cache` directory is mounted to each of the Neon containers as `XDG_CACHE_HOME`.
+Any cache information should be recreated as needed if manually removed and includes things like
+STT/TTS model files, TTS audio files, and other downloaded files.
+
 > *Note*: When Docker creates files on the host filesystem, they are owned by `root`.
 > In order to modify anything in the `xdg` directory, you may need to take ownership with:
 > `sudo chown -R $USER:$USER xdg`
