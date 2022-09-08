@@ -9,6 +9,9 @@ ready_settings:
   - speech
   - audio
   - gui
+skills:
+  default_skills:
+    - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
 MQ:
   server: mq.2021.us
   port: 25672

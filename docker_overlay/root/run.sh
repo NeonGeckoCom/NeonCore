@@ -28,6 +28,6 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Python package installation must occur in a separate thread, before module load, for the entry point to be loaded.
-neon install-skills-default
+neon install-default-skills
 neon install-skill-requirements /skills
 neon run-skills
