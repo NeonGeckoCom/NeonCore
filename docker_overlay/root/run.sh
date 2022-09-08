@@ -27,6 +27,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Plugin installation must occur in a separate thread, before module load, for the entry point to be loaded.
+# Python package installation must occur in a separate thread, before module load, for the entry point to be loaded.
+neon install-skills-default
 neon install-skill-requirements /skills
 neon run-skills
