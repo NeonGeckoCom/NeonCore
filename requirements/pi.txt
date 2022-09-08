@@ -14,7 +14,8 @@ ovos-phal-plugin-notification-widgets
 ovos-phal-plugin-color-scheme-manager
 ovos-phal-plugin-configuration-provider
 ovos-phal-plugin-balena-wifi
-ovos-phal-plugin-network-manager
+# ovos-phal-plugin-network-manager
+ovos-phal-plugin-network-manager @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-network-manager@FIX_ReconnectAndNetworkScan
 ovos-phal-plugin-wifi-setup
 ovos-phal-plugin-dashboard
 ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2
