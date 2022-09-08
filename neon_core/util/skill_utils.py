@@ -101,6 +101,53 @@ def _write_pip_constraints_to_file(output_file: str = None):
     LOG.info(f"Wrote core constraints to file: {output_file}")
 
 
+def _install_skill_osm(skill_url: str, skill_dir: str, skills_catalog: dict):
+    """
+    Install a skill from source using OVOS Skills Manager
+    :param skill_url: URL of skill to install
+    :param skill_dir: Directory to install skill to
+    :param skills_catalog: dict Neon skill information (url to dict data)
+    """
+    osm = OVOSSkillsManager()
+    try:
+        normalized_url = normalize_github_url(skill_url)
+        # Check if this skill is in the Neon list
+        if normalized_url in skills_catalog:
+            branch = get_branch_from_github_url(skill_url)
+            # Set URL and branch to requested spec
+            skills_catalog[normalized_url]["url"] = normalized_url
+            skills_catalog[normalized_url]["branch"] = branch
+            entry = SkillEntry.from_json(skills_catalog.get(normalized_url), False)
+        else:
+            LOG.warning(f"Requested Skill not in Neon skill store ({skill_url})")
+            entry = osm.skill_entry_from_url(skill_url)
+            LOG.debug(entry.json)
+
+        osm.install_skill(entry, skill_dir)
+        if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
+            LOG.error(f"Failed to install: "
+                      f"{os.path.join(skill_dir, entry.uuid)}")
+            if entry.download(skill_dir):
+                LOG.info(f"Downloaded failed skill: {entry.uuid}")
+            else:
+                LOG.error(f"Failed to download: {entry.uuid}")
+        else:
+            LOG.info(f"Installed {skill_url} to {skill_dir}")
+    except Exception as e:
+        LOG.error(e)
+
+
+def _install_skill_pip(skill_package: str, constraints_file: str):
+    """
+    Pip install the specified package
+    """
+    import pip
+    LOG.info(f"Requested installation of plugin skill: {skill_package}")
+    returned = pip.main(['install', skill_package, "-c",
+                         constraints_file])
+    LOG.info(f"pip status: {returned}")
+
+
 def set_osm_constraints_file(constraints_file: str):
     """
     Sets the DEFAULT_CONSTRAINTS param for OVOS Skills Manager.
@@ -127,7 +174,6 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
                            and config["directory"] != "skills" else
                            join(xdg_data_home(), "neon", "skills"))
     LOG.info(f"skill_dir={skill_dir}")
-    osm = OVOSSkillsManager()
     skills_catalog = get_neon_skills_data()
     token_set = False
     if config.get("neon_token"):
@@ -136,37 +182,17 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         LOG.info(f"Added token to request headers: {config.get('neon_token')}")
     try:
         _write_pip_constraints_to_file()
+        constraints_file = '/etc/mycroft/constraints.txt'
     except PermissionError:
         constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
         _write_pip_constraints_to_file(constraints_file)
         set_osm_constraints_file(constraints_file)
     for url in skills_to_install:
-        try:
-            normalized_url = normalize_github_url(url)
-            # Check if this skill is in the Neon list
-            if normalized_url in skills_catalog:
-                branch = get_branch_from_github_url(url)
-                # Set URL and branch to requested spec
-                skills_catalog[normalized_url]["url"] = normalized_url
-                skills_catalog[normalized_url]["branch"] = branch
-                entry = SkillEntry.from_json(skills_catalog.get(normalized_url), False)
-            else:
-                LOG.warning(f"Requested Skill not in Neon skill store ({url})")
-                entry = osm.skill_entry_from_url(url)
-                LOG.debug(entry.json)
+        if "github.com" in url and "git+" not in url:
+            _install_skill_osm(url, skill_dir, skills_catalog)
+        else:
+            _install_skill_pip(url, constraints_file)
 
-            osm.install_skill(entry, skill_dir)
-            if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
-                LOG.error(f"Failed to install: "
-                          f"{os.path.join(skill_dir, entry.uuid)}")
-                if entry.download(skill_dir):
-                    LOG.info(f"Downloaded failed skill: {entry.uuid}")
-                else:
-                    LOG.error(f"Failed to download: {entry.uuid}")
-            else:
-                LOG.info(f"Installed {url} to {skill_dir}")
-        except Exception as e:
-            LOG.error(e)
     if token_set:
         clear_github_token()
     LOG.info(f"Installed skills to: {skill_dir}")
