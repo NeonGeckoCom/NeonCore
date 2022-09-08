@@ -120,9 +120,10 @@ class SkillUtilsTests(unittest.TestCase):
                       if os.path.isdir(os.path.join(SKILL_DIR, d))]
         self.assertEqual(len(skill_dirs), 1)
         self.assertIn("skill-date_time.neongeckocom", skill_dirs)
-        from ovos_plugin_manager.skills import find_skill_plugins
-        skills = find_skill_plugins().keys()
-        self.assertIn("skill-support_helper.neongeckocom", skills)
+
+        import pip
+        returned = pip.main(['show', 'neon-skill-support-helper'])
+        self.assertEqual(returned, 0)
 
     def test_get_neon_skills_data(self):
         from neon_core.util.skill_utils import get_neon_skills_data
