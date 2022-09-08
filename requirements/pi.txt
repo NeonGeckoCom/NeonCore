@@ -9,19 +9,18 @@ neon-cli-client~=0.2
 ovos-ww-plugin-vosk~=0.0,>=0.0.4
 
 # PHAL Plugins
-ovos-phal-plugin-brightness-control-rpi
-ovos-phal-plugin-notification-widgets
-ovos-phal-plugin-color-scheme-manager
-ovos-phal-plugin-configuration-provider
-ovos-phal-plugin-balena-wifi
-# ovos-phal-plugin-network-manager
-ovos-phal-plugin-network-manager @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-network-manager@FIX_ReconnectAndNetworkScan
-ovos-phal-plugin-wifi-setup
-ovos-phal-plugin-dashboard
-ovos-phal-plugin-mk2 @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-mk2
-ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system
+ovos-phal-plugin-brightness-control-rpi>=1.0.0a3
+ovos-phal-plugin-notification-widgets>=1.0.0a2
+ovos-phal-plugin-color-scheme-manager>=1.0.0a2
+ovos-phal-plugin-configuration-provider>=1.0.0a2
+ovos-phal-plugin-balena-wifi>=1.0.0a4
+ovos-phal-plugin-gui-network-client>=0.0.2a2
+ovos-phal-plugin-network-manager>=1.0.0a3
+ovos-phal-plugin-wifi-setup>=1.0.0a4
+ovos-phal-plugin-dashboard>=0.0.1
+ovos-phal-plugin-mk2>=0.0.1a2
+ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system@FEAT_ConfigurableCoreService
 ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa
-ovos-phal-plugin-gui-network-client @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gui-network-client
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
 
 # Pi-specific skills
