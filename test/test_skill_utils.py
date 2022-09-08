@@ -121,8 +121,7 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(len(skill_dirs), 1)
         self.assertIn("skill-date_time.neongeckocom", skill_dirs)
 
-        import pip
-        returned = pip.main(['show', 'neon-skill-support-helper'])
+        returned = os.system("pip show neon-skill-support-helper")
         self.assertEqual(returned, 0)
 
     def test_get_neon_skills_data(self):
