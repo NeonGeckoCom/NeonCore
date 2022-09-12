@@ -19,8 +19,8 @@ ovos-phal-plugin-network-manager>=1.0.0a3
 ovos-phal-plugin-wifi-setup>=1.0.0a4
 ovos-phal-plugin-dashboard>=0.0.1
 ovos-phal-plugin-mk2>=0.0.1a2
-ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-system@FEAT_ConfigurableCoreService
-ovos-phal-plugin-alsa @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-alsa
+ovos-phal-plugin-alsa>=0.0.1a2
+ovos-phal-plugin-system>=0.0.2a4
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
 
 # Pi-specific skills
