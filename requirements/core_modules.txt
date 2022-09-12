@@ -1,9 +1,6 @@
-ovos-core[all]~=0.0.4
-ovos-ww-plugin-pocketsphinx~=0.1.2
-
 # neon core modules
 neon_messagebus~=0.2
-neon_gui~=1.0
+neon_gui~=1.0,>=1.0.1a1
 neon_enclosure~=1.0
-neon_speech~=2.0,>=2.0.1a1
-neon_audio~=1.1
+neon_speech~=2.0,>=2.0.1a7
+neon_audio~=1.1,>=1.1.1a0

@@ -34,9 +34,11 @@ from os.path import isdir, dirname, join
 from typing import Optional
 from threading import Thread
 
+from mycroft_bus_client import Message
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
+from ovos_utils.process_utils import ProcessState
 from ovos_utils.skills.locations import get_plugin_skills, get_skill_directories
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
@@ -130,7 +132,7 @@ class NeonSkillService(Thread):
         """
         plugin_dirs, _ = get_plugin_skills()
         skill_base_dirs = get_skill_directories(self.config)
-
+        # TODO: Get ovos_plugin_common_play too
         skill_dirs = [join(base_dir, d) for base_dir in skill_base_dirs
                       for d in listdir(base_dir)]
         return plugin_dirs + skill_dirs
@@ -177,6 +179,7 @@ class NeonSkillService(Thread):
         while not self.skill_manager.is_all_loaded():
             time.sleep(0.1)
         self.status.set_ready()
+        self.register_wifi_setup_events()
         announce_connection()
 
     def _initialize_metrics_handler(self):
@@ -203,6 +206,17 @@ class NeonSkillService(Thread):
             FallbackSkill.make_intent_failure_handler(self.bus)
         )
         return service
+
+    def handle_wifi_setup_completed(self, _):
+        # Skills have been loaded, allow some time for time sync service
+        time.sleep(10)
+        self.bus.emit(Message("system.display.homescreen"))
+
+    def register_wifi_setup_events(self):
+        self.bus.once("ovos.wifi.setup.completed",
+                      self.handle_wifi_setup_completed)
+        self.bus.once("ovos.phal.wifi.plugin.skip.setup",
+                      self.handle_wifi_setup_completed)
 
     def shutdown(self):
         LOG.info('Shutting down Skills service')
