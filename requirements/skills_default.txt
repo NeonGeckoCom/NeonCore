@@ -1,7 +1,7 @@
 ovos-skill-homescreen-lite @ git+https://github.com/openvoiceos/skill-homescreen-lite
 skill-ddg @ git+https://github.com/openvoiceos/skill-ddg
-neon-skill-alerts~=1.0
-neon-skill-caffeinewiz~=0.2
+neon-skill-alerts~=1.0,>=1.0.1a0
+neon-skill-caffeinewiz~=0.2,>=0.2.1a0
 neon-skill-data_controls~=0.1
 neon-skill-fallback_wolfram_alpha~=0.0.1,>=0.0.2a0
 neon-skill-personal~=0.0.1
