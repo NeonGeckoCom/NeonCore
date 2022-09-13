@@ -3,7 +3,8 @@ neon-skill-custom_conversation
 neon-skill-instructions
 neon-skill-launcher
 neon-skill-messaging
-neon-skill-news
+# neon-skill-news
+ovos-skill-news @ git+https://github.com/neondaniel/skill-news@REF_RequirementsHandling
 # neon-skill-recipes
 neon-skill-synonyms
 neon-skill-translation
