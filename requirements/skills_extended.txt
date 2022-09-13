@@ -1,4 +1,4 @@
-# neon-skill-audio_record>=0.0.2a0
+neon-skill-audio_record>=0.0.2a0
 neon-skill-custom_conversation
 neon-skill-instructions
 neon-skill-launcher
@@ -7,5 +7,5 @@ neon-skill-news
 # neon-skill-recipes
 neon-skill-synonyms
 neon-skill-translation
-neon-skill-avmusic
+# neon-skill-avmusic
 neon-skill-camera
