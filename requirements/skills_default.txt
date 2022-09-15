@@ -10,7 +10,7 @@ neon-skill-spelling~=0.0.1
 neon-skill-stock~=0.0.1,>=0.0.2a0
 neon-skill-support_helper~=0.0.1,>=0.0.2a0
 # neon-skill-update
-neon-skill-user_settings~=0.0.1,>=0.0.2a1
+neon-skill-user_settings~=0.0.1,>=0.0.2a2
 neon-skill-weather~=0.0.1
 neon-skill-wikipedia~=0.3
 neon-skill-free_music_archive>=0.0.1a0
