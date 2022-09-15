@@ -21,6 +21,7 @@ ovos-phal-plugin-dashboard>=0.0.1
 ovos-phal-plugin-mk2>=0.0.1a2
 ovos-phal-plugin-alsa>=0.0.1a2
 ovos-phal-plugin-system>=0.0.2a4
+ovos-phal-plugin-notification-widgets>=1.0.0a2
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
 
 # Pi-specific skills
