@@ -7,6 +7,6 @@ neon-skill-messaging
 ovos-skill-news @ git+https://github.com/neondaniel/skill-news@REF_RequirementsHandling
 # neon-skill-recipes
 neon-skill-synonyms
-neon-skill-translation
+neon-skill-translation>=0.1.1a0
 # neon-skill-avmusic
 neon-skill-camera
