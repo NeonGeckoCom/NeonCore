@@ -4,7 +4,7 @@ neon-skill-instructions
 neon-skill-launcher
 neon-skill-messaging
 # neon-skill-news
-ovos-skill-news @ git+https://github.com/neondaniel/skill-news@REF_RequirementsHandling
+ovos-skill-news @ git+https://github.com/openvoiceos/skill-news
 # neon-skill-recipes
 neon-skill-synonyms
 neon-skill-translation>=0.1.1a0
