@@ -11,6 +11,7 @@ ready_settings:
   - gui
 skills:
   default_skills:
+    # Jokes skill included because it cannot be pip installed to the image
     - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
 MQ:
   server: mq.2021.us
