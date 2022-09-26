@@ -208,9 +208,10 @@ class NeonSkillService(Thread):
         return service
 
     def handle_wifi_setup_completed(self, _):
-        # Skills have been loaded, allow some time for time sync service
-        time.sleep(10)
-        self.bus.emit(Message("system.display.homescreen"))
+        self.bus.emit(Message('ovos.shell.status.ok'))
+        # # Skills have been loaded, allow some time for time sync service
+        # time.sleep(10)
+        # self.bus.emit(Message("system.display.homescreen"))
 
     def register_wifi_setup_events(self):
         self.bus.once("ovos.wifi.setup.completed",
