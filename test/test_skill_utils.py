@@ -43,6 +43,13 @@ TEST_SKILLS_NO_AUTH = [
     "https://github.com/NeonGeckoCom/caffeinewiz.neon/tree/dev",
     "https://github.com/NeonGeckoCom/launcher.neon/tree/dev"
 ]
+
+TEST_SKILLS_WITH_PIP = [
+    "https://github.com/NeonGeckoCom/skill-date_time/tree/dev",
+    "git+https://github.com/NeonGeckoCom/malls-parser-skill",
+    "neon-skill-support_helper"
+]
+
 TEST_SKILLS_WITH_AUTH = [
     "https://github.com/NeonGeckoCom/i-like-brands.neon/tree/dev",
     "https://github.com/NeonGeckoCom/i-like-coupons.neon/tree/dev"
@@ -105,6 +112,17 @@ class SkillUtilsTests(unittest.TestCase):
             len(get_remote_entries(SKILL_CONFIG["default_skills"])),
             f"{skill_dirs}\n\n"
             f"{get_remote_entries(SKILL_CONFIG['default_skills'])}")
+
+    def test_install_skills_with_pip(self):
+        from neon_core.util.skill_utils import install_skills_from_list
+        install_skills_from_list(TEST_SKILLS_WITH_PIP, SKILL_CONFIG)
+        skill_dirs = [d for d in os.listdir(SKILL_DIR)
+                      if os.path.isdir(os.path.join(SKILL_DIR, d))]
+        self.assertEqual(len(skill_dirs), 1)
+        self.assertIn("skill-date_time.neongeckocom", skill_dirs)
+
+        returned = os.system("pip show neon-skill-support-helper")
+        self.assertEqual(returned, 0)
 
     def test_get_neon_skills_data(self):
         from neon_core.util.skill_utils import get_neon_skills_data
