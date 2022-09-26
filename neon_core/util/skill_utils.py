@@ -137,15 +137,19 @@ def _install_skill_osm(skill_url: str, skill_dir: str, skills_catalog: dict):
         LOG.error(e)
 
 
-def _install_skill_pip(skill_package: str, constraints_file: str):
+def _install_skill_pip(skill_package: str, constraints_file: str) -> bool:
     """
     Pip install the specified package
+    :param skill_package: package to install (git url or pypi name)
+    :param constraints_file: system Python package constraints
+    :returns: True if installation was successful, else False
     """
     import pip
     LOG.info(f"Requested installation of plugin skill: {skill_package}")
     returned = pip.main(['install', skill_package, "-c",
                          constraints_file])
     LOG.info(f"pip status: {returned}")
+    return returned == 0
 
 
 def set_osm_constraints_file(constraints_file: str):
@@ -161,8 +165,8 @@ def set_osm_constraints_file(constraints_file: str):
 
 def install_skills_from_list(skills_to_install: list, config: dict = None):
     """
-    Installs the passed list of skill URLs
-    :param skills_to_install: list of skill URLs to install
+    Installs the passed list of skill URLs and/or PyPI package names
+    :param skills_to_install: list of skills to install
     :param config: optional dict configuration
     """
     config = config or Configuration()["skills"]
@@ -188,10 +192,12 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         _write_pip_constraints_to_file(constraints_file)
         set_osm_constraints_file(constraints_file)
     for url in skills_to_install:
-        if "github.com" in url and "git+" not in url:
+        if "://" in url and "git+" not in url:
             _install_skill_osm(url, skill_dir, skills_catalog)
         else:
-            _install_skill_pip(url, constraints_file)
+            if not _install_skill_pip(url, constraints_file):
+                LOG.warning(f"Pip installation failed for: {url}")
+                _install_skill_osm(url, skill_dir, skills_catalog)
 
     if token_set:
         clear_github_token()

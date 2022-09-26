@@ -83,6 +83,7 @@ listener:
   continuous_listen: false
   VAD:
     silence_method: vad_and_ratio
+    # vad_only, radio_only, current_only, vad_and_ratio, vad_and_current, all
     speech_seconds: 0.1
     silence_seconds: 0.5
     before_seconds: 0.5
