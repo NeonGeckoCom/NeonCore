@@ -85,6 +85,7 @@ class NeonSkillService(Thread):
                  watchdog: Optional[callable] = None,
                  config: Optional[dict] = None, daemonic: bool = False):
         Thread.__init__(self)
+        LOG.debug("Starting Skills Service")
         self.setDaemon(daemonic)
         self.bus = None
         self.skill_manager = None
@@ -138,6 +139,7 @@ class NeonSkillService(Thread):
         return plugin_dirs + skill_dirs
 
     def run(self):
+        LOG.debug("Starting Skills Service Thread")
         # Set the active lang to match the configured one
         set_default_lang(self.config.get("language", {}).get('internal') or
                          self.config.get("lang") or "en-us")
@@ -145,7 +147,13 @@ class NeonSkillService(Thread):
         set_default_tz()
 
         # Setup signal manager
-        self.bus = self.bus or get_messagebus()
+        try:
+            self.bus = self.bus or get_messagebus(timeout=300)
+        except TimeoutError as e:
+            LOG.exception(e)
+            self.status.set_error(repr(e))
+            raise e
+
         init_signal_bus(self.bus)
         init_signal_handlers()
 
