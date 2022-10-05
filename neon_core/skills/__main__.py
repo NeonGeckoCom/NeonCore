@@ -27,6 +27,7 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from neon_core.skills.service import NeonSkillService
+from neon_utils.logger import LOG
 
 from mycroft.lock import Lock
 from mycroft.util import reset_sigint_handler, wait_for_exit_signal
@@ -37,8 +38,11 @@ def main(*args, **kwargs):
     # Create PID file, prevent multiple instances of this service
     Lock('skills')
     service = NeonSkillService(*args, **kwargs)
-    service.start()
-    wait_for_exit_signal()
+    try:
+        service.start()
+        wait_for_exit_signal()
+    except Exception as e:
+        LOG.exception(e)
     service.shutdown()
 
 
