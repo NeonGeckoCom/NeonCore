@@ -204,6 +204,9 @@ MQ:
 signal:
   use_signal_files: true
   max_wait_seconds: 300
+PHAL:
+  wait_for_gui: False
+
 # Debug/Metrics
 opt_in: false
 debug: false
