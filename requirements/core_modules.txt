@@ -1,7 +1,7 @@
 # neon core modules
 neon_messagebus~=0.2
 neon_gui~=1.0,>=1.0.1a1
-neon_enclosure~=1.0
+# neon_enclosure~=1.0
 neon_enclosure @ git+https://github.com/neongeckocom/neon_enclosure@FEAT_WaitForGui
 neon_speech~=2.0,>=2.0.1a7
 neon_audio~=1.1,>=1.1.1a0
