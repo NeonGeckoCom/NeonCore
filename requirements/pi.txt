@@ -24,5 +24,4 @@ ovos-phal-plugin-system>=0.0.2a5
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
 
 # Pi-specific skills
-# TODO Homescreen advertises itself as mycroft-homescreen when pip installed, so we're not pip installing it
-# ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
+ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
