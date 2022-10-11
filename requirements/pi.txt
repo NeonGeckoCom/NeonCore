@@ -7,6 +7,7 @@ neon-cli-client~=0.2
 
 # Default plugins
 ovos-ww-plugin-vosk~=0.0,>=0.0.4
+neon-stt-plugin-google-cloud-streaming~=0.2,>=0.2.9a0
 
 # PHAL Plugins
 ovos-phal-plugin-brightness-control-rpi>=1.0.0a3
