@@ -7,7 +7,7 @@ neon-cli-client~=0.2
 
 # Default plugins
 ovos-ww-plugin-vosk~=0.0,>=0.0.4
-neon-stt-plugin-google-cloud-streaming~=0.2,>=0.2.9a0
+neon-stt-plugin-google-cloud-streaming~=0.2,>=0.2.9a1
 
 # PHAL Plugins
 ovos-phal-plugin-brightness-control-rpi>=1.0.0a3
@@ -22,7 +22,7 @@ ovos-phal-plugin-dashboard>=0.0.1
 ovos-phal-plugin-mk2>=0.0.1a2
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system>=0.0.2a5
-ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
 
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
+ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
