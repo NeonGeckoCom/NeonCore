@@ -25,4 +25,5 @@ ovos-phal-plugin-system>=0.0.2a5
 
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
-ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
+# ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
+ovos-skill-setup @ git+https://github.com/NeonGeckoCom/skill-device-setup@FEAT_SkipBackendSetup
