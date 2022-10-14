@@ -38,7 +38,7 @@ from os.path import dirname
 NEON_ROOT_PATH = dirname(__file__)
 sys.path.append(NEON_ROOT_PATH)
 init_config_dir()
-init_log()
+init_log(log_name="neon-skills")
 CORE_VERSION_STR = get_core_version()
 setup_resolve_resource_file()
 
