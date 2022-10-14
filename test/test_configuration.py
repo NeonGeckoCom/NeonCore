@@ -34,7 +34,7 @@ import yaml
 
 from copy import deepcopy
 from pprint import pformat
-from neon_utils.logger import LOG
+from ovos_utils.log import LOG
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 

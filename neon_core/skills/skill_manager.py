@@ -29,7 +29,7 @@
 from os import makedirs
 from os.path import isdir, join, expanduser
 from ovos_utils.xdg_utils import xdg_data_home
-from neon_utils.log_utils import init_log, LOG
+from ovos_utils.log import LOG
 
 from neon_core.skills.skill_store import SkillsStore
 
@@ -44,7 +44,6 @@ class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        init_log(self.config, "skills")
         skill_dir = self.get_default_skills_dir()
         self.skill_downloader = SkillsStore(
             skills_dir=skill_dir,

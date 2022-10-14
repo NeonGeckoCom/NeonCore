@@ -44,7 +44,7 @@ from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.session import SESSION, set_github_token, clear_github_token
 from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url, download_url_from_github_url
 from ovos_skill_installer import download_extract_zip
-from neon_utils.logger import LOG
+from ovos_utils.log import LOG
 
 from ovos_config.config import Configuration
 
