@@ -29,6 +29,7 @@
 import sys
 
 from neon_utils.configuration_utils import init_config_dir
+from neon_utils.log_utils import init_log
 from neon_core.config import get_core_version, \
     setup_resolve_resource_file
 from os.path import dirname
@@ -37,6 +38,7 @@ from os.path import dirname
 NEON_ROOT_PATH = dirname(__file__)
 sys.path.append(NEON_ROOT_PATH)
 init_config_dir()
+init_log()
 CORE_VERSION_STR = get_core_version()
 setup_resolve_resource_file()
 
