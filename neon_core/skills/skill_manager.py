@@ -44,7 +44,7 @@ class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        init_log(self.config, "neon-skills")
+        init_log(self.config, "skills")
         skill_dir = self.get_default_skills_dir()
         self.skill_downloader = SkillsStore(
             skills_dir=skill_dir,
