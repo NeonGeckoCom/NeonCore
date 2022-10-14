@@ -203,6 +203,22 @@ MQ:
 signal:
   use_signal_files: true
   max_wait_seconds: 300
+
+# Logging Config
+log_level: INFO
+logs:
+  path:
+  max_bytes: 50000000
+  backup_count: 3
+  diagnostic: False
+  level_overrides:
+    error: []
+    warning:
+      - filelock
+      - botocore
+    info: []
+    debug: []
+
 PHAL:
   wait_for_gui: False
 
