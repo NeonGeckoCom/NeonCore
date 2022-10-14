@@ -72,6 +72,7 @@ play_ogg_cmdline: ogg123 -q %1
 # Speech Module
 confirm_listening: true
 listener:
+  wake_word: hey_neon
   sample_rate: 16000
   mic_meter_ipc: true
   record_wake_words: false
@@ -94,7 +95,7 @@ listener:
     ovos-vad-plugin-silero:
       threshold: 0.2
     ovos-vad-plugin-webrtcvad:
-      vad_mode: 3
+      vad_mode: 2
   mute_during_output: true
   duck_while_listening: 0.3
   phoneme_duration: 120
@@ -104,9 +105,7 @@ listener:
   recording_timeout_with_silence: 3.0
   instant_listen: false
 hotwords:
-  hey mycroft:
-    active: false
-  hey neon:
+  hey_neon:
     module: ovos-ww-plugin-vosk
     listen: true
     sound: snd/start_listening.wav
@@ -115,15 +114,16 @@ hotwords:
     lang: en
     samples:
       - hey neon
-  thank you:
+  thank_you:
     module: ovos-ww-plugin-vosk
     sound: snd/acknowledge.mp3
     active: false
-  wake up:
+  wake_up:
     module: ovos-ww-plugin-vosk
     active: false
 # Skills
 skills:
+  run_gui_file_server: false
   wait_for_internet: false
   extra_directories: []
   upload_skill_manifest: true
