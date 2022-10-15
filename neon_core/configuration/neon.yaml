@@ -73,6 +73,7 @@ play_ogg_cmdline: ogg123 -q %1
 confirm_listening: true
 listener:
   wake_word: hey_neon
+  stand_up_word: wake_up
   sample_rate: 16000
   mic_meter_ipc: true
   record_wake_words: false
@@ -117,10 +118,8 @@ hotwords:
   thank_you:
     module: ovos-ww-plugin-vosk
     sound: snd/acknowledge.mp3
-    active: false
   wake_up:
     module: ovos-ww-plugin-vosk
-    active: false
 # Skills
 skills:
   run_gui_file_server: false
