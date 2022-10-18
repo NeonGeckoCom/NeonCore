@@ -31,7 +31,7 @@ from os.path import isdir
 from typing import List, Optional, Generator, Union
 from ovos_skills_manager.osm import OVOSSkillsManager
 from ovos_skills_manager.skill_entry import SkillEntry
-from neon_utils.logger import LOG
+from ovos_utils.log import LOG
 from neon_utils.net_utils import check_online
 from neon_utils.authentication_utils import repo_is_neon
 from datetime import datetime, timedelta

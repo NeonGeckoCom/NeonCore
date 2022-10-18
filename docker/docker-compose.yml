@@ -29,6 +29,7 @@ services:
     - XDG_CONFIG_HOME=/xdg/config
     - XDG_DATA_HOME=/xdg/data
     - XDG_CACHE_HOME=/xdg/cache
+    - XDG_STATE_HOME=/xdg/state
   neon-speech:
     container_name: neon-speech
     image: ghcr.io/neongeckocom/neon_speech:dev
@@ -45,6 +46,7 @@ services:
     - XDG_CONFIG_HOME=/xdg/config
     - XDG_DATA_HOME=/xdg/data
     - XDG_CACHE_HOME=/xdg/cache
+    - XDG_STATE_HOME=/xdg/state
     devices:
     - /dev/snd:/dev/snd
   neon-skills:
@@ -66,6 +68,7 @@ services:
     - XDG_CONFIG_HOME=/xdg/config
     - XDG_DATA_HOME=/xdg/data
     - XDG_CACHE_HOME=/xdg/cache
+    - XDG_STATE_HOME=/xdg/state
     devices:
     - /dev/snd:/dev/snd
   neon-audio:
@@ -87,6 +90,7 @@ services:
     - XDG_CONFIG_HOME=/xdg/config
     - XDG_DATA_HOME=/xdg/data
     - XDG_CACHE_HOME=/xdg/cache
+    - XDG_STATE_HOME=/xdg/state
     devices:
     - /dev/snd:/dev/snd
   neon-gui:
@@ -105,3 +109,4 @@ services:
     - XDG_CONFIG_HOME=/xdg/config
     - XDG_DATA_HOME=/xdg/data
     - XDG_CACHE_HOME=/xdg/cache
+    - XDG_STATE_HOME=/xdg/state

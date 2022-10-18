@@ -30,7 +30,7 @@ import os
 
 from ovos_plugin_manager.language import load_lang_detect_plugin, \
     load_tx_plugin
-from neon_utils.logger import LOG
+from ovos_utils.log import LOG
 from neon_core.configuration import Configuration, get_private_keys
 
 
