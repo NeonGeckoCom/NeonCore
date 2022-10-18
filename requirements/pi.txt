@@ -2,6 +2,9 @@
 deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
 vosk @ https://github.com/alphacep/vosk-api/releases/download/v0.3.30/vosk-0.3.30-py3-none-linux_aarch64.whl
 
+# SystemD integration
+sdnotify~=0.3
+
 # Default debug client
 neon-cli-client~=0.2
 
