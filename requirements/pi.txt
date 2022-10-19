@@ -26,7 +26,7 @@ ovos-phal-plugin-mk2>=0.0.1a2
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system>=0.0.2a6
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
-
+ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
