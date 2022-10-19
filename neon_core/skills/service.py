@@ -164,7 +164,13 @@ class NeonSkillService(Thread):
                                     namespace="neon")
         SkillApi.connect_bus(self.bus)
         LOG.info("Starting Skill Manager")
-        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
+        self.skill_manager = NeonSkillManager(
+            bus=self.bus, watchdog=self.watchdog,
+            alive_hook=self.callbacks.on_alive,
+            started_hook=self.callbacks.on_started,
+            ready_hook=self.callbacks.on_ready,
+            error_hook=self.callbacks.on_error,
+            stopping_hook=self.callbacks.on_stopping)
         self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
         LOG.info("Skill Manager started")
