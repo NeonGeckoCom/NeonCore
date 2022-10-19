@@ -1,9 +1,6 @@
 # neon core modules
-# neon_messagebus~=0.2,>=0.2.1a3
-neon_messagebus@git+https://github.com/neongeckocom/neon_messagebus@FEAT_ServiceHooks
-# neon_gui~=1.0,>=1.0.1a5
-neon_gui@git+https://github.com/neondaniel/neon_gui@FEAT_ServiceHooks
-# neon_enclosure~=1.0,>=1.0.1a3
-neon_enclosure@git+https://github.com/neongeckocom/neon_enclosure@FEAT_ServiceHookCompat
+neon_messagebus~=0.2,>=0.2.1a4
+neon_gui~=1.0,>=1.0.1a6
+neon_enclosure~=1.0,>=1.0.1a4
 neon_speech~=2.0,>=2.0.1a10
 neon_audio~=1.1,>=1.1.1a4
