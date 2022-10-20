@@ -1,4 +1,4 @@
-# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+ # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
 # Copyright 2008-2022 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
@@ -86,7 +86,7 @@ class TestSkillService(unittest.TestCase):
     def test_neon_skills_service(self, run, install_default):
         from neon_core.skills.service import NeonSkillService
         from neon_core.skills.skill_manager import NeonSkillManager
-        from mycroft.util.process_utils import ProcessState
+        # from mycroft.util.process_utils import ProcessState
 
         config = {"skills": {
                 "disable_osm": False,
@@ -98,11 +98,11 @@ class TestSkillService(unittest.TestCase):
 
         started = Event()
 
-        def started_hook():
+        def ready_hook():
             started.set()
 
         alive_hook = Mock()
-        ready_hook = Mock()
+        started_hook = Mock()
         error_hook = Mock()
         stopping_hook = Mock()
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
@@ -120,15 +120,15 @@ class TestSkillService(unittest.TestCase):
         self.assertIsNotNone(service.http_server)
         self.assertTrue(service.config['skills']['auto_update'])
         install_default.assert_called_once()
-        run.assert_called_once()
 
+        # Check mock method called
+        run.assert_called_once()
+        # Mock status change calls from mocked `run`
         self.assertIsInstance(service.skill_manager, NeonSkillManager)
-        service.skill_manager.status.state = ProcessState.ALIVE
-        sleep(1)
+        service.skill_manager.status.set_alive()
         alive_hook.assert_called_once()
-        service.skill_manager.status.state = ProcessState.READY
-        sleep(1)
-        ready_hook.assert_called_once()
+        service.skill_manager.status.set_ready()
+        started_hook.assert_called_once()
 
         service.shutdown()
         stopping_hook.assert_called_once()

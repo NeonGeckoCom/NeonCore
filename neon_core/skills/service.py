@@ -151,7 +151,7 @@ class NeonSkillService(Thread):
             self.bus = self.bus or get_messagebus(timeout=300)
         except TimeoutError as e:
             LOG.exception(e)
-            self.status.set_error(repr(e))
+            self.callbacks.on_error(repr(e))
             raise e
 
         init_signal_bus(self.bus)
@@ -160,8 +160,6 @@ class NeonSkillService(Thread):
         # Setup Intents and Skill Manager
         self._register_intent_services()
         self.event_scheduler = EventScheduler(self.bus)
-        self.status = ProcessStatus('skills', self.bus, self.callbacks,
-                                    namespace="neon")
         SkillApi.connect_bus(self.bus)
         LOG.info("Starting Skill Manager")
         self.skill_manager = NeonSkillManager(
@@ -173,6 +171,7 @@ class NeonSkillService(Thread):
             stopping_hook=self.callbacks.on_stopping)
         self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
+        self.status = self.skill_manager.status  # TODO: Deprecate backwards-compat?
         LOG.info("Skill Manager started")
 
         # Setup GUI File Server
@@ -182,17 +181,6 @@ class NeonSkillService(Thread):
             # Allow service to start if GUI file server fails
             LOG.exception(e)
 
-        # Update status
-        self.status.set_started()
-
-        # TODO: These should be event-based in Mycroft/OVOS
-        # Wait for skill manager to start up
-        while not self.skill_manager.is_alive():
-            time.sleep(0.1)
-        self.status.set_alive()
-        while not self.skill_manager.is_all_loaded():
-            time.sleep(0.1)
-        self.status.set_ready()
         self.register_wifi_setup_events()
         announce_connection()
 
@@ -235,7 +223,7 @@ class NeonSkillService(Thread):
 
     def shutdown(self):
         LOG.info('Shutting down Skills service')
-        self.status.set_stopping()
+        # self.status.set_stopping()
         if self.event_scheduler is not None:
             self.event_scheduler.shutdown()
 
