@@ -34,7 +34,7 @@ from os.path import isdir, dirname, join
 from typing import Optional
 from threading import Thread
 
-from mycroft_bus_client import Message
+from mycroft_bus_client import Message, MessageBusClient
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
@@ -87,7 +87,7 @@ class NeonSkillService(Thread):
         Thread.__init__(self)
         LOG.debug("Starting Skills Service")
         self.setDaemon(daemonic)
-        self.bus = None
+        self.bus: MessageBusClient = None
         self.skill_manager = None
         self.http_server = None
         self.event_scheduler = None
@@ -235,8 +235,7 @@ class NeonSkillService(Thread):
 
     def shutdown(self):
         LOG.info('Shutting down Skills service')
-        if self.status:
-            self.status.set_stopping()
+        self.status.set_stopping()
         if self.event_scheduler is not None:
             self.event_scheduler.shutdown()
 
@@ -247,4 +246,6 @@ class NeonSkillService(Thread):
         if self.skill_manager is not None:
             self.skill_manager.stop()
             self.skill_manager.join()
+
+        self.bus.close()
         LOG.info('Skills service shutdown complete!')

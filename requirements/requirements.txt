@@ -1,7 +1,7 @@
 # mycroft
 ovos-core[skills_lgpl]~=0.0.4,>=0.0.5a28
 # utils
-neon-utils[network,configuration]~=1.0,>=1.0.3a7
+neon-utils[network,configuration]~=1.0,>=1.0.3a8
 neon-transformers~=0.2
 ovos_utils~=0.0,>=0.0.25
 ovos-config~=0.0,>=0.0.4
@@ -16,3 +16,6 @@ neon-utterance-translator-plugin~=0.1
 neon-utterance-normalizer-plugin~=0.0.2
 # text parser modules
 RAKEkeywords~=0.2
+
+# Patching min version
+ovos-workshop>=0.0.9a1
