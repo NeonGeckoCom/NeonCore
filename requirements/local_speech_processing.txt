@@ -1,5 +1,5 @@
-neon-stt-plugin-deepspeech-stream-local>=1.1.1a2
-neon-tts-plugin-coqui~=0.5,>=0.6.1a0
+neon-stt-plugin-deepspeech-stream-local>=1.1.1a4
+neon-tts-plugin-coqui~=0.5,>=0.6.1a1
 # TODO: Local language plugin
 
 # Fallback TTS
