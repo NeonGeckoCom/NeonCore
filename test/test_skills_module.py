@@ -1,4 +1,4 @@
- # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
 # Copyright 2008-2022 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
