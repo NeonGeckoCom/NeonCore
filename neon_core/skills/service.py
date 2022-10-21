@@ -91,7 +91,6 @@ class NeonSkillService(Thread):
         self.skill_manager = None
         self.http_server = None
         self.event_scheduler = None
-        self.status = None
         self.watchdog = watchdog
         self.callbacks = StatusCallbackMap(on_started=started_hook,
                                            on_alive=alive_hook,
@@ -104,6 +103,12 @@ class NeonSkillService(Thread):
             from neon_core.configuration import patch_config
             patch_config(config)
         self.config = Configuration()
+
+    @property
+    def status(self):
+        LOG.warning("This reference is deprecated. "
+                    "Use `NeonSkillService.skill_manager.status` directly.")
+        return self.skill_manager.status
 
     def _init_gui_server(self):
         """
@@ -171,7 +176,6 @@ class NeonSkillService(Thread):
             stopping_hook=self.callbacks.on_stopping)
         self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
-        self.status = self.skill_manager.status  # TODO: Deprecate backwards-compat?
         LOG.info("Skill Manager started")
 
         # Setup GUI File Server
