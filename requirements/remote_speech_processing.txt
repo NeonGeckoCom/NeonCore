@@ -1,4 +1,4 @@
-neon-stt-plugin-google-cloud-streaming~=0.2,>=0.2.9a0
+neon-stt-plugin-google-cloud-streaming~=1.0
 neon-tts-plugin-polly~=0.2
 neon-lang-plugin-amazon_translate~=0.1
 

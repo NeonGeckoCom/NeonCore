@@ -3,10 +3,8 @@ neon-skill-custom_conversation
 neon-skill-instructions
 neon-skill-launcher
 neon-skill-messaging
-# neon-skill-news
 skill-news @ git+https://github.com/openvoiceos/skill-ovos-news
 # neon-skill-recipes
 neon-skill-synonyms
 neon-skill-translation>=0.1.1a0
-# neon-skill-avmusic
 neon-skill-camera
