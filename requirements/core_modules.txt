@@ -1,6 +1,7 @@
 # neon core modules
-neon_messagebus~=0.2,>=0.2.1a4
-neon_gui~=1.0,>=1.0.1a7
+neon_messagebus~=0.2,>=0.2.1a5
+# neon_gui~=1.0,>=1.0.1a7
+neon_gui@git+https://github.com/NeonGeckoCom/neon_gui@FEAT_AutoUpdateIPAddress
 neon_enclosure~=1.0,>=1.0.1a4
 neon_speech~=2.0,>=2.0.1a11
 neon_audio~=1.1,>=1.1.1a4
