@@ -1,6 +1,3 @@
-play_wav_cmdline: "play %1"
-play_mp3_cmdline: "play %1"
-play_ogg_cmdline: "play %1"
 websocket:
   host: neon-messagebus
 gui_websocket:
@@ -12,6 +9,10 @@ ready_settings:
   - speech
   - audio
   - gui
-#MQ:
-#  server: mq.2021.us
-#  port: 25672
+skills:
+  default_skills:
+    # Jokes skill included because it cannot be pip installed to the image
+    - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
+MQ:
+  server: mq.2021.us
+  port: 25672

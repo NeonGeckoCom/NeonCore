@@ -1,6 +1,10 @@
 # Plugin Configuration
-text_parsers:
-  blacklist: []
+utterance_transformers:
+  neon_utterance_translator_plugin:
+    active: True
+  neon_utterance_normalizer_plugin:
+    active: True
+
 audio_parsers:
   blacklist:
   - gender
@@ -68,6 +72,8 @@ play_ogg_cmdline: ogg123 -q %1
 # Speech Module
 confirm_listening: true
 listener:
+  wake_word: hey_neon
+  stand_up_word: wake_up
   sample_rate: 16000
   mic_meter_ipc: true
   record_wake_words: false
@@ -79,6 +85,7 @@ listener:
   continuous_listen: false
   VAD:
     silence_method: vad_and_ratio
+    # vad_only, radio_only, current_only, vad_and_ratio, vad_and_current, all
     speech_seconds: 0.1
     silence_seconds: 0.5
     before_seconds: 0.5
@@ -89,7 +96,7 @@ listener:
     ovos-vad-plugin-silero:
       threshold: 0.2
     ovos-vad-plugin-webrtcvad:
-      vad_mode: 3
+      vad_mode: 2
   mute_during_output: true
   duck_while_listening: 0.3
   phoneme_duration: 120
@@ -99,35 +106,23 @@ listener:
   recording_timeout_with_silence: 3.0
   instant_listen: false
 hotwords:
-  hey mycroft:
-    active: false
-  hey neon:
+  hey_neon:
     module: ovos-ww-plugin-vosk
     listen: true
     sound: snd/start_listening.wav
     debug: false
+    rule: fuzzy
+    lang: en
     samples:
       - hey neon
-      - hey neil
-      - hey near
-      - hey now
-      - hey india
-      - hey me or
-      - hey moron
-      - kenya
-      - the neon
-      - a neon
-      - the indian
-      - hey on
-  thank you:
+  thank_you:
     module: ovos-ww-plugin-vosk
     sound: snd/acknowledge.mp3
-    active: false
-  wake up:
+  wake_up:
     module: ovos-ww-plugin-vosk
-    active: false
 # Skills
 skills:
+  run_gui_file_server: false
   wait_for_internet: false
   extra_directories: []
   upload_skill_manifest: true
@@ -208,6 +203,25 @@ MQ:
 signal:
   use_signal_files: true
   max_wait_seconds: 300
+
+# Logging Config
+log_level: INFO
+logs:
+  path:
+  max_bytes: 50000000
+  backup_count: 3
+  diagnostic: False
+  level_overrides:
+    error: []
+    warning:
+      - filelock
+      - botocore
+    info: []
+    debug: []
+
+PHAL:
+  wait_for_gui: False
+
 # Debug/Metrics
 opt_in: false
 debug: false

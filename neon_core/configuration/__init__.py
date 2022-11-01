@@ -29,7 +29,7 @@
 from ovos_config.config import Configuration
 from os.path import exists, isdir, dirname
 from os import makedirs
-from neon_utils.logger import LOG
+from ovos_utils.log import LOG
 
 """
 Neon modules should import config from this module since module_overrides will

@@ -1,2 +1,9 @@
-neon-stt-plugin-deepspeech-stream-local~=1.1
-neon-tts-plugin-mimic~=0.1,>=0.1.8
+neon-stt-plugin-deepspeech-stream-local~=2.0
+neon-tts-plugin-coqui~=0.7
+# TODO: Local language plugin
+
+# Fallback TTS
+ovos-tts-plugin-mimic
+
+# Backwards-compat. for tests
+neon-tts-plugin-mimic

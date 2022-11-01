@@ -1,16 +1,16 @@
-ovos-skill-homescreen-lite @ git+https://github.com/openvoiceos/skill-homescreen-lite
 skill-ddg @ git+https://github.com/openvoiceos/skill-ddg
-neon-skill-alerts~=1.0
-neon-skill-caffeinewiz~=0.2
-neon-skill-data_controls~=0.1
-neon-skill-fallback_wolfram_alpha~=0.0.1
-neon-skill-personal~=0.0.1
-neon-skill-speak~=0.0.1
-neon-skill-speed_test~=0.2
-neon-skill-spelling~=0.0.1
-neon-skill-stock~=0.0.1
-neon-skill-support_helper~=0.0.1
+neon-skill-alerts~=1.0,>=1.0.1
+neon-skill-caffeinewiz~=0.2,>=0.2.1
+neon-skill-data_controls~=0.1,>=0.1.1
+neon-skill-fallback_wolfram_alpha~=0.0.1,>=0.0.2
+neon-skill-personal~=0.0.1,>=0.0.2
+neon-skill-speak~=0.0.2
+neon-skill-speed_test~=0.2,>=0.2.1
+neon-skill-spelling~=0.0.2
+neon-skill-stock~=0.1
+neon-skill-support_helper~=0.0.2
 # neon-skill-update
-neon-skill-user_settings~=0.0.1
-neon-skill-weather~=0.0.1
-neon-skill-wikipedia~=0.3
+neon-skill-user_settings~=0.1
+neon-skill-weather~=0.0.2
+neon-skill-wikipedia~=0.3,>=0.3.1
+neon-skill-free_music_archive~=0.0.1

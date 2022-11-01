@@ -20,7 +20,8 @@ license_overrides = {
     "ovos-skill-installer": "MIT",
     "python-dateutil": "Apache-2.0",
     "pyparsing": "MIT",
-    "exceptiongroup": "MIT"
+    "exceptiongroup": "MIT",
+    "idna": "BSD3"
 }
 # explicitly allow these packages that would fail otherwise
 whitelist = ["neon-core",

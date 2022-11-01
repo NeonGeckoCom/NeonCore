@@ -43,6 +43,7 @@ from mock.mock import patch
 from mycroft_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 from ovos_utils.xdg_utils import xdg_data_home
+from ovos_plugin_manager.templates.language import LanguageTranslator
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -50,6 +51,16 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 class MockEventSchedulerInterface(Mock):
     def __init__(self, *_, **__):
         super().__init__()
+
+
+class MockTranslator(LanguageTranslator):
+    def __init__(self):
+        super(MockTranslator, self).__init__()
+        self.supported_langs = []
+
+    @property
+    def available_languages(self) -> set:
+        return set(self.supported_langs)
 
 
 class TestSkillService(unittest.TestCase):
@@ -75,7 +86,7 @@ class TestSkillService(unittest.TestCase):
     def test_neon_skills_service(self, run, install_default):
         from neon_core.skills.service import NeonSkillService
         from neon_core.skills.skill_manager import NeonSkillManager
-        from mycroft.util.process_utils import ProcessState
+        # from mycroft.util.process_utils import ProcessState
 
         config = {"skills": {
                 "disable_osm": False,
@@ -87,11 +98,11 @@ class TestSkillService(unittest.TestCase):
 
         started = Event()
 
-        def started_hook():
+        def ready_hook():
             started.set()
 
         alive_hook = Mock()
-        ready_hook = Mock()
+        started_hook = Mock()
         error_hook = Mock()
         stopping_hook = Mock()
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
@@ -109,15 +120,15 @@ class TestSkillService(unittest.TestCase):
         self.assertIsNotNone(service.http_server)
         self.assertTrue(service.config['skills']['auto_update'])
         install_default.assert_called_once()
-        run.assert_called_once()
 
+        # Check mock method called
+        run.assert_called_once()
+        # Mock status change calls from mocked `run`
         self.assertIsInstance(service.skill_manager, NeonSkillManager)
-        service.skill_manager.status.state = ProcessState.ALIVE
-        sleep(1)
+        service.skill_manager.status.set_alive()
         alive_hook.assert_called_once()
-        service.skill_manager.status.state = ProcessState.READY
-        sleep(1)
-        ready_hook.assert_called_once()
+        service.skill_manager.status.set_ready()
+        started_hook.assert_called_once()
 
         service.shutdown()
         stopping_hook.assert_called_once()
@@ -157,15 +168,22 @@ class TestSkillService(unittest.TestCase):
 
 class TestIntentService(unittest.TestCase):
     bus = FakeBus()
+    test_config_dir = join(dirname(__file__), "test_config")
 
     @classmethod
     def setUpClass(cls) -> None:
+        os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
+        from neon_utils.configuration_utils import init_config_dir
+        init_config_dir()
+
         from neon_core import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
 
     @classmethod
     def tearDownClass(cls) -> None:
         cls.intent_service.shutdown()
+        os.environ.pop("XDG_CONFIG_HOME")
+        shutil.rmtree(cls.test_config_dir)
 
     def test_save_utterance_transcription(self):
         self.intent_service.transcript_service = Mock()
@@ -252,6 +270,56 @@ class TestIntentService(unittest.TestCase):
         patched.reset_mock()
         self.bus.emit(message)
         patched.assert_called_once_with(message)
+
+    def test_handle_supported_languages(self):
+        handled = Event()
+        response: Message = None
+
+        def _handle_languages_response(msg):
+            nonlocal response
+            response = msg
+            handled.set()
+
+        self.bus.on('neon.languages.skills.response',
+                    _handle_languages_response)
+
+        # Patch things
+        real_config = self.intent_service.language_config
+        translator = self.intent_service.transformers.loaded_modules.get(
+            'neon_utterance_translator_plugin')
+        real_plug = translator.translator
+        translator.translator = MockTranslator()
+
+        # Test default intent languages no translation
+        self.intent_service.language_config = {
+            'supported_langs': None
+        }
+        translator.translator.supported_langs = []
+        handled.clear()
+        self.bus.emit(Message('neon.languages.skills'))
+        handled.wait(3)
+        self.assertEqual(response.data['native_langs'], ['en'])
+        self.assertEqual(response.data['translate_langs'], [])
+        self.assertEqual(response.data['skill_langs'], ['en'])
+
+        # Test supported languages and translation
+        translator.translator.supported_langs = ['en', 'pt', 'es']
+        self.intent_service.language_config = {
+            'supported_langs': ['en', 'uk', 'pt']
+        }
+        handled.clear()
+        self.bus.emit(Message('neon.languages.skills'))
+        handled.wait(3)
+        self.assertEqual(response.data['native_langs'], ['en', 'uk', 'pt'])
+        self.assertEqual(set(response.data['translate_langs']),
+                         {'en', 'pt', 'es'})
+        self.assertEqual(set(response.data['skill_langs']),
+                         {'en', 'pt', 'es', 'uk'})
+        self.assertEqual(len(response.data['skill_langs']),
+                         len(set(response.data['skill_langs'])))
+
+        self.intent_service.language_config = real_config
+        translator.translator = real_plug
 
 
 class TestSkillManager(unittest.TestCase):

@@ -33,7 +33,7 @@ import http.server
 from tempfile import gettempdir
 from os.path import isdir, join, dirname
 from threading import Thread, Event
-from neon_utils.logger import LOG
+from ovos_utils.log import LOG
 
 _HTTP_SERVER: socketserver.TCPServer = None
 

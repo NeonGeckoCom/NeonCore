@@ -34,9 +34,11 @@ from os.path import isdir, dirname, join
 from typing import Optional
 from threading import Thread
 
+from mycroft_bus_client import Message, MessageBusClient
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
+from ovos_utils.process_utils import ProcessState
 from ovos_utils.skills.locations import get_plugin_skills, get_skill_directories
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
@@ -83,12 +85,12 @@ class NeonSkillService(Thread):
                  watchdog: Optional[callable] = None,
                  config: Optional[dict] = None, daemonic: bool = False):
         Thread.__init__(self)
+        LOG.debug("Starting Skills Service")
         self.setDaemon(daemonic)
-        self.bus = None
+        self.bus: MessageBusClient = None
         self.skill_manager = None
         self.http_server = None
         self.event_scheduler = None
-        self.status = None
         self.watchdog = watchdog
         self.callbacks = StatusCallbackMap(on_started=started_hook,
                                            on_alive=alive_hook,
@@ -101,6 +103,12 @@ class NeonSkillService(Thread):
             from neon_core.configuration import patch_config
             patch_config(config)
         self.config = Configuration()
+
+    @property
+    def status(self):
+        LOG.warning("This reference is deprecated. "
+                    "Use `NeonSkillService.skill_manager.status` directly.")
+        return self.skill_manager.status
 
     def _init_gui_server(self):
         """
@@ -130,12 +138,13 @@ class NeonSkillService(Thread):
         """
         plugin_dirs, _ = get_plugin_skills()
         skill_base_dirs = get_skill_directories(self.config)
-
+        # TODO: Get ovos_plugin_common_play too
         skill_dirs = [join(base_dir, d) for base_dir in skill_base_dirs
                       for d in listdir(base_dir)]
         return plugin_dirs + skill_dirs
 
     def run(self):
+        LOG.debug("Starting Skills Service Thread")
         # Set the active lang to match the configured one
         set_default_lang(self.config.get("language", {}).get('internal') or
                          self.config.get("lang") or "en-us")
@@ -143,18 +152,28 @@ class NeonSkillService(Thread):
         set_default_tz()
 
         # Setup signal manager
-        self.bus = self.bus or get_messagebus()
+        try:
+            self.bus = self.bus or get_messagebus(timeout=300)
+        except TimeoutError as e:
+            LOG.exception(e)
+            self.callbacks.on_error(repr(e))
+            raise e
+
         init_signal_bus(self.bus)
         init_signal_handlers()
 
         # Setup Intents and Skill Manager
         self._register_intent_services()
         self.event_scheduler = EventScheduler(self.bus)
-        self.status = ProcessStatus('skills', self.bus, self.callbacks,
-                                    namespace="neon")
         SkillApi.connect_bus(self.bus)
         LOG.info("Starting Skill Manager")
-        self.skill_manager = NeonSkillManager(self.bus, self.watchdog)
+        self.skill_manager = NeonSkillManager(
+            bus=self.bus, watchdog=self.watchdog,
+            alive_hook=self.callbacks.on_alive,
+            started_hook=self.callbacks.on_started,
+            ready_hook=self.callbacks.on_ready,
+            error_hook=self.callbacks.on_error,
+            stopping_hook=self.callbacks.on_stopping)
         self.skill_manager.setName("skill_manager")
         self.skill_manager.start()
         LOG.info("Skill Manager started")
@@ -166,17 +185,7 @@ class NeonSkillService(Thread):
             # Allow service to start if GUI file server fails
             LOG.exception(e)
 
-        # Update status
-        self.status.set_started()
-
-        # TODO: These should be event-based in Mycroft/OVOS
-        # Wait for skill manager to start up
-        while not self.skill_manager.is_alive():
-            time.sleep(0.1)
-        self.status.set_alive()
-        while not self.skill_manager.is_all_loaded():
-            time.sleep(0.1)
-        self.status.set_ready()
+        self.register_wifi_setup_events()
         announce_connection()
 
     def _initialize_metrics_handler(self):
@@ -204,10 +213,21 @@ class NeonSkillService(Thread):
         )
         return service
 
+    def handle_wifi_setup_completed(self, _):
+        self.bus.emit(Message('ovos.shell.status.ok'))
+        # # Skills have been loaded, allow some time for time sync service
+        # time.sleep(10)
+        # self.bus.emit(Message("system.display.homescreen"))
+
+    def register_wifi_setup_events(self):
+        self.bus.once("ovos.wifi.setup.completed",
+                      self.handle_wifi_setup_completed)
+        self.bus.once("ovos.phal.wifi.plugin.skip.setup",
+                      self.handle_wifi_setup_completed)
+
     def shutdown(self):
         LOG.info('Shutting down Skills service')
-        if self.status:
-            self.status.set_stopping()
+        # self.status.set_stopping()
         if self.event_scheduler is not None:
             self.event_scheduler.shutdown()
 
@@ -218,4 +238,6 @@ class NeonSkillService(Thread):
         if self.skill_manager is not None:
             self.skill_manager.stop()
             self.skill_manager.join()
+
+        self.bus.close()
         LOG.info('Skills service shutdown complete!')

@@ -29,6 +29,24 @@ jobs:
       - name: Test Skills Installation
         run: |
           pip install .[skills_required,skills_essential,skills_default,skills_extended]
+  pi_image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test chroot installation
+        uses: pguyot/arm-runner-action@v2
+        with:
+          optimize_image: false
+          base_image: https://2222.us/app/files/neon_images/pi/ubuntu_22_04.img.xz
+          cpu: cortex-a53
+          copy_repository_path: /core
+          commands: |
+            bash /core/test/pi_setup.sh
+            . /core/venv/bin/activate
+            neon-audio init-plugin -p coqui
+            neon-speech init-plugin -p deepspeech_stream_local
+
   legacy-remote:
     strategy:
       matrix:

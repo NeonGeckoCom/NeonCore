@@ -41,12 +41,14 @@ from neon_utils.metrics_utils import Stopwatch
 from neon_utils.log_utils import LOG
 from neon_utils.user_utils import apply_local_user_profile_updates
 from neon_utils.configuration_utils import get_neon_user_config
-from ovos_utils.json_helper import merge_dict
 from lingua_franca.parse import get_full_lang_code
 from ovos_config.locale import set_default_lang
 from mycroft.skills.intent_service import IntentService
 
-
+try:
+    from neon_utterance_translator_plugin import UtteranceTranslator
+except ImportError:
+    UtteranceTranslator = None
 # try:
 #     if get_neon_device_type() == "server":
 #         from neon_transcripts_controller.transcript_db_manager import\
@@ -62,7 +64,7 @@ class NeonIntentService(IntentService):
     def __init__(self, bus: MessageBusClient):
         super().__init__(bus)
         self.converse = NeonConverseService(bus)
-        self.config = Configuration.get().get('context', {})
+        self.config = Configuration()
         self.language_config = get_lang_config()
 
         # Initialize default user to inject into incoming messages
@@ -73,7 +75,7 @@ class NeonIntentService(IntentService):
 
         # self._setup_converse_handlers()
 
-        self.transformers = UtteranceTransformersService(self.bus)
+        self.transformers = UtteranceTransformersService(self.bus, self.config)
 
         self.transcript_service = None
         if Transcribe:
@@ -83,6 +85,22 @@ class NeonIntentService(IntentService):
                 LOG.exception(e)
 
         self.bus.on("neon.profile_update", self.handle_profile_update)
+        self.bus.on("neon.languages.skills", self.handle_supported_languages)
+
+    def handle_supported_languages(self, message):
+        """
+        Handle a request for supported skills languages
+        :param message: neon.get_languages_skills request
+        """
+        translator = self.transformers.loaded_modules.get('neon_utterance_translator_plugin')
+        translate_langs = list(translator.translator.available_languages) if \
+            translator and translator.translator else list()
+
+        native_langs = list(self.language_config.get('supported_langs') or ['en'])
+        skill_langs = list(set(native_langs + translate_langs))
+        self.bus.emit(message.response({"skill_langs": skill_langs,
+                                        "native_langs": native_langs,
+                                        "translate_langs": translate_langs}))
 
     def handle_profile_update(self, message):
         updated_profile = message.data.get("profile")

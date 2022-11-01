@@ -29,7 +29,7 @@
 from os import makedirs
 from os.path import isdir, join, expanduser
 from ovos_utils.xdg_utils import xdg_data_home
-from neon_utils.log_utils import LOG
+from ovos_utils.log import LOG
 
 from neon_core.skills.skill_store import SkillsStore
 
