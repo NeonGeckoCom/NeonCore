@@ -1,12 +1,12 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.4,>=0.0.5a28
+ovos-core[skills_lgpl]==0.0.5a35
 # utils
 neon-utils[network,configuration]~=1.1
 neon-transformers~=0.2
 ovos_utils~=0.0,>=0.0.25
 ovos-config~=0.0,>=0.0.4
 ovos-skills-manager~=0.0.11
-ovos-plugin-manager~=0.0.19,>=0.0.20a1
+ovos-plugin-manager==0.0.20a1
 
 psutil~=5.6
 
@@ -18,4 +18,5 @@ neon-utterance-normalizer-plugin~=0.0.2
 RAKEkeywords~=0.2
 
 # Patching min version
-ovos-workshop>=0.0.9a1
+ovos-workshop==0.0.9a1
+ovos-plugin-manager==0.0.20a1
