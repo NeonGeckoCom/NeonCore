@@ -1,6 +1,7 @@
 # neon core modules
 neon_messagebus~=0.3
 neon_gui~=1.1
-neon_enclosure~=1.1
+# neon_enclosure~=1.1
 neon_speech~=3.0
 neon_audio~=1.2
+neon_enclosure@git+https://github.com/neongeckocom/neon_enclosure@FEAT_AdminService
