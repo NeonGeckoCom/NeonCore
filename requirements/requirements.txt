@@ -18,5 +18,4 @@ neon-utterance-normalizer-plugin~=0.0.2
 RAKEkeywords~=0.2
 
 # Patching min version
-ovos-workshop==0.0.9a1
 ovos-plugin-manager==0.0.20a1
