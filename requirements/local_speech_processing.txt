@@ -1,5 +1,6 @@
 neon-stt-plugin-deepspeech-stream-local~=2.0
-neon-tts-plugin-coqui~=0.7
+# neon-tts-plugin-coqui~=0.7
+neon-tts-plugin-coqui @ git+https://github.com/neongeckocom/neon-tts-plugin-coqui@FIX_TorchBug
 # TODO: Local language plugin
 
 # Fallback TTS
