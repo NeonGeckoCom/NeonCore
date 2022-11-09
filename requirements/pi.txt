@@ -15,7 +15,7 @@ neon-stt-plugin-google-cloud-streaming~=1.0
 # PHAL Plugins
 neon-phal-plugin-fan
 neon-phal-plugin-switches
-neon-phal-plugin-linear_led@git+https://github.com/neongeckocom/neon-phal-plugin-linear_led@FEAT_InitialImplementation
+neon-phal-plugin-linear_led
 
 ovos-phal-plugin-brightness-control-rpi>=1.0.0a4
 ovos-phal-plugin-notification-widgets>=1.0.0a4
