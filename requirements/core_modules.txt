@@ -3,5 +3,6 @@ neon_messagebus~=0.3
 neon_gui~=1.1,>=1.1.1a0
 # neon_enclosure~=1.1,>=1.1.1a0
 neon_enclosure @ git+https://github.com/neongeckocom/neon_enclosure@FIX_TroubleshootDependencyResolution
-neon_speech~=3.0,>=3.0.1a0
+# neon_speech~=3.0,>=3.0.1a0
+neon_speech @ git+https://github.com/neongeckocom/neon_speech@FIX_TroubleshootDependencyResolution
 neon_audio~=1.2,>=1.2.1a0
