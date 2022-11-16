@@ -20,14 +20,14 @@ neon-phal-plugin-switches
 neon-phal-plugin-linear_led
 
 ovos-phal-plugin-brightness-control-rpi>=1.0.0a4
-ovos-phal-plugin-notification-widgets>=1.0.0a5
+ovos-phal-plugin-notification-widgets~=1.0.0
 ovos-phal-plugin-color-scheme-manager>=1.0.0a5
 ovos-phal-plugin-configuration-provider>=1.0.0a3
 ovos-phal-plugin-balena-wifi>=1.0.0a5
 ovos-phal-plugin-gui-network-client>=0.0.2a6
 ovos-phal-plugin-network-manager>=1.0.0a7
 ovos-phal-plugin-wifi-setup>=1.0.0a9
-ovos-phal-plugin-dashboard>=0.0.1
+ovos-phal-plugin-dashboard~=0.0.1
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system>=0.0.2a6
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
