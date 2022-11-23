@@ -17,7 +17,7 @@ neon-tts-plugin-coqui-remote
 # PHAL Plugins
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.3
-neon-phal-plugin-linear_led @ git+https://github.com/neongeckocom/neon-phal-plugin-linear_led@FEAT_MoreCoreEvents
+neon-phal-plugin-linear_led>=0.0.4a0
 
 ovos-phal-plugin-brightness-control-rpi~=1.0.0
 ovos-phal-plugin-notification-widgets~=1.0.0
