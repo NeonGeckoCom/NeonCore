@@ -52,7 +52,8 @@ class QmlFileHandler(http.server.SimpleHTTPRequestHandler):
 def start_qml_http_server(skills_dir: str, port: int = 8000):
     if not isdir(skills_dir):
         os.makedirs(skills_dir)
-    system_dir = join(dirname(dirname(__file__)), "res")
+    import mycroft
+    system_dir = join(dirname(mycroft.__file__), "res")
 
     qml_dir = join(gettempdir(), "neon", "qml")
     if not isdir(qml_dir):
