@@ -4,7 +4,7 @@ ovos-core[skills_lgpl]~=0.0.5,>=0.0.6a3
 neon-utils[network,configuration]~=1.1,>=1.1.3a4
 neon-transformers~=0.2
 ovos_utils~=0.0,>=0.0.27a4
-ovos-config~=0.0,>=0.0.4
+ovos-config~=0.0.5
 ovos-skills-manager~=0.0.11
 ovos-plugin-manager~=0.0.20
 psutil~=5.6
