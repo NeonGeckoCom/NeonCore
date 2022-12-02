@@ -25,6 +25,8 @@ services:
     volumes:
     - config:/config:ro
     - xdg:/xdg:rw
+    - /etc/timezone:/etc/timezone:ro
+    - /etc/localtime:/etc/localtime:ro
     environment:
     - XDG_CONFIG_HOME=/xdg/config
     - XDG_DATA_HOME=/xdg/data
@@ -40,6 +42,8 @@ services:
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - xdg:/xdg:rw
+    - /etc/timezone:/etc/timezone:ro
+    - /etc/localtime:/etc/localtime:ro
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
@@ -51,7 +55,7 @@ services:
     - /dev/snd:/dev/snd
   neon-skills:
     container_name: neon-skills
-    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
+    image: neon_skills:test
     networks:
     - neon-core
     ports:
@@ -62,6 +66,8 @@ services:
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - ${NEON_SKILLS_DIR}:/skills:ro
     - xdg:/xdg:rw
+    - /etc/timezone:/etc/timezone:ro
+    - /etc/localtime:/etc/localtime:ro
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
@@ -83,6 +89,8 @@ services:
     - /run/dbus/system_dbus_socket:/run/dbus/system_dbus_socket:rw
     - /tmp/.X11-unix:/tmp/.X11-unix:ro
     - xdg:/xdg:rw
+    - /etc/timezone:/etc/timezone:ro
+    - /etc/localtime:/etc/localtime:ro
     environment:
     - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
     - PULSE_COOKIE=/tmp/pulse_cookie
@@ -105,6 +113,8 @@ services:
     volumes:
     - config:/config:ro
     - xdg:/xdg:rw
+    - /etc/timezone:/etc/timezone:ro
+    - /etc/localtime:/etc/localtime:ro
     environment:
     - XDG_CONFIG_HOME=/xdg/config
     - XDG_DATA_HOME=/xdg/data
