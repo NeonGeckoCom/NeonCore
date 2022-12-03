@@ -1,6 +1,6 @@
 # ARM-specific releases
-deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
-vosk @ https://github.com/alphacep/vosk-api/releases/download/v0.3.30/vosk-0.3.30-py3-none-linux_aarch64.whl
+# deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
+# vosk @ https://github.com/alphacep/vosk-api/releases/download/v0.3.30/vosk-0.3.30-py3-none-linux_aarch64.whl
 
 # SystemD integration
 sdnotify~=0.3
@@ -11,8 +11,11 @@ neon-cli-client~=0.2
 # Default plugins
 ovos-ww-plugin-vosk~=0.0,>=0.0.4
 neon-stt-plugin-google-cloud-streaming~=1.0
-neon-tts-plugin-larynx_server~=0.2
 neon-tts-plugin-coqui-remote
+
+# Fallback plugins
+neon-tts-plugin-coqui~=0.7,>=0.7.1
+ovos-stt-plugin-vosk
 
 # PHAL Plugins
 neon-phal-plugin-fan~=0.0.3
