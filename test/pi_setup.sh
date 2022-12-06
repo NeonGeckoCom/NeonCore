@@ -38,11 +38,11 @@ apt install -y curl
 curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
 echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
 apt update
-apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3.7-dev python3.7-venv mimic espeak-ng g++ libjpeg-dev make || exit 1
+apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3.10-dev python3.10-venv mimic espeak-ng g++ libjpeg-dev make || exit 1
 
 # Configure venv for deepspeech compat.
 cd /core || exit 10
-python3.7 -m venv "/core/venv" || exit 11
+python3.10 -m venv "/core/venv" || exit 11
 . /core/venv/bin/activate
 
 pip install --upgrade pip wheel
