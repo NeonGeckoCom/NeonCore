@@ -34,7 +34,7 @@ ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system~=0.0.2
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
 ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
-ovos-phal-plugin-homeassistant @ git+https://github.com/neondaniel/ovos-PHAL-plugin-homeassistant@FEAT_WebsocketAPI
+# ovos-phal-plugin-homeassistant @ git+https://github.com/neondaniel/ovos-PHAL-plugin-homeassistant@FEAT_WebsocketAPI
 
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
