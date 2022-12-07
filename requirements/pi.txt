@@ -9,7 +9,7 @@ neon-cli-client~=0.2
 
 # Default plugins
 ovos-ww-plugin-vosk~=0.0,>=0.0.4
-neon-stt-plugin-google-cloud-streaming~=1.0
+neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1a0
 neon-tts-plugin-coqui-remote
 
 # Fallback plugins
