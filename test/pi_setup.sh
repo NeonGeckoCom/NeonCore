@@ -38,17 +38,14 @@ apt install -y curl
 curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
 echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
 apt update
-apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3.7-dev python3.7-venv mimic espeak-ng g++ libjpeg-dev make || exit 1
+apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3.10-dev python3.10-venv mimic espeak-ng g++ libjpeg-dev make || exit 1
 
 # Configure venv for deepspeech compat.
 cd /core || exit 10
-python3.7 -m venv "/core/venv" || exit 11
+python3.10 -m venv "/core/venv" || exit 11
 . /core/venv/bin/activate
 
 pip install --upgrade pip wheel
-pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi,local]" || exit 11
+pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" || exit 11
 
 cp -rf /core/test/pi_image_overlay/* /
-# TODO: Remove patched STT config
-wget -O /root/.local/share/neon/deepspeech-0.9.3-models.scorer https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.scorer
-wget -O /root/.local/share/neon/deepspeech-0.9.3-models.tflite https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-models.tflite

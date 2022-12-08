@@ -1,6 +1,5 @@
 # ARM-specific releases
-deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
-vosk @ https://github.com/alphacep/vosk-api/releases/download/v0.3.30/vosk-0.3.30-py3-none-linux_aarch64.whl
+# deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
 
 # SystemD integration
 sdnotify~=0.3
@@ -10,9 +9,12 @@ neon-cli-client~=0.2
 
 # Default plugins
 ovos-ww-plugin-vosk~=0.0,>=0.0.4
-neon-stt-plugin-google-cloud-streaming~=1.0
-neon-tts-plugin-larynx_server~=0.2
+neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1a0
 neon-tts-plugin-coqui-remote
+
+# Fallback plugins
+neon-tts-plugin-coqui~=0.7,>=0.7.1
+ovos-stt-plugin-vosk~=0.1
 
 # PHAL Plugins
 neon-phal-plugin-fan~=0.0.3
@@ -27,11 +29,13 @@ ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-gui-network-client~=0.0.2
 ovos-phal-plugin-network-manager~=1.0.0
 ovos-phal-plugin-wifi-setup~=1.0.0
-ovos-phal-plugin-dashboard~=0.0.1
+ovos-phal-plugin-dashboard>=0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system~=0.0.2
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
 ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
+# ovos-phal-plugin-homeassistant @ git+https://github.com/neondaniel/ovos-PHAL-plugin-homeassistant@FEAT_WebsocketAPI
+
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
