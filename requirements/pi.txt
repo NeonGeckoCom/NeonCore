@@ -28,13 +28,13 @@ ovos-phal-plugin-configuration-provider~=1.0.0
 ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-gui-network-client~=0.0.2
 ovos-phal-plugin-network-manager~=1.0.0
-ovos-phal-plugin-wifi-setup~=1.0.0
+ovos-phal-plugin-wifi-setup~=1.0.0,>=1.0.1a1
 ovos-phal-plugin-dashboard>=0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system~=0.0.2
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
 ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
-# ovos-phal-plugin-homeassistant @ git+https://github.com/neondaniel/ovos-PHAL-plugin-homeassistant@FEAT_WebsocketAPI
+ovos-phal-plugin-homeassistant @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-homeassistant@feat/groups_fixes_new_entities
 
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
