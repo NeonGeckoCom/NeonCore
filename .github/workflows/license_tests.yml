@@ -5,6 +5,7 @@ on:
 
 jobs:
   license_tests:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,7 +22,7 @@ jobs:
           sudo apt install python3-dev swig libssl-dev libfann-dev portaudio19-dev libpulse-dev
       - name: Install core repo
         run: |
-          pip install .[core_modules,dev,local,remote,pi,docker,skills_required,skills_essential,skills_default,skills_extended]
+          pip install .[core_modules,dev,pi,docker]
       - name: Get explicit and transitive dependencies
         run: |
           pip freeze > requirements-all.txt
