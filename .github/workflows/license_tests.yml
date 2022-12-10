@@ -33,7 +33,7 @@ jobs:
           requirements: 'requirements-all.txt'
           fail: 'Copyleft,Other,Error'
           fails-only: true
-          exclude: '^(precise-runner|fann2|tqdm|bs4|ovos-phal-plugin|ovos-skill).*'
+          exclude: '^(precise-runner|fann2|tqdm|bs4|ovos-phal-plugin|ovos-skill|neon-core).*'
           exclude-license: '^(Mozilla|NeonAI License v1.0).*$'
       - name: Print report
         if: ${{ always() }}
