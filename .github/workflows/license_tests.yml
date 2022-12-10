@@ -33,8 +33,8 @@ jobs:
           requirements: 'requirements-all.txt'
           fail: 'Copyleft,Other,Error'
           fails-only: true
-          exclude: '^(precise-runner|fann2|tqdm).*'
-          exclude-license: '^(Mozilla).*$'
+          exclude: '^(precise-runner|fann2|tqdm|bs4|ovos-phal-plugin|ovos-skill).*'
+          exclude-license: '^(Mozilla|NeonAI License v1.0).*$'
       - name: Print report
         if: ${{ always() }}
         run: echo "${{ steps.license_check_report.outputs.report }}"
