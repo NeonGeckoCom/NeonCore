@@ -51,7 +51,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{secrets.GITHUB_TOKEN}}
-          tag: ${{env.VERSION}}
+          tag: ${{steps.version.outputs.version}}
           prerelease: true
   build_and_publish_docker:
     runs-on: ubuntu-latest
