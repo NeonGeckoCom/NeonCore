@@ -34,6 +34,25 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Increment Version
+  tag_alpha_release:
+    runs-on: ubuntu-latest
+    needs: increment_version
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Get Version
+        id: version
+        run: |
+          VERSION=$(sed "s/a/-a./" <<< $(python setup.py --version))
+          echo ::set-output name=version::${VERSION}
+      - name: Create Pre-release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          tag: ${{env.VERSION}}
+          prerelease: true
   build_and_publish_docker:
     runs-on: ubuntu-latest
     needs: increment_version
