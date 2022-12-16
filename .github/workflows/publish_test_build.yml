@@ -45,7 +45,7 @@ jobs:
       - name: Get Version
         id: version
         run: |
-          VERSION=$(sed "s/a/-a./" <<< $(python setup.py --version))
+          VERSION=$(python setup.py --version)
           echo ::set-output name=version::${VERSION}
       - name: Create Pre-release
         uses: ncipollo/release-action@v1
