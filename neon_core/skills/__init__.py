@@ -40,6 +40,11 @@ mycroft.skills.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
+import importlib
+importlib.reload(mycroft.skills.fallback_skill)
+importlib.reload(mycroft.skills.common_play_skill)
+importlib.reload(mycroft.skills.common_query_skill)
+
 mycroft.skills.intent_service.AdaptIntent = AdaptIntent
 
 
