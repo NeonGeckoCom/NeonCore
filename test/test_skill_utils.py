@@ -25,15 +25,14 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import importlib
 import json
 import os
 import shutil
 import sys
 import unittest
-from copy import deepcopy, copy
 
-from importlib import reload
 from mock.mock import Mock
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -217,6 +216,20 @@ class SkillUtilsTests(unittest.TestCase):
         set_osm_constraints_file(__file__)
         self.assertEqual(ovos_skills_manager.requirements.DEFAULT_CONSTRAINTS,
                          __file__)
+
+    def test_skill_class_patches(self):
+        import neon_core.skills  # Import to do all the patching
+        from neon_utils.skills.mycroft_skill import PatchedMycroftSkill
+        from mycroft.skills import MycroftSkill
+        from mycroft.skills.fallback_skill import FallbackSkill
+        from mycroft.skills.common_play_skill import CommonPlaySkill
+        from mycroft.skills.common_query_skill import CommonQuerySkill
+        from mycroft.skills.common_iot_skill import CommonIoTSkill
+        self.assertEqual(MycroftSkill, PatchedMycroftSkill)
+        self.assertTrue(issubclass(FallbackSkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(CommonPlaySkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(CommonIoTSkill, PatchedMycroftSkill))
 
 
 if __name__ == '__main__':
