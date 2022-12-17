@@ -35,6 +35,9 @@ ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipg
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 # ovos-phal-plugin-homeassistant @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-homeassistant@feat/groups_fixes_new_entities
 
+neon-phal-plugin-core-updater @ git+https://github.com/neongeckocom/neon-phal-plugin-core-updater@FEAT_InitialImplementation
+neon-skill-update
+
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
