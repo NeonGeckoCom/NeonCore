@@ -153,7 +153,7 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(num_installed, install_pip_deps.call_count)
         self.assertEqual(num_installed, install_sys_deps.call_count)
 
-def test_write_pip_constraints_to_file(self):
+    def test_write_pip_constraints_to_file(self):
         from neon_core.util.skill_utils import _write_pip_constraints_to_file
         from neon_utils.packaging_utils import get_package_dependencies
         real_deps = get_package_dependencies("neon-core")
