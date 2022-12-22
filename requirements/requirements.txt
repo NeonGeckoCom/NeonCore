@@ -5,7 +5,7 @@ neon-utils[network,configuration]~=1.1,>=1.1.3a6
 neon-transformers~=0.2
 ovos_utils~=0.0,>=0.0.27a4
 ovos-config~=0.0.5
-ovos-skills-manager~=0.0.11
+ovos-skills-manager~=0.0.11,>=0.0.12a3
 ovos-plugin-manager~=0.0.20
 psutil~=5.6
 
