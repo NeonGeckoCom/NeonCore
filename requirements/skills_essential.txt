@@ -1,4 +1,4 @@
-neon-skill-about~=0.0.2
+neon-skill-about~=0.0.2,>=0.0.4a0
 neon-skill-date_time~=0.0.2
 neon-skill-demo~=0.1,>=0.1.1a4
 neon-skill-device_controls~=0.0.2
