@@ -32,7 +32,7 @@ ovos-phal-plugin-network-manager~=1.0.0
 ovos-phal-plugin-wifi-setup~=1.0.0,>=1.0.1a3
 ovos-phal-plugin-dashboard>=0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
-ovos-phal-plugin-system @ git+https://github.com/OpenGoiceOS/ovos-phal-plugin-system@FIX_ResetEventHandlers
+ovos-phal-plugin-system @ git+https://github.com/OpenVoiceOS/ovos-phal-plugin-system@FIX_ResetEventHandlers
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 # ovos-phal-plugin-homeassistant @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-homeassistant@feat/groups_fixes_new_entities
