@@ -1,6 +1,5 @@
 # neon core modules
-ovos-core[audio]~=0.0.5,>=0.0.6a3
-# TODO: Above patching version for neon_audio
+ovos-core~=0.0.5,>=0.0.6a10
 neon_messagebus~=0.3
 neon_gui~=1.1,>=1.1.1
 neon_enclosure~=1.2
