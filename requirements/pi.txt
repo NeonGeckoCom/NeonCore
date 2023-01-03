@@ -17,6 +17,8 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4a6
 
 # PHAL Plugins
+neon-phal-plugin-reset~=0.0.1a3
+neon-phal-plugin-core-updater~=0.0.1a0
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.3
 neon-phal-plugin-linear_led>=0.0.4a1
@@ -30,7 +32,7 @@ ovos-phal-plugin-network-manager~=1.0.0
 ovos-phal-plugin-wifi-setup~=1.0.0,>=1.0.1a3
 ovos-phal-plugin-dashboard>=0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
-ovos-phal-plugin-system~=0.0.2
+ovos-phal-plugin-system~=0.0.2,>=0.0.3a1
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 # ovos-phal-plugin-homeassistant @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-homeassistant@feat/groups_fixes_new_entities
