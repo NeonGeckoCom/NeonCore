@@ -17,7 +17,7 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4a6
 
 # PHAL Plugins
-neon-phal-plugin-reset~=0.0.1a0
+neon-phal-plugin-reset~=0.0.1a3
 neon-phal-plugin-core-updater~=0.0.1a0
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.3
