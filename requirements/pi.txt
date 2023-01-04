@@ -40,7 +40,7 @@ ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipg
 # ovos-phal-plugin-homeassistant @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-homeassistant@feat/groups_fixes_new_entities
 
 # neon-skill-update>=0.0.1a3
-neon-skill-update@git+https://github.com/neongeckocom/neon-skill-update@FEAT_UpdateConfiguration
+neon-skill-update@git+https://github.com/neongeckocom/skill-update@FEAT_UpdateConfiguration
 # Pi-specific skills
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
