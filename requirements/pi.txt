@@ -17,8 +17,10 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4a6
 
 # PHAL Plugins
-neon-phal-plugin-reset~=0.0.1a5
-neon-phal-plugin-core-updater~=0.0.1a1
+# neon-phal-plugin-reset~=0.0.1a5
+# neon-phal-plugin-core-updater~=0.0.1a1
+neon-phal-plugin-reset@git+https://github.com/neongeckocom/neon-phal-plugin-reset@FEAT_OptionalRestartAfterConfigUpdate
+neon-phal-plugin-core-updater@git+https://github.com/neongeckocom/neon-phal-plugin-core-updater@FEAT_UpdateConfig
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.3
 neon-phal-plugin-linear_led>=0.0.4a1
