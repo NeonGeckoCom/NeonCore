@@ -30,7 +30,7 @@ ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-gui-network-client~=0.0.2
 ovos-phal-plugin-network-manager~=1.0.0
 # ovos-phal-plugin-wifi-setup~=1.0.0,>=1.0.1a3
-ovos-phal-plugin-wifi-setup@git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup@FIX_ClientAfterSetupDisplay
+ovos-phal-plugin-wifi-setup@git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-wifi-setup@FIX_ClientsAfterSetupDisplay
 ovos-phal-plugin-dashboard>=0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system~=0.0.2,>=0.0.3a1
