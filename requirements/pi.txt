@@ -17,7 +17,8 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4a6
 
 # PHAL Plugins
-neon-phal-plugin-reset~=0.0.1a6
+# neon-phal-plugin-reset~=0.0.1a6
+neon-phal-plugin-reset@git+https://github.com/neongeckocom/neon-phal-plugin-reset@FEAT_CreateDrive
 neon-phal-plugin-core-updater~=0.0.1a3
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.3
@@ -38,6 +39,7 @@ ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipg
 # ovos-phal-plugin-homeassistant @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-homeassistant@feat/groups_fixes_new_entities
 
 # Pi-specific skills
-neon-skill-update>=0.0.1a5
+# neon-skill-update>=0.0.1a5
+neon-skill-update @ git+https://github.com/neongeckocom/skill-update@FEAT_DownloadImage
 ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
