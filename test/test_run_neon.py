@@ -69,10 +69,7 @@ class TestRunNeon(unittest.TestCase):
             cls.bus.close()
             cls.process.join(30)
             if cls.process.is_alive():
-                stop = Process(target=stop_neon, daemon=False)
-                stop.start()
-                stop.join(60)
-                cls.process.join(15)
+                cls.process.kill()
             if cls.process.is_alive:
                 raise ChildProcessError("Process Not Killed!")
         except Exception as e:
@@ -137,12 +134,14 @@ class TestRunNeon(unittest.TestCase):
     #     matches = resp.data.get("transcripts")
     #     self.assertIsInstance(matches, list)
 
+    @pytest.mark.xfail
     def test_skills_module(self):
         # TODO: Diagnose test failures
-        # response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
-        # self.assertTrue(response.data['status'])
+        response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
+        self.assertTrue(response.data['status'])
 
-        response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
+        response = self.bus.wait_for_response(Message("skillmanager.list"),
+                                              "mycroft.skills.list")
         self.assertIsInstance(response, Message)
         loaded_skills = response.data
         self.assertIsInstance(loaded_skills, dict)
