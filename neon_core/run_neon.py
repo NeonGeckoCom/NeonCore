@@ -37,7 +37,7 @@ from subprocess import Popen, STDOUT
 from mycroft_bus_client import MessageBusClient, Message
 from ovos_utils.gui import is_gui_running
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
-    get_log_file_for_module
+    get_log_file_for_module, init_log
 from typing.io import IO
 
 LOG_FILES = {}
@@ -151,12 +151,42 @@ def start_neon():
     _stop_all_core_processes()
     _cycle_logs()
 
-    _start_process(["neon_messagebus_service"]) or STOP_MODULES.set()
+    # init_config_dir()  Already Done
+
+    from neon_messagebus.service import NeonBusService
+    from neon_messagebus.util.signal_utils import SignalManager
+    from neon_messagebus.util.mq_connector import start_mq_connector
+    from neon_messagebus.util.config import load_message_bus_config
+    from neon_speech.service import NeonSpeechClient
+    from neon_audio.service import NeonPlaybackService
+    from neon_core.skills.service import NeonSkillService
+
+
+    init_log(log_name="bus")
+    bus_service = NeonBusService(debug=True, daemonic=True)
+    bus_service.start()
     bus.connected_event.wait()
-    _start_process("neon_speech_client") or STOP_MODULES.set()
-    _start_process("neon_audio_client") or STOP_MODULES.set()
-    _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
-    _start_process("neon_transcripts_controller")
+    signal_manager = SignalManager(bus)
+    mq_connector = start_mq_connector(load_message_bus_config()._asdict())
+
+    init_log(log_name="voice")
+    speech_service = NeonSpeechClient()
+    speech_service.start()
+
+    init_log(log_name="audio")
+    audio_service = NeonPlaybackService()
+    audio_service.start()
+
+    init_log(log_name="skills")
+    skill_service = NeonSkillService()
+    skill_service.start()
+
+    # _start_process(["neon_messagebus_service"]) or STOP_MODULES.set()
+    # bus.connected_event.wait()
+    # _start_process("neon_speech_client") or STOP_MODULES.set()
+    # _start_process("neon_audio_client") or STOP_MODULES.set()
+    # _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
+    # _start_process("neon_transcripts_controller")
     # if get_neon_device_type() == "server":
     #     _start_process("neon_core_server")
     # else:
@@ -172,6 +202,11 @@ def start_neon():
         pass
 
     LOG.info("Stopping all modules")
+    mq_connector.stop()
+    skill_service.shutdown()
+    audio_service.shutdown()
+    speech_service.shutdown()
+    bus_service.shutdown()
 
     for p in PROCESSES.values():
         _stop_process(p)
