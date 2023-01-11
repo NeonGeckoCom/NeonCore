@@ -138,7 +138,13 @@ class TestRunNeon(unittest.TestCase):
     #     self.assertIsInstance(matches, list)
 
     def test_skills_module(self):
+        # TODO: Remove this after readiness is better defined DM
+        i = 0
         response = self.bus.wait_for_response(Message('mycroft.skills.is_ready'))
+        while not response.data['status'] and i < 10:
+            LOG.warning(f"Speech not ready when core reported ready!")
+            sleep(5)
+            i += 1
         self.assertTrue(response.data['status'])
 
         response = self.bus.wait_for_response(Message("skillmanager.list"), "mycroft.skills.list")
