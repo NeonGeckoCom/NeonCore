@@ -5,7 +5,7 @@ neon-skill-data_controls~=0.1,>=0.1.1
 neon-skill-fallback_wolfram_alpha~=0.0.1,>=0.0.2
 neon-skill-personal~=0.0.1,>=0.0.3a0
 neon-skill-speak~=0.0.2,>=0.0.3a2
-neon-skill-speed_test~=0.2,>=0.2.1
+neon-skill-speed_test~=0.2,>=0.2.2a1
 neon-skill-spelling~=0.0.2
 neon-skill-stock~=0.1,>=0.1.1a1
 neon-skill-support_helper~=0.0.2
