@@ -9,8 +9,7 @@ neon-skill-speed_test~=0.2,>=0.2.2a1
 neon-skill-spelling~=0.0.2
 neon-skill-stock~=0.1,>=0.1.1a1
 neon-skill-support_helper~=0.0.2
-# neon-skill-user_settings~=0.1,>=0.1.1a8
-neon-skill-user_settings @ git+https://github.com/neongeckocom/skill-user_settings@PATCH_RetryGeolocation
+neon-skill-user_settings~=0.1,>=0.1.1a9
 neon-skill-weather~=0.0.2
 neon-skill-wikipedia~=0.3,>=0.3.1
 neon-skill-free_music_archive~=0.0.1
