@@ -1,5 +1,6 @@
-neon-skill-about~=0.0.2,>=0.0.4a1
-neon-skill-date_time~=0.0.2,>=0.0.3a1
+neon-skill-about~=0.1
+neon-skill-date_time~=0.0.3
 neon-skill-demo~=0.1,>=0.1.1a4
+# TODO: Update TTS plugin dependency for demo skill
 neon-skill-device_controls~=0.0.2
 neon-skill-ip_address~=0.0.3
