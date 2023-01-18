@@ -47,7 +47,7 @@ try:
     importlib.reload(ovos_workshop.skills.ovos)
     importlib.reload(ovos_workshop.skills.fallback)
     importlib.reload(ovos_workshop.skills)
-except ImportError:
+except (ImportError, AttributeError):
     import importlib
 
 importlib.reload(mycroft.skills.fallback_skill)
