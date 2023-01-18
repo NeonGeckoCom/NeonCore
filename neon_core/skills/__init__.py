@@ -41,10 +41,10 @@ mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
 try:
-    import ovos_workshop.skills.mycroft_skill
+    import ovos_workshop.skills
     ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
     import importlib
-    importlib.reload(ovos_workshop.skills.mycroft_skill)
+    importlib.reload(ovos_workshop.skills)
 except ImportError:
     import importlib
 
