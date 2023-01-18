@@ -40,7 +40,16 @@ mycroft.skills.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
-import importlib
+try:
+    import ovos_workshop.skills
+    ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
+    import importlib
+    importlib.reload(ovos_workshop.skills.ovos)
+    importlib.reload(ovos_workshop.skills.fallback)
+    importlib.reload(ovos_workshop.skills)
+except (ImportError, AttributeError):
+    import importlib
+
 importlib.reload(mycroft.skills.fallback_skill)
 importlib.reload(mycroft.skills.common_play_skill)
 importlib.reload(mycroft.skills.common_query_skill)
