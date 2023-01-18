@@ -188,12 +188,16 @@ class SkillUtilsTests(unittest.TestCase):
         from neon_utils.skills.mycroft_skill import PatchedMycroftSkill
         from mycroft.skills import MycroftSkill
         from mycroft.skills.mycroft_skill import MycroftSkill as MycroftSkill2
+        from mycroft.skills.core import MycroftSkill as MycroftSkill3
         from mycroft.skills.fallback_skill import FallbackSkill
+        from mycroft.skills.core import FallbackSkill as FallbackSkill2
         from mycroft.skills.common_play_skill import CommonPlaySkill
         from mycroft.skills.common_query_skill import CommonQuerySkill
         from mycroft.skills.common_iot_skill import CommonIoTSkill
         self.assertEqual(MycroftSkill, PatchedMycroftSkill)
         self.assertEqual(MycroftSkill2, PatchedMycroftSkill)
+        self.assertEqual(MycroftSkill3, PatchedMycroftSkill)
+        self.assertEqual(FallbackSkill, FallbackSkill2)
         self.assertTrue(issubclass(FallbackSkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonPlaySkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))

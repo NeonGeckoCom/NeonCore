@@ -55,6 +55,8 @@ importlib.reload(mycroft.skills.common_play_skill)
 importlib.reload(mycroft.skills.common_query_skill)
 importlib.reload(mycroft.skills.common_iot_skill)
 
+mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
+
 mycroft.skills.intent_service.AdaptIntent = AdaptIntent
 
 
