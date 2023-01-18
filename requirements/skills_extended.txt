@@ -1,10 +1,10 @@
 neon-skill-audio_record~=0.0.2
 neon-skill-custom_conversation
 neon-skill-instructions
-neon-skill-launcher~=0.2,>=0.2.1a1
+neon-skill-launcher~=0.3
 neon-skill-messaging
 skill-news @ git+https://github.com/openvoiceos/skill-ovos-news
 # neon-skill-recipes
-neon-skill-synonyms
+neon-skill-synonyms~=0.0.1
 neon-skill-translation~=0.2
-neon-skill-camera
+neon-skill-camera~=0.1

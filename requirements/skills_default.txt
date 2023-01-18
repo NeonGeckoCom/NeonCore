@@ -1,9 +1,8 @@
 skill-ddg @ git+https://github.com/openvoiceos/skill-ddg
-neon-skill-alerts~=1.0,>=1.0.2a12
-# TODO: Stable alerts skill requires neon_utils release
+neon-skill-alerts~=1.1
 neon-skill-caffeinewiz~=0.2,>=0.2.2
 neon-skill-data_controls~=0.1,>=0.1.1
-neon-skill-fallback_wolfram_alpha~=0.0.1,>=0.0.2
+neon-skill-fallback_wolfram_alpha~=0.0.2
 neon-skill-personal~=0.1
 neon-skill-speak~=0.0.3
 neon-skill-speed_test~=0.3
