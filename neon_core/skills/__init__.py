@@ -44,6 +44,8 @@ try:
     import ovos_workshop.skills
     ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
     import importlib
+    importlib.reload(ovos_workshop.skills.ovos)
+    importlib.reload(ovos_workshop.skills.fallback)
     importlib.reload(ovos_workshop.skills)
 except ImportError:
     import importlib
