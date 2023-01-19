@@ -9,6 +9,9 @@ ovos-skills-manager~=0.0.11,>=0.0.12a3
 ovos-plugin-manager~=0.0.20
 psutil~=5.6
 
+# TODO: Patching compat.
+ovos-workshop<0.0.10a3
+
 # default plugins
 neon-lang-plugin-libretranslate~=0.2
 neon-utterance-translator-plugin~=0.1
