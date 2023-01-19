@@ -26,9 +26,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mycroft.skills import FallbackSkill
-from neon_core.skills.neon_skill import NeonSkill
-
-
-class NeonFallbackSkill(FallbackSkill, NeonSkill):
-    """"""
+from neon_utils.skills.neon_fallback_skill import NeonFallbackSkill
+from ovos_utils.log import LOG
+LOG.warning(f"This module is deprecated. "
+            f"import from `neon_utils.skills.neon_fallback_skill` directly")
