@@ -1,5 +1,5 @@
 # neon core modules
-ovos-core[audio]@git+https://github.com/openvoiceos/ovos-core@refactor/skill_class_from_workshop
+ovos-core[audio]>=0.0.6a16
 # TODO: Above patching version for neon_audio
 neon_messagebus~=0.3
 neon_gui~=1.1,>=1.1.1
