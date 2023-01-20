@@ -26,34 +26,41 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import importlib
+import neon_utils.skills
+import mycroft.skills.core
+
 from neon_utils.skills.mycroft_skill import PatchedMycroftSkill
 from neon_core.skills.neon_skill import NeonSkill
 from neon_core.skills.fallback_skill import NeonFallbackSkill
 from neon_core.skills.decorators import intent_handler, intent_file_handler, \
     resting_screen_handler, conversational_intent
 
-try:
-    import ovos_workshop.skills
-    ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
-    import importlib
-    importlib.reload(ovos_workshop.skills.ovos)
-    importlib.reload(ovos_workshop.skills.fallback)
-    importlib.reload(ovos_workshop.skills)
-except (ImportError, AttributeError):
-    import importlib
-    import mycroft.skills.core
-    mycroft.MycroftSkill = PatchedMycroftSkill
-    mycroft.skills.MycroftSkill = PatchedMycroftSkill
-    mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
-    mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
+# Patch the base skill
+import ovos_workshop.skills
+ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
-    importlib.reload(mycroft.skills.fallback_skill)
-    importlib.reload(mycroft.skills.common_play_skill)
-    importlib.reload(mycroft.skills.common_query_skill)
-    importlib.reload(mycroft.skills.common_iot_skill)
+# Reload ovos_workshop modules with Patched class
+importlib.reload(ovos_workshop.skills.ovos)
+importlib.reload(ovos_workshop.skills.fallback)
+importlib.reload(ovos_workshop.skills)
 
-    mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
-    mycroft.skills.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
+# Reload neon_utils modules with Patched class
+importlib.reload(neon_utils.skills.neon_fallback_skill)
+importlib.reload(neon_utils.skills)
+
+# Reload mycroft modules with Patched class
+importlib.reload(mycroft.skills.mycroft_skill.mycroft_skill)
+importlib.reload(mycroft.skills.mycroft_skill)
+importlib.reload(mycroft.skills.fallback_skill)
+importlib.reload(mycroft.skills.common_play_skill)
+importlib.reload(mycroft.skills.common_query_skill)
+importlib.reload(mycroft.skills.common_iot_skill)
+importlib.reload(mycroft.skills)
+
+# Manually patch re-defined classes in `mycroft.skills.core`
+mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
+mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
 
 
 __all__ = ['NeonSkill',
