@@ -40,11 +40,11 @@ init_config_dir()
 CORE_VERSION_STR = get_core_version()
 setup_resolve_resource_file()
 
-from neon_core.skills import NeonSkill, NeonFallbackSkill
+# from neon_core.skills import NeonSkill, NeonFallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 
 __all__ = ['NEON_ROOT_PATH',
            'NeonIntentService',
-           'NeonSkill',
-           'NeonFallbackSkill',
+           # 'NeonSkill',
+           # 'NeonFallbackSkill',
            'CORE_VERSION_STR']

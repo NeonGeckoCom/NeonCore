@@ -1,13 +1,16 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.5,>=0.0.6a3
+ovos-core[skills_lgpl]~=0.0.5,>=0.0.6a3,<=0.0.6a15
 # utils
-neon-utils[network,configuration]~=1.1,>=1.1.3a15
+neon-utils[network,configuration]~=1.2
 neon-transformers~=0.2
 ovos_utils~=0.0,>=0.0.27a4
 ovos-config~=0.0.5
 ovos-skills-manager~=0.0.11,>=0.0.12a3
 ovos-plugin-manager~=0.0.20
 psutil~=5.6
+
+# TODO: Patching compat.
+ovos-workshop<0.0.10a3
 
 # default plugins
 neon-lang-plugin-libretranslate~=0.2

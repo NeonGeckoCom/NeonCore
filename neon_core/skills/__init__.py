@@ -32,14 +32,6 @@ from neon_core.skills.fallback_skill import NeonFallbackSkill
 from neon_core.skills.decorators import intent_handler, intent_file_handler, \
     resting_screen_handler, conversational_intent
 
-from mycroft.skills.intent_services.adapt_service import AdaptIntent
-
-import mycroft.skills.core
-mycroft.MycroftSkill = PatchedMycroftSkill
-mycroft.skills.MycroftSkill = PatchedMycroftSkill
-mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
-mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
-
 try:
     import ovos_workshop.skills
     ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
@@ -49,15 +41,19 @@ try:
     importlib.reload(ovos_workshop.skills)
 except (ImportError, AttributeError):
     import importlib
+    import mycroft.skills.core
+    mycroft.MycroftSkill = PatchedMycroftSkill
+    mycroft.skills.MycroftSkill = PatchedMycroftSkill
+    mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
+    mycroft.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
-importlib.reload(mycroft.skills.fallback_skill)
-importlib.reload(mycroft.skills.common_play_skill)
-importlib.reload(mycroft.skills.common_query_skill)
-importlib.reload(mycroft.skills.common_iot_skill)
+    importlib.reload(mycroft.skills.fallback_skill)
+    importlib.reload(mycroft.skills.common_play_skill)
+    importlib.reload(mycroft.skills.common_query_skill)
+    importlib.reload(mycroft.skills.common_iot_skill)
 
-mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
-
-mycroft.skills.intent_service.AdaptIntent = AdaptIntent
+    mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
+    mycroft.skills.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
 
 
 __all__ = ['NeonSkill',
