@@ -1,7 +1,7 @@
 # mycroft
 ovos-core[skills_lgpl]@git+https://github.com/openvoiceos/ovos-core@refactor/skill_class_from_workshop
 # utils
-neon-utils[network,configuration]~=1.2
+neon-utils[network,configuration]@git+https://github.com/neongeckocom/neon-skill-utils@REF_SkillsFromOvosWorkshop
 neon-transformers~=0.2
 ovos_utils~=0.0,>=0.0.27a4
 ovos-config~=0.0.5

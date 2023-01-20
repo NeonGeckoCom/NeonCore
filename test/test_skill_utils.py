@@ -194,14 +194,39 @@ class SkillUtilsTests(unittest.TestCase):
         from mycroft.skills.common_play_skill import CommonPlaySkill
         from mycroft.skills.common_query_skill import CommonQuerySkill
         from mycroft.skills.common_iot_skill import CommonIoTSkill
+
         self.assertEqual(MycroftSkill, PatchedMycroftSkill)
         self.assertEqual(MycroftSkill2, PatchedMycroftSkill)
         self.assertEqual(MycroftSkill3, PatchedMycroftSkill)
         self.assertEqual(FallbackSkill, FallbackSkill2)
+
         self.assertTrue(issubclass(FallbackSkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonPlaySkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonIoTSkill, PatchedMycroftSkill))
+
+        from ovos_workshop.skills.mycroft_skill import MycroftSkill as Patched
+        from ovos_workshop.skills import MycroftSkill as Patched2
+        from ovos_workshop.skills.ovos import MycroftSkill as Patched3
+        self.assertEqual(Patched, PatchedMycroftSkill)
+        self.assertEqual(Patched2, PatchedMycroftSkill)
+        self.assertEqual(Patched3, PatchedMycroftSkill)
+
+        from ovos_workshop.skills.ovos import OVOSSkill
+        from ovos_workshop.skills import OVOSSkill as OVOSSkill2
+        self.assertTrue(issubclass(OVOSSkill, PatchedMycroftSkill))
+        self.assertEqual(OVOSSkill, OVOSSkill2)
+
+        from neon_utils.skills import NeonFallbackSkill, NeonSkill
+        self.assertTrue(issubclass(NeonFallbackSkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(NeonSkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(NeonFallbackSkill, OVOSSkill))
+
+        from neon_utils.skills.neon_fallback_skill import NeonFallbackSkill as \
+            NeonFallbackSkill2
+        from neon_utils.skills.neon_skill import NeonSkill as NeonSkill2
+        self.assertEqual(NeonFallbackSkill, NeonFallbackSkill2)
+        self.assertEqual(NeonSkill, NeonSkill2)
 
 
 if __name__ == '__main__':
