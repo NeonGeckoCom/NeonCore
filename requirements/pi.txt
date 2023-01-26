@@ -17,11 +17,11 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4a6
 
 # PHAL Plugins
-neon-phal-plugin-reset~=0.0.1a8
+neon-phal-plugin-reset~=0.0.2
 neon-phal-plugin-core-updater~=0.0.1
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.3
-neon-phal-plugin-linear_led>=0.0.4a1
+neon-phal-plugin-linear_led~=0.1
 ovos-phal-plugin-brightness-control-rpi~=1.0.0
 ovos-phal-plugin-notification-widgets~=1.0.0
 ovos-phal-plugin-color-scheme-manager~=1.0.0
@@ -29,15 +29,16 @@ ovos-phal-plugin-configuration-provider~=1.0.0
 ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-gui-network-client~=0.0.2
 ovos-phal-plugin-network-manager~=1.0.0
-ovos-phal-plugin-wifi-setup~=1.0.0,>=1.0.1a7
+ovos-phal-plugin-wifi-setup~=1.0,>=1.0.1
 ovos-phal-plugin-dashboard>=0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
-ovos-phal-plugin-system~=0.0.2,>=0.0.3a1
+ovos-phal-plugin-system~=0.0.3
+ovos-phal-plugin-connectivity-events~=0.0.1
 ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 # ovos-phal-plugin-homeassistant @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-homeassistant@feat/groups_fixes_new_entities
 
 # Pi-specific skills
 neon-skill-update~=0.0.1
-ovos-skill-homescreen @ git+https://github.com/OpenVoiceOS/skill-ovos-homescreen
+ovos-skill-homescreen~=0.0.1
 ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup

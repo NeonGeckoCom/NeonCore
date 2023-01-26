@@ -90,6 +90,9 @@ class NeonSkillManager(SkillManager):
                     # if no internet just skip this update
                     LOG.error("no internet, skipped default skills installation")
 
+    def _load_new_skills(self, *args, **kwargs):
+        super()._load_new_skills(*args, **kwargs)
+
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self.download_or_update_defaults()
