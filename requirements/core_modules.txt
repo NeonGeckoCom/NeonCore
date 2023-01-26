@@ -1,5 +1,5 @@
 # neon core modules
-ovos-core[audio]@git+https://github.com/OpenVoiceOS/ovos-core@refactor/skill_connectivity
+ovos-core[audio]>=0.0.6a21
 # TODO: Above patching version for neon_audio
 neon_messagebus~=0.3
 neon_gui~=1.1,>=1.1.1
