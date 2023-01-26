@@ -1,5 +1,5 @@
 # mycroft
-ovos-core[skills_lgpl]ovos-core>=0.0.6a21
+ovos-core[skills_lgpl]>=0.0.6a21
 # utils
 neon-utils[network,configuration]~=1.2,>=1.2.1a0
 neon-transformers~=0.2
