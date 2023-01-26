@@ -1,11 +1,11 @@
 # neon core modules
 ovos-core[audio]>=0.0.6a21
-# TODO: Above patching version for neon_audio
+# Above ensures alpha versions for neon_audio
 neon_messagebus~=0.3
 neon_gui~=1.1,>=1.1.1
 neon_enclosure~=1.2
-neon_speech~=3.0,>=3.0.2a4
+neon_speech~=3.1
 neon_audio~=1.2,>=1.2.2a6
 
 # TODO: Patching OCP Compat
-ovos_plugin_common_play~=0.0, >=0.0.3a14
+ovos_plugin_common_play~=0.0.3
