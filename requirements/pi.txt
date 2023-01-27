@@ -6,15 +6,16 @@ sdnotify~=0.3
 
 # Default debug client
 neon-cli-client~=0.2
+neon-mana-utils~=0.0.4
 
 # Default plugins
-ovos-ww-plugin-vosk~=0.0,>=0.0.4
-neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1a0
+ovos-ww-plugin-vosk~=0.1,>=0.1.1
+neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
 neon-tts-plugin-coqui-remote
 
 # Fallback plugins
 neon-tts-plugin-coqui~=0.7,>=0.7.1
-ovos-stt-plugin-vosk~=0.1,>=0.1.4a6
+ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
 neon-phal-plugin-reset~=0.0.2
@@ -41,4 +42,4 @@ ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipg
 # Pi-specific skills
 neon-skill-update~=0.0.1
 ovos-skill-homescreen~=0.0.1
-ovos-skill-setup @ git+https://github.com/OpenVoiceOS/skill-ovos-setup
+ovos-skill-setup~=0.0.1
