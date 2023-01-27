@@ -9,6 +9,7 @@ neon-cli-client~=0.2
 neon-mana-utils~=0.0.4
 
 # Default plugins
+ovos-ww-plugin-precise~=0.1
 ovos-ww-plugin-vosk~=0.1,>=0.1.1
 neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
 neon-tts-plugin-coqui-remote

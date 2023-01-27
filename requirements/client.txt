@@ -1,3 +1,4 @@
 neon-transcripts-controller @ git+https://github.com/NeonGeckoCom/transcripts_controller
 
-ovos-ww-plugin-vosk~=0.0,>=0.0.4
+ovos-ww-plugin-vosk~=0.1
+ovos-ww-plugin-precise~=0.1

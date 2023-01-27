@@ -106,6 +106,13 @@ listener:
   recording_timeout_with_silence: 3.0
   instant_listen: false
 hotwords:
+  hey_mycroft:
+    active: false
+    module: ovos-ww-plugin-precise
+    listen: true
+    sound: snd/start_listening.wav
+    version: "0.3"
+    model: "https://github.com/MycroftAI/precise-data/raw/models-dev/hey-mycroft.tar.gz"
   hey_neon:
     module: ovos-ww-plugin-vosk
     listen: true
