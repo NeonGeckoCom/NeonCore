@@ -31,18 +31,12 @@ import sys
 from neon_utils.configuration_utils import init_config_dir
 from neon_core.config import get_core_version, \
     setup_resolve_resource_file
-from os.path import dirname, isfile, expanduser
+from os.path import dirname
 
 
 NEON_ROOT_PATH = dirname(__file__)
 sys.path.append(NEON_ROOT_PATH)
 init_config_dir()
-
-if isfile(expanduser("~/.config/neon/web_cache.json")):
-    from ovos_utils.log import LOG
-    from os import remove
-    LOG.warning(f"Removing unexpected web_cache.json")
-    remove(expanduser("~/.config/neon/web_cache.json"))
 
 CORE_VERSION_STR = get_core_version()
 setup_resolve_resource_file()
