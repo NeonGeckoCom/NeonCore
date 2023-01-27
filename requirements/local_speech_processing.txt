@@ -5,7 +5,7 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 # TODO: Local language plugin
 
 # Fallback
-ovos-stt-plugin-vosk~=0.2
+ovos-stt-plugin-vosk~=0.1,>=0.1.4
 ovos-tts-plugin-mimic~=0.2
 
 # Backwards-compat. for tests
