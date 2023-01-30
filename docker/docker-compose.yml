@@ -15,9 +15,9 @@ volumes:
 services:
   neon-messagebus:
     container_name: neon-messagebus
-    image: ghcr.io/neongeckocom/neon_messagebus:dev
+    image: ghcr.io/neongeckocom/neon_messagebus:master
     ports:
-    - 8181:8181
+    - "8181:8181"
     networks:
       neon-core:
         aliases:
@@ -34,7 +34,7 @@ services:
     - XDG_STATE_HOME=/xdg/state
   neon-speech:
     container_name: neon-speech
-    image: ghcr.io/neongeckocom/neon_speech:dev
+    image: ghcr.io/neongeckocom/neon_speech:master
     networks:
     - neon-core
     volumes:
@@ -55,11 +55,11 @@ services:
     - /dev/snd:/dev/snd
   neon-skills:
     container_name: neon-skills
-    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
+    image: ghcr.io/neongeckocom/neon_skills-default_skills:master
     networks:
     - neon-core
     ports:
-    - 8000:8000
+    - "8000:8000"
     volumes:
     - config:/config:rw
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
@@ -79,7 +79,7 @@ services:
     - /dev/snd:/dev/snd
   neon-audio:
     container_name: neon-audio
-    image: ghcr.io/neongeckocom/neon_audio:dev
+    image: ghcr.io/neongeckocom/neon_audio:master
     networks:
     - neon-core
     volumes:
@@ -103,13 +103,13 @@ services:
     - /dev/snd:/dev/snd
   neon-gui:
     container_name: neon-gui
-    image: ghcr.io/neongeckocom/neon_gui:dev
+    image: ghcr.io/neongeckocom/neon_gui:master
     networks:
       neon-core:
         aliases:
         - gui
     ports:
-    - 18181:18181
+    - "18181:18181"
     volumes:
     - config:/config:ro
     - xdg:/xdg:rw

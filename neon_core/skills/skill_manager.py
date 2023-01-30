@@ -28,6 +28,8 @@
 
 from os import makedirs
 from os.path import isdir, join, expanduser
+
+from mycroft_bus_client import Message
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
 
@@ -96,4 +98,9 @@ class NeonSkillManager(SkillManager):
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self.download_or_update_defaults()
+        from neon_utils.net_utils import check_online
+        if check_online():
+            LOG.debug("Already online, allow skills to load")
+            self.bus.emit(Message("mycroft.network.connected"))
+            self.bus.emit(Message("mycroft.internet.connected"))
         super().run()
