@@ -46,13 +46,13 @@ SKILL_MAIN_MODULE = '__init__.py'
 class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
+        self.load_lock = RLock()  # Prevent multiple network event handling
         super().__init__(*args, **kwargs)
         skill_dir = self.get_default_skills_dir()
         self.skill_downloader = SkillsStore(
             skills_dir=skill_dir,
             config=self.config["skills"], bus=self.bus)
         self.skill_downloader.skills_dir = skill_dir
-        self.load_lock = RLock()  # Prevent multiple network event handling
 
     def get_default_skills_dir(self):
         """
