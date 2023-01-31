@@ -96,7 +96,7 @@ class NeonSkillManager(SkillManager):
 
     def _load_new_skills(self, *args, **kwargs):
         with self.load_lock:
-            LOG.info(f"Loading skills: {kwargs}")
+            LOG.debug(f"Loading skills: {kwargs}")
             super()._load_new_skills(*args, **kwargs)
 
     def run(self):
