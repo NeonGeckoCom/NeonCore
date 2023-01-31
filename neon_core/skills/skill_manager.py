@@ -28,14 +28,15 @@
 
 from os import makedirs
 from os.path import isdir, join, expanduser
+from threading import RLock
 
 from mycroft_bus_client import Message
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
 
 from neon_core.skills.skill_store import SkillsStore
+from neon_utils.net_utils import check_online as connected
 
-from mycroft.util import connected
 from mycroft.skills.skill_manager import SkillManager
 
 SKILL_MAIN_MODULE = '__init__.py'
@@ -51,6 +52,7 @@ class NeonSkillManager(SkillManager):
             skills_dir=skill_dir,
             config=self.config["skills"], bus=self.bus)
         self.skill_downloader.skills_dir = skill_dir
+        self.load_lock = RLock()  # Prevent multiple network event handling
 
     def get_default_skills_dir(self):
         """
@@ -93,7 +95,9 @@ class NeonSkillManager(SkillManager):
                     LOG.error("no internet, skipped default skills installation")
 
     def _load_new_skills(self, *args, **kwargs):
-        super()._load_new_skills(*args, **kwargs)
+        with self.load_lock:
+            LOG.info(f"Loading skills: {kwargs}")
+            super()._load_new_skills(*args, **kwargs)
 
     def run(self):
         """Load skills and update periodically from disk and internet."""
