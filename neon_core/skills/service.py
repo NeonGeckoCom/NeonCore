@@ -26,11 +26,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import time
 
 from tempfile import gettempdir
 from os import listdir
-from os.path import isdir, dirname, join
+from os.path import join
 from typing import Optional
 from threading import Thread
 
@@ -38,21 +37,22 @@ from mycroft_bus_client import Message, MessageBusClient
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
-from ovos_utils.process_utils import ProcessState
 from ovos_utils.skills.locations import get_plugin_skills, get_skill_directories
+from ovos_utils.process_utils import StatusCallbackMap
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 from neon_utils.messagebus_utils import get_messagebus
 
-from neon_core.skills.fallback_skill import FallbackSkill
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.util.diagnostic_utils import report_metric
 from neon_core.util.qml_file_server import start_qml_http_server
 
+from mycroft.skills.fallback_skill import FallbackSkill
+# TODO: Update to import from ovos-workshop
+
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler
-from mycroft.util.process_utils import ProcessStatus, StatusCallbackMap
 
 
 def on_started():

@@ -25,15 +25,14 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 import importlib
 import json
 import os
 import shutil
 import sys
 import unittest
-from copy import deepcopy, copy
 
-from importlib import reload
 from mock.mock import Mock
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
@@ -135,10 +134,14 @@ class SkillUtilsTests(unittest.TestCase):
                              normalize_github_url(neon_skills[skill]["url"]))
 
     def test_install_local_skills(self):
+        import ovos_skills_manager.requirements
         import neon_core.util.skill_utils
         importlib.reload(neon_core.util.skill_utils)
-        install_deps = Mock()
-        neon_core.util.skill_utils._install_skill_dependencies = install_deps
+        install_pip_deps = Mock()
+        install_sys_deps = Mock()
+        ovos_skills_manager.requirements.pip_install = install_pip_deps
+        ovos_skills_manager.requirements.install_system_deps = install_sys_deps
+
         install_local_skills = neon_core.util.skill_utils.install_local_skills
 
         local_skills_dir = os.path.join(os.path.dirname(__file__),
@@ -147,46 +150,8 @@ class SkillUtilsTests(unittest.TestCase):
         installed = install_local_skills(local_skills_dir)
         num_installed = len(installed)
         self.assertEqual(installed, os.listdir(local_skills_dir))
-        self.assertEqual(num_installed, install_deps.call_count)
-
-    def test_install_skill_dependencies(self):
-        # Patch dependency installation
-        import ovos_skills_manager.requirements
-        importlib.reload(ovos_skills_manager.requirements)
-        pip_install = Mock()
-        install_system_deps = Mock()
-        ovos_skills_manager.requirements.install_system_deps = \
-            install_system_deps
-        ovos_skills_manager.requirements.pip_install = pip_install
-        from ovos_skills_manager.skill_entry import SkillEntry
-        import neon_core.util.skill_utils
-        importlib.reload(neon_core.util.skill_utils)
-        from neon_core.util.skill_utils import _install_skill_dependencies
-        local_skills_dir = os.path.join(os.path.dirname(__file__),
-                                        "local_skills")
-        with open(os.path.join(local_skills_dir,
-                               "skill-osm_parsing", "skill.json")) as f:
-            skill_json = json.load(f)
-        entry = SkillEntry.from_json(skill_json, False)
-        self.assertEqual(entry.json["requirements"],
-                         skill_json["requirements"])
-
-        _install_skill_dependencies(entry)
-        pip_install.assert_called_once()
-        pip_install.assert_called_with(entry.json["requirements"]["python"])
-        install_system_deps.assert_called_once()
-        install_system_deps.assert_called_with(
-            entry.json["requirements"]["system"])
-
-        invalid_dep_json = entry.json
-        invalid_dep_json['requirements']['python'].extend(
-            ['lingua-franca', 'neon-utils[network]~=0.6'])
-        invalid_entry = SkillEntry.from_json(invalid_dep_json)
-        _install_skill_dependencies(invalid_entry)
-        valid_deps = invalid_entry.json['requirements']['python']
-        valid_deps.remove('lingua-franca')
-        valid_deps.remove('neon-utils[network]~=0.6')
-        pip_install.assert_called_with(valid_deps)
+        self.assertEqual(num_installed, install_pip_deps.call_count)
+        self.assertEqual(num_installed, install_sys_deps.call_count)
 
     def test_write_pip_constraints_to_file(self):
         from neon_core.util.skill_utils import _write_pip_constraints_to_file
@@ -217,6 +182,51 @@ class SkillUtilsTests(unittest.TestCase):
         set_osm_constraints_file(__file__)
         self.assertEqual(ovos_skills_manager.requirements.DEFAULT_CONSTRAINTS,
                          __file__)
+
+    def test_skill_class_patches(self):
+        import neon_core.skills  # Import to do all the patching
+        from neon_utils.skills.mycroft_skill import PatchedMycroftSkill
+        from mycroft.skills import MycroftSkill
+        from mycroft.skills.mycroft_skill import MycroftSkill as MycroftSkill2
+        from mycroft.skills.core import MycroftSkill as MycroftSkill3
+        from mycroft.skills.fallback_skill import FallbackSkill
+        from mycroft.skills.core import FallbackSkill as FallbackSkill2
+        from mycroft.skills.common_play_skill import CommonPlaySkill
+        from mycroft.skills.common_query_skill import CommonQuerySkill
+        from mycroft.skills.common_iot_skill import CommonIoTSkill
+
+        self.assertEqual(MycroftSkill, PatchedMycroftSkill)
+        self.assertEqual(MycroftSkill2, PatchedMycroftSkill)
+        self.assertEqual(MycroftSkill3, PatchedMycroftSkill)
+        self.assertEqual(FallbackSkill, FallbackSkill2)
+
+        self.assertTrue(issubclass(FallbackSkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(CommonPlaySkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(CommonIoTSkill, PatchedMycroftSkill))
+
+        from ovos_workshop.skills.mycroft_skill import MycroftSkill as Patched
+        from ovos_workshop.skills import MycroftSkill as Patched2
+        from ovos_workshop.skills.ovos import MycroftSkill as Patched3
+        self.assertEqual(Patched, PatchedMycroftSkill)
+        self.assertEqual(Patched2, PatchedMycroftSkill)
+        self.assertEqual(Patched3, PatchedMycroftSkill)
+
+        from ovos_workshop.skills.ovos import OVOSSkill
+        from ovos_workshop.skills import OVOSSkill as OVOSSkill2
+        self.assertTrue(issubclass(OVOSSkill, PatchedMycroftSkill))
+        self.assertEqual(OVOSSkill, OVOSSkill2)
+
+        from neon_utils.skills import NeonFallbackSkill, NeonSkill
+        self.assertTrue(issubclass(NeonFallbackSkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(NeonSkill, PatchedMycroftSkill))
+        self.assertTrue(issubclass(NeonFallbackSkill, OVOSSkill))
+
+        from neon_utils.skills.neon_fallback_skill import NeonFallbackSkill as \
+            NeonFallbackSkill2
+        from neon_utils.skills.neon_skill import NeonSkill as NeonSkill2
+        self.assertEqual(NeonFallbackSkill, NeonFallbackSkill2)
+        self.assertEqual(NeonSkill, NeonSkill2)
 
 
 if __name__ == '__main__':

@@ -29,20 +29,20 @@
 import json
 import os.path
 import re
+
 from copy import copy
-
-import requests
-
 from os import listdir, makedirs
 from tempfile import mkdtemp
 from shutil import rmtree
-from os.path import expanduser, join, isdir, dirname, isfile
+from os.path import expanduser, join, isdir, dirname
 from ovos_utils.xdg_utils import xdg_data_home
-from ovos_skills_manager.requirements import install_system_deps, pip_install
 from ovos_skills_manager.skill_entry import SkillEntry
 from ovos_skills_manager.osm import OVOSSkillsManager
-from ovos_skills_manager.session import SESSION, set_github_token, clear_github_token
+from ovos_skills_manager.session import set_github_token, clear_github_token
 from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url, download_url_from_github_url
+from ovos_skills_manager.utils import get_skills_from_url as get_remote_entries
+from ovos_skills_manager.utils import install_local_skill_dependencies as install_local_skills
+from ovos_skills_manager.utils import set_osm_constraints_file
 from ovos_skill_installer import download_extract_zip
 from ovos_utils.log import LOG
 
@@ -152,17 +152,6 @@ def _install_skill_pip(skill_package: str, constraints_file: str) -> bool:
     return returned == 0
 
 
-def set_osm_constraints_file(constraints_file: str):
-    """
-    Sets the DEFAULT_CONSTRAINTS param for OVOS Skills Manager.
-    :param constraints_file: path to valid constraints file for neon-core
-    """
-    if not constraints_file:
-        raise ValueError("constraints_file not defined")
-    import ovos_skills_manager.requirements
-    ovos_skills_manager.requirements.DEFAULT_CONSTRAINTS = constraints_file
-
-
 def install_skills_from_list(skills_to_install: list, config: dict = None):
     """
     Installs the passed list of skill URLs and/or PyPI package names
@@ -215,79 +204,3 @@ def install_skills_default(config: dict = None):
     assert isinstance(skills_list, list)
     install_skills_from_list(skills_list, config)
     clear_github_token()
-
-
-def get_remote_entries(url: str):
-    """
-    Parse a skill list at a given URL
-    :param url: URL of skill list to parse (one skill per line)
-    :returns: list of skills by name, url, and/or ID
-    """
-    r = SESSION.get(url)
-    if not r.ok:
-        LOG.warning(f"Cached response returned: {r.status_code}")
-        SESSION.cache.delete_url(r.url)
-        r = requests.get(url)
-    if r.ok:
-        return [s for s in r.text.split("\n") if s.strip()]
-    else:
-        LOG.error(f"{url} request failed with code: {r.status_code}")
-    return []
-
-
-def _install_skill_dependencies(skill: SkillEntry):
-    """
-    Install any system and Python dependencies for the specified skill
-    :param skill: Skill to install dependencies for
-    """
-    sys_deps = skill.requirements.get("system")
-    requirements = copy(skill.requirements.get("python"))
-    if sys_deps:
-        install_system_deps(sys_deps)
-    if requirements:
-        # Imperfect patching of common conflicts. This code is mostly unused
-        # with implementation of plugin skills though
-        invalid = [r for r in requirements if any((r.startswith(x) for x in
-                                                   ("lingua-franca",
-                                                    "neon-utils")))]
-        if any(invalid):
-            for dep in invalid:
-                LOG.warning(f"{dep} is not valid under this core"
-                            f" and will be ignored")
-                requirements.remove(dep)
-        pip_install(requirements)
-    LOG.info(f"Installed dependencies for {skill.skill_folder}")
-
-
-def install_local_skills(local_skills_dir: str = "/skills") -> list:
-    """
-    Install skill dependencies for skills in the specified directory and ensure
-    the directory is loaded.
-    NOTE: dependence on other skills is not handled here.
-          Only Python and System dependencies are handled
-    :param local_skills_dir: Directory to install skills from
-    :returns: list of installed skill directories
-    """
-    github_token = Configuration().get("skills", {}).get("neon_token")
-    local_skills_dir = expanduser(local_skills_dir)
-    if not isdir(local_skills_dir):
-        raise ValueError(f"{local_skills_dir} is not a valid directory")
-    installed_skills = list()
-    for skill in listdir(local_skills_dir):
-        skill_dir = join(local_skills_dir, skill)
-        if not isdir(skill_dir):
-            continue
-        if not isfile(join(skill_dir, "__init__.py")):
-            continue
-        LOG.debug(f"Attempting installation of {skill}")
-        try:
-            entry = SkillEntry.from_directory(skill_dir, github_token)
-            _install_skill_dependencies(entry)
-            installed_skills.append(skill)
-        except Exception as e:
-            LOG.error(f"Exception while installing {skill}")
-            LOG.exception(e)
-    if local_skills_dir not in \
-            Configuration().get("skills", {}).get("extra_directories", []):
-        LOG.error(f"{local_skills_dir} not found in configuration")
-    return installed_skills

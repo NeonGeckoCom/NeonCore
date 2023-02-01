@@ -16,6 +16,6 @@ skills:
 MQ:
   server: mq.2021.us
   port: 25672
-TTS:
+tts:
   neon-tts-plugin-audiofiles:
     audio_file_path: /xdg/data/neon/AudioFileTTS
