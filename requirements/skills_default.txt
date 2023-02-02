@@ -8,7 +8,7 @@ neon-skill-speak~=0.0.3
 neon-skill-speed_test~=0.3
 neon-skill-spelling~=0.0.2
 neon-skill-stock~=0.1,>=0.1.1
-neon-skill-support_helper~=0.0.2
+neon-skill-support_helper~=0.0.2,>=0.0.3a1
 neon-skill-user_settings~=0.2
 neon-skill-weather~=0.0.2
 neon-skill-wikipedia~=0.3,>=0.3.1
