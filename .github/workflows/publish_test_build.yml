@@ -52,6 +52,7 @@ jobs:
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           tag: ${{steps.version.outputs.version}}
+          commit: ${{ github.ref }}
           prerelease: true
   build_and_publish_docker:
     runs-on: ubuntu-latest
