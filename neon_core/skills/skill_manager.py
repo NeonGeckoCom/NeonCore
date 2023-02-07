@@ -39,9 +39,6 @@ from neon_utils.net_utils import check_online as connected
 
 from mycroft.skills.skill_manager import SkillManager
 
-SKILL_MAIN_MODULE = '__init__.py'
-# TODO: deprecate `SKILL_MAIN_MODULE`?
-
 
 class NeonSkillManager(SkillManager):
 
