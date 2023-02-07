@@ -44,4 +44,3 @@ ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipg
 neon-skill-update~=0.1,>=0.1.1
 ovos-skill-homescreen~=0.0.1
 ovos-skill-setup~=0.0.1
-neon-homeassistant-skill~=0.0.6
