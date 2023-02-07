@@ -27,6 +27,10 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
+
+from ovos_plugin_manager.language import OVOSLangDetectionFactory as DetectorFactory
+from ovos_plugin_manager.language import OVOSLangTranslationFactory as TranslatorFactory
+
 from neon_core.configuration import Configuration
 
 
