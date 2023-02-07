@@ -48,8 +48,7 @@ from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.util.diagnostic_utils import report_metric
 from neon_core.util.qml_file_server import start_qml_http_server
 
-from mycroft.skills.fallback_skill import FallbackSkill
-# TODO: Update to import from ovos-workshop
+from ovos_workshop.skills.fallback import FallbackSkill
 
 from mycroft.skills.api import SkillApi
 from mycroft.skills.event_scheduler import EventScheduler

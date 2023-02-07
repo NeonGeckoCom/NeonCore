@@ -28,10 +28,10 @@
 
 import os
 
-from ovos_plugin_manager.language import load_lang_detect_plugin, \
-    load_tx_plugin
-from ovos_utils.log import LOG
-from neon_core.configuration import Configuration, get_private_keys
+from ovos_plugin_manager.language import OVOSLangDetectionFactory as DetectorFactory
+from ovos_plugin_manager.language import OVOSLangTranslationFactory as TranslatorFactory
+
+from neon_core.configuration import Configuration
 
 
 def get_lang_config():
@@ -67,44 +67,3 @@ def get_language_dir(base_path, lang="en-us"):
         if len(paths):
             return paths[0]
     return os.path.join(base_path, lang)
-
-
-class TranslatorFactory:
-    CLASSES = {}
-
-    @staticmethod
-    def create(module=None):
-        config = Configuration().get("language", {})
-        module = module or config.get("translation_module",
-                                      "libretranslate_plug")
-        if module not in DetectorFactory.CLASSES:
-            # plugin!
-            clazz = load_tx_plugin(module)
-        else:
-            clazz = TranslatorFactory.CLASSES.get(module)
-        if not clazz:
-            LOG.error(f"Configured translation module not found ({module})")
-            return None
-        config["keys"] = get_private_keys()
-        return clazz(config)
-
-
-class DetectorFactory:
-    CLASSES = {}
-
-    @staticmethod
-    def create(module=None):
-        config = Configuration().get("language", {})
-        module = module or config.get("detection_module",
-                                      "libretranslate_detection_plug")
-
-        if module not in DetectorFactory.CLASSES:
-            # plugin!
-            clazz = load_lang_detect_plugin(module)
-        else:
-            clazz = DetectorFactory.CLASSES.get(module)
-        if not clazz:
-            LOG.error(f"Configured detection module not found ({module})")
-            return None
-        config["keys"] = get_private_keys()
-        return clazz(config)

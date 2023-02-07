@@ -29,12 +29,7 @@
 import time
 import wave
 
-from mycroft.skills.intent_services import ConverseService
-
-from neon_core.configuration import Configuration
-from neon_core.language import get_lang_config
 from neon_transformers.text_transformers import UtteranceTransformersService
-
 from mycroft_bus_client import Message, MessageBusClient
 from neon_utils.message_utils import get_message_user
 from neon_utils.metrics_utils import Stopwatch
@@ -43,7 +38,12 @@ from neon_utils.user_utils import apply_local_user_profile_updates
 from neon_utils.configuration_utils import get_neon_user_config
 from lingua_franca.parse import get_full_lang_code
 from ovos_config.locale import set_default_lang
+
+from neon_core.configuration import Configuration
+from neon_core.language import get_lang_config
+
 from mycroft.skills.intent_service import IntentService
+from mycroft.skills.intent_services import ConverseService
 
 try:
     from neon_utterance_translator_plugin import UtteranceTranslator
