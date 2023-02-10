@@ -1,5 +1,7 @@
 # mycroft
-ovos-core[skills_lgpl]~=0.0.7a6
+#ovos-core[skills_lgpl]~=0.0.7a6
+ovos-core[skills_lgpl] @ git+https://github.com/openvoiceos/ovos-core@FIX_NetworkSkillLoading
+
 # utils
 neon-utils[network,configuration]~=1.2,>=1.2.1
 neon-transformers~=0.2
