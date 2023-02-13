@@ -1,6 +1,5 @@
 # neon core modules
-#ovos-core[audio]~=0.0.7a6
-ovos-core[audio] @ git+https://github.com/openvoiceos/ovos-core@FIX_NetworkSkillLoading
+ovos-core[audio]~=0.0.7a7
 # Above ensures alpha versions for neon_audio
 neon_messagebus~=0.3
 neon_gui~=1.1,>=1.1.1
