@@ -5,22 +5,13 @@ on:
   push:
   workflow_dispatch:
 
-# TODO: Run tests here for everything in NeonCore
 jobs:
-  build_tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-      - name: Install Build Tools
-        run: |
-          python -m pip install build wheel
-      - name: Build Distribution Packages
-        run: |
-          python setup.py bdist_wheel
+  py_build_tests:
+    uses: neongeckocom/.github/.github/workflows/python_build_tests.yml@master
+    with:
+      python_version: "3.8"
+  docker_build_tests:
+    uses: neongeckocom/.github/.github/workflows/docker_build_tests.yml@master
   util_tests:
     strategy:
       matrix:
