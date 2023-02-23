@@ -7,9 +7,18 @@ on:
       - master
 
 jobs:
-  build_and_publish_pypi_and_release:
-    uses: neongeckocom/.github/.github/workflows/publish_stable_release.yml@master
-    secrets: inherit
+  tag_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Get Version
+        run: |
+          VERSION=$(python setup.py --version)
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+      - uses: ncipollo/release-action@v1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          tag: ${{env.VERSION}}
   build_and_publish_docker:
     needs: build_and_publish_pypi_and_release
     uses: neongeckocom/.github/.github/workflows/publish_docker.yml@master
