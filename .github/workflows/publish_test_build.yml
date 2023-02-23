@@ -9,11 +9,49 @@ on:
       - 'version.py'
 
 jobs:
-  build_and_publish_pypi:
-    uses: neongeckocom/.github/.github/workflows/publish_alpha_release.yml@master
-    secrets: inherit
+  increment_version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.8
+      - name: Install Build Tools
+        run: |
+          python -m pip install build wheel
+      - name: Increment Version
+        run: |
+          VER=$(python setup.py --version)
+          python version_bump.py
+      - name: Push Version Change
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Increment Version
+  tag_alpha_release:
+    runs-on: ubuntu-latest
+    needs: increment_version
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+      - name: Get Version
+        id: version
+        run: |
+          VERSION=$(python setup.py --version)
+          echo ::set-output name=version::${VERSION}
+      - name: Create Pre-release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
+          tag: ${{steps.version.outputs.version}}
+          commit: ${{ github.ref }}
+          prerelease: true
   build_and_publish_docker:
-    needs: build_and_publish_pypi
+    needs: increment_version
     uses: neongeckocom/.github/.github/workflows/publish_docker.yml@master
     secrets: inherit
     with:
