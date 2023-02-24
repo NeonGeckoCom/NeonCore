@@ -35,12 +35,12 @@ ovos-phal-plugin-wifi-setup~=1.0,>=1.0.1
 ovos-phal-plugin-dashboard>=0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system~=0.0.3
-ovos-phal-plugin-connectivity-events~=0.0.1
+ovos-phal-plugin-connectivity-events~=0.0.1,>=0.0.2a1
 ovos-phal-plugin-homeassistant>=0.0.0a3
-ovos-phal-plugin-ipgeo @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-ipgeo
+ovos-phal-plugin-ipgeo>=0.0.1a1
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 
 # Pi-specific skills
-neon-skill-update~=0.1,>=0.1.1
+neon-skill-update~=0.1,>=0.1.2a2
 ovos-skill-homescreen~=0.0.1
 ovos-skill-setup~=0.0.1

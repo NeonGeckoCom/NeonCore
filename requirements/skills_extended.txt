@@ -3,8 +3,9 @@ neon-skill-custom_conversation
 neon-skill-instructions
 neon-skill-launcher~=0.3,>=0.3.1
 neon-skill-messaging
-skill-news~=0.0.2
+skill-news~=0.0.2,>=0.0.3a12
 # neon-skill-recipes
 neon-skill-synonyms~=0.0.1
 neon-skill-translation~=0.2
 neon-skill-camera~=0.1,>=0.1.1
+ovos-skill-somafm>=0.0.1a1
