@@ -1,5 +1,5 @@
 neon-skill-audio_record~=0.1
-neon-skill-custom_conversation~=0.1
+neon-skill-custom_conversation
 neon-skill-instructions~=0.1
 neon-skill-launcher~=0.4
 neon-skill-messaging
