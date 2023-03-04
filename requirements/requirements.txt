@@ -1,9 +1,9 @@
 # mycroft
 ovos-core[skills_lgpl]~=0.0.6,>=0.0.7a7
 # utils
-neon-utils[network,configuration]~=1.2,>=1.2.2a4
+neon-utils[network,configuration]~=1.2,>=1.2.3a0
 neon-transformers~=0.2
-ovos_utils~=0.0.27
+ovos_utils~=0.0.27, !=0.0.29a2, !=0.0.29a1, !=0.0.29
 ovos-config~=0.0.5
 ovos-skills-manager~=0.0.12
 ovos-plugin-manager~=0.0.21
