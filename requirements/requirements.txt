@@ -1,7 +1,7 @@
 # mycroft
 ovos-core[skills_lgpl]~=0.0.6,>=0.0.7a7
 # utils
-neon-utils[network,configuration]~=1.2,>=1.2.2a4
+neon-utils[network,configuration] @ git+https://github.com/neongeckocom/neon-utils@FIX_ConfigInitBugfixes
 neon-transformers~=0.2
 ovos_utils~=0.0.27
 ovos-config~=0.0.5
