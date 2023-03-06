@@ -120,3 +120,27 @@ services:
     - XDG_DATA_HOME=/xdg/data
     - XDG_CACHE_HOME=/xdg/cache
     - XDG_STATE_HOME=/xdg/state
+  neon-enclosure:
+    container_name: neon-enclosure
+    image: ghcr.io/neongeckocom/neon_enclosure:master
+    networks:
+    - neon-core
+    volumes:
+    - config:/config:ro
+    - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
+    - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
+    - /run/dbus/system_dbus_socket:/run/dbus/system_dbus_socket:rw
+    - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    - xdg:/xdg:rw
+    - /etc/timezone:/etc/timezone:ro
+    - /etc/localtime:/etc/localtime:ro
+    environment:
+    - PULSE_SERVER=unix:${XDG_RUNTIME_DIR}/pulse/native
+    - PULSE_COOKIE=/tmp/pulse_cookie
+    - DISPLAY=${DISPLAY}
+    - XDG_CONFIG_HOME=/xdg/config
+    - XDG_DATA_HOME=/xdg/data
+    - XDG_CACHE_HOME=/xdg/cache
+    - XDG_STATE_HOME=/xdg/state
+    devices:
+    - /dev/snd:/dev/snd

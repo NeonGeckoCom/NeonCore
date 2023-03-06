@@ -1,10 +1,10 @@
 # neon core modules
 neon_messagebus~=0.3,>=0.3.1a3
 neon_gui~=1.1,>=1.1.2a1
-neon_enclosure~=1.2,>=1.2.1a3
+neon_enclosure~=1.3
 neon_speech~=3.1,>=3.1.1a8
 neon_audio~=1.3,>=1.3.1a3
 
 # Below patching alpha version conflicts
-neon-utils[audio]~=1.2,>=1.2.2a4
+neon-utils[audio]~=1.2,>=1.2.3
 ovos-core[audio]~=0.0.6,>=0.0.7a7
