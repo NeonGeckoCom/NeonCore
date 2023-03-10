@@ -7,35 +7,39 @@
    * [e. Persistent Data](#e-persistent-data)
 
 # Welcome to Neon AI
-Neon AI is an open source voice assistant. Follow these instructions to start using Neon on your computer. If you are 
-using a Raspberry Pi, you may use the prebuilt image available [on our website](https://neon.ai/Download).
+Neon AI is an open source voice assistant. Follow these instructions to start 
+using Neon on your computer. If you are using a Mycroft Mark2 or Raspberry Pi, 
+you may use the prebuilt image available [on our website](https://neon.ai/Download).
 
 # Quick Start
 The fastest method for getting started with Neon is to run the modules in Docker containers.
 The `docker` directory contains everything you need to run Neon Core with default skills.
 
 ## a. Prerequisite Setup
-You will need `docker` and `docker-compose` available. Docker provides updated guides for installing 
-[docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
-> *Note*: At this time, Neon is not tested with Docker Desktop. This may change
+You will need `docker` and `docker-compose` available. Docker provides updated 
+guides for installing [docker](https://docs.docker.com/engine/install/) and 
+[docker-compose](https://docs.docker.com/compose/install/).
+> *Note*: At this time, Neon is not compatible with Docker Desktop. This may change
 > in the future, but it is currently recommended NOT to install Docker Desktop.
 
-Neon Core is only tested on Ubuntu, but should be compatible with any linux distribution that uses
+Neon Core is only tested on Ubuntu, but should be compatible with any Linux distribution that uses
 [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/).
 
 > *Note*: By default, only the `root` user has permissions to interact with Docker under Ubuntu.
 > To allow the current user to modify Docker containers, you can add them to the `docker` group with:
 > 
-> `sudo usermod -aG docker $USER && newgrp`
+> `sudo usermod -aG docker $USER && newgrp docker`
 
 ## b. Running Neon
-You can clone the repository, or just copy the `docker` directory contents onto your local system; this document will 
-assume that the repository is cloned to: `~/NeonCore`.
+You can clone the repository, or just copy the `docker` directory contents onto 
+your local system; this document will  assume that the repository is cloned to: `~/NeonCore`.
 
-> *Note*: The `docker` directory includes required hidden files. If you copy files, make sure to include any hidden
-> files. In must Ubuntu distros, you can toggle hidden file visibility in the file explorer with `CTRL` + `h`.
+> *Note*: The `docker` directory includes required hidden files. If you copy files, 
+> make sure to include any hidden files. In must Ubuntu distros, you can toggle 
+> hidden file visibility in the file explorer with `CTRL` + `h`.
 
-> *Note*: If you run `docker` commands with `sudo`, make sure to use the `-E` flag to preserve runtime envvars.
+> *Note*: If you run `docker` commands with `sudo`, make sure to use the `-E` 
+> flag to preserve runtime envvars.
 
 > *Note*: Some Docker implementations don't handle relative paths.
 > If you encounter errors, try updating the paths in `.env` to absolute paths.
@@ -61,7 +65,8 @@ The Mycroft GUI is an optional component that can be run on Linux host systems.
 The GUI is available with instructions [on GitHub](https://github.com/MycroftAI/mycroft-gui)
 
 ## c. Interacting with Neon
-With the containers running, you can interact with Neon by voice (i.e. "hey Neon, what time is it?"), or using one of 
+With the containers running, you can interact with Neon by voice 
+(i.e. "hey Neon, what time is it?"), or using one of 
 our CLI utilities, like [mana](https://pypi.org/project/neon-mana-utils/) or the 
 [neon_cli_client](https://pypi.org/project/neon-cli-client/). If using the CLI
 client, you can run `neon-cli --logs-dir xdg/state/neon/` from the directory
@@ -88,7 +93,8 @@ cd ~/NeonCore/docker
 docker-compose up
 ```
 
-To run the skills module without any bundled skills, the image referenced in `docker-compose.yml` can be changed from:
+To run the skills module without any bundled skills, the image referenced in 
+`docker-compose.yml` can be changed from:
 
 ```yaml
   neon-skills:
@@ -119,9 +125,11 @@ STT/TTS model files, TTS audio files, and other downloaded files.
 > In order to modify anything in the `xdg` directory, you may need to take ownership with:
 > `sudo chown -R $USER:$USER xdg`
 
-# Running Docker Modules
+# Running Docker Skills Module
+To run only the skills container that is published with this repository, you can
+run the following command. You will need a messagebus service for the skills module
+to connect to.
 
-Skills Service
 ```shell
 docker run -d \
 --name=neon_skills \
