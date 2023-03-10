@@ -17,6 +17,9 @@ The `docker` directory contains everything you need to run Neon Core with defaul
 ## a. Prerequisite Setup
 You will need `docker` and `docker-compose` available. Docker provides updated guides for installing 
 [docker](https://docs.docker.com/engine/install/) and [docker-compose](https://docs.docker.com/compose/install/).
+> *Note*: At this time, Neon is not tested with Docker Desktop. This may change
+> in the future, but it is currently recommended NOT to install Docker Desktop.
+
 Neon Core is only tested on Ubuntu, but should be compatible with any linux distribution that uses
 [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/).
 
@@ -60,7 +63,9 @@ The GUI is available with instructions [on GitHub](https://github.com/MycroftAI/
 ## c. Interacting with Neon
 With the containers running, you can interact with Neon by voice (i.e. "hey Neon, what time is it?"), or using one of 
 our CLI utilities, like [mana](https://pypi.org/project/neon-mana-utils/) or the 
-[neon_cli_client](https://pypi.org/project/neon-cli-client/).
+[neon_cli_client](https://pypi.org/project/neon-cli-client/). If using the CLI
+client, you can run `neon-cli --logs-dir xdg/state/neon/` from the directory
+containing `docker-compose.yml` to see logs in the CLI.
 You can view module logs via docker with:
 
 ```shell
