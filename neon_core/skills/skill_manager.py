@@ -43,7 +43,7 @@ from mycroft.skills.skill_manager import SkillManager
 class NeonSkillManager(SkillManager):
 
     def __init__(self, *args, **kwargs):
-        self.load_lock = RLock()  # Prevent multiple network event handling
+        # self.load_lock = RLock()  # Prevent multiple network event handling
         super().__init__(*args, **kwargs)
         skill_dir = self.get_default_skills_dir()
         self.skill_downloader = SkillsStore(
@@ -91,17 +91,17 @@ class NeonSkillManager(SkillManager):
                     # if no internet just skip this update
                     LOG.error("no internet, skipped default skills installation")
 
-    def _load_new_skills(self, *args, **kwargs):
-        with self.load_lock:
-            LOG.debug(f"Loading skills: {kwargs}")
-            super()._load_new_skills(*args, **kwargs)
+    # def _load_new_skills(self, *args, **kwargs):
+    #     with self.load_lock:
+    #         LOG.debug(f"Loading skills: {kwargs}")
+    #         super()._load_new_skills(*args, **kwargs)
 
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self.download_or_update_defaults()
-        from neon_utils.net_utils import check_online
-        if check_online():
-            LOG.debug("Already online, allow skills to load")
-            self.bus.emit(Message("mycroft.network.connected"))
-            self.bus.emit(Message("mycroft.internet.connected"))
+        # from neon_utils.net_utils import check_online
+        # if check_online():
+        #     LOG.debug("Already online, allow skills to load")
+        #     self.bus.emit(Message("mycroft.network.connected"))
+        #     self.bus.emit(Message("mycroft.internet.connected"))
         super().run()
