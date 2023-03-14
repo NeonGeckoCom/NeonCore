@@ -56,6 +56,10 @@ importlib.reload(mycroft.skills.common_query_skill)
 importlib.reload(mycroft.skills.common_iot_skill)
 importlib.reload(mycroft.skills)
 
+import mycroft
+mycroft.MycroftSkill = PatchedMycroftSkill
+mycroft.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
+
 # Manually patch re-defined classes in `mycroft.skills.core`
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
