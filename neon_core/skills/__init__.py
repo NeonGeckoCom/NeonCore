@@ -31,8 +31,6 @@ import neon_utils.skills
 import mycroft.skills.core
 
 from neon_utils.skills.mycroft_skill import PatchedMycroftSkill
-from neon_core.skills.neon_skill import NeonSkill
-from neon_core.skills.fallback_skill import NeonFallbackSkill
 from neon_core.skills.decorators import intent_handler, intent_file_handler, \
     resting_screen_handler, conversational_intent
 
@@ -58,14 +56,16 @@ importlib.reload(mycroft.skills.common_query_skill)
 importlib.reload(mycroft.skills.common_iot_skill)
 importlib.reload(mycroft.skills)
 
+import mycroft
+mycroft.MycroftSkill = PatchedMycroftSkill
+mycroft.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
+
 # Manually patch re-defined classes in `mycroft.skills.core`
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
 
 
-__all__ = ['NeonSkill',
-           'intent_handler',
+__all__ = ['intent_handler',
            'intent_file_handler',
            'resting_screen_handler',
-           'conversational_intent',
-           'NeonFallbackSkill']
+           'conversational_intent']
