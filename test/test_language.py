@@ -73,16 +73,6 @@ class LanguageTests(unittest.TestCase):
         for search, result in resolved_languages.items():
             self.assertEqual(get_language_dir(base_dir, search),
                              os.path.join(base_dir, result))
-        self.assertEqual(get_language_dir(base_dir, "en-uk"),
-                         os.path.join(base_dir, "en-uk"))
-        self.assertEqual(get_language_dir(base_dir, "en-au"),
-                         os.path.join(base_dir, "en"))
-        self.assertEqual(get_language_dir(base_dir, "es-mx"),
-                         os.path.join(base_dir, "es-es"))
-        self.assertEqual(get_language_dir(base_dir, "es-es"),
-                         os.path.join(base_dir, "es-es"))
-        self.assertEqual(get_language_dir(base_dir, "es"),
-                         os.path.join(base_dir, "es-es"))
 
     def test_get_language_dir_invalid(self):
         from neon_core.language import get_language_dir
