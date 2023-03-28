@@ -20,7 +20,6 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
           tag: ${{env.VERSION}}
   build_and_publish_docker:
-    needs: build_and_publish_pypi_and_release
     uses: neongeckocom/.github/.github/workflows/publish_docker.yml@master
     secrets: inherit
     with:
