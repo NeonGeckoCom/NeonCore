@@ -41,7 +41,8 @@ from ovos_utils.skills.locations import get_plugin_skills, get_skill_directories
 from ovos_utils.process_utils import StatusCallbackMap
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
-from neon_utils.messagebus_utils import get_messagebus
+# from neon_utils.messagebus_utils import get_messagebus
+from ovos_utils.messagebus import get_mycroft_bus
 
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
@@ -152,7 +153,7 @@ class NeonSkillService(Thread):
 
         # Setup signal manager
         try:
-            self.bus = self.bus or get_messagebus(timeout=300)
+            self.bus = self.bus or get_mycroft_bus()
         except TimeoutError as e:
             LOG.exception(e)
             self.callbacks.on_error(repr(e))
