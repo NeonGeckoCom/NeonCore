@@ -1,0 +1,14 @@
+name: Propose Stable Release
+on:
+  workflow_dispatch:
+#    inputs:
+#      release_type:
+#        type: choice
+#        description: Release Type
+#        options:
+#          - patch
+#          - minor
+#          - major
+jobs:
+  update_version:
+    uses: neongeckocom/.github/.github/workflows/propose_dated_release.yml@FEAT_VersionActions

@@ -2,7 +2,7 @@
 
 name: Test Installation
 on:
-  push:
+#  push:
   workflow_dispatch:
 
 jobs:
