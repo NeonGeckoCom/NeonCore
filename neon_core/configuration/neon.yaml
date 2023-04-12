@@ -105,6 +105,7 @@ listener:
   recording_timeout: 10.0
   recording_timeout_with_silence: 3.0
   instant_listen: false
+  enable_stt_api: true
 hotwords:
   hey_mycroft:
     active: false

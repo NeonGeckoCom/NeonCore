@@ -2,9 +2,9 @@
 ovos-core[skills_lgpl]~=0.0.7
 # utils
 neon-utils[network,configuration]~=1.3,>=1.3.1a1
+ovos-bus-client~=0.0.2,>=0.0.3a18
 neon-transformers~=0.2
-ovos_utils==0.0.31a6
-# TODO: Above patching breaking change
+ovos_utils~=0.0.30
 ovos-config~=0.0.7
 ovos-skills-manager~=0.0.12
 ovos-plugin-manager~=0.0.21
