@@ -1,5 +1,5 @@
 skill-ddg~=0.0
-neon-skill-alerts~=1.4
+neon-skill-alerts~=1.4,>=1.4.1a2
 neon-skill-caffeinewiz~=0.3,>=0.3.1
 neon-skill-data_controls~=0.3,>=0.3.1a0
 neon-skill-fallback_wolfram_alpha~=0.1
