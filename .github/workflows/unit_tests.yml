@@ -2,7 +2,7 @@
 
 name: Test Core Modules
 on:
-#  push:
+  push:
   workflow_dispatch:
 
 jobs:
