@@ -7,6 +7,7 @@ on:
       - dev
     paths-ignore:
       - 'version.py'
+      - 'CHANGELOG.md'
 
 jobs:
   publish_alpha_release:

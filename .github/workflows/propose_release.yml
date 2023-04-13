@@ -12,3 +12,6 @@ jobs:
     with:
       pr_reviewer: neonreviewers
       pr_assignee: ${{ github.actor }}
+      pr_draft: false
+      pr_title: ${{ needs.update_version.outputs.version }}
+      pr_body: ${{ needs.update_version.outputs.changelog }}
