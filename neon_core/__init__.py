@@ -33,3 +33,7 @@ from ovos_utils.events import get_handler_name, create_wrapper, EventContainer
 ovos_utils.messagebus.get_handler_name = get_handler_name
 ovos_utils.messagebus.create_wrapper = create_wrapper
 ovos_utils.messagebus.EventContainer = EventContainer
+
+
+# TODO: Patching out Backend Client
+from ovos_backend_client.backends.offline import OfflineBackend
