@@ -11,7 +11,7 @@ on:
 
 jobs:
   publish_alpha_release:
-    uses: neongeckocom/.github/.github/workflows/publish_alpha_release.yml@master
+    uses: neongeckocom/.github/.github/workflows/publish_alpha_release.yml@FEAT_ChangelogSince
     secrets: inherit
     with:
       version_scheme: "dated"
