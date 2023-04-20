@@ -2,10 +2,10 @@
 ovos-core[skills_lgpl]~=0.0.7
 # utils
 neon-utils[network,configuration]~=1.4
-ovos-bus-client~=0.0.2,>=0.0.3a18
+ovos-bus-client~=0.0.3
 neon-transformers~=0.2
-ovos_utils~=0.0.30
-ovos-config~=0.0.7,>=0.0.8a5
+ovos_utils~=0.0.32
+ovos-config~=0.0.8
 ovos-skills-manager~=0.0.12
 ovos-plugin-manager~=0.0.21
 ovos-backend-client~=0.0.6
