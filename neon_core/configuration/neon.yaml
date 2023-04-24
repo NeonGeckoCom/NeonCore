@@ -167,7 +167,7 @@ padatious:
   intent_cache: ~/.local/share/mycroft/intent_cache
   train_delay: 4
   single_thread: false
-  padaos_only: false
+  regex_only: true
 # GUI Service
 gui:
   extension: generic
