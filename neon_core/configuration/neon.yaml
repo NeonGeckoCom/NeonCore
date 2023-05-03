@@ -92,7 +92,7 @@ listener:
     min_seconds: 1
     max_current_ratio_threshold: 2
     initial_energy_threshold: 1000.0
-    module: ''
+    module: ovos-vad-plugin-webrtcvad
     ovos-vad-plugin-silero:
       threshold: 0.2
     ovos-vad-plugin-webrtcvad:
