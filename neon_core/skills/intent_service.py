@@ -141,7 +141,8 @@ class NeonIntentService(IntentService):
         """
         utterances = message.data.get('utterances', [])
         message.context["lang"] = lang
-        utterances, message.context = self.transformers.transform(utterances, message.context)
+        utterances, message.context = \
+            self.transformers.transform(utterances, message.context)
         message.data["utterances"] = utterances
         return message
 
