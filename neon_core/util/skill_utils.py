@@ -134,7 +134,7 @@ def _install_skill_osm(skill_url: str, skill_dir: str, skills_catalog: dict):
         else:
             LOG.info(f"Installed {skill_url} to {skill_dir}")
     except Exception as e:
-        LOG.error(e)
+        LOG.exception(e)
 
 
 def _install_skill_pip(skill_package: str, constraints_file: str) -> bool:
