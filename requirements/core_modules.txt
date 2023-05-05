@@ -7,3 +7,6 @@ neon_audio~=1.3,>=1.3.2
 
 ovos-vad-plugin-webrtcvad~=0.0.1
 # Ensure configured default VAD plugin is installed
+
+# TODO: Patching test failures https://github.com/NeonGeckoCom/NeonCore/actions/runs/4888865255/jobs/8727164992?pr=422
+requests < 2.30.0
