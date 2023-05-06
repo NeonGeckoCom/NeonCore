@@ -67,6 +67,10 @@ from ovos_utils.log import LOG
 from mycroft.skills.intent_services import IntentMatch
 
 
+def calc_intent(service, utterance, lang):
+    return service.calc_intent(utterance, lang)
+
+
 class PatchedPadatiousMatcher:
     """Matcher class to avoid redundancy in padatious intent matching."""
 
@@ -92,8 +96,9 @@ class PatchedPadatiousMatcher:
             LOG.debug(f'Padatious Matching confidence > {limit}')
             with Pool(4) as pool:
                 idx = 0
-                for intent in pool.starmap(self.service.calc_intent,
-                                           ((utt, lang) for utt in utterances)):
+                for intent in pool.starmap(calc_intent,
+                                           ((self.service, utt, lang)
+                                            for utt in utterances)):
                     if intent:
                         best = padatious_intent.conf if padatious_intent else 0.0
                         if best < intent.conf:
