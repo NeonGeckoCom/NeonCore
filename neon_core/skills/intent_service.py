@@ -91,15 +91,15 @@ class PatchedPadatiousMatcher:
             padatious_intent = None
             LOG.debug(f'Padatious Matching confidence > {limit}')
             with Pool(4) as pool:
-                intents = pool.starmap(self.service.calc_intent,
-                                   [(utt, lang) for utt in utterances])
-            for intent in intents:
-                if intent:
-                    best = padatious_intent.conf if padatious_intent else 0.0
-                    if best < intent.conf:
-                        padatious_intent = intent
-                        idx = intents.indexof(intent)
-                        padatious_intent.matches['utterance'] = utterances[idx]
+                idx = 0
+                for intent in pool.starmap(self.service.calc_intent,
+                                           ((utt, lang) for utt in utterances)):
+                    if intent:
+                        best = padatious_intent.conf if padatious_intent else 0.0
+                        if best < intent.conf:
+                            padatious_intent = intent
+                            padatious_intent.matches['utterance'] = utterances[idx]
+                    idx += 1
             if padatious_intent:
                 LOG.info(f"matched intent: {padatious_intent}")
                 skill_id = padatious_intent.name.split(':')[0]
