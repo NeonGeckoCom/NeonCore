@@ -63,7 +63,7 @@ class PadatiousService(_svc):
             return padatious_intent
 
 
-def calc_intent(*args):
+def calc_intent(args):
     utt = args[0]
     intent_container = args[1]
     intent = intent_container.calc_intent(utt)
