@@ -43,7 +43,7 @@ class PadatiousService(_svc):
         lang = lang.lower()
         if lang in self.containers:
             intent_container = self.containers.get(lang)
-            with Pool(4) as pool:
+            with Pool(16) as pool:
                 idx = 0
                 padatious_intent = None
                 for intent in pool.starmap(calc_intent,
