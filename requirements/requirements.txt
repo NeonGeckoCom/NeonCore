@@ -1,7 +1,6 @@
 # mycroft
 ovos-core[skills]~=0.0.7
-
-padacioso>=0.1.3a2
+padacioso~=0.2
 
 # utils
 neon-utils[network,configuration]~=1.4
