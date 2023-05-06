@@ -60,6 +60,88 @@ except ImportError:
 Transcribe = None
 
 
+import mycroft.skills.intent_service
+from multiprocessing import Pool
+from ovos_utils import flatten_list
+from ovos_utils.log import LOG
+from mycroft.skills.intent_services import IntentMatch
+
+
+class PatchedPadatiousMatcher:
+    """Matcher class to avoid redundancy in padatious intent matching."""
+
+    def __init__(self, service):
+        self.service = service
+        self.has_result = False
+        self.ret = None
+        self.conf = None
+
+    def _match_level(self, utterances, limit, lang=None):
+        """Match intent and make sure a certain level of confidence is reached.
+
+        Args:
+            utterances (list of tuples): Utterances to parse, originals paired
+                                         with optional normalized version.
+            limit (float): required confidence level.
+        """
+        # we call flatten in case someone is sending the old style list of tuples
+        utterances = flatten_list(utterances)
+        if not self.has_result:
+            lang = lang or self.service.lang
+            padatious_intent = None
+            LOG.debug(f'Padatious Matching confidence > {limit}')
+            with Pool(4) as pool:
+                intents = pool.map(self.service.calc_intent,
+                                   [(utt, lang) for utt in utterances])
+            for intent in intents:
+                if intent:
+                    best = padatious_intent.conf if padatious_intent else 0.0
+                    if best < intent.conf:
+                        padatious_intent = intent
+                        idx = intents.indexof(intent)
+                        padatious_intent.matches['utterance'] = utterances[idx]
+            if padatious_intent:
+                LOG.info(f"matched intent: {padatious_intent}")
+                skill_id = padatious_intent.name.split(':')[0]
+                self.ret = IntentMatch(
+                    'Padatious', padatious_intent.name,
+                    padatious_intent.matches, skill_id)
+                self.conf = padatious_intent.conf
+            self.has_result = True
+        if self.conf and self.conf > limit:
+            return self.ret
+
+    def match_high(self, utterances, lang=None, __=None):
+        """Intent matcher for high confidence.
+
+        Args:
+            utterances (list of tuples): Utterances to parse, originals paired
+                                         with optional normalized version.
+        """
+        return self._match_level(utterances, 0.95, lang)
+
+    def match_medium(self, utterances, lang=None, __=None):
+        """Intent matcher for medium confidence.
+
+        Args:
+            utterances (list of tuples): Utterances to parse, originals paired
+                                         with optional normalized version.
+        """
+        return self._match_level(utterances, 0.8, lang)
+
+    def match_low(self, utterances, lang=None, __=None):
+        """Intent matcher for low confidence.
+
+        Args:
+            utterances (list of tuples): Utterances to parse, originals paired
+                                         with optional normalized version.
+        """
+        return self._match_level(utterances, 0.5, lang)
+
+
+mycroft.skills.intent_service.PadatiousMatcher = PatchedPadatiousMatcher
+
+
 class NeonIntentService(IntentService):
     def __init__(self, bus: MessageBusClient):
         super().__init__(bus)
