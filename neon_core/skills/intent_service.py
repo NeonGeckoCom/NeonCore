@@ -61,7 +61,7 @@ Transcribe = None
 
 
 import mycroft.skills.intent_service
-from multiprocessing import Pool
+from multiprocessing.pool import Pool
 from ovos_utils import flatten_list
 from ovos_utils.log import LOG
 from mycroft.skills.intent_services import IntentMatch
@@ -91,7 +91,7 @@ class PatchedPadatiousMatcher:
             padatious_intent = None
             LOG.debug(f'Padatious Matching confidence > {limit}')
             with Pool(4) as pool:
-                intents = pool.map(self.service.calc_intent,
+                intents = pool.starmap(self.service.calc_intent,
                                    [(utt, lang) for utt in utterances])
             for intent in intents:
                 if intent:
