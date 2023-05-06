@@ -22,8 +22,8 @@ class PadatiousMatcher(_match):
         if not self.has_result:
             lang = lang or self.service.lang
             LOG.debug(f'Padatious Matching confidence > {limit}')
-            padatious_intent = self.service.threaded_get_intent(utterances,
-                                                                lang)
+            padatious_intent = self.service.threaded_calc_intent(utterances,
+                                                                 lang)
 
             if padatious_intent:
                 LOG.info(f"matched intent: {padatious_intent}")
@@ -38,7 +38,7 @@ class PadatiousMatcher(_match):
 
 
 class PadatiousService(_svc):
-    def threaded_get_intent(self, utterances, lang):
+    def threaded_calc_intent(self, utterances, lang):
         lang = lang or self.lang
         lang = lang.lower()
         if lang in self.containers:
@@ -46,14 +46,16 @@ class PadatiousService(_svc):
             with Pool(16) as pool:
                 idx = 0
                 padatious_intent = None
-                for intent in pool.starmap(calc_intent,
-                                           ((utt, intent_container)
-                                            for utt in utterances)):
+                for intent in pool.imap(calc_intent,
+                                        ((utt, intent_container)
+                                         for utt in utterances)):
                     if intent:
-                        best = padatious_intent.conf if padatious_intent else 0.0
+                        best = \
+                            padatious_intent.conf if padatious_intent else 0.0
                         if best < intent.conf:
                             padatious_intent = intent
-                            padatious_intent.matches['utterance'] = utterances[idx]
+                            padatious_intent.matches['utterance'] = \
+                                utterances[idx]
                             if intent.conf == 1.0:
                                 LOG.debug(f"Returning perfect match")
                                 return intent
@@ -61,7 +63,9 @@ class PadatiousService(_svc):
             return padatious_intent
 
 
-def calc_intent(utt, intent_container):
+def calc_intent(*args):
+    utt = args[0]
+    intent_container = args[1]
     intent = intent_container.calc_intent(utt)
     if isinstance(intent, dict):
         if "entities" in intent:
