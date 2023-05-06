@@ -54,6 +54,9 @@ class PadatiousService(_svc):
                         if best < intent.conf:
                             padatious_intent = intent
                             padatious_intent.matches['utterance'] = utterances[idx]
+                            if intent.conf == 1.0:
+                                LOG.debug(f"Returning perfect match")
+                                return intent
                     idx += 1
             return padatious_intent
 
