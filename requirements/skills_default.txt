@@ -7,7 +7,8 @@ neon-skill-personal~=0.3
 neon-skill-speak~=0.1
 neon-skill-speed_test~=0.5
 neon-skill-spelling~=0.1
-neon-skill-stock~=0.3
+neon-skill-stock~=0.2.0
+# TODO: Pinning older stock skill for Padatious compat.
 neon-skill-support_helper~=0.2
 neon-skill-user_settings~=0.5
 neon-skill-weather~=0.1
