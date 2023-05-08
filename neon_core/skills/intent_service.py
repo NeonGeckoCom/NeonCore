@@ -59,6 +59,8 @@ except ImportError:
 # except ImportError:
 Transcribe = None
 
+from ovos_utils.log import LOG
+
 
 class NeonIntentService(IntentService):
     def __init__(self, bus: MessageBusClient):
