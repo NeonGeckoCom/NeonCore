@@ -1,5 +1,5 @@
 # mycroft
-ovos-core[skills-lgpl]~=0.0.7
+ovos-core[skills,skills-lgpl]~=0.0.7
 # padacioso==0.1.3a2
 
 # utils
