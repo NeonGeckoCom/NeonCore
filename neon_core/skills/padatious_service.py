@@ -50,23 +50,20 @@ class PadatiousService(_svc):
         if lang in self.containers:
             intent_container = self.containers.get(lang)
             with POOL as pool:
-                idx = 0
                 padatious_intent = None
-                for intent in pool.imap(calc_intent,
-                                        ((utt, intent_container)
-                                         for utt in utterances)):
+                for intent in pool.map(calc_intent,
+                                       ((utt, intent_container)
+                                        for utt in utterances)):
                     with _stopwatch:
                         if intent:
                             best = \
                                 padatious_intent.conf if padatious_intent else 0.0
                             if best < intent.conf:
                                 padatious_intent = intent
-                                padatious_intent.matches['utterance'] = \
-                                    utterances[idx]
                                 if intent.conf == 1.0:
                                     LOG.debug(f"Returning perfect match")
                                     return intent
-                        idx += 1
+                    # 1e-05 processing time
                     LOG.debug(f"Intent result processed in: {_stopwatch.time}")
             return padatious_intent
 
@@ -82,6 +79,7 @@ def calc_intent(args):
                 intent["matches"] = intent.pop("entities")
             intent["sent"] = utt
             intent = PadatiousIntent(**intent)
+            intent.matches['utterance'] = utt
     LOG.debug(f"Intent determined in: {timer.time}")
     return intent
 
