@@ -8,7 +8,9 @@ from ovos_utils.log import LOG
 from mycroft.skills.intent_services.base import IntentMatch
 
 from neon_utils.metrics_utils import Stopwatch
+
 _stopwatch = Stopwatch("Padatious")
+POOL = Pool()
 
 
 class PadatiousMatcher(_match):
@@ -41,12 +43,13 @@ class PadatiousMatcher(_match):
 
 
 class PadatiousService(_svc):
+
     def threaded_calc_intent(self, utterances, lang):
         lang = lang or self.lang
         lang = lang.lower()
         if lang in self.containers:
             intent_container = self.containers.get(lang)
-            with Pool(16) as pool:
+            with POOL as pool:
                 idx = 0
                 padatious_intent = None
                 for intent in pool.imap(calc_intent,
