@@ -52,8 +52,9 @@ class PadatiousService(_svc):
             with POOL as pool:
                 padatious_intent = None
                 with _stopwatch:
-                    intent_map = pool.map(calc_intent, ((utt, intent_container)
-                                                        for utt in utterances))
+                    intent_map = pool.imap_unordered(calc_intent,
+                                                     ((utt, intent_container)
+                                                      for utt in utterances))
                 LOG.debug(f"intent_map initialized in: {_stopwatch.time}")
                 for intent in intent_map:
                     with _stopwatch:
