@@ -48,27 +48,25 @@ class PadatiousService(_svc):
         lang = lang.lower()
         if lang in self.containers:
             intent_container = self.containers.get(lang)
-            with _stopwatch:
-                with Pool() as pool:
-                    padatious_intent = None
-                    intent_map = pool.imap_unordered(calc_intent,
-                                                     ((utt, intent_container)
-                                                      for utt in utterances))
-                    for intent in intent_map:
-                        LOG.debug(f"Intent!")
-                        if intent:
-                            best = \
-                                padatious_intent.conf if padatious_intent else 0.0
-                            if best < intent.conf:
-                                padatious_intent = intent
-                                if intent.conf == 1.0:
-                                    LOG.debug(f"Returning perfect match")
-                                    # return intent
-            LOG.info(f"pool time = {_stopwatch.time}")
+            # with _stopwatch:
+            #     with Pool() as pool:
+            #         padatious_intent = None
+            #         intent_map = pool.imap_unordered(calc_intent,
+            #                                          ((utt, intent_container)
+            #                                           for utt in utterances))
+            #         for intent in intent_map:
+            #             if intent:
+            #                 best = \
+            #                     padatious_intent.conf if padatious_intent else 0.0
+            #                 if best < intent.conf:
+            #                     padatious_intent = intent
+            #                     if intent.conf == 1.0:
+            #                         LOG.debug(f"Returning perfect match")
+            #                         # return intent
+            # LOG.info(f"pool time = {_stopwatch.time}")
             with _stopwatch:
                 for utt in utterances:
                     intent = calc_intent((utt, intent_container))
-                    LOG.debug(f"Intent!")
                     if intent:
                         best = \
                             padatious_intent.conf if padatious_intent else 0.0
@@ -77,7 +75,7 @@ class PadatiousService(_svc):
                             if intent.conf == 1.0:
                                 LOG.debug(f"Returning perfect match")
                                 # return intent
-                LOG.info(f"loop time = {_stopwatch.time}")
+            LOG.info(f"loop time = {_stopwatch.time}")
             return padatious_intent
 
 
@@ -92,7 +90,7 @@ def calc_intent(args):
                 intent["matches"] = intent.pop("entities")
             intent["sent"] = utt
             intent = PadatiousIntent(**intent)
-            intent.matches['utterance'] = utt
+        intent.matches['utterance'] = utt
     # 0.1-0.01s
     LOG.debug(f"Intent determined in: {timer.time}")
     return intent
