@@ -51,9 +51,11 @@ class PadatiousService(_svc):
             intent_container = self.containers.get(lang)
             with POOL as pool:
                 padatious_intent = None
-                for intent in pool.map(calc_intent,
-                                       ((utt, intent_container)
-                                        for utt in utterances)):
+                with _stopwatch:
+                    intent_map = pool.map(calc_intent, ((utt, intent_container)
+                                                        for utt in utterances))
+                LOG.debug(f"intent_map initialized in: {_stopwatch.time}")
+                for intent in intent_map:
                     with _stopwatch:
                         if intent:
                             best = \
@@ -80,6 +82,7 @@ def calc_intent(args):
             intent["sent"] = utt
             intent = PadatiousIntent(**intent)
             intent.matches['utterance'] = utt
+    # 0.1-0.01s
     LOG.debug(f"Intent determined in: {timer.time}")
     return intent
 
