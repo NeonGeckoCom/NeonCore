@@ -7,6 +7,9 @@ from ovos_utils import flatten_list
 from ovos_utils.log import LOG
 from mycroft.skills.intent_services.base import IntentMatch
 
+from neon_utils.metrics_utils import Stopwatch
+_stopwatch = Stopwatch("Padatious")
+
 
 class PadatiousMatcher(_match):
     def _match_level(self, utterances, limit, lang=None):
@@ -49,31 +52,42 @@ class PadatiousService(_svc):
                 for intent in pool.imap(calc_intent,
                                         ((utt, intent_container)
                                          for utt in utterances)):
-                    if intent:
-                        best = \
-                            padatious_intent.conf if padatious_intent else 0.0
-                        if best < intent.conf:
-                            padatious_intent = intent
-                            padatious_intent.matches['utterance'] = \
-                                utterances[idx]
-                            if intent.conf == 1.0:
-                                LOG.debug(f"Returning perfect match")
-                                return intent
-                    idx += 1
+                    with _stopwatch:
+                        if intent:
+                            best = \
+                                padatious_intent.conf if padatious_intent else 0.0
+                            if best < intent.conf:
+                                padatious_intent = intent
+                                padatious_intent.matches['utterance'] = \
+                                    utterances[idx]
+                                if intent.conf == 1.0:
+                                    LOG.debug(f"Returning perfect match")
+                                    return intent
+                        idx += 1
+                    LOG.debug(f"Intent result processed in: {_stopwatch.time}")
             return padatious_intent
 
 
 def calc_intent(args):
-    utt = args[0]
-    intent_container = args[1]
-    intent = intent_container.calc_intent(utt)
-    if isinstance(intent, dict):
-        if "entities" in intent:
-            intent["matches"] = intent.pop("entities")
-        intent["sent"] = utt
-        intent = PadatiousIntent(**intent)
+    timer = Stopwatch("calc_intent")
+    with timer:
+        utt = args[0]
+        intent_container = args[1]
+        intent = intent_container.calc_intent(utt)
+        if isinstance(intent, dict):
+            if "entities" in intent:
+                intent["matches"] = intent.pop("entities")
+            intent["sent"] = utt
+            intent = PadatiousIntent(**intent)
+    LOG.debug(f"Intent determined in: {timer.time}")
     return intent
+
+
+def _configure_simplematch():
+    import padacioso
+    padacioso.simplematch.types = dict()
 
 
 mycroft.skills.intent_service.PadatiousMatcher = PadatiousMatcher
 mycroft.skills.intent_service.PadatiousService = PadatiousService
+_configure_simplematch()
