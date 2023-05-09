@@ -64,19 +64,19 @@ class PadatiousService(_svc):
                                 if intent.conf == 1.0:
                                     LOG.debug(f"Returning perfect match")
                                     # return intent
-                LOG.info(f"pool time = {_stopwatch.time}")
-                with _stopwatch:
-                    for utt in utterances:
-                        intent = calc_intent((utt, intent_container))
-                        LOG.debug(f"Intent!")
-                        if intent:
-                            best = \
-                                padatious_intent.conf if padatious_intent else 0.0
-                            if best < intent.conf:
-                                padatious_intent = intent
-                                if intent.conf == 1.0:
-                                    LOG.debug(f"Returning perfect match")
-                                    # return intent
+            LOG.info(f"pool time = {_stopwatch.time}")
+            with _stopwatch:
+                for utt in utterances:
+                    intent = calc_intent((utt, intent_container))
+                    LOG.debug(f"Intent!")
+                    if intent:
+                        best = \
+                            padatious_intent.conf if padatious_intent else 0.0
+                        if best < intent.conf:
+                            padatious_intent = intent
+                            if intent.conf == 1.0:
+                                LOG.debug(f"Returning perfect match")
+                                # return intent
                 LOG.info(f"loop time = {_stopwatch.time}")
             return padatious_intent
 
