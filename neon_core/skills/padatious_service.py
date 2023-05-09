@@ -10,7 +10,6 @@ from mycroft.skills.intent_services.base import IntentMatch
 from neon_utils.metrics_utils import Stopwatch
 
 _stopwatch = Stopwatch("Padatious")
-POOL = Pool()
 
 
 class PadatiousMatcher(_match):
@@ -49,15 +48,14 @@ class PadatiousService(_svc):
         lang = lang.lower()
         if lang in self.containers:
             intent_container = self.containers.get(lang)
-            with POOL as pool:
-                padatious_intent = None
-                with _stopwatch:
+            with _stopwatch:
+                with Pool() as pool:
+                    padatious_intent = None
                     intent_map = pool.imap_unordered(calc_intent,
                                                      ((utt, intent_container)
                                                       for utt in utterances))
-                LOG.debug(f"intent_map initialized in: {_stopwatch.time}")
-                for intent in intent_map:
-                    with _stopwatch:
+                    for intent in intent_map:
+                        LOG.debug(f"Intent!")
                         if intent:
                             best = \
                                 padatious_intent.conf if padatious_intent else 0.0
@@ -65,9 +63,21 @@ class PadatiousService(_svc):
                                 padatious_intent = intent
                                 if intent.conf == 1.0:
                                     LOG.debug(f"Returning perfect match")
-                                    return intent
-                    # 1e-05 processing time
-                    LOG.debug(f"Intent result processed in: {_stopwatch.time}")
+                                    # return intent
+                LOG.info(f"pool time = {_stopwatch.time}")
+                with _stopwatch:
+                    for utt in utterances:
+                        intent = calc_intent((utt, intent_container))
+                        LOG.debug(f"Intent!")
+                        if intent:
+                            best = \
+                                padatious_intent.conf if padatious_intent else 0.0
+                            if best < intent.conf:
+                                padatious_intent = intent
+                                if intent.conf == 1.0:
+                                    LOG.debug(f"Returning perfect match")
+                                    # return intent
+                LOG.info(f"loop time = {_stopwatch.time}")
             return padatious_intent
 
 
@@ -95,4 +105,4 @@ def _configure_simplematch():
 
 mycroft.skills.intent_service.PadatiousMatcher = PadatiousMatcher
 mycroft.skills.intent_service.PadatiousService = PadatiousService
-_configure_simplematch()
+# _configure_simplematch()
