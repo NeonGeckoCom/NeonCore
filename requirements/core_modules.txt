@@ -2,7 +2,7 @@
 neon_messagebus~=0.3,>=0.3.1
 neon_gui~=1.1,>=1.1.2
 neon_enclosure~=1.4,>=1.4.2
-neon_speech~=3.3,>=3.3.2
+neon_speech~=3.3,>=3.3.1
 neon_audio~=1.3,>=1.3.2
 
 ovos-vad-plugin-webrtcvad~=0.0.1
