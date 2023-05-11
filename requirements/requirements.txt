@@ -3,7 +3,7 @@ ovos-core[skills,skills-lgpl]~=0.0.7
 # padacioso==0.1.3a2
 
 # utils
-neon-utils[network,configuration]~=1.4
+neon-utils[network,configuration]~=1.4,>=1.5.0a2
 ovos-bus-client~=0.0.3
 neon-transformers~=0.2
 ovos_utils~=0.0.32

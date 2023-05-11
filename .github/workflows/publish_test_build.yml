@@ -6,7 +6,7 @@ on:
     branches:
       - dev
     paths-ignore:
-      - 'version.py'
+      - 'neon_core/version.py'
       - 'CHANGELOG.md'
 
 jobs:
@@ -15,7 +15,7 @@ jobs:
     secrets: inherit
     with:
       version_scheme: "dated"
-      version_file: "version.py"
+      version_file: "neon_core/version.py"
       setup_py: "setup.py"
       publish_pypi: false
       publish_prerelease: true
