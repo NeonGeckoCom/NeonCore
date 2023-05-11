@@ -59,6 +59,8 @@ except ImportError:
 # except ImportError:
 Transcribe = None
 
+from ovos_utils.log import LOG
+
 
 class NeonIntentService(IntentService):
     def __init__(self, bus: MessageBusClient):
@@ -141,7 +143,8 @@ class NeonIntentService(IntentService):
         """
         utterances = message.data.get('utterances', [])
         message.context["lang"] = lang
-        utterances, message.context = self.transformers.transform(utterances, message.context)
+        utterances, message.context = \
+            self.transformers.transform(utterances, message.context)
         message.data["utterances"] = utterances
         return message
 

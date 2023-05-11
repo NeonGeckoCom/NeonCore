@@ -1,0 +1,17 @@
+name: Propose Stable Release
+on:
+  workflow_dispatch:
+jobs:
+  update_version:
+    uses: neongeckocom/.github/.github/workflows/propose_dated_release.yml@master
+    with:
+      branch: dev
+      update_changelog: false
+  pull_changes:
+    uses: neongeckocom/.github/.github/workflows/pull_master.yml@master
+    with:
+      pr_reviewer: neonreviewers
+      pr_assignee: ${{ github.actor }}
+      pr_draft: false
+      pr_title: ${{ needs.update_version.outputs.version }}
+      pr_body: ${{ needs.update_version.outputs.changelog }}
