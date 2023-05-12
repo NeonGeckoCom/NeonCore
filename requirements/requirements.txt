@@ -3,7 +3,7 @@ ovos-core[skills,skills-lgpl]~=0.0.7
 # padacioso==0.1.3a2
 
 # utils
-neon-utils[network,configuration]~=1.4
+neon-utils[network,configuration]~=1.4,>=1.5.0a2
 ovos-bus-client~=0.0.3
 neon-transformers~=0.2
 ovos_utils~=0.0.32
@@ -20,3 +20,6 @@ neon-utterance-normalizer-plugin~=0.0.2
 
 # TODO: Patching test failures https://github.com/NeonGeckoCom/NeonCore/actions/runs/4888865255/jobs/8727164992?pr=422
 requests < 2.30.0
+
+# TODO: Patching alpha dependency resolution
+neon-utils[audio]~=1.4,>=1.5.0a2

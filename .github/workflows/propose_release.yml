@@ -8,6 +8,8 @@ jobs:
       branch: dev
       update_changelog: false
       # Changelog automation fails with this large repo
+      version_file: "neon_core/version.py"
+
   pull_changes:
     uses: neongeckocom/.github/.github/workflows/pull_master.yml@master
     with:
