@@ -6,7 +6,7 @@ jobs:
     uses: neongeckocom/.github/.github/workflows/propose_dated_release.yml@master
     with:
       branch: dev
-      update_changelog: true
+      update_changelog: false
   pull_changes:
     uses: neongeckocom/.github/.github/workflows/pull_master.yml@master
     with:
