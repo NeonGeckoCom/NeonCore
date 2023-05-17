@@ -40,7 +40,7 @@ ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 workshop_modules = ("ovos_workshop.skills.ovos",
                     "ovos_workshop.skills.fallback",
                     "ovos_workshop.skills.common_query_skill",
-                    "ovos_workshop.skills.common_play"
+                    "ovos_workshop.skills.common_play",
                     "ovos_workshop.skills")
 neon_utils_modules = ("neon_utils.skills.neon_fallback_skill",
                       "neon_utils.skills")
