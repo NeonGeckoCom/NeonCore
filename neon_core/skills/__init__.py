@@ -39,6 +39,8 @@ ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
 workshop_modules = ("ovos_workshop.skills.ovos",
                     "ovos_workshop.skills.fallback",
+                    "ovos_workshop.skills.common_query_skill",
+                    "ovos_workshop.skills.common_play",
                     "ovos_workshop.skills")
 neon_utils_modules = ("neon_utils.skills.neon_fallback_skill",
                       "neon_utils.skills")
@@ -81,6 +83,8 @@ import mycroft.skills.core
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
 
+# TODO: Remove below patch with ovos-core 0.0.8 refactor
+import neon_core.skills.patched_plugin_loader
 
 __all__ = ['intent_handler',
            'intent_file_handler',

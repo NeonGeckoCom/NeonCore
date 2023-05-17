@@ -233,6 +233,13 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(NeonFallbackSkill, NeonFallbackSkill2)
         self.assertEqual(NeonSkill, NeonSkill2)
 
+        from ovos_workshop.skills.common_play import OVOSCommonPlaybackSkill
+        self.assertTrue(issubclass(OVOSCommonPlaybackSkill,
+                                   PatchedMycroftSkill))
+
+        from ovos_workshop.skills.common_query_skill import CommonQuerySkill
+        self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
+
 
 if __name__ == '__main__':
     unittest.main()

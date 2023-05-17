@@ -1,12 +1,14 @@
 # mycroft
 ovos-core[skills,skills-lgpl]~=0.0.7
+ovos-workshop~=0.0.11,>=0.0.12a26
 # padacioso==0.1.3a2
 
 # utils
 neon-utils[network,configuration]~=1.4,>=1.5.0a2
 ovos-bus-client~=0.0.3
 neon-transformers~=0.2
-ovos_utils~=0.0.32
+ovos_utils[extras]~=0.0.32,>=0.0.33a7
+# TODO extras patching dependency resolution
 ovos-config~=0.0.8
 ovos-skills-manager~=0.0.12
 ovos-plugin-manager~=0.0.21
@@ -23,3 +25,5 @@ requests < 2.30.0
 
 # TODO: Patching alpha dependency resolution
 neon-utils[audio]~=1.4,>=1.5.0a2
+neon-utils[audio,network]~=1.4,>=1.5.0a2
+neon-utils[network]~=1.4,>=1.5.0a2
