@@ -237,13 +237,9 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertTrue(issubclass(OVOSCommonPlaybackSkill,
                                    PatchedMycroftSkill))
 
-        try:
-            from ovos_workshop.skills.common_query_skill import CommonQuerySkill
-            self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
-        except ImportError:
-            # TODO: Remove exception handling here with ovos-workshop dependency update
-            # Older ovos-workshop did not include this class
-            pass
+        from ovos_workshop.skills.common_query_skill import CommonQuerySkill
+        self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
+
 
 if __name__ == '__main__':
     unittest.main()
