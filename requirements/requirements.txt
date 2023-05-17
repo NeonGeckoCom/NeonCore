@@ -24,3 +24,4 @@ requests < 2.30.0
 
 # TODO: Patching alpha dependency resolution
 neon-utils[audio]~=1.4,>=1.5.0a2
+neon-utils[audio,network]~=1.4,>=1.5.0a2
