@@ -153,8 +153,8 @@ def start_neon():
 
     _start_process(["neon_messagebus_service"]) or STOP_MODULES.set()
     bus.connected_event.wait()
-    _start_process("neon_speech_client") or STOP_MODULES.set()
-    _start_process("neon_audio_client") or STOP_MODULES.set()
+    _start_process(["neon-speech", "run"]) or STOP_MODULES.set()
+    _start_process(["neon-audio", "run"]) or STOP_MODULES.set()
     _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
     _start_process("neon_transcripts_controller")
     # if get_neon_device_type() == "server":
