@@ -231,6 +231,10 @@ PHAL:
   wait_for_gui: False
 
 # Debug/Metrics
+debugging:
+  tracemalloc: false
+  log_malloc: true
+  log_interval_minutes: 60
 opt_in: false
 debug: false
 device_name: unknown
