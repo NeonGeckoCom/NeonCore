@@ -15,6 +15,7 @@ stt:
     url: https://stt.openvoiceos.com/stt
 tts:
   pulse_duck: false
+  preload_fallback: false
   module: coqui
   fallback_module: amazon_polly
 language:
