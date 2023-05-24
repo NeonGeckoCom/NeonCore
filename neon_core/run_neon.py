@@ -151,7 +151,7 @@ def start_neon():
     _stop_all_core_processes()
     _cycle_logs()
 
-    _start_process(["neon_messagebus_service"]) or STOP_MODULES.set()
+    _start_process(["neon-messagebus", "run"]) or STOP_MODULES.set()
     bus.connected_event.wait()
     _start_process(["neon-speech", "run"]) or STOP_MODULES.set()
     _start_process(["neon-audio", "run"]) or STOP_MODULES.set()
