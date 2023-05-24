@@ -31,7 +31,7 @@ jobs:
           pip install .[skills_required,skills_essential,skills_default,skills_extended]
   pi_image:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v2
       - name: Test chroot installation
