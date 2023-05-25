@@ -92,7 +92,10 @@ def _start_process(name, logfile: IO = None):
     try:
         logfile = logfile or _get_log_file(name)
         proc = Popen(name, stdout=logfile, stderr=STDOUT)
-        PROCESSES[repr(name)] = proc
+        if isinstance(name, str):
+            PROCESSES[name] = proc
+        elif isinstance(name, list):
+            PROCESSES[name[0]] = proc
         return True
     except Exception as e:
         LOG.error(f"Failed to start: {name}")
