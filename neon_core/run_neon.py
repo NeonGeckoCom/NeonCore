@@ -159,13 +159,14 @@ def start_neon():
     _start_process(["neon-speech", "run"]) or STOP_MODULES.set()
     _start_process(["neon-audio", "run"]) or STOP_MODULES.set()
     _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
+    _start_process(["neon-enclosure", "run"]) or STOP_MODULES.set()
+    # TODO: neon-enclosure run-admin
     _start_process("neon_transcripts_controller")
     # if get_neon_device_type() == "server":
     #     _start_process("neon_core_server")
     # else:
     if not is_gui_running():
         _start_process("mycroft-gui-app")
-    _start_process("neon_enclosure_client")
     # _start_process("neon_core_client")
     _start_process(["neon_gui_service"])
 
