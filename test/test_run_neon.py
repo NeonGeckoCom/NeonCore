@@ -103,7 +103,7 @@ class TestRunNeon(unittest.TestCase):
                    "user": "TestRunner"}
         stt_resp = self.bus.wait_for_response(Message("neon.get_stt",
                                                       {"audio_file": os.path.join(AUDIO_FILE_PATH, "stop.wav")},
-                                                      context), context["ident"])
+                                                      context), context["ident"], timeout=10)
         self.assertEqual(stt_resp.context, context)
         self.assertIsInstance(stt_resp.data.get("parser_data"), dict,
                               stt_resp.data)
