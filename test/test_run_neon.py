@@ -90,11 +90,11 @@ class TestRunNeon(unittest.TestCase):
     def test_speech_module(self):
         # TODO: Remove this after readiness is better defined DM
         i = 0
-        response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+        response = self.bus.wait_for_response(Message('mycroft.voice.is_ready'))
         while not response.data['status'] and i < 10:
             LOG.warning(f"Speech not ready when core reported ready!")
             sleep(5)
-            response = self.bus.wait_for_response(Message('mycroft.speech.is_ready'))
+            response = self.bus.wait_for_response(Message('mycroft.voice.is_ready'))
             i += 1
         self.assertTrue(response.data['status'])
 

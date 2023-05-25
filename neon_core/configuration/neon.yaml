@@ -30,7 +30,7 @@ language:
 # System and startup
 ready_settings:
   - skills
-  - speech
+  - voice
   - audio
 system:
   disable_user_config: false
