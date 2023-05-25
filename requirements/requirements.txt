@@ -1,15 +1,15 @@
 # mycroft
-ovos-core[skills,skills-lgpl]~=0.0.7
+ovos-core[skills,skills_lgpl]~=0.0.7
 ovos-workshop~=0.0.11,>=0.0.12a26
 # padacioso==0.1.3a2
 
 # utils
-neon-utils[network,configuration]~=1.4,>=1.5.0a8
-ovos-bus-client~=0.0.3,>=0.0.4a11
+neon-utils[network]~=1.4,>=1.5.0a8
+ovos-bus-client~=0.0.3,>=0.0.4a12
 neon-transformers~=0.2
-ovos_utils[extras]~=0.0.32,>=0.0.33a7
+ovos_utils[extras]~=0.0.32,>=0.0.33a9
 # TODO extras patching dependency resolution
-ovos-config~=0.0.8
+ovos-config~=0.0.9
 ovos-skills-manager~=0.0.12
 ovos-plugin-manager~=0.0.21
 ovos-backend-client~=0.0.6

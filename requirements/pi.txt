@@ -46,3 +46,8 @@ neon-skill-update~=0.3
 ovos-skill-homescreen~=0.0.2
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
+
+# TODO: Below patching update bug
+ovos-plugin-manager~=0.0.21,>=0.0.23a5
+ovos-backend-client~=0.0.6,>=0.0.7a6
+neon-mq-connector~=0.6,>=0.6.1a9
