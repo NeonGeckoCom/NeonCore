@@ -176,7 +176,7 @@ class TestIntentService(unittest.TestCase):
         from neon_utils.configuration_utils import init_config_dir
         init_config_dir()
 
-        from neon_core import NeonIntentService
+        from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
 
     @classmethod
