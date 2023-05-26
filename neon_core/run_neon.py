@@ -35,10 +35,14 @@ from signal import SIGTERM
 from threading import Event
 from subprocess import Popen, STDOUT
 from mycroft_bus_client import MessageBusClient, Message
+from typing.io import IO
+
+from neon_utils.configuration_utils import init_config_dir
+init_config_dir()
+
 from ovos_utils.gui import is_gui_running
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
     get_log_file_for_module
-from typing.io import IO
 
 LOG_FILES = {}
 PROCESSES = {}
@@ -158,7 +162,7 @@ def start_neon():
     bus.connected_event.wait()
     _start_process(["neon-speech", "run"]) or STOP_MODULES.set()
     _start_process(["neon-audio", "run"]) or STOP_MODULES.set()
-    _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
+    _start_process(["neon", "run-skills"]) or STOP_MODULES.set()
     _start_process(["neon-enclosure", "run"]) or STOP_MODULES.set()
     # TODO: neon-enclosure run-admin
     _start_process("neon_transcripts_controller")
@@ -168,7 +172,7 @@ def start_neon():
     if not is_gui_running():
         _start_process("mycroft-gui-app")
     # _start_process("neon_core_client")
-    _start_process(["neon_gui_service"])
+    _start_process(["neon-gui", "run"])
 
     try:
         STOP_MODULES.wait()
