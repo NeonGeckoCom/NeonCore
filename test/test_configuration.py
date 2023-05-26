@@ -38,6 +38,9 @@ from ovos_utils.log import LOG
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
+from neon_utils.configuration_utils import init_config_dir
+init_config_dir()
+
 
 class ConfigurationTests(unittest.TestCase):
     CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
