@@ -226,6 +226,7 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertTrue(issubclass(NeonFallbackSkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(NeonSkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(NeonFallbackSkill, OVOSSkill))
+        self.assertTrue(issubclass(NeonFallbackSkill, NeonSkill))
 
         from neon_utils.skills.neon_fallback_skill import NeonFallbackSkill as \
             NeonFallbackSkill2
