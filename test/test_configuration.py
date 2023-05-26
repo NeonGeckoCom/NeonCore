@@ -38,16 +38,16 @@ from ovos_utils.log import LOG
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from neon_utils.configuration_utils import init_config_dir
-init_config_dir()
-
 
 class ConfigurationTests(unittest.TestCase):
     CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
 
     @classmethod
     def setUpClass(cls) -> None:
+        from neon_core.util.runtime_utils import use_neon_core
+        from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
+        use_neon_core(init_config_dir)()
 
         import neon_core
         assert isinstance(neon_core.CORE_VERSION_STR, str)
