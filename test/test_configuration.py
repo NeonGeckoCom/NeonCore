@@ -49,12 +49,11 @@ class ConfigurationTests(unittest.TestCase):
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
         use_neon_core(init_config_dir)()
 
-        import neon_core
-        assert isinstance(neon_core.CORE_VERSION_STR, str)
+        # import neon_core
+        # assert isinstance(neon_core.CORE_VERSION_STR, str)
         assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
                                            "OpenVoiceOS", "ovos.conf"))
 
-        from neon_core.util.runtime_utils import use_neon_core
         from ovos_config.meta import get_ovos_config
         from neon_core.configuration import Configuration
         ovos_config = use_neon_core(get_ovos_config)()

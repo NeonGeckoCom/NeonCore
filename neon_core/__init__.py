@@ -26,24 +26,23 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys
+# import sys
 
-from neon_core.config import get_core_version, \
-    setup_resolve_resource_file
-from os.path import dirname
+from neon_core.config import setup_resolve_resource_file
+# from os.path import dirname
 
 
-NEON_ROOT_PATH = dirname(__file__)
-sys.path.append(NEON_ROOT_PATH)
+# NEON_ROOT_PATH = dirname(__file__)
+# sys.path.append(NEON_ROOT_PATH)
 
-CORE_VERSION_STR = get_core_version()
+# CORE_VERSION_STR = get_core_version()
 setup_resolve_resource_file()
 
 # from neon_core.skills import NeonSkill, NeonFallbackSkill
-from neon_core.skills.intent_service import NeonIntentService
+# from neon_core.skills.intent_service import NeonIntentService
 
-__all__ = ['NEON_ROOT_PATH',
-           'NeonIntentService',
-           # 'NeonSkill',
-           # 'NeonFallbackSkill',
-           'CORE_VERSION_STR']
+# __all__ = ['NEON_ROOT_PATH',
+#            'NeonIntentService',
+#            # 'NeonSkill',
+#            # 'NeonFallbackSkill',
+#            'CORE_VERSION_STR']
