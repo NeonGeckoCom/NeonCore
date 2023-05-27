@@ -99,6 +99,9 @@ def install_skill_requirements(skill_dir):
 @click.option("--install-skills", "-i", default=None,
               help="Path to local skills for which to install dependencies")
 def run_skills(install_skills):
+    from neon_utils.configuration_utils import init_config_dir
+    init_config_dir()
+
     from neon_core.util.skill_utils import install_local_skills
     from neon_core.skills.__main__ import main
     if install_skills:
