@@ -199,9 +199,12 @@ class NeonIntentService(IntentService):
                 message = self._get_parsers_service_context(message, lang)
             message.context["timing"]["text_parsers"] = stopwatch.time
 
+            # Normalize all utterances for intent engines
+            message.data['utterances'] = [u.lower().strip() for u in
+                                          message.data.get('utterances', [])]
+
             # Catch empty utterances after parser service
-            if len([u for u in message.data.get("utterances", [])
-                    if u.strip()]) == 0:
+            if len(message.data['utterances']) == 0:
                 LOG.debug("Received empty utterance!!")
                 reply = \
                     message.reply('intent_aborted',
