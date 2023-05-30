@@ -22,3 +22,5 @@ neon-utterance-normalizer-plugin~=0.0.2
 
 # TODO: Patching test failures https://github.com/NeonGeckoCom/NeonCore/actions/runs/4888865255/jobs/8727164992?pr=422
 requests < 2.30.0
+# TODO: Patching https://github.com/python-attrs/cattrs/issues/369
+cattrs!=23.1.0
