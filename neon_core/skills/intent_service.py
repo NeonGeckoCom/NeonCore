@@ -201,7 +201,8 @@ class NeonIntentService(IntentService):
 
             # Normalize all utterances for intent engines
             message.data['utterances'] = [u.lower().strip() for u in
-                                          message.data.get('utterances', [])]
+                                          message.data.get('utterances', [])
+                                          if u.strip()]
 
             # Catch empty utterances after parser service
             if len(message.data['utterances']) == 0:
