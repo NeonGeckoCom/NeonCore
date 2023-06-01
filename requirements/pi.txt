@@ -20,8 +20,8 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
-neon-phal-plugin-reset~=0.1,>=0.1.1a2
-neon-phal-plugin-core-updater~=1.0,>=1.0.1a1
+neon-phal-plugin-reset~=0.1,>=0.1.1a3
+neon-phal-plugin-core-updater~=1.0,>=1.0.1a2
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.3
 neon-phal-plugin-linear_led~=0.2
@@ -48,6 +48,5 @@ ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 
 # TODO: Below patching update bug
-ovos-plugin-manager~=0.0.21,>=0.0.23a5
 ovos-backend-client~=0.0.6,>=0.0.7a6
 neon-mq-connector~=0.6,>=0.6.1a9
