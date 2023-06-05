@@ -5,7 +5,7 @@ ovos-workshop~=0.0.11,>=0.0.12a26
 
 # utils
 neon-utils[network]~=1.5
-ovos-bus-client~=0.0.3,>=0.0.4a12
+ovos-bus-client~=0.0.3
 neon-transformers~=0.2
 ovos-config~=0.0.9
 ovos-skills-manager~=0.0.12
