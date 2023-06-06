@@ -107,6 +107,11 @@ listener:
   recording_timeout_with_silence: 3.0
   instant_listen: false
   enable_stt_api: true
+  speech_begin: 0.5
+  silence_end: 0.9
+  # TODO: tune below params with WW disabled
+  utterance_chunks_to_rewind: 2
+  wakeword_chunks_to_save: 15
 hotwords:
   hey_mycroft:
     active: false
