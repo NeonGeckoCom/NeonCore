@@ -238,9 +238,12 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertTrue(issubclass(OVOSCommonPlaybackSkill,
                                    PatchedMycroftSkill))
 
-        from ovos_workshop.skills.common_query_skill import CommonQuerySkill
-        self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
-
+        try:
+            from ovos_workshop.skills.common_query_skill import CommonQuerySkill
+            self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
+        except ModuleNotFoundError:
+            # Class added in ovos-workwhop 0.0.12
+            pass
 
 if __name__ == '__main__':
     unittest.main()
