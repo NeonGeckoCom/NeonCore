@@ -4,8 +4,8 @@ ovos-workshop~=0.0.11,>=0.0.12a26
 # padacioso==0.1.3a2
 
 # utils
-neon-utils[network]~=1.4,>=1.5.0a12
-ovos-bus-client~=0.0.3,>=0.0.4a12
+neon-utils[network]~=1.5
+ovos-bus-client~=0.0.3
 neon-transformers~=0.2
 ovos-config~=0.0.9
 ovos-skills-manager~=0.0.12
