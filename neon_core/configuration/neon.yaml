@@ -95,7 +95,7 @@ listener:
     initial_energy_threshold: 1000.0
     module: ovos-vad-plugin-webrtcvad
     ovos-vad-plugin-silero:
-      threshold: 0.2
+      threshold: 0.15
     ovos-vad-plugin-webrtcvad:
       vad_mode: 2
   mute_during_output: true
