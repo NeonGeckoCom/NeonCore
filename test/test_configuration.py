@@ -28,7 +28,6 @@
 
 import os
 import shutil
-import sys
 import unittest
 import yaml
 
@@ -36,22 +35,24 @@ from copy import deepcopy
 from pprint import pformat
 from ovos_utils.log import LOG
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-
 
 class ConfigurationTests(unittest.TestCase):
     CONFIG_PATH = os.path.join(os.path.dirname(__file__), "config")
 
     @classmethod
     def setUpClass(cls) -> None:
+        from neon_core.util.runtime_utils import use_neon_core
+        from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        use_neon_core(init_config_dir)()
 
-        import neon_core
-        assert isinstance(neon_core.CORE_VERSION_STR, str)
+        # import neon_core
+        # assert isinstance(neon_core.CORE_VERSION_STR, str)
         assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
                                            "OpenVoiceOS", "ovos.conf"))
 
-        from neon_core.util.runtime_utils import use_neon_core
         from ovos_config.meta import get_ovos_config
         from neon_core.configuration import Configuration
         ovos_config = use_neon_core(get_ovos_config)()
@@ -65,6 +66,8 @@ class ConfigurationTests(unittest.TestCase):
         if os.path.exists(cls.CONFIG_PATH):
             shutil.rmtree(cls.CONFIG_PATH)
         os.environ.pop("XDG_CONFIG_HOME")
+        os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
+        os.environ.pop("OVOS_CONFIG_FILENAME")
 
     def test_neon_core_config_init(self):
         from neon_core.configuration import Configuration

@@ -226,6 +226,7 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertTrue(issubclass(NeonFallbackSkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(NeonSkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(NeonFallbackSkill, OVOSSkill))
+        self.assertTrue(issubclass(NeonFallbackSkill, NeonSkill))
 
         from neon_utils.skills.neon_fallback_skill import NeonFallbackSkill as \
             NeonFallbackSkill2
@@ -233,6 +234,16 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(NeonFallbackSkill, NeonFallbackSkill2)
         self.assertEqual(NeonSkill, NeonSkill2)
 
+        from ovos_workshop.skills.common_play import OVOSCommonPlaybackSkill
+        self.assertTrue(issubclass(OVOSCommonPlaybackSkill,
+                                   PatchedMycroftSkill))
+
+        try:
+            from ovos_workshop.skills.common_query_skill import CommonQuerySkill
+            self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
+        except ModuleNotFoundError:
+            # Class added in ovos-workwhop 0.0.12
+            pass
 
 if __name__ == '__main__':
     unittest.main()

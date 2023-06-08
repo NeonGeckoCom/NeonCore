@@ -35,10 +35,14 @@ from signal import SIGTERM
 from threading import Event
 from subprocess import Popen, STDOUT
 from mycroft_bus_client import MessageBusClient, Message
+from typing.io import IO
+
+from neon_utils.configuration_utils import init_config_dir
+init_config_dir()
+
 from ovos_utils.gui import is_gui_running
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
     get_log_file_for_module
-from typing.io import IO
 
 LOG_FILES = {}
 PROCESSES = {}
@@ -92,7 +96,10 @@ def _start_process(name, logfile: IO = None):
     try:
         logfile = logfile or _get_log_file(name)
         proc = Popen(name, stdout=logfile, stderr=STDOUT)
-        PROCESSES[repr(name)] = proc
+        if isinstance(name, str):
+            PROCESSES[name] = proc
+        elif isinstance(name, list):
+            PROCESSES[name[0]] = proc
         return True
     except Exception as e:
         LOG.error(f"Failed to start: {name}")
@@ -151,20 +158,21 @@ def start_neon():
     _stop_all_core_processes()
     _cycle_logs()
 
-    _start_process(["neon_messagebus_service"]) or STOP_MODULES.set()
+    _start_process(["neon-messagebus", "run"]) or STOP_MODULES.set()
     bus.connected_event.wait()
-    _start_process("neon_speech_client") or STOP_MODULES.set()
-    _start_process("neon_audio_client") or STOP_MODULES.set()
-    _start_process(["python3", "-m", "neon_core.skills"]) or STOP_MODULES.set()
+    _start_process(["neon-speech", "run"]) or STOP_MODULES.set()
+    _start_process(["neon-audio", "run"]) or STOP_MODULES.set()
+    _start_process(["neon", "run-skills"]) or STOP_MODULES.set()
+    _start_process(["neon-enclosure", "run"]) or STOP_MODULES.set()
+    # TODO: neon-enclosure run-admin
     _start_process("neon_transcripts_controller")
     # if get_neon_device_type() == "server":
     #     _start_process("neon_core_server")
     # else:
     if not is_gui_running():
         _start_process("mycroft-gui-app")
-    _start_process("neon_enclosure_client")
     # _start_process("neon_core_client")
-    _start_process(["neon_gui_service"])
+    _start_process(["neon-gui", "run"])
 
     try:
         STOP_MODULES.wait()

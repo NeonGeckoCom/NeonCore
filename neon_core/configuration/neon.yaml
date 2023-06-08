@@ -15,6 +15,7 @@ stt:
     url: https://stt.openvoiceos.com/stt
 tts:
   pulse_duck: false
+  preload_fallback: false
   module: coqui
   fallback_module: amazon_polly
 language:
@@ -29,7 +30,7 @@ language:
 # System and startup
 ready_settings:
   - skills
-  - speech
+  - voice
   - audio
 system:
   disable_user_config: false
@@ -94,7 +95,7 @@ listener:
     initial_energy_threshold: 1000.0
     module: ovos-vad-plugin-webrtcvad
     ovos-vad-plugin-silero:
-      threshold: 0.2
+      threshold: 0.15
     ovos-vad-plugin-webrtcvad:
       vad_mode: 2
   mute_during_output: true
@@ -106,6 +107,11 @@ listener:
   recording_timeout_with_silence: 3.0
   instant_listen: false
   enable_stt_api: true
+  speech_begin: 0.5
+  silence_end: 0.9
+  # TODO: tune below params with WW disabled
+  utterance_chunks_to_rewind: 2
+  wakeword_chunks_to_save: 15
 hotwords:
   hey_mycroft:
     active: false
@@ -231,6 +237,10 @@ PHAL:
   wait_for_gui: False
 
 # Debug/Metrics
+debugging:
+  tracemalloc: false
+  log_malloc: true
+  log_interval_minutes: 60
 opt_in: false
 debug: false
 device_name: unknown

@@ -68,11 +68,12 @@ class TestSkillService(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        from neon_core.util.runtime_utils import use_neon_core
+        from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        if os.path.exists(cls.config_dir):
-            shutil.rmtree(cls.config_dir)
-        from neon_core import CORE_VERSION_STR
-        assert isinstance(CORE_VERSION_STR, str)
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        use_neon_core(init_config_dir)()
         assert os.path.isdir(cls.config_dir)
 
     @classmethod
@@ -172,17 +173,22 @@ class TestIntentService(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
+        from neon_core.util.runtime_utils import use_neon_core
         from neon_utils.configuration_utils import init_config_dir
-        init_config_dir()
+        os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        use_neon_core(init_config_dir)()
 
-        from neon_core import NeonIntentService
+        from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
 
     @classmethod
     def tearDownClass(cls) -> None:
         cls.intent_service.shutdown()
         os.environ.pop("XDG_CONFIG_HOME")
+        os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
+        os.environ.pop("OVOS_CONFIG_FILENAME")
         shutil.rmtree(cls.test_config_dir)
 
     def test_save_utterance_transcription(self):
@@ -327,13 +333,18 @@ class TestSkillManager(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        from neon_core.util.runtime_utils import use_neon_core
+        from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        from neon_core import CORE_VERSION_STR
-        assert isinstance(CORE_VERSION_STR, str)
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        use_neon_core(init_config_dir)()
 
     @classmethod
     def tearDownClass(cls) -> None:
         os.environ.pop("XDG_CONFIG_HOME")
+        os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
+        os.environ.pop("OVOS_CONFIG_FILENAME")
         if os.path.isdir(cls.config_dir):
             shutil.rmtree(cls.config_dir)
 
