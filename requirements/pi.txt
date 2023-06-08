@@ -45,7 +45,7 @@ ovos-phal-plugin-ipgeo~=0.0.1
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 
 # Pi-specific skills
-neon-skill-update~=0.3,>=0.3.1
+neon-skill-update~=0.3,>=0.3.2a1
 ovos-skill-homescreen~=0.0.2
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
