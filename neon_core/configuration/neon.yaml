@@ -235,7 +235,16 @@ logs:
 
 PHAL:
   wait_for_gui: False
-
+  ovos-phal-plugin-brightness-control-rpi:
+    enabled: False
+  ovos-PHAL-plugin-color-scheme-manager:
+    enabled: False
+  ovos-PHAL-plugin-configuration-provider:
+    enabled: False
+  ovos-phal-plugin-notification-widgets:
+    enabled: False
+  ovos-PHAL-plugin-dashboard:
+    enabled: False
 # Debug/Metrics
 debugging:
   tracemalloc: false
