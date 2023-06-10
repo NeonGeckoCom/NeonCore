@@ -6,7 +6,7 @@ sdnotify~=0.3
 
 # Default debug client
 neon-cli-client~=0.2
-neon-mana-utils~=0.1
+neon-mana-utils~=0.1,>=0.1.1a2
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
@@ -15,8 +15,11 @@ ovos-ww-plugin-precise-lite[tflite]~=0.1,>=0.1.2
 ovos-ww-plugin-vosk~=0.1,>=0.1.1
 ovos-ww-plugin-openwakeword~=0.2
 neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
+
+# TODO: Stable releases for below plugins
 neon-tts-plugin-coqui-remote
-# neon-stt-plugin-nemo~=0.0,>=0.0.3a3
+ovos-tts-plugin-server
+neon-stt-plugin-nemo~=0.0,>=0.0.3a3
 
 # Fallback plugins
 neon-tts-plugin-coqui~=0.7,>=0.7.1
@@ -24,9 +27,9 @@ ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
 neon-phal-plugin-reset~=0.2,>=0.2.1a1
-neon-phal-plugin-core-updater~=1.1,>=1.1.2a1
+neon-phal-plugin-core-updater~=1.1,>=1.1.2a2
 neon-phal-plugin-fan~=0.0.3
-neon-phal-plugin-switches~=0.0.3
+neon-phal-plugin-switches~=0.0.3,>=0.0.4a0
 neon-phal-plugin-linear_led~=0.2,>=0.2.1a1
 ovos-gui-plugin-shell-companion<0.1.0,>=0.0.0a6
 # ovos-phal-plugin-brightness-control-rpi~=1.0.0
@@ -34,14 +37,14 @@ ovos-gui-plugin-shell-companion<0.1.0,>=0.0.0a6
 # ovos-phal-plugin-color-scheme-manager~=1.0.0
 # ovos-phal-plugin-configuration-provider~=1.0.0
 ovos-phal-plugin-balena-wifi~=1.0.0
-ovos-phal-plugin-gui-network-client~=0.0.2
+ovos-phal-plugin-gui-network-client~=0.0.2,>=0.0.3a2
 ovos-phal-plugin-network-manager~=1.0.0
-ovos-phal-plugin-wifi-setup~=1.1
+ovos-phal-plugin-wifi-setup~=1.1,>=1.1.1a1
 # ovos-phal-plugin-dashboard==0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2
 ovos-phal-plugin-system~=0.0.3
 ovos-phal-plugin-connectivity-events~=0.0.2
-ovos-phal-plugin-homeassistant~=0.0.2
+ovos-phal-plugin-homeassistant~=0.0.2,>=0.0.3a1
 ovos-phal-plugin-ipgeo~=0.0.1
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 
