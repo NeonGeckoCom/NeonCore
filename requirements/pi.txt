@@ -6,11 +6,12 @@ sdnotify~=0.3
 
 # Default debug client
 neon-cli-client~=0.2
-neon-mana-utils~=0.0.4
+neon-mana-utils~=0.1
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
 ovos-ww-plugin-precise~=0.1
+ovos-ww-plugin-precise-lite[tflite]~=0.1,>=0.1.2
 ovos-ww-plugin-vosk~=0.1,>=0.1.1
 ovos-ww-plugin-openwakeword~=0.2
 neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
