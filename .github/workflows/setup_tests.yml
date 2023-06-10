@@ -29,7 +29,7 @@ jobs:
       - name: Test Skills Installation
         run: |
           pip install .[skills_required,skills_essential,skills_default,skills_extended]
-  pi_image:
+  pi_image_3_7:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
@@ -38,11 +38,11 @@ jobs:
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/pi/ubuntu_22_04.img.xz
+          base_image: https://2222.us/app/files/neon_images/pi/debian-base-image-rpi4_2023-02-13_09_05.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
-            bash /core/test/pi_setup.sh
+            bash /core/test/pi_setup_3_7.sh
             . /core/venv/bin/activate
             neon-audio init-plugin -p coqui
             neon-speech init-plugin -p deepspeech_stream_local
