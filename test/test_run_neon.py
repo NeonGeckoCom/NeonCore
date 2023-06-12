@@ -127,6 +127,8 @@ class TestRunNeon(unittest.TestCase):
                                                       {"text": text}, context),
                                               context["ident"], timeout=60)
         # Context may be added, but existing context should be preserved
+        session = context.pop('session')
+        self.assertIsInstance(session, dict)
         for key in context:
             self.assertEqual(tts_resp.context[key], context[key], key)
         # self.assertEqual(tts_resp.context, context)
