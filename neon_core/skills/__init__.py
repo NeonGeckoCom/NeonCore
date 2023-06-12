@@ -88,9 +88,11 @@ import neon_core.skills.patched_plugin_loader
 
 from mycroft.skills import api
 from mycroft.skills import skill_manager
+from mycroft.skills.intent_services import padatious_service
 from ovos_bus_client.message import Message
 mycroft.skills.api.Message = Message
 mycroft.skills.skill_manager.Message = Message
+mycroft.skills.intent_services.padatious_service.Message = Message
 
 __all__ = ['intent_handler',
            'intent_file_handler',
