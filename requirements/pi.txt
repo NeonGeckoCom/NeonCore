@@ -5,7 +5,7 @@
 sdnotify~=0.3
 
 # Default debug client
-neon-cli-client~=0.2
+neon-cli-client~=0.2,>=0.2.4a9
 neon-mana-utils~=0.1,>=0.1.1a2
 
 # Default plugins

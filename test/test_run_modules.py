@@ -31,7 +31,7 @@ import unittest
 
 from multiprocessing import Process
 from time import time, sleep
-from mycroft_bus_client import MessageBusClient, Message
+from ovos_bus_client import MessageBusClient, Message
 from neon_speech.__main__ import main as neon_speech_main
 from neon_audio.__main__ import main as neon_audio_main
 from neon_messagebus.service import NeonBusService

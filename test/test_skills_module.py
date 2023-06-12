@@ -40,7 +40,7 @@ from time import time, sleep
 
 from mock import Mock
 from mock.mock import patch
-from mycroft_bus_client import Message
+from ovos_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_plugin_manager.templates.language import LanguageTranslator

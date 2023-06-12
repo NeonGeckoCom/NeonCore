@@ -1,6 +1,7 @@
 # TODO: Remove below patches with ovos-core 0.0.8
 import mycroft.skills.skill_loader
 from mycroft.skills.skill_loader import PluginSkillLoader as _Plugin
+from ovos_bus_client.message import Message
 
 
 class PluginSkillLoader(_Plugin):
@@ -13,3 +14,4 @@ class PluginSkillLoader(_Plugin):
 
 
 mycroft.skills.skill_loader.PluginSkillLoader = PluginSkillLoader
+mycroft.skills.skill_loader.Message = Message

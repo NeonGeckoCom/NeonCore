@@ -30,15 +30,14 @@ import time
 import wave
 
 from neon_transformers.text_transformers import UtteranceTransformersService
-from mycroft_bus_client import Message, MessageBusClient
+from ovos_bus_client import Message, MessageBusClient
 from neon_utils.message_utils import get_message_user
 from neon_utils.metrics_utils import Stopwatch
-from neon_utils.log_utils import LOG
 from neon_utils.user_utils import apply_local_user_profile_updates
 from neon_utils.configuration_utils import get_neon_user_config
 from lingua_franca.parse import get_full_lang_code
 from ovos_config.locale import set_default_lang
-
+from ovos_utils.log import LOG
 from neon_core.configuration import Configuration
 from neon_core.language import get_lang_config
 
@@ -59,8 +58,6 @@ except ImportError:
 # except ImportError:
 Transcribe = None
 
-from ovos_utils.log import LOG
-
 
 class NeonIntentService(IntentService):
     def __init__(self, bus: MessageBusClient):
@@ -80,7 +77,7 @@ class NeonIntentService(IntentService):
         self.transformers = UtteranceTransformersService(self.bus, self.config)
 
         self.transcript_service = None
-        if Transcribe:
+        if callable(Transcribe):
             try:
                 self.transcript_service = Transcribe()
             except Exception as e:
@@ -94,11 +91,13 @@ class NeonIntentService(IntentService):
         Handle a request for supported skills languages
         :param message: neon.get_languages_skills request
         """
-        translator = self.transformers.loaded_modules.get('neon_utterance_translator_plugin')
+        translator = self.transformers.loaded_modules.get(
+            'neon_utterance_translator_plugin')
         translate_langs = list(translator.translator.available_languages) if \
             translator and translator.translator else list()
 
-        native_langs = list(self.language_config.get('supported_langs') or ['en'])
+        native_langs = list(self.language_config.get('supported_langs') or
+                            ['en'])
         skill_langs = list(set(native_langs + translate_langs))
         self.bus.emit(message.response({"skill_langs": skill_langs,
                                         "native_langs": native_langs,

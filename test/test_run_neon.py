@@ -34,11 +34,12 @@ import pytest
 from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
-from mycroft_bus_client import MessageBusClient, Message
+from ovos_bus_client import MessageBusClient, Message
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), "audio_files")
+AUDIO_FILE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               "audio_files")
 
 
 class TestRunNeon(unittest.TestCase):
@@ -79,7 +80,7 @@ class TestRunNeon(unittest.TestCase):
             LOG.error(e)
 
     def test_messagebus_connection(self):
-        from mycroft_bus_client import MessageBusClient
+        from ovos_bus_client import MessageBusClient
         bus = MessageBusClient()
         bus.run_in_thread()
         self.assertTrue(bus.started_running)
@@ -126,8 +127,10 @@ class TestRunNeon(unittest.TestCase):
                                                       {"text": text}, context),
                                               context["ident"], timeout=60)
         # Context may be added, but existing context should be preserved
+        session = context.pop('session')
+        self.assertIsInstance(session, dict)
         for key in context:
-            self.assertEqual(tts_resp.context[key], context[key])
+            self.assertEqual(tts_resp.context[key], context[key], key)
         # self.assertEqual(tts_resp.context, context)
         responses = tts_resp.data
         self.assertIsInstance(responses, dict)

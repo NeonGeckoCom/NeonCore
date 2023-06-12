@@ -28,12 +28,8 @@
 
 from os import makedirs
 from os.path import isdir, join, expanduser
-from threading import RLock
-
-from mycroft_bus_client import Message
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
-
 from neon_core.skills.skill_store import SkillsStore
 from neon_utils.net_utils import check_online as connected
 
