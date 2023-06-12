@@ -77,3 +77,7 @@ def calc_intent(args):
 
 mycroft.skills.intent_service.PadatiousMatcher = PadatiousMatcher
 mycroft.skills.intent_service.PadatiousService = PadatiousService
+
+# TODO: Remove below patches with ovos-core 0.0.8 refactor
+from ovos_bus_client.message import Message
+mycroft.skills.intent_services.padatious_service.Message = Message
