@@ -34,7 +34,7 @@ import pytest
 from time import time, sleep
 from multiprocessing import Process
 from neon_utils.log_utils import LOG
-from mycroft_bus_client import MessageBusClient, Message
+from ovos_bus_client import MessageBusClient, Message
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -79,7 +79,7 @@ class TestRunNeon(unittest.TestCase):
             LOG.error(e)
 
     def test_messagebus_connection(self):
-        from mycroft_bus_client import MessageBusClient
+        from ovos_bus_client import MessageBusClient
         bus = MessageBusClient()
         bus.run_in_thread()
         self.assertTrue(bus.started_running)

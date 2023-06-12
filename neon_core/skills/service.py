@@ -33,7 +33,7 @@ from os.path import join
 from typing import Optional
 from threading import Thread
 
-from mycroft_bus_client import Message, MessageBusClient
+from ovos_bus_client import Message, MessageBusClient
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
@@ -85,8 +85,8 @@ class NeonSkillService(Thread):
                  config: Optional[dict] = None, daemonic: bool = False):
         Thread.__init__(self)
         LOG.debug("Starting Skills Service")
-        self.setDaemon(daemonic)
-        self.bus: MessageBusClient = None
+        self.daemon = daemonic
+        self.bus: Optional[MessageBusClient] = None
         self.skill_manager = None
         self.http_server = None
         self.event_scheduler = None
@@ -173,7 +173,7 @@ class NeonSkillService(Thread):
             ready_hook=self.callbacks.on_ready,
             error_hook=self.callbacks.on_error,
             stopping_hook=self.callbacks.on_stopping)
-        self.skill_manager.setName("skill_manager")
+        self.skill_manager.name = "skill_manager"
         self.skill_manager.start()
         LOG.info("Skill Manager started")
 
