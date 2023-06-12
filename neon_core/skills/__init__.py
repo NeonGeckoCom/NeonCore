@@ -83,8 +83,12 @@ import mycroft.skills.core
 mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
 mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
 
-# TODO: Remove below patch with ovos-core 0.0.8 refactor
+# TODO: Remove below patches with ovos-core 0.0.8 refactor
 import neon_core.skills.patched_plugin_loader
+
+from mycroft.skills import api
+from ovos_bus_client.message import Message
+mycroft.skills.api.Message = Message
 
 __all__ = ['intent_handler',
            'intent_file_handler',
