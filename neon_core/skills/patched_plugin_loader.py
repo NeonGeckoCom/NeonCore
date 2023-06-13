@@ -1,6 +1,9 @@
 # TODO: Remove below patches with ovos-core 0.0.8
 import mycroft.skills.skill_loader
-from mycroft.skills.skill_loader import PluginSkillLoader as _Plugin
+try:
+    from ovos_workshop.skill_launcher import PluginSkillLoader as _Plugin
+except ImportError:
+    from mycroft.skills.skill_loader import PluginSkillLoader as _Plugin
 from ovos_bus_client.message import Message
 from ovos_utils.log import LOG
 
