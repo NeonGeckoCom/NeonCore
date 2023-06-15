@@ -53,6 +53,6 @@ ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 
 # TODO: Patching neon-utils pre-release
-neon-utils[network,audio]>=1.5.1a1
+neon-utils[network,audio]>=1.5.1a3
 # TODO: Patching stable release with ovos-workshop alpha
 ovos-workshop==0.0.12a29
