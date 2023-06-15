@@ -85,6 +85,7 @@ mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
 
 # TODO: Remove below patches with ovos-core 0.0.8 refactor
 import neon_core.skills.patched_plugin_loader
+import neon_core.skills.patched_settings_meta
 
 from mycroft.skills import api
 from mycroft.skills import skill_manager
