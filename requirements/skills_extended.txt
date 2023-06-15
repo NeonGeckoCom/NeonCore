@@ -1,12 +1,12 @@
-neon-skill-audio_record~=0.1
-neon-skill-custom_conversation>=0.0.1a6,<0.0.2
-neon-skill-instructions~=0.1
-neon-skill-launcher~=0.4,>=0.4.1a1
-neon-skill-messaging
+neon-skill-audio_record~=0.1,>=0.1.1a2
+neon-skill-custom_conversation>=0.0.1a8,<0.0.2
+neon-skill-instructions~=0.1,>=0.1.1a2
+neon-skill-launcher~=0.4,>=0.4.1a3
+neon-skill-messaging~=0.0.1,>=0.0.2a4
 skill-news~=0.0.3
-# neon-skill-recipes
-neon-skill-synonyms~=0.1,>=0.1.1a1
-neon-skill-translation~=0.3
-neon-skill-camera~=0.2
+# neon-skill-recipes>=0.0.1a7
+neon-skill-synonyms~=0.1,>=0.1.1a3
+neon-skill-translation~=0.3,>=0.3.1a2
+neon-skill-camera~=0.2,>=0.2.1a2
 ovos-skill-somafm~=0.0.1
 neon-homeassistant-skill~=0.0.12
