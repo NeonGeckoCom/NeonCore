@@ -52,7 +52,7 @@ class SkillsStore:
         self._alternative_skills = []
         self._essential_skills = []
         self.bus = bus or get_messagebus()
-        self.scheduler = EventSchedulerInterface("OSM", sched_id="osm",
+        self.scheduler = EventSchedulerInterface(skill_id="osm",
                                                  bus=self.bus)
         if not self.disabled or not self.config["auto_update"]:
             if self.config.get("auto_update_interval"):

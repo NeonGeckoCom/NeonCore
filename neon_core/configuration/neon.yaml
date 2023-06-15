@@ -241,7 +241,7 @@ PHAL:
     enabled: False
   ovos-PHAL-plugin-configuration-provider:
     enabled: False
-  ovos-phal-plugin-notification-widgets:
+  ovos-PHAL-plugin-notification-widgets:
     enabled: False
   ovos-PHAL-plugin-dashboard:
     enabled: False
