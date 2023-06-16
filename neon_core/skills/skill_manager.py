@@ -93,6 +93,12 @@ class NeonSkillManager(SkillManager):
         # Override load method for config module checks
         super()._load_new_skills(*args, **kwargs)
 
+    def _get_plugin_skill_loader(self, skill_id, init_bus=True):
+        assert self.bus is not None
+        if not init_bus:
+            LOG.info("Ignoring request not to bind bus")
+        super()._get_plugin_skill_loader(skill_id, True)
+
     def run(self):
         """Load skills and update periodically from disk and internet."""
         self.download_or_update_defaults()
