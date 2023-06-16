@@ -50,5 +50,10 @@ ovos-skill-homescreen~=0.0.2
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 
+
+# Pin alpha dependencies
+ovos-workshop==0.0.12a29
+
 # TODO: Below patching update bug
+ovos-utils~=0.0.34
 # ovos-backend-client~=0.0.6
