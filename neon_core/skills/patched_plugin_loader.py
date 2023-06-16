@@ -17,7 +17,7 @@ try:
             try:
                 # in skill classes __new__ should fully create the skill object
                 skill_class = self._skill_class or get_skill_class(skill_module)
-                LOG.info(f"loading skill: {skill_class}")
+                LOG.debug(f"loading skill: {skill_class}")
                 self.instance = skill_class(bus=self.bus, skill_id=self.skill_id)
                 if hasattr(self.instance, "initialize"):
                     self.instance.initialize()

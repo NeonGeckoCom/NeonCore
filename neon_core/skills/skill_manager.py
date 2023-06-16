@@ -96,7 +96,7 @@ class NeonSkillManager(SkillManager):
     def _get_plugin_skill_loader(self, skill_id, init_bus=True):
         assert self.bus is not None
         if not init_bus:
-            LOG.info("Ignoring request not to bind bus")
+            LOG.debug("Ignoring request not to bind bus")
         return SkillManager._get_plugin_skill_loader(self, skill_id, True)
 
     def run(self):
