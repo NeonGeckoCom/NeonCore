@@ -121,8 +121,8 @@ class SkillsStore:
         """
         Get an authenticated instance of OSM if not disabled
         """
-        from ovos_utils.skills import get_skills_folder
-        osm_skill_dir = get_skills_folder()
+        from ovos_utils.skills.locations import get_default_skills_directory
+        osm_skill_dir = get_default_skills_directory()
         if osm_skill_dir and osm_skill_dir != self.skills_dir:
             LOG.warning(f"OSM configured local skills: {osm_skill_dir}")
             if not isdir(osm_skill_dir):
