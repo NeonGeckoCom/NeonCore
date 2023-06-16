@@ -91,13 +91,13 @@ class NeonSkillManager(SkillManager):
         # with self.load_lock:
         #     LOG.debug(f"Loading skills: {kwargs}")
         # Override load method for config module checks
-        super()._load_new_skills(*args, **kwargs)
+        SkillManager._load_new_skills(self, *args, **kwargs)
 
     def _get_plugin_skill_loader(self, skill_id, init_bus=True):
         assert self.bus is not None
         if not init_bus:
             LOG.info("Ignoring request not to bind bus")
-        super()._get_plugin_skill_loader(skill_id, True)
+        return SkillManager._get_plugin_skill_loader(self, skill_id, True)
 
     def run(self):
         """Load skills and update periodically from disk and internet."""
@@ -107,4 +107,4 @@ class NeonSkillManager(SkillManager):
         #     LOG.debug("Already online, allow skills to load")
         #     self.bus.emit(Message("mycroft.network.connected"))
         #     self.bus.emit(Message("mycroft.internet.connected"))
-        super().run()
+        SkillManager.run(self)
