@@ -1,7 +1,7 @@
 # TODO: Deprecate with ovos-backend-client update
 try:
-    import mycroft.skills.settings
-    from mycroft.skills.settings import SkillSettingsManager as _SM
+    import ovos_workshop.settings
+    from ovos_workshop.settings import SkillSettingsManager as _SM
     from ovos_backend_client.api import DeviceApi
     from mock import Mock
 
@@ -13,6 +13,6 @@ try:
             self.remote_settings = Mock()
             self.register_bus_handlers()
 
-    mycroft.skills.settings.SkillSettingsManager = SkillSettingsManager
+    ovos_workshop.settings.SkillSettingsManager = SkillSettingsManager
 except ImportError:
     pass
