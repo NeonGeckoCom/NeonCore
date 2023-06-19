@@ -1,0 +1,35 @@
+1.Prepare free space (~10 GB)
+	* if space end during installation can be errors , and all fixes that will be done could not show that there is empty space 
+	If was installing docker and made all fixes that mentioned under and still not worked, use :
+		docker image prune –a
+	It will empty space 
+2.It can be multiple errors called with no uses “SUDO”:
+	Example 2.1
+	Example 2.2
+3.After installing\updating\not using for long time docker, use :
+		sudo docker-compose pull  
+    Example 3.1
+	It will update all needed folders and files
+4.Container issues
+	If there is such error:
+ Example 4.1
+	Stop docker and Use  this commands before stoping docker again: 
+		docker-compose down
+		docker volume rm docker_config
+		docker volume rm docker_xdg
+ Example 4.2
+	After this launch again: 
+		docker-compose up –d
+5. If there is such error: 
+ Example 5.1
+ Example 5.2
+	Use command :
+		sudo usermod –aG docker $USER && nwegrp docker
+	And run docker after
+6.Common issue que;
+	export NEON_XDG_PATH=…/NeonCore/docker/xdg/
+	export NEON_CONFIG_PATH=…/NeonCore/docker/config/
+	sudo usermod –aG docker $USER && nwegrp docker
+	docker volume rm docker_config
+	docker volume rm docker_xdg
+	docker-compose up –d(in this case not usind sudo)
