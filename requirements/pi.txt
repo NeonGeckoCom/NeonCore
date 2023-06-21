@@ -6,7 +6,7 @@ sdnotify~=0.3
 
 # Default debug client
 neon-cli-client~=0.2,>=0.2.4a9
-neon-mana-utils~=0.1,>=0.1.1a2
+neon-mana-utils~=0.1,>=0.1.1a3
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
@@ -40,7 +40,7 @@ ovos-phal-plugin-oauth~=0.0.1,>=0.0.2a2
 # ovos-phal-plugin-dashboard==0.0.2a3
 ovos-phal-plugin-alsa~=0.0.2,>=0.0.2a2
 ovos-phal-plugin-system~=0.0.3,>=0.0.4a4
-ovos-phal-plugin-connectivity-events~=0.0.2,>=0.0.3a1
+ovos-phal-plugin-connectivity-events~=0.0.2,>=0.0.3a2
 ovos-phal-plugin-homeassistant~=0.0.2,>=0.0.3a1
 ovos-phal-plugin-wallpaper-manager~=0.0.0,>=0.0.1a2
 ovos-phal-plugin-ipgeo~=0.0.1

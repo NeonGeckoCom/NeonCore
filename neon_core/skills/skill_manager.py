@@ -101,6 +101,10 @@ class NeonSkillManager(SkillManager):
 
     def run(self):
         """Load skills and update periodically from disk and internet."""
+        from os import environ
+        environ.setdefault('OVOS_CONFIG_BASE_FOLDER', "neon")
+        environ.setdefault('OVOS_CONFIG_FILENAME', "neon.yaml")
+        LOG.debug("set default configuration to `neon/neon.yaml`")
         self.download_or_update_defaults()
         # from neon_utils.net_utils import check_online
         # if check_online():
