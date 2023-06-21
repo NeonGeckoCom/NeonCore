@@ -9,4 +9,4 @@ neon-skill-synonyms~=0.1,>=0.1.1a3
 neon-skill-translation~=0.3,>=0.3.1a3
 neon-skill-camera~=0.2,>=0.2.1a3
 ovos-skill-somafm~=0.0.1
-neon-homeassistant-skill~=0.0.12
+neon-homeassistant-skill~=0.0.13
