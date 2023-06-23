@@ -235,7 +235,7 @@ logs:
 
 PHAL:
   wait_for_gui: False
-  ovos-phal-plugin-brightness-control-rpi:
+  ovos-PHAL-plugin-brightness-control-rpi:
     enabled: False
   ovos-PHAL-plugin-color-scheme-manager:
     enabled: False
