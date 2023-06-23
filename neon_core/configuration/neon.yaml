@@ -245,6 +245,8 @@ PHAL:
     enabled: False
   ovos-PHAL-plugin-dashboard:
     enabled: False
+  ovos-PHAL-plugin-gui-network-client:
+    enabled: False
 # Debug/Metrics
 debugging:
   tracemalloc: false
