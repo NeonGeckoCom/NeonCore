@@ -7,9 +7,9 @@ neon-skill-personal~=0.3,>=0.3.1a3
 neon-skill-speak~=1.0,>=1.0.1a1
 neon-skill-speed_test~=0.5,>=0.5.2a2
 neon-skill-spelling~=0.1,>=0.1.1a2
-neon-skill-stock~=0.3,>=0.3.1a3
+neon-skill-stock~=0.3,>=0.3.1a5
 neon-skill-support_helper~=0.3,>=0.3.1a2
-neon-skill-user_settings~=0.5,>=0.5.2a4
+neon-skill-user_settings~=0.5,>=0.5.2a5
 neon-skill-weather~=0.1,>=0.1.1a3
 neon-skill-wikipedia~=0.4,>=0.4.2a2
 neon-skill-free_music_archive~=0.1,>=0.1.2a2
