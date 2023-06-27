@@ -3,7 +3,8 @@ FROM python:3.8-slim as base
 LABEL vendor=neon.ai \
     ai.neon.name="neon-skills"
 
-ENV NEON_CONFIG_PATH /config
+ENV OVOS_CONFIG_BASE_FOLDER neon
+ENV OVOS_CONFIG_FILENAME neon.yaml
 
 RUN  apt-get update && \
      apt-get install -y \

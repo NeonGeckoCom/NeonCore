@@ -33,9 +33,7 @@ skills:
   install_essential: true
   essential_skills: []
   install_default: false
-  default_skills:
-  # TODO: Defaults are just patching skills not yet pip installable
-  - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
+  default_skills: []
 play_wav_cmdline: "play %1"
 play_mp3_cmdline: "play %1"
 play_ogg_cmdline: "play %1"

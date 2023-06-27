@@ -1,0 +1,21 @@
+websocket:
+  host: neon-messagebus
+  port: 8181
+  route: /core
+  ssl: false
+  shared_connection: true
+gui_websocket:
+  host: neon-gui
+  base_port: 18181
+  route: /gui
+  ssl: false
+gui:
+  idle_display_skill: skill-homescreen-lite.openvoiceos
+ready_settings:
+- skills
+- voice
+- audio
+- gui_service
+skills:
+  blacklisted_skills:
+  - mycroft-wiki.mycroftai
