@@ -5,8 +5,8 @@
 sdnotify~=0.3
 
 # Default debug client
-neon-cli-client~=0.2,>=0.2.4a9
-neon-mana-utils~=0.1,>=0.1.1a5
+neon-cli-client~=0.3
+neon-mana-utils~=0.2
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
@@ -18,7 +18,7 @@ neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
 
 neon-tts-plugin-coqui-remote~=0.0.3
 neon-stt-plugin-nemo~=0.0.4
-# TODO: Stable releases for below plugins
+# TODO: Stable release for below plugin
 ovos-tts-plugin-server
 
 # Fallback plugins
