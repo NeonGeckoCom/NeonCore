@@ -5,8 +5,8 @@
 sdnotify~=0.3
 
 # Default debug client
-neon-cli-client~=0.2,>=0.2.4a9
-neon-mana-utils~=0.1,>=0.1.1a5
+neon-cli-client~=0.3
+neon-mana-utils~=0.2
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
@@ -17,9 +17,9 @@ ovos-ww-plugin-openwakeword~=0.2
 neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
 
 neon-tts-plugin-coqui-remote~=0.0.3
-# TODO: Stable releases for below plugins
+neon-stt-plugin-nemo~=0.0.4
+# TODO: Stable release for below plugin
 ovos-tts-plugin-server
-neon-stt-plugin-nemo~=0.0,>=0.0.3a3
 
 # Fallback plugins
 neon-tts-plugin-coqui~=0.7,>=0.7.1
@@ -30,7 +30,7 @@ neon-phal-plugin-reset~=0.2,>=0.2.1
 neon-phal-plugin-core-updater~=1.2,>=1.2.1
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.4
-neon-phal-plugin-linear_led~=0.2,>=0.2.2a1
+neon-phal-plugin-linear_led~=0.2,>=0.2.2a2
 ovos-phal-plugin-balena-wifi~=1.0.0
 neon-phal-plugin-gui-network-client~=0.0.3
 ovos-phal-plugin-network-manager~=1.1
