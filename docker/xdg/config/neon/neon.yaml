@@ -19,3 +19,5 @@ ready_settings:
 skills:
   blacklisted_skills:
   - mycroft-wiki.mycroftai
+listener:
+  hotwords:
