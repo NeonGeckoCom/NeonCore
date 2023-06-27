@@ -99,13 +99,13 @@ To run the skills module without any bundled skills, the image referenced in
 ```yaml
   neon-skills:
     container_name: neon-skills
-    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
+    image: ghcr.io/neongeckocom/neon_skills-default_skills:<TAG>
 ```
 to:
 ```yaml
   neon-skills:
     container_name: neon-skills
-    image: ghcr.io/neongeckocom/neon_skills:dev
+    image: ghcr.io/neongeckocom/neon_skills:<TAG>
 ```
 
 ## e. Persistent Data
