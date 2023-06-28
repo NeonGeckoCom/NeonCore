@@ -160,15 +160,19 @@ class CommonQuery:
         self.bus.emit(msg)
 
         query.timeout_time = time.time() + 1
+        timeout = False
         while query.completed.wait(EXTENSION_TIME):
             if time.time() > query.timeout_time + 1:
                 LOG.debug("Timeout")
+                timeout = True
                 break
 
         # forcefully timeout if search is still going
-        if not query.completed.is_set():
+        if timeout:
             LOG.warning(f"Timed out getting responses for: {query.query}")
             self._query_timeout(message)
+            if not query.completed.wait(10):
+                raise TimeoutError("Timed out processing responses")
         answered = bool(query.answered)
         self.active_queries.pop(sid)
         del query
@@ -192,7 +196,7 @@ class CommonQuery:
             # TODO: Perhaps block multiple extensions?
             if skill_id not in query.extensions:
                 query.extensions.append(skill_id)
-        elif skill_id in query.extensions:
+        else:
             # Search complete, don't wait on this skill any longer
             if answer:
                 LOG.info(f'Answer from {skill_id}')
@@ -200,13 +204,13 @@ class CommonQuery:
 
             # Remove the skill from list of timeout extensions
             if skill_id in query.extensions:
+                LOG.debug(f"Done waiting for {skill_id}")
                 query.extensions.remove(skill_id)
 
             # not waiting for any more skills
             if not query.extensions:
+                LOG.debug("No more skills to wait for")
                 self._query_timeout(message)
-        else:
-            LOG.warning(f'{skill_id} Answered too slowly, will be ignored.')
 
     def _query_timeout(self, message):
         query: Query = self.active_queries.get(self.get_sid(message))
@@ -250,7 +254,7 @@ class CommonQuery:
                 query.answered = True
             else:
                 query.answered = False
-        query.completed.set()
+            query.completed.set()
 
     def speak(self, utterance, message=None):
         """Speak a sentence.
