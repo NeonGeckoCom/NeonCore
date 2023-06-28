@@ -219,8 +219,7 @@ class CommonQuery:
             return  # not searching, ignore timeout event
         # Prevent any late-comers from re-triggering this query handler
         with self.lock:
-            LOG.info(f'Timeout occurred check responses with'
-                     f' {len(query.replies)} replies')
+            LOG.info(f'Check responses with {len(query.replies)} replies')
             search_phrase = message.data.get('phrase', "")
             if query.extensions:
                 query.extensions = []
@@ -230,13 +229,12 @@ class CommonQuery:
             # Find response(s) with the highest confidence
             best = None
             ties = []
-            if search_phrase in query.replies:
-                for handler in query.replies:
-                    if not best or handler['conf'] > best['conf']:
-                        best = handler
-                        ties = []
-                    elif handler['conf'] == best['conf']:
-                        ties.append(handler)
+            for response in query.replies:
+                if not best or response['conf'] > best['conf']:
+                    best = response
+                    ties = []
+                elif response['conf'] == best['conf']:
+                    ties.append(response)
 
             if best:
                 if ties:
