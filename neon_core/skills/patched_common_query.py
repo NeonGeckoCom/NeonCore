@@ -30,7 +30,7 @@ import re
 import time
 from dataclasses import dataclass
 from itertools import chain
-from threading import Lock, Event
+from threading import Event
 
 from ovos_bus_client.message import Message, dig_for_message
 from ovos_utils.enclosure.api import EnclosureAPI
@@ -60,7 +60,7 @@ class CommonQuery:
         self.bus = bus
         self.skill_id = "common_query.neongeckocom"  # fake skill
         self.active_queries = dict()  # dict of session ID to query
-        self.lock = Lock()
+        # self.lock = Lock()
         self.enclosure = EnclosureAPI(self.bus, self.skill_id)
         self._vocabs = {}
         self.bus.on('question:query.response', self.handle_query_response)
@@ -215,42 +215,40 @@ class CommonQuery:
 
     def _query_timeout(self, message):
         query: Query = self.active_queries.get(self.get_sid(message))
-        # Prevent any late-comers from re-triggering this query handler
-        with self.lock:
-            LOG.info(f'Check responses with {len(query.replies)} replies')
-            search_phrase = message.data.get('phrase', "")
-            if query.extensions:
-                query.extensions = []
-            self.enclosure.mouth_reset()
+        LOG.info(f'Check responses with {len(query.replies)} replies')
+        search_phrase = message.data.get('phrase', "")
+        if query.extensions:
+            query.extensions = []
+        self.enclosure.mouth_reset()
 
-            # Look at any replies that arrived before the timeout
-            # Find response(s) with the highest confidence
-            best = None
-            ties = []
-            for response in query.replies:
-                if not best or response['conf'] > best['conf']:
-                    best = response
-                    ties = []
-                elif response['conf'] == best['conf']:
-                    ties.append(response)
+        # Look at any replies that arrived before the timeout
+        # Find response(s) with the highest confidence
+        best = None
+        ties = []
+        for response in query.replies:
+            if not best or response['conf'] > best['conf']:
+                best = response
+                ties = []
+            elif response['conf'] == best['conf']:
+                ties.append(response)
 
-            if best:
-                if ties:
-                    # TODO: Ask user to pick between ties or do it automagically
-                    pass
+        if best:
+            if ties:
+                # TODO: Ask user to pick between ties or do it automagically
+                pass
 
-                # invoke best match
-                self.speak(best['answer'], message)
-                LOG.info('Handling with: ' + str(best['skill_id']))
-                cb = best.get('callback_data') or {}
-                self.bus.emit(message.forward('question:action',
-                                              data={'skill_id': best['skill_id'],
-                                                    'phrase': search_phrase,
-                                                    'callback_data': cb}))
-                query.answered = True
-            else:
-                query.answered = False
-            query.completed.set()
+            # invoke best match
+            self.speak(best['answer'], message)
+            LOG.info('Handling with: ' + str(best['skill_id']))
+            cb = best.get('callback_data') or {}
+            self.bus.emit(message.forward('question:action',
+                                          data={'skill_id': best['skill_id'],
+                                                'phrase': search_phrase,
+                                                'callback_data': cb}))
+            query.answered = True
+        else:
+            query.answered = False
+        query.completed.set()
 
     def speak(self, utterance, message=None):
         """Speak a sentence.
