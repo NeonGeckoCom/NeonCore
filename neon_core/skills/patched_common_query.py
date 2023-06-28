@@ -50,6 +50,7 @@ class Query:
     replies: list = None
     extensions: list = None
     timeout_time: float = time.time() + 1
+    responses_gathered: Event = Event()
     completed: Event = Event()
     answered: bool = False
 
@@ -161,18 +162,18 @@ class CommonQuery:
 
         query.timeout_time = time.time() + 1
         timeout = False
-        while query.completed.wait(EXTENSION_TIME):
+        while query.responses_gathered.wait(EXTENSION_TIME):
             if time.time() > query.timeout_time + 1:
-                LOG.debug("Timeout")
+                LOG.debug("Timeout gathering responses")
                 timeout = True
                 break
 
         # forcefully timeout if search is still going
         if timeout:
             LOG.warning(f"Timed out getting responses for: {query.query}")
-            self._query_timeout(message)
-            if not query.completed.wait(10):
-                raise TimeoutError("Timed out processing responses")
+        self._query_timeout(message)
+        if not query.completed.wait(10):
+            raise TimeoutError("Timed out processing responses")
         answered = bool(query.answered)
         self.active_queries.pop(sid)
         del query
@@ -210,12 +211,12 @@ class CommonQuery:
             # not waiting for any more skills
             if not query.extensions:
                 LOG.debug("No more skills to wait for")
-                self._query_timeout(message)
+                query.responses_gathered.set()
 
     def _query_timeout(self, message):
         query: Query = self.active_queries.get(self.get_sid(message))
         if not query or query.completed.is_set():
-            LOG.warning(f"timed out completed query: {query}")
+            LOG.warning(f"timed out completed query: {query.query}")
             return  # not searching, ignore timeout event
         # Prevent any late-comers from re-triggering this query handler
         with self.lock:
