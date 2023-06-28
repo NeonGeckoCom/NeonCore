@@ -215,9 +215,6 @@ class CommonQuery:
 
     def _query_timeout(self, message):
         query: Query = self.active_queries.get(self.get_sid(message))
-        if not query or query.completed.is_set():
-            LOG.warning(f"timed out completed query: {query.query}")
-            return  # not searching, ignore timeout event
         # Prevent any late-comers from re-triggering this query handler
         with self.lock:
             LOG.info(f'Check responses with {len(query.replies)} replies')
