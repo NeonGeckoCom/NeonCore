@@ -42,6 +42,7 @@ from mycroft.skills.intent_services.base import IntentMatch
 from mycroft.skills.skill_data import CoreResources
 # TODO: Port to ovos-core
 EXTENSION_TIME = 10
+MIN_RESPONSE_WAIT = 3
 
 
 @dataclass
@@ -50,6 +51,7 @@ class Query:
     query: str
     replies: list = None
     extensions: list = None
+    query_time: float = time.time()
     timeout_time: float = time.time() + 1
     responses_gathered: Event = Event()
     completed: Event = Event()
@@ -209,13 +211,12 @@ class CommonQuery:
                 LOG.debug(f"Done waiting for {skill_id}")
                 query.extensions.remove(skill_id)
 
+            time_to_wait = query.query_time + MIN_RESPONSE_WAIT - time.time()
+            if time_to_wait > 0:
+                LOG.debug(f"Waiting {time_to_wait}s before checking extensions")
+                query.responses_gathered.wait(time_to_wait)
             # not waiting for any more skills
             if not query.extensions:
-                time.sleep(1)  # TODO: Patching quick replies
-                if query.extensions:
-                    LOG.debug(f"Another skill started handling "
-                              f"{query.session_id}")
-                    return
                 LOG.debug(f"No more skills to wait for ({query.session_id})")
                 query.responses_gathered.set()
 
