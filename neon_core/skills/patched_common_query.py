@@ -31,6 +31,7 @@ import time
 from dataclasses import dataclass
 from itertools import chain
 from threading import Event
+from typing import Dict
 
 from ovos_bus_client.message import Message, dig_for_message
 from ovos_utils.enclosure.api import EnclosureAPI
@@ -59,7 +60,7 @@ class CommonQuery:
     def __init__(self, bus):
         self.bus = bus
         self.skill_id = "common_query.neongeckocom"  # fake skill
-        self.active_queries = dict()  # dict of session ID to query
+        self.active_queries: Dict[str, Query] = dict()  # dict of session ID to query
         # self.lock = Lock()
         self.enclosure = EnclosureAPI(self.bus, self.skill_id)
         self._vocabs = {}
@@ -162,7 +163,7 @@ class CommonQuery:
 
         query.timeout_time = time.time() + 1
         timeout = False
-        while query.responses_gathered.wait(EXTENSION_TIME):
+        while not query.responses_gathered.wait(EXTENSION_TIME):
             if time.time() > query.timeout_time + 1:
                 LOG.debug(f"Timeout gathering responses ({query.session_id})")
                 timeout = True
@@ -185,7 +186,7 @@ class CommonQuery:
         searching = message.data.get('searching')
         answer = message.data.get('answer')
 
-        query: Query = self.active_queries.get(self.get_sid(message))
+        query = self.active_queries.get(self.get_sid(message))
         if not query:
             LOG.warning(f"No active query for: {search_phrase}")
         # Manage requests for time to complete searches
