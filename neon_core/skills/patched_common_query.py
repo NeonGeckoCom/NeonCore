@@ -164,7 +164,7 @@ class CommonQuery:
         timeout = False
         while query.responses_gathered.wait(EXTENSION_TIME):
             if time.time() > query.timeout_time + 1:
-                LOG.debug("Timeout gathering responses")
+                LOG.debug(f"Timeout gathering responses ({query.session_id})")
                 timeout = True
                 break
 
@@ -176,7 +176,6 @@ class CommonQuery:
             raise TimeoutError("Timed out processing responses")
         answered = bool(query.answered)
         self.active_queries.pop(sid)
-        del query
         LOG.debug(f"answered={answered}")
         return answered
 
@@ -210,7 +209,7 @@ class CommonQuery:
 
             # not waiting for any more skills
             if not query.extensions:
-                LOG.debug("No more skills to wait for")
+                LOG.debug(f"No more skills to wait for ({query.session_id})")
                 query.responses_gathered.set()
 
     def _query_timeout(self, message):
