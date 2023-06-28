@@ -34,6 +34,7 @@ from threading import Event
 from typing import Dict
 
 from ovos_bus_client.message import Message, dig_for_message
+from ovos_utils import flatten_list
 from ovos_utils.enclosure.api import EnclosureAPI
 from ovos_utils.log import LOG
 from ovos_utils.messagebus import get_message_lang
@@ -62,8 +63,7 @@ class CommonQuery:
     def __init__(self, bus):
         self.bus = bus
         self.skill_id = "common_query.neongeckocom"  # fake skill
-        self.active_queries: Dict[str, Query] = dict()  # dict of session ID to query
-        # self.lock = Lock()
+        self.active_queries: Dict[str, Query] = dict()
         self.enclosure = EnclosureAPI(self.bus, self.skill_id)
         self._vocabs = {}
         self.bus.on('question:query.response', self.handle_query_response)
@@ -137,14 +137,17 @@ class CommonQuery:
         Returns:
             IntentMatch or None
         """
+        # we call flatten in case someone is sending the old style list of tuples
+        utterances = flatten_list(utterances)
         match = None
-        utterance = utterances[0][0]
-        if self.is_question_like(utterance, lang):
-            message.data["lang"] = lang  # only used for speak
-            message.data["utterance"] = utterance
-            answered = self.handle_question(message)
-            if answered:
-                match = IntentMatch('CommonQuery', None, {}, None)
+        for utterance in utterances:
+            if self.is_question_like(utterance, lang):
+                message.data["lang"] = lang  # only used for speak
+                message.data["utterance"] = utterance
+                answered = self.handle_question(message)
+                if answered:
+                    match = IntentMatch('CommonQuery', None, {}, None)
+                break
         return match
 
     def handle_question(self, message):
