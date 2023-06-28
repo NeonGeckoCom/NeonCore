@@ -186,14 +186,15 @@ class CommonQuery:
             LOG.warning(f"No active query for: {search_phrase}")
         # Manage requests for time to complete searches
         if searching:
+            LOG.debug(f"{skill_id} is searching")
             # request extending the timeout by EXTENSION_TIME
             query.timeout_time = time.time() + EXTENSION_TIME
             # TODO: Perhaps block multiple extensions?
             if skill_id not in query.extensions:
                 query.extensions.append(skill_id)
-        elif query.extensions:
+        elif skill_id in query.extensions:
             # Search complete, don't wait on this skill any longer
-            if answer and search_phrase in query.replies:
+            if answer:
                 LOG.info(f'Answer from {skill_id}')
                 query.replies.append(message.data)
 
