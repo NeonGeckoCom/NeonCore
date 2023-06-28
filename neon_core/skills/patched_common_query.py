@@ -51,7 +51,6 @@ class Query:
     extensions: list = None
     timeout_time: float = time.time() + 1
     completed: Event = Event()
-    waiting: bool = True
     answered: bool = False
 
 
@@ -161,8 +160,9 @@ class CommonQuery:
         self.bus.emit(msg)
 
         query.timeout_time = time.time() + 1
-        while query.completed.wait(1):
-            if not query.waiting or time.time() > query.timeout_time + 1:
+        while query.completed.wait(EXTENSION_TIME):
+            if time.time() > query.timeout_time + 1:
+                LOG.debug("Timeout")
                 break
 
         # forcefully timeout if search is still going
@@ -212,8 +212,6 @@ class CommonQuery:
         if not query or query.completed.is_set():
             LOG.warning(f"timed out completed query: {query}")
             return  # not searching, ignore timeout event
-        query.completed.set()
-
         # Prevent any late-comers from re-triggering this query handler
         with self.lock:
             LOG.info(f'Timeout occurred check responses with'
@@ -251,7 +249,7 @@ class CommonQuery:
                 query.answered = True
             else:
                 query.answered = False
-            query.waiting = False
+        query.completed.set()
 
     def speak(self, utterance, message=None):
         """Speak a sentence.
