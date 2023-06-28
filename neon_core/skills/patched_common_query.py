@@ -277,3 +277,4 @@ class CommonQuery:
 
 import mycroft.skills.intent_services.commonqa_service
 mycroft.skills.intent_services.commonqa_service.CommonQAService = CommonQuery
+mycroft.skills.intent_service.CommonQAService = CommonQuery
