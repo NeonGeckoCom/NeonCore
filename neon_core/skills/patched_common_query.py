@@ -150,6 +150,8 @@ class CommonQuery:
         utt = message.data.get('utterance')
         sid = SessionManager.get(message).session_id
         query = Query(session_id=sid, query=utt, replies=[], extensions=[])
+        assert query.responses_gathered.is_set() is False
+        assert query.completed.is_set() is False
         self.active_queries[sid] = query
         self.enclosure.mouth_think()
 
@@ -176,7 +178,8 @@ class CommonQuery:
             raise TimeoutError("Timed out processing responses")
         answered = bool(query.answered)
         self.active_queries.pop(sid)
-        LOG.debug(f"answered={answered}")
+        LOG.debug(f"answered={answered}|"
+                  f"remaining active_queries={len(self.active_queries)}")
         return answered
 
     def handle_query_response(self, message):
