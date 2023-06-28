@@ -149,7 +149,11 @@ class CommonQuery:
         """
         utt = message.data.get('utterance')
         sid = SessionManager.get(message).session_id
-        query = Query(session_id=sid, query=utt, replies=[], extensions=[])
+        # TODO: Why are defaults not creating new objects on init?
+        query = Query(session_id=sid, query=utt, replies=[], extensions=[],
+                      query_time=time.time(), timeout_time=time.time() + 1,
+                      responses_gathered=Event(), completed=Event(),
+                      answered=False)
         assert query.responses_gathered.is_set() is False
         assert query.completed.is_set() is False
         self.active_queries[sid] = query
