@@ -5,7 +5,7 @@ ovos-core[skills,skills_lgpl]~=0.0.7
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[network]~=1.5
+neon-utils[network]~=1.5,>=1.5.1a7
 ovos-bus-client~=0.0.4
 neon-transformers~=0.2
 ovos-config~=0.0.9
