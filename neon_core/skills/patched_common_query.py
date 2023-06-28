@@ -66,6 +66,7 @@ class CommonQuery:
         self._vocabs = {}
         self.bus.on('question:query.response', self.handle_query_response)
         self.bus.on('common_query.question', self.handle_question)
+        # TODO: Register available CommonQuery skills
 
     def get_sid(self, message: Message):
         sid = message.context.get('session', {}).get('session_id')
@@ -210,6 +211,11 @@ class CommonQuery:
 
             # not waiting for any more skills
             if not query.extensions:
+                time.sleep(1)  # TODO: Patching quick replies
+                if query.extensions:
+                    LOG.debug(f"Another skill started handling "
+                              f"{query.session_id}")
+                    return
                 LOG.debug(f"No more skills to wait for ({query.session_id})")
                 query.responses_gathered.set()
 
