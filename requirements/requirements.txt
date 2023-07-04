@@ -7,7 +7,7 @@ ovos-plugin-common-play~=0.0.5
 # utils
 neon-utils[network]~=1.6
 ovos-utils~=0.0.34
-ovos-bus-client~=0.0.4
+ovos-bus-client~=0.0.5
 neon-transformers~=0.2
 ovos-config~=0.0.9
 ovos-skills-manager~=0.0.12
