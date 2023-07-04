@@ -41,11 +41,11 @@ class ConfigurationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
+        os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
+        # os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        # os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         from neon_core.util.runtime_utils import use_neon_core
         from neon_utils.configuration_utils import init_config_dir
-        os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
-        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         use_neon_core(init_config_dir)()
 
         # import neon_core
@@ -66,8 +66,8 @@ class ConfigurationTests(unittest.TestCase):
         if os.path.exists(cls.CONFIG_PATH):
             shutil.rmtree(cls.CONFIG_PATH)
         os.environ.pop("XDG_CONFIG_HOME")
-        os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
-        os.environ.pop("OVOS_CONFIG_FILENAME")
+        # os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
+        # os.environ.pop("OVOS_CONFIG_FILENAME")
 
     def test_neon_core_config_init(self):
         from neon_core.configuration import Configuration

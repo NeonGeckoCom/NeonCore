@@ -2,11 +2,6 @@ version: '3.1'
 networks:
   neon-core:
 volumes:
-  config:
-    driver_opts:
-      type: config
-      o: bind
-      device: ${NEON_CONFIG_PATH}
   xdg:
     driver_opts:
       type: xdg
@@ -15,7 +10,7 @@ volumes:
 services:
   neon-messagebus:
     container_name: neon-messagebus
-    image: ghcr.io/neongeckocom/neon_messagebus:master
+    image: ghcr.io/neongeckocom/neon_messagebus:dev
     ports:
     - "8181:8181"
     networks:
@@ -23,7 +18,6 @@ services:
         aliases:
         - messagebus
     volumes:
-    - config:/config:ro
     - xdg:/xdg:rw
     - /etc/timezone:/etc/timezone:ro
     - /etc/localtime:/etc/localtime:ro
@@ -34,11 +28,10 @@ services:
     - XDG_STATE_HOME=/xdg/state
   neon-speech:
     container_name: neon-speech
-    image: ghcr.io/neongeckocom/neon_speech:master
+    image: ghcr.io/neongeckocom/neon_speech:dev
     networks:
     - neon-core
     volumes:
-    - config:/config:ro
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - xdg:/xdg:rw
@@ -55,13 +48,12 @@ services:
     - /dev/snd:/dev/snd
   neon-skills:
     container_name: neon-skills
-    image: ghcr.io/neongeckocom/neon_skills-default_skills:master
+    image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
     networks:
     - neon-core
     ports:
     - "8000:8000"
     volumes:
-    - config:/config:rw
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - ${NEON_SKILLS_DIR}:/skills:ro
@@ -79,11 +71,10 @@ services:
     - /dev/snd:/dev/snd
   neon-audio:
     container_name: neon-audio
-    image: ghcr.io/neongeckocom/neon_audio:master
+    image: ghcr.io/neongeckocom/neon_audio:dev
     networks:
     - neon-core
     volumes:
-    - config:/config:ro
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - /run/dbus/system_dbus_socket:/run/dbus/system_dbus_socket:rw
@@ -103,7 +94,7 @@ services:
     - /dev/snd:/dev/snd
   neon-gui:
     container_name: neon-gui
-    image: ghcr.io/neongeckocom/neon_gui:master
+    image: ghcr.io/neongeckocom/neon_gui:dev
     networks:
       neon-core:
         aliases:
@@ -111,7 +102,6 @@ services:
     ports:
     - "18181:18181"
     volumes:
-    - config:/config:ro
     - xdg:/xdg:rw
     - /etc/timezone:/etc/timezone:ro
     - /etc/localtime:/etc/localtime:ro
@@ -122,11 +112,10 @@ services:
     - XDG_STATE_HOME=/xdg/state
   neon-enclosure:
     container_name: neon-enclosure
-    image: ghcr.io/neongeckocom/neon_enclosure:master
+    image: ghcr.io/neongeckocom/neon_enclosure:dev
     networks:
     - neon-core
     volumes:
-    - config:/config:ro
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
     - /run/dbus/system_dbus_socket:/run/dbus/system_dbus_socket:rw

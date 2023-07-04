@@ -31,7 +31,7 @@ import threading
 
 from functools import wraps
 from inspect import signature
-from mycroft_bus_client import Message
+from ovos_bus_client import Message
 from ovos_utils import create_killable_daemon
 
 from mycroft.skills.mycroft_skill.decorators import intent_handler, \

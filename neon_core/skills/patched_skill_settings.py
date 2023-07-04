@@ -1,4 +1,3 @@
-#!/bin/bash
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
 # Copyright 2008-2022 Neongecko.com Inc.
@@ -27,25 +26,23 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Override DNS resolver
-rm /etc/resolv.conf
-echo "nameserver 1.1.1.1" | tee /etc/resolv.conf
+from ovos_utils.log import LOG
+# TODO: Deprecate with ovos-backend-client update
+try:
+    import ovos_workshop.settings
+    from ovos_workshop.settings import SkillSettingsManager as _SM
+    from ovos_backend_client.api import DeviceApi
+    from mock import Mock
 
-# install system packages
-apt update
-add-apt-repository -y ppa:deadsnakes/ppa
-apt install -y curl
-curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
-echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
-apt update
-apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev python3.10-dev python3.10-venv mimic espeak-ng g++ libjpeg-dev make || exit 1
+    class SkillSettingsManager(_SM):
+        def __init__(self, skill):
+            self.download_timer = None
+            self.skill = skill
+            self.api = DeviceApi()
+            self.remote_settings = Mock()
+            self.register_bus_handlers()
 
-# Configure venv for deepspeech compat.
-cd /core || exit 10
-python3.10 -m venv "/core/venv" || exit 11
-. /core/venv/bin/activate
-
-pip install --upgrade pip wheel
-pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" || exit 11
-
-cp -rf /core/test/pi_image_overlay/* /
+    LOG.info("Patching SkillSettingsManager")
+    ovos_workshop.settings.SkillSettingsManager = SkillSettingsManager
+except ImportError:
+    pass

@@ -28,12 +28,8 @@
 
 from os import makedirs
 from os.path import isdir, join, expanduser
-from threading import RLock
-
-from mycroft_bus_client import Message
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
-
 from neon_core.skills.skill_store import SkillsStore
 from neon_utils.net_utils import check_online as connected
 
@@ -95,14 +91,24 @@ class NeonSkillManager(SkillManager):
         # with self.load_lock:
         #     LOG.debug(f"Loading skills: {kwargs}")
         # Override load method for config module checks
-        super()._load_new_skills(*args, **kwargs)
+        SkillManager._load_new_skills(self, *args, **kwargs)
+
+    def _get_plugin_skill_loader(self, skill_id, init_bus=True):
+        assert self.bus is not None
+        if not init_bus:
+            LOG.debug("Ignoring request not to bind bus")
+        return SkillManager._get_plugin_skill_loader(self, skill_id, True)
 
     def run(self):
         """Load skills and update periodically from disk and internet."""
+        from os import environ
+        environ.setdefault('OVOS_CONFIG_BASE_FOLDER', "neon")
+        environ.setdefault('OVOS_CONFIG_FILENAME', "neon.yaml")
+        LOG.debug("set default configuration to `neon/neon.yaml`")
         self.download_or_update_defaults()
         # from neon_utils.net_utils import check_online
         # if check_online():
         #     LOG.debug("Already online, allow skills to load")
         #     self.bus.emit(Message("mycroft.network.connected"))
         #     self.bus.emit(Message("mycroft.internet.connected"))
-        super().run()
+        SkillManager.run(self)

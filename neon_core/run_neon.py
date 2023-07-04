@@ -34,7 +34,7 @@ from time import time, sleep
 from signal import SIGTERM
 from threading import Event
 from subprocess import Popen, STDOUT
-from mycroft_bus_client import MessageBusClient, Message
+from ovos_bus_client import MessageBusClient, Message
 from typing.io import IO
 
 from neon_utils.configuration_utils import init_config_dir

@@ -40,7 +40,7 @@ from time import time, sleep
 
 from mock import Mock
 from mock.mock import patch
-from mycroft_bus_client import Message
+from ovos_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_plugin_manager.templates.language import LanguageTranslator
@@ -71,8 +71,8 @@ class TestSkillService(unittest.TestCase):
         from neon_core.util.runtime_utils import use_neon_core
         from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        # os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        # os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         use_neon_core(init_config_dir)()
         assert os.path.isdir(cls.config_dir)
 
