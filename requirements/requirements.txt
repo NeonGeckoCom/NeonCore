@@ -11,7 +11,7 @@ ovos-bus-client~=0.0.5
 neon-transformers~=0.2
 ovos-config~=0.0.9
 ovos-skills-manager~=0.0.12
-ovos-plugin-manager~=0.0.21
+ovos-plugin-manager~=0.0.21,>=0.0.24a4
 ovos-backend-client~=0.0.6
 psutil~=5.6
 
