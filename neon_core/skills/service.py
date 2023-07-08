@@ -46,7 +46,6 @@ from neon_utils.messagebus_utils import get_messagebus
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.util.diagnostic_utils import report_metric
-from neon_core.util.qml_file_server import start_qml_http_server
 
 from ovos_workshop.skills.fallback import FallbackSkill
 
