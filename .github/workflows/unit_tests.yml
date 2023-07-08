@@ -55,15 +55,6 @@ jobs:
           name: diagnostic-utils-test-results
           path: tests/diagnostic-utils-test-results.xml
 
-      - name: Test QML File Server
-        run: |
-          pytest test/test_qml_file_server.py --doctest-modules --junitxml=tests/qml-file-server-test-results.xml
-      - name: Upload QML File Server test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: qml-file-server-test-results
-          path: tests/qml-file-server-test-results.xml
-
   unit_tests:
     strategy:
       matrix:

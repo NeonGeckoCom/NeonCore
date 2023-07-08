@@ -51,6 +51,8 @@ class LanguageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
+        from neon_utils.configuration_utils import init_config_dir
+        init_config_dir()
 
     @classmethod
     def tearDownClass(cls) -> None:
