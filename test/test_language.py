@@ -51,8 +51,6 @@ class LanguageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
-        from neon_utils.configuration_utils import init_config_dir
-        init_config_dir()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -87,7 +85,7 @@ class LanguageTests(unittest.TestCase):
     def test_translator(self):
         from neon_core.language import TranslatorFactory
         translator = TranslatorFactory.create(
-            {"module": "libretranslate_plug"})
+            {"translation_module": "libretranslate_plug"})
         self.assertIsInstance(translator, LanguageTranslator)
         output = translator.translate("hello", "es-es", "en-us")
         self.assertEqual(output.lower(), "hola")
@@ -95,7 +93,7 @@ class LanguageTests(unittest.TestCase):
     def test_detector(self):
         from neon_core.language import DetectorFactory
         detector = DetectorFactory.create(
-            {"module": "libretranslate_detection_plug"})
+            {"detection_module": "libretranslate_detection_plug"})
         self.assertIsInstance(detector, LanguageDetector)
         lang = detector.detect("hello")
         self.assertEqual(lang, "en")
