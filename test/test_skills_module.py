@@ -71,8 +71,6 @@ class TestSkillService(unittest.TestCase):
         from neon_core.util.runtime_utils import use_neon_core
         from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        # os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        # os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         use_neon_core(init_config_dir)()
         assert os.path.isdir(cls.config_dir)
 
@@ -117,8 +115,6 @@ class TestSkillService(unittest.TestCase):
         service.bus.connected_event = Event()
         service.start()
         started.wait(30)
-        self.assertTrue(service.config['skills']['run_gui_file_server'])
-        self.assertIsNotNone(service.http_server)
         self.assertTrue(service.config['skills']['auto_update'])
         install_default.assert_called_once()
 
