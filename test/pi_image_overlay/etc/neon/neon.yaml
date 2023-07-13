@@ -21,7 +21,7 @@ audio_parsers:
   blacklist:
   - gender
 stt:
-  module: deepspeech_stream_local
+  module: neon-stt-plugin-nemo
   fallback_module: ovos-stt-plugin-vosk
   vosk:
     model: /home/neon/.config/neon/vosk-model-small-en-us-0.15

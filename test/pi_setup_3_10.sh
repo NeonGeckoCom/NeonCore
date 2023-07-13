@@ -40,7 +40,7 @@ apt update
 apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev mimic espeak-ng g++ libjpeg-dev make || exit 1
 
 cd /core || exit 10
-python3.7 -m venv "/core/venv" || exit 11
+python3.10 -m venv "/core/venv" || exit 11
 . /core/venv/bin/activate
 
 pip install --upgrade pip wheel

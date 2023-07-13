@@ -42,11 +42,27 @@ jobs:
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
-            bash /core/test/pi_setup_3_7.sh
-            . /core/venv/bin/activate
-            neon-audio init-plugin -p coqui
-            neon-speech init-plugin -p deepspeech_stream_local
-
+            bash /core/test/pi_setup_3_7.sh || exit 2
+            . /core/venv/bin/activate || exit 2
+            neon-audio init-plugin -p coqui || exit 2
+            neon-speech init-plugin -p neon-stt-plugin-nemo || exit 2
+  pi_image_3_10:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test chroot installation
+        uses: pguyot/arm-runner-action@v2
+        with:
+          optimize_image: false
+          base_image: https://2222.us/app/files/neon_images/pi/debian-base-image-rpi4_2023-07-12_16_30.img.xz
+          cpu: cortex-a53
+          copy_repository_path: /core
+          commands: |
+            bash /core/test/pi_setup_3_10.sh || exit 2
+            . /core/venv/bin/activate || exit 2
+            neon-audio init-plugin -p coqui || exit 2
+            neon-speech init-plugin -p neon-stt-plugin-nemo || exit 2
   legacy-remote:
     strategy:
       matrix:
