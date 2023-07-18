@@ -1,5 +1,5 @@
 # mycroft
-# ovos-core[skills,skills_lgpl]~=0.0.7
+ovos-core[skills,skills_lgpl]~=0.0.7
 ovos-workshop~=0.0.11,>=0.0.12a46
 # padacioso==0.1.3a2
 ovos-plugin-common-play~=0.0.5
@@ -25,14 +25,6 @@ neon-utterance-normalizer-plugin~=0.0.2
 
 # TODO: Patching test failures https://github.com/NeonGeckoCom/NeonCore/actions/runs/4888865255/jobs/8727164992?pr=422
 requests < 2.30.0
-# TODO: Patching dependency installation https://github.com/NeonGeckoCom/NeonCore/actions/runs/5590024956/jobs/10219185265?pr=501
-pyyaml~=6.0
 
-# TODO: Patching pyyaml version compat with stable ovos-core extras
-ovos-core~=0.0.7
-adapt-parser~=0.5
-padacioso~=0.1.2
-ovos-lingua-franca~=0.4, >=0.4.7
-padatious~=0.4.8
-fann2==1.0.7
-ovos-phal-plugin-connectivity-events~=0.0.1
+# TODO: Patching pyyaml installation
+pip<23.2
