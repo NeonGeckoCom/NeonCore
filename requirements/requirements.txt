@@ -27,4 +27,4 @@ neon-utterance-normalizer-plugin~=0.0.2
 requests < 2.30.0
 
 # TODO: Patching pyyaml installation
-pip<23.2
+cython<3.0.0
