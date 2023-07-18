@@ -218,15 +218,20 @@ class NeonIntentService(IntentService):
                 self.bus.emit(reply)
                 return
 
-            # TODO: Try the original lang and fallback to translation
+            if message.data["lang"].split('-')[0] in \
+                    self.language_config.get('supported_langs'):
+                LOG.debug("Native language support")
             # If translated, make sure message.data['lang'] is updated
-            if message.context.get("translation_data") and \
+            elif message.context.get("translation_data") and \
                     message.context.get("translation_data")[0].get(
                         "was_translated"):
+                LOG.info(f"Using utterance translated to: "
+                         f"{self.language_config['internal']}")
                 message.data["lang"] = self.language_config["internal"]
             # now pass our modified message to Mycroft
             # TODO: Consider how to implement 'and' parsing and converse DM
-            LOG.info(message.data.get('utterances'))
+            LOG.info(f"lang={message.data['lang']} "
+                     f"{message.data.get('utterances')}")
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
