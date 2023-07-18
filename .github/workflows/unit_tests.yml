@@ -71,7 +71,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev
-          pip install wheel
+          pip install wheel "cython<3.0.0"  # TODO: cython patching https://github.com/yaml/pyyaml/issues/724
           pip install . -r requirements/test.txt
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
