@@ -1,6 +1,6 @@
 # mycroft
 ovos-core[skills,skills_lgpl]~=0.0.7
-ovos-workshop~=0.0.11,>=0.0.12a48
+ovos-workshop~=0.0.11,>=0.0.12a47
 # padacioso==0.1.3a2
 ovos-plugin-common-play~=0.0.5
 
