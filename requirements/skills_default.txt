@@ -11,7 +11,7 @@ neon-skill-stock~=1.0
 neon-skill-support_helper~=1.0,>=1.0.1a1
 neon-skill-user_settings~=1.0,>=1.0.1a1
 neon-skill-weather~=1.0,>=1.0.1a2
-neon-skill-wikipedia~=1.0
+neon-skill-wikipedia~=1.0,>=1.0.1a1
 neon-skill-free_music_archive~=1.0
 neon-skill-local_music~=1.0,>=1.0.1a1
 # neon-skill-holidays~=0.0.0a1
