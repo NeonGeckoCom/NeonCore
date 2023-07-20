@@ -1,6 +1,7 @@
 # neon core modules
 neon_messagebus~=1.1
-neon_enclosure~=1.5,>=1.5.2a3
+neon_enclosure~=1.6
 neon_speech~=4.1
-neon_gui~=1.1,>=1.1.3a13
+# TODO: update to looser spec after stable release
+neon_gui==1.1.3a13
 neon_audio~=1.3
