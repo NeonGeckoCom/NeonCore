@@ -1,13 +1,11 @@
 # mycroft
 ovos-core~=0.0.7
-# TODO: update to looser spec after stable release
-ovos-workshop==0.0.12a50
+ovos-workshop~=0.0.12
 # padacioso==0.1.3a2
 ovos-plugin-common-play~=0.0.5
 
 # utils
-# TODO: update to looser spec after stable release
-neon-utils[network]==1.6.1a1
+neon-utils[network]~=1.6,>=1.6.1
 ovos-utils~=0.0.35
 ovos-bus-client~=0.0.5
 neon-transformers~=0.2
