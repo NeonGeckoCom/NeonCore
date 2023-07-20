@@ -3,5 +3,5 @@ neon_messagebus~=1.1
 neon_enclosure~=1.6
 neon_speech~=4.1
 # TODO: update to looser spec after stable release
-neon_gui==1.1.3a13
+neon_gui==1.1.3a14
 neon_audio~=1.3
