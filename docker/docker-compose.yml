@@ -51,8 +51,6 @@ services:
     image: ghcr.io/neongeckocom/neon_skills-default_skills:dev
     networks:
     - neon-core
-    ports:
-    - "8000:8000"
     volumes:
     - ~/.config/pulse/cookie:/tmp/pulse_cookie:ro
     - ${XDG_RUNTIME_DIR}/pulse:${XDG_RUNTIME_DIR}/pulse:ro
@@ -101,6 +99,7 @@ services:
         - gui
     ports:
     - "18181:18181"
+    - "8000:8000"
     volumes:
     - xdg:/xdg:rw
     - /etc/timezone:/etc/timezone:ro

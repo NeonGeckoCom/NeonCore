@@ -33,7 +33,6 @@ echo "nameserver 1.1.1.1" | tee /etc/resolv.conf
 
 # install system packages
 apt update
-add-apt-repository -y ppa:deadsnakes/ppa
 apt install -y curl
 curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
 echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
@@ -44,7 +43,8 @@ cd /core || exit 10
 python3.7 -m venv "/core/venv" || exit 11
 . /core/venv/bin/activate
 
-pip install --upgrade pip wheel
+pip install --upgrade pip wheel "cython<3.0.0"  # TODO: cython patching https://github.com/yaml/pyyaml/issues/724
+pip install --no-build-isolation pyyaml~=5.4  # TODO: patching https://github.com/yaml/pyyaml/issues/724
 pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" || exit 11
 
 cp -rf /core/test/pi_image_overlay/* /

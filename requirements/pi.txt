@@ -6,7 +6,7 @@ sdnotify~=0.3
 
 # Default debug client
 neon-cli-client~=0.3
-neon-mana-utils~=0.2
+neon-mana-utils~=0.2,>=0.2.1a1
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
@@ -51,5 +51,6 @@ ovos-skill-homescreen~=0.0.2
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 
-# TODO: Patching stable release with ovos-workshop alpha
-ovos-workshop==0.0.12a29
+# TODO Rolling back alpha versions
+ovos-plugin-manager==0.0.23
+neon-audio==1.3.2

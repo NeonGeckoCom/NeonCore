@@ -136,7 +136,6 @@ hotwords:
     module: ovos-ww-plugin-vosk
 # Skills
 skills:
-  run_gui_file_server: false
   wait_for_internet: false
   extra_directories: []
   upload_skill_manifest: true

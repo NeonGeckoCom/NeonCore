@@ -1,3 +1,4 @@
+#!/bin/bash
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
 # Copyright 2008-2022 Neongecko.com Inc.
@@ -26,27 +27,23 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import os
-import sys
-import unittest
-import requests
+# Override DNS resolver
+rm /etc/resolv.conf
+echo "nameserver 1.1.1.1" | tee /etc/resolv.conf
 
-from socketserver import TCPServer
+# install system packages
+apt update
+apt install -y curl
+curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
+echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
+apt update
+apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev mimic espeak-ng g++ libjpeg-dev make || exit 1
 
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from neon_core.util.qml_file_server import start_qml_http_server
+cd /core || exit 10
+python3.10 -m venv "/core/venv" || exit 11
+. /core/venv/bin/activate
 
+pip install --upgrade pip wheel
+pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" || exit 11
 
-class SkillFileServerTests(unittest.TestCase):
-
-    def test_start_file_server(self):
-        server = start_qml_http_server('/')
-        self.assertIsInstance(server, TCPServer)
-        resp = requests.get("http://localhost:8000")
-        self.assertTrue(resp.ok)
-        self.assertIn("<title>Directory listing for /</title>", resp.text)
-        server.shutdown()
-
-
-if __name__ == '__main__':
-    unittest.main()
+cp -rf /core/test/pi_image_overlay/* /

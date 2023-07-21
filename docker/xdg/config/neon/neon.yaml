@@ -10,6 +10,7 @@ gui_websocket:
   route: /gui
   ssl: false
 gui:
+  server_path: /xdg/data/neon/gui_files
   idle_display_skill: skill-homescreen-lite.openvoiceos
 ready_settings:
 - skills
@@ -17,7 +18,7 @@ ready_settings:
 - audio
 - gui_service
 skills:
+  run_gui_file_server: false
   blacklisted_skills:
   - mycroft-wiki.mycroftai
-listener:
-  hotwords:
+  - skill-custom_conversation.neongeckocom
