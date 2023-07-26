@@ -9,8 +9,7 @@ neon-utils[network]~=1.6,>=1.6.1
 ovos-utils~=0.0.35
 ovos-bus-client~=0.0.5
 neon-transformers~=0.2
-# ovos-config~=0.0.9,>=0.0.11a5
-ovos-config@git+https://github.com/openvoiceos/ovos-config@FIX_NonexistentFileMTime
+ovos-config~=0.0.9,>=0.0.11a6
 ovos-skills-manager~=0.0.12,>=0.0.13a4
 ovos-plugin-manager~=0.0.21
 ovos-backend-client~=0.0.6
