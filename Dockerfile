@@ -5,6 +5,7 @@ LABEL vendor=neon.ai \
 
 ENV OVOS_CONFIG_BASE_FOLDER neon
 ENV OVOS_CONFIG_FILENAME neon.yaml
+ENV XDG_CONFIG_HOME /config
 
 RUN  apt-get update && \
      apt-get install -y \

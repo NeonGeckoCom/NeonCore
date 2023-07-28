@@ -67,6 +67,7 @@ sounds:
   start_listening: snd/start_listening.wav
   end_listening: snd/end_listening.wav
   acknowledge: snd/acknowledge.mp3
+  error: snd/error.mp3
 play_wav_cmdline: play %1
 play_mp3_cmdline: mpg123 %1
 play_ogg_cmdline: ogg123 -q %1
@@ -107,9 +108,12 @@ listener:
   recording_timeout_with_silence: 3.0
   instant_listen: false
   enable_stt_api: true
+  # amount of time to wait for speech to start after WW detection
   speech_begin: 0.5
+  # amount of time without speech to wait before stopping listening
   silence_end: 0.9
   # TODO: tune below params with WW disabled
+  # number of audio chunks from WW detection to include in STT audio
   utterance_chunks_to_rewind: 2
   wakeword_chunks_to_save: 15
 hotwords:
