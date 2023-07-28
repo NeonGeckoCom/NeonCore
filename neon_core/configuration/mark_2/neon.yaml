@@ -1,0 +1,166 @@
+play_wav_cmdline: "play %1"
+play_mp3_cmdline: "play %1"
+play_ogg_cmdline: "play %1"
+g2p:
+  module: "dummy"
+tts:
+  module: neon-tts-plugin-coqui-remote
+  fallback_module: coqui
+  neon-tts-plugin-larynx-server:
+    host: "https://larynx.2022.us"
+  mozilla_remote:
+    api_url: "https://mtts.2022.us/api/tts"
+Audio:
+  backends:
+    OCP:
+      type: ovos_common_play
+      active: true
+      dbus_type: system
+audio_parsers:
+  blacklist:
+  - gender
+stt:
+  module: google_cloud_streaming
+  fallback_module: ovos-stt-plugin-vosk
+  ovos-stt-plugin-vosk:
+    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
+confirm_listening: true
+listener:
+  VAD:
+    silence_method: vad_only
+    module: ovos-vad-plugin-silero
+  mute_during_output: false
+  instant_listen: true
+  speech_begin: 0.5
+  silence_end: 0.9
+  utterance_chunks_to_rewind: 1
+hotwords:
+  wake_up:
+    active: false
+  hey_neon:
+    model_folder: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
+  hey_mycroft:
+    module: ovos-ww-plugin-precise-lite
+    model: https://github.com/OpenVoiceOS/precise-lite-models/raw/master/wakewords/en/hey_mycroft.tflite
+    listen: True
+    expected_duration: 3
+    trigger_level: 3
+    sensitivity: 0.5
+
+sounds:
+  start_listening: snd/start_listening.wav
+  acknowledge: snd/acknowledge.mp3
+gui_websocket:
+  host: 0.0.0.0
+  base_port: 18181
+  route: /gui
+  ssl: false
+websocket:
+  host: 0.0.0.0
+  port: 8181
+  route: /core
+  ssl: false
+  allow_self_signed: false
+  ssl_cert:
+  ssl_key:
+  shared_connection: true
+gui:
+  idle_display_skill: skill-ovos-homescreen.openvoiceos
+  extension: smartspeaker
+  run_gui_file_server: false
+  generic:
+    homescreen_supported: true
+MQ:
+  server: mq.2023.us
+  port: 35672
+  users:
+    mq_handler:
+      user: neon_api_utils
+      password: Klatchat2021
+signal:
+  use_signal_files: false
+skills:
+  blacklisted_skills:
+    - skill-ovos-setup.openvoiceos
+    - skill-messaging.neongeckocom
+    - skill-custom_conversation.neongeckocom
+    - skill-instructions.neongeckocom
+    - skill-audio_record.neongeckocom
+  # TODO: extra_directories here is the default, can it be removed?
+  extra_directories:
+    - /home/neon/.local/share/neon/skills
+  default_skills:
+  # TODO: Defaults are just patching skills not yet pip installable
+  - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
+PHAL:
+  ovos-PHAL-plugin-balena-wifi:
+    enabled: false
+    debug: false
+    ssid: Neon
+    psk:
+    color: '#ff8600'
+    portal: start dot neon dot ai
+    device: Neon Device
+  ovos-PHAL-plugin-system:
+    core_service: neon.service
+  neon-phal-plugin-linear-led:
+    mute_color: burnt_orange
+    sleep_color: red
+    utterance_animation: refill
+  admin:
+    neon-phal-plugin-device-updater:
+      enabled: true
+      initramfs_url: "https://github.com/NeonGeckoCom/neon_debos/raw/dev/overlays/02-rpi4/boot/firmware/initramfs"
+      initramfs_path: /boot/firmware/initramfs
+      initramfs_update_path: /opt/neon/initramfs
+      squashfs_url: "https://2222.us/app/files/neon_images/pi/mycroft_mark_2/updates/"
+      squashfs_path: /opt/neon/update.squashfs
+    neon-phal-plugin-linear-led-neopixel:
+      enabled: true
+    neon-phal-plugin-core-updater:
+      enabled: true
+      update_command: systemctl start neon-updater
+      core_module: neon_core
+      github_ref: NeonGeckoCom/NeonCore
+    neon-phal-plugin-reset:
+      enabled: true
+      default_config_url: "https://github.com/NeonGeckoCom/NeonCore/archive/refs/tags/{}.zip"
+      default_config_path: configuration/mark_2
+ready_settings:
+  - skills
+  - voice
+  - audio
+  - gui_service
+  - internet
+  - network_skills
+  - internet_skills
+#  - setup
+server:
+  backend_type: offline
+
+# Logging Config
+log_dir: /home/neon/logs/
+log_level: INFO
+logs:
+  path: /home/neon/.local/state/neon/
+  max_bytes: 50000000
+  backup_count: 3
+  diagnostic: False
+  level_overrides:
+    error: []
+    warning:
+      - filelock
+      - botocore
+    info: []
+    debug: []
+debug: False
+system_unit: imperial
+system:
+  protected_keys:
+    remote:
+      - gui_websocket:host
+      - websocket:host
+      - ready_settings
+    user:
+      - gui_websocket:host
+      - websocket:host
