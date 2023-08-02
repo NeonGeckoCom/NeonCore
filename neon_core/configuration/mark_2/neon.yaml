@@ -47,6 +47,7 @@ hotwords:
     trigger_level: 3
     sensitivity: 0.5
 
+data_dir: /ramdisk
 sounds:
   start_listening: snd/start_listening.wav
   acknowledge: snd/acknowledge.mp3
