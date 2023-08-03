@@ -26,8 +26,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-from tempfile import gettempdir
 from os import listdir
 from os.path import join
 from typing import Optional
@@ -42,15 +40,13 @@ from ovos_utils.process_utils import StatusCallbackMap
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 from neon_utils.messagebus_utils import get_messagebus
+from ovos_bus_client.util.scheduler import EventScheduler
+from ovos_utils.skills.api import SkillApi
+from ovos_workshop.skills.fallback import FallbackSkill
 
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
 from neon_core.util.diagnostic_utils import report_metric
-
-from ovos_workshop.skills.fallback import FallbackSkill
-
-from mycroft.skills.api import SkillApi
-from mycroft.skills.event_scheduler import EventScheduler
 
 
 def on_started():
@@ -108,28 +104,6 @@ class NeonSkillService(Thread):
                     "Use `NeonSkillService.skill_manager.status` directly.")
         return self.skill_manager.status
 
-    def _init_gui_server(self):
-        """
-        If configured, start the local file server to serve QML resources
-        """
-        from os.path import basename, isdir, join
-        from os import symlink, makedirs
-        # from shutil import copytree
-        if not self.config["skills"].get("run_gui_file_server"):
-            return
-        directory = join(gettempdir(), "neon", "qml", "skills")
-        if not isdir(directory):
-            makedirs(directory, exist_ok=True)
-        for d in reversed(self._get_skill_dirs()):
-            if not isdir(join(d, "ui")):
-                continue
-            skill_dir = basename(d)
-            if not isdir(join(directory, skill_dir)):
-                makedirs(join(directory, skill_dir))
-                symlink(join(d, "ui"), join(directory, skill_dir, "ui"))
-                LOG.info(f"linked {d}/ui to {directory}/{skill_dir}/ui")
-        self.http_server = start_qml_http_server(directory)
-
     def _get_skill_dirs(self) -> list:
         """
         Get a list of paths to every loaded skill in load order (priority last)
@@ -175,13 +149,6 @@ class NeonSkillService(Thread):
         self.skill_manager.name = "skill_manager"
         self.skill_manager.start()
         LOG.info("Skill Manager started")
-
-        # Setup GUI File Server
-        try:
-            self._init_gui_server()
-        except Exception as e:
-            # Allow service to start if GUI file server fails
-            LOG.exception(e)
 
         self.register_wifi_setup_events()
         announce_connection()
