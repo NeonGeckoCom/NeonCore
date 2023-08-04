@@ -136,7 +136,10 @@ class NeonSkillService(Thread):
 
         # Setup Intents and Skill Manager
         self._register_intent_services()
-        self.event_scheduler = EventScheduler(self.bus)
+        self.event_scheduler = EventScheduler(self.bus, autostart=False)
+        self.event_scheduler.name = "event_scheduler"
+        self.event_scheduler.daemon = True
+        self.event_scheduler.start()
         SkillApi.connect_bus(self.bus)
         LOG.info("Starting Skill Manager")
         self.skill_manager = NeonSkillManager(
