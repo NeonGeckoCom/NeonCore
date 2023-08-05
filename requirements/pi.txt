@@ -6,7 +6,7 @@ sdnotify~=0.3
 
 # Default debug client
 neon-cli-client~=0.3
-neon-mana-utils~=0.2,>=0.2.1a1
+neon-mana-utils~=0.2,>=0.2.2
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
@@ -26,9 +26,9 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
-neon-phal-plugin-reset~=0.2,>=0.2.2a2
+neon-phal-plugin-reset~=0.3
 neon-phal-plugin-core-updater~=1.2,>=1.2.1
-neon-phal-plugin-device-updater~=0.0,>=0.0.1a4
+neon-phal-plugin-device-updater~=0.0,>=0.0.1a5
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.4
 neon-phal-plugin-linear_led~=0.2,>=0.2.2
