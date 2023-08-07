@@ -12,7 +12,8 @@ on:
 
 jobs:
   build_squashfs_image:
-    runs-on: diana
+#    runs-on: diana
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Debos Repository
         uses: actions/checkout@v2
@@ -25,10 +26,11 @@ jobs:
           mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
           echo ${GOOGLE_KEY}>action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
           echo ${SSH_KEY}>action/id_rsa
+          sudo chmod 600 action/id_rsa
       - name: Build Image
         run: |
           sudo apt update
-          sudo apt install -y qemu-system-x86 qemu-user-static  # systemd-container
+          sudo apt install -y qemu-system-x86 qemu-user-static systemd-container
           bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev  # ${{ github.ref }}  TODO: Testing
       - name: Upload Outputs
         run: |
