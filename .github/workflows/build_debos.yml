@@ -27,8 +27,8 @@ jobs:
           echo ${SSH_KEY}>action/id_rsa
       - name: Build Image
         run: |
-          apt update
-          apt install -y qemu-system-x86 qemu-user-static  # systemd-container
+          sudo apt update
+          sudo apt install -y qemu-system-x86 qemu-user-static  # systemd-container
           bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev  # ${{ github.ref }}  TODO: Testing
       - name: Upload Outputs
         run: |
