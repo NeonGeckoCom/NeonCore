@@ -1,0 +1,33 @@
+name: Publish Alpha Build
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+      - master
+    paths-ignore:
+      - 'neon_core/version.py'
+      - 'CHANGELOG.md'
+
+jobs:
+  build_squashfs_image:
+    runs-on: diana
+    steps:
+      - name: Checkout Debos Repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+          repository: NeonGeckoCom/neon_debos
+          path: action/neon_debos
+      - name: Export keys for image build
+        run: |
+          mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
+          echo ${GOOGLE_KEY}>action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
+          echo ${SSH_KEY}>action/id_rsa
+      - name: Build Image
+        run: |
+          bash action/neon_debos/run_docker_debos.sh debian-neon-image-rpi4.yml ${{ github.ref }}
+      - name: Upload Outputs
+        run: |
+          scp action/neon_debos/outputs/*.img.xz 2222.us:/home/d_mcknight/ -i action/id_rsa
+          scp action/neon_debos/outputs/*.squashfs 2222.us:/home/d_mcknight/ -i action/id_rsa
