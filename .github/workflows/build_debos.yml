@@ -29,6 +29,7 @@ jobs:
         run: |
           echo ${SSH_KEY}>action/id_rsa
           sudo chmod 600 action/id_rsa
+          mkdir ~/.ssh
           ssh-keyscan -H 2222.us >> ~/.ssh/known_hosts
       - name: Build Image
         run: |
