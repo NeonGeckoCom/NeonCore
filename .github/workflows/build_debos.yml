@@ -1,4 +1,4 @@
-name: Publish Alpha Build
+name: Build SquashFS Image
 on:
   workflow_dispatch:
   push:
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout Debos Repository
         uses: actions/checkout@v2
         with:
-          ref: dev  # ${{ github.ref }}  TODO: Testing
+          ref: FEAT_CoreAutomation  # ${{ github.ref }}  TODO: Testing
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
       - name: Export keys for image build
@@ -27,8 +27,10 @@ jobs:
           echo ${SSH_KEY}>action/id_rsa
       - name: Build Image
         run: |
-          bash action/neon_debos/run_docker_debos.sh debian-neon-image-rpi4.yml dev  # ${{ github.ref }}  TODO: Testing
+#          apt update
+#          apt install -y golang git libglib2.0-dev libostree-dev qemu-system-x86 qemu-user-static debootstrap systemd-container
+          bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev  # ${{ github.ref }}  TODO: Testing
       - name: Upload Outputs
         run: |
-          scp action/neon_debos/outputs/*.img.xz 2222.us:/home/d_mcknight/ -i action/id_rsa
-          scp action/neon_debos/outputs/*.squashfs 2222.us:/home/d_mcknight/ -i action/id_rsa
+          scp -i action/id_rsa action/neon_debos/outputs/*.img.xz 2222.us:/home/d_mcknight/
+          scp -i action/id_rsa action/neon_debos/outputs/*.squashfs 2222.us:/home/d_mcknight/
