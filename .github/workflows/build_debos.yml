@@ -12,8 +12,8 @@ on:
 
 jobs:
   build_squashfs_image:
-#    runs-on: diana
-    runs-on: ubuntu-latest
+    runs-on: diana
+#    runs-on: ubuntu-latest
     steps:
       - name: Checkout Debos Repository
         uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
           echo ${SSH_KEY}>action/id_rsa
           sudo chmod 600 action/id_rsa
           mkdir ~/.ssh
-          ssh-keyscan -H 2222.us >> ~/.ssh/known_hosts
+          ssh-keyscan -f action/id_rsa -H 2222.us >> ~/.ssh/known_hosts
       - name: Build Image
         run: |
           sudo apt update
