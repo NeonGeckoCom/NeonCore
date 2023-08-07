@@ -25,8 +25,11 @@ jobs:
         run: |
           mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
           echo ${GOOGLE_KEY}>action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
+      - name: Configure SSH Upload
+        run: |
           echo ${SSH_KEY}>action/id_rsa
           sudo chmod 600 action/id_rsa
+          ssh-keyscan -H 2222.us >> ~/.ssh/known_hosts
       - name: Build Image
         run: |
           sudo apt update
