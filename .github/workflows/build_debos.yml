@@ -2,9 +2,10 @@ name: Publish Alpha Build
 on:
   workflow_dispatch:
   push:
-    branches:
-      - dev
-      - master
+# TODO: Replace branches spec after validating build
+#    branches:
+#      - dev
+#      - master
     paths-ignore:
       - 'neon_core/version.py'
       - 'CHANGELOG.md'
