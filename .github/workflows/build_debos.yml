@@ -17,7 +17,7 @@ jobs:
       - name: Checkout Debos Repository
         uses: actions/checkout@v2
         with:
-          ref: ${{ github.ref }}
+          ref: dev  # ${{ github.ref }}  TODO: Testing
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
       - name: Export keys for image build
@@ -27,7 +27,7 @@ jobs:
           echo ${SSH_KEY}>action/id_rsa
       - name: Build Image
         run: |
-          bash action/neon_debos/run_docker_debos.sh debian-neon-image-rpi4.yml ${{ github.ref }}
+          bash action/neon_debos/run_docker_debos.sh debian-neon-image-rpi4.yml dev  # ${{ github.ref }}  TODO: Testing
       - name: Upload Outputs
         run: |
           scp action/neon_debos/outputs/*.img.xz 2222.us:/home/d_mcknight/ -i action/id_rsa
