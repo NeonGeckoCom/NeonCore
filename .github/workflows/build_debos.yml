@@ -2,10 +2,9 @@ name: Build SquashFS Image
 on:
   workflow_dispatch:
   push:
-# TODO: Replace branches spec after validating build
-#    branches:
-#      - dev
-#      - master
+    branches:
+      - dev
+      - master
     paths-ignore:
       - 'neon_core/version.py'
       - 'CHANGELOG.md'
@@ -17,13 +16,15 @@ jobs:
       - name: Checkout Debos Repository
         uses: actions/checkout@v2
         with:
-          ref: FEAT_CoreAutomation  # ${{ github.ref }}  TODO: Testing
+          ref: ${{ github.ref }}
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
       - name: Export keys for image build
         run: |
           mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
-          echo "${{secrets.google_api_key}}">action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
+          echo ${GOOGLE_KEY}>action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
+        env:
+          GOOGLE_KEY: ${{secrets.google_api_key}}
       - name: Build and Export Image
         run: |
-          bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev /var/www/html/app/files/neon_images/pi/automation # ${{ github.ref }}  TODO: Testing
+          bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev /var/www/html/app/files/neon_images/pi/automation ${{ github.ref }}
