@@ -13,7 +13,6 @@ on:
 jobs:
   build_squashfs_image:
     runs-on: 2222.us
-#    runs-on: ubuntu-latest
     steps:
       - name: Checkout Debos Repository
         uses: actions/checkout@v2
@@ -25,17 +24,10 @@ jobs:
         run: |
           mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
           echo ${GOOGLE_KEY}>action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
-#      - name: Configure SSH Upload
-#        run: |
-#          echo ${SSH_KEY}>action/id_rsa
-#          sudo chmod 600 action/id_rsa
-#          mkdir ~/.ssh
-#          ssh-keyscan -f action/id_rsa -H 2222.us >> ~/.ssh/known_hosts
       - name: Build Image
         run: |
           bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev  # ${{ github.ref }}  TODO: Testing
-      - name: Upload Outputs
+      - name: Move Outputs
         run: |
-          mv action/id_rsa action/neon_debos/outputs/*.img.xz /home/d_mcknight/
-          mv action/id_rsa action/neon_debos/outputs/*.squashfs /home/d_mcknight/
-          # TODO: Move directly to hosted directory?
+          mv action/neon_debos/outputs/*.img.xz /var/www/html/app/files/neon_images/pi/automation
+          mv action/neon_debos/outputs/*.squashfs /var/www/html/app/files/neon_images/pi/automation
