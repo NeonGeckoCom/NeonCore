@@ -24,10 +24,6 @@ jobs:
         run: |
           mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
           echo "${{secrets.google_api_key}}">action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
-      - name: Build Image
+      - name: Build and Export Image
         run: |
-          bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev  # ${{ github.ref }}  TODO: Testing
-      - name: Move Outputs
-        run: |
-          mv action/neon_debos/outputs/*.img.xz /var/www/html/app/files/neon_images/pi/automation
-          mv action/neon_debos/outputs/*.squashfs /var/www/html/app/files/neon_images/pi/automation
+          bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev /var/www/html/app/files/neon_images/pi/automation # ${{ github.ref }}  TODO: Testing
