@@ -28,7 +28,7 @@ ovos-stt-plugin-vosk~=0.1,>=0.1.4
 # PHAL Plugins
 neon-phal-plugin-reset~=0.3
 neon-phal-plugin-core-updater~=1.2,>=1.2.1
-neon-phal-plugin-device-updater~=0.0,>=0.0.1a5
+neon-phal-plugin-device-updater~=0.0,>=0.0.1a7
 neon-phal-plugin-fan~=0.0.3
 neon-phal-plugin-switches~=0.0.4
 neon-phal-plugin-linear_led~=0.2,>=0.2.2
@@ -47,7 +47,7 @@ ovos-phal-plugin-ipgeo~=0.0.2
 ovos-gui-plugin-shell-companion~=0.0.0
 
 # Pi-specific skills
-neon-skill-update~=1.0,>=1.0.1a3
+neon-skill-update~=1.0,>=1.0.1a5
 ovos-skill-homescreen~=0.0.2,>=0.0.3a6
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
