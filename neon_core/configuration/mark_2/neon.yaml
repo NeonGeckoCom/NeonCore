@@ -115,6 +115,7 @@ PHAL:
       initramfs_update_path: /opt/neon/initramfs
       squashfs_url: "https://2222.us/app/files/neon_images/pi/mycroft_mark_2/updates/{}/"
       squashfs_path: /opt/neon/update.squashfs
+      default_track: dev
     neon-phal-plugin-linear-led-neopixel:
       enabled: true
     neon-phal-plugin-core-updater:
