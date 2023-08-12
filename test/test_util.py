@@ -354,7 +354,8 @@ class DeviceUtilsTests(unittest.TestCase):
         shutil.unpack_archive(output_file, extract_path)
         self.assertTrue(isdir(extract_path))
         self.assertTrue(isfile(join(extract_path, "skills",
-                                    "skill-test.neon", "skill.json")))
+                                    "skill-test.neon", "skill.json")),
+                        repr(dir(extract_path)))
         self.assertTrue(isfile(join(extract_path, "neon.yaml")))
 
         # Validate export file exists
@@ -379,8 +380,10 @@ class DeviceUtilsTests(unittest.TestCase):
         imported = import_user_config(valid_import_file, valid_import_directory)
         self.assertEqual(imported, valid_import_directory)
         self.assertTrue(isfile(join(valid_import_directory, "neon.yaml")))
-        self.assertTrue(isfile(join(valid_import_directory, "skills", "skill-test.neon", "test.file")))
-        self.assertTrue(isfile(join(valid_import_directory, "skills", "skill-test.neon", "skill.json")))
+        self.assertTrue(isfile(join(valid_import_directory, "skills",
+                                    "skill-test.neon", "test.file")))
+        self.assertTrue(isfile(join(valid_import_directory, "skills",
+                                    "skill-test.neon", "skill.json")))
         self.assertTrue(isfile(join(valid_import_directory, "neon.yaml")))
         with open(join(valid_import_directory, "neon.yaml")) as f:
             contents = f.read()
