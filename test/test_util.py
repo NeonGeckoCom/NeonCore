@@ -363,7 +363,7 @@ class DeviceUtilsTests(unittest.TestCase):
 
         # Cleanup test files
         shutil.rmtree(extract_path)
-        # os.remove(output_file)
+        os.remove(output_file)
 
     def test_import_user_config(self):
         from neon_core.util.device_utils import import_user_config
