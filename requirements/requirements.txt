@@ -6,7 +6,7 @@ ovos-plugin-common-play~=0.0.5
 
 # utils
 neon-utils[network]~=1.6,>=1.6.1
-ovos-utils~=0.0.35
+ovos-utils==0.0.35  # TODO: Troubleshooting test failure
 ovos-bus-client~=0.0.5
 neon-transformers~=0.2
 ovos-config==0.0.11a9  # TODO: Pinned for stable release
