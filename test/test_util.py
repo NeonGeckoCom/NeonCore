@@ -355,7 +355,7 @@ class DeviceUtilsTests(unittest.TestCase):
         self.assertTrue(isdir(extract_path))
         self.assertTrue(isfile(join(extract_path, "skills",
                                     "skill-test.neon", "skill.json")),
-                        repr(dir(extract_path)))
+                        repr(os.listdir(extract_path)))
         self.assertTrue(isfile(join(extract_path, "neon.yaml")))
 
         # Validate export file exists
