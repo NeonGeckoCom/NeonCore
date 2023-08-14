@@ -357,6 +357,9 @@ class DeviceUtilsTests(unittest.TestCase):
                                     "skill-test.neon", "skill.json")),
                         repr(os.listdir(extract_path)))
         self.assertTrue(isfile(join(extract_path, "neon.yaml")))
+        with open(join(extract_path, "neon.yaml")) as f:
+            contents = f.read()
+        self.assertEqual(contents, "test: true\n")
 
         # Validate export file exists
         with self.assertRaises(FileExistsError):
