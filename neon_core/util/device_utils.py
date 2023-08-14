@@ -46,9 +46,8 @@ def export_user_config(output_path: str, config_path: str = None) -> str:
                               f"{output_path}")
     if exists(f"{output_path}.zip"):
         raise FileExistsError(f"Export already exists: {output_path}.zip")
-    makedirs(output_path, exist_ok=True)
     config_path = config_path or join(xdg_config_home(), "neon")
-    shutil.copytree(config_path, join(output_path, "neon_export"))
+    shutil.copytree(config_path, output_path)
     output_file = shutil.make_archive(output_path, "zip", config_path,
                                       config_path)
     shutil.rmtree(output_path)
