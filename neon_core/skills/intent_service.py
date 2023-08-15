@@ -67,9 +67,13 @@ class NeonIntentService(IntentService):
         self.language_config = get_lang_config()
 
         # Initialize default user to inject into incoming messages
-        self._default_user = get_neon_user_config()
-        self._default_user['user']['username'] = "local"
+        try:
+            self._default_user = get_neon_user_config()
+        except PermissionError:
+            LOG.warning("Unable to get writable config path; fallback to /tmp")
+            self._default_user = get_neon_user_config("/tmp")
 
+        self._default_user['user']['username'] = "local"
         set_default_lang(self.language_config["internal"])
 
         # self._setup_converse_handlers()
