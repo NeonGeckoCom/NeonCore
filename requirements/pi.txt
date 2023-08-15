@@ -47,7 +47,7 @@ ovos-phal-plugin-ipgeo~=0.0.2
 ovos-gui-plugin-shell-companion~=0.0.0
 
 # Pi-specific skills
-neon-skill-update~=2.0,>=2.0.1a1
+neon-skill-update~=2.0,>=2.0.1
 # ovos-skill-homescreen~=0.0.2,>=0.0.3a6
 # TODO: Pinned for stable release
 ovos-skill-homescreen==0.0.3a6
