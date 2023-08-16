@@ -5,7 +5,7 @@ ovos-workshop~=0.0.12
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[network]~=1.6,>=1.6.1
+neon-utils[audio,network]~=1.6,>=1.6.2a2  # Audio patching resolution
 ovos-utils==0.0.35  # TODO: Troubleshooting test failure
 ovos-bus-client~=0.0.5
 neon-transformers~=0.2
@@ -29,7 +29,7 @@ requests < 2.30.0
 # TODO: Patching dependencies ovos-core[skills,skills_lgpl] extra deps
 adapt-parser~=0.5
 padacioso~=0.1
-ovos-lingua-franca~=0.4,>=0.4.7
+ovos-lingua-franca~=0.4,>=0.4.8a3
 ovos-phal-plugin-connectivity-events~=0.0.1
 padatious~=0.4.8
 fann2==1.0.7
