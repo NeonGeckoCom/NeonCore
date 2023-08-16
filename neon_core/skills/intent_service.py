@@ -93,8 +93,11 @@ class NeonIntentService(IntentService):
 
     @property
     def supported_languages(self) -> List[str]:
+        """
+        Get a list of supported ISO 639-1 language codes
+        """
         return [lang.split('-')[0] for lang in
-                self.language_config.get("supported_langs")]
+                self.language_config.get("supported_langs") or []]
 
     def handle_supported_languages(self, message):
         """
