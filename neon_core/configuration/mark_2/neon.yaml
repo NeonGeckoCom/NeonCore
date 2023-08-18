@@ -127,6 +127,8 @@ PHAL:
       enabled: true
       default_config_url: "https://github.com/NeonGeckoCom/NeonCore/archive/refs/tags/{}.zip"
       default_config_path: neon_core/configuration/mark_2
+    neon-phal-plugin-audio-receiver:
+      enabled: true
 ready_settings:
   - skills
   - voice
