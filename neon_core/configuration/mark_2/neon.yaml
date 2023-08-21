@@ -107,6 +107,8 @@ PHAL:
     mute_color: burnt_orange
     sleep_color: red
     utterance_animation: refill
+  neon-phal-plugin-fan:
+    min_fan_temp: 40.0
   admin:
     neon-phal-plugin-device-updater:
       enabled: true
