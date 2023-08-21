@@ -1,6 +1,8 @@
 # ARM-specific releases
 # deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
 
+pydbus~=0.6
+
 # SystemD integration
 sdnotify~=0.3
 
