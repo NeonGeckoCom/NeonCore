@@ -1,6 +1,8 @@
 # ARM-specific releases
 # deepspeech @ https://github.com/mozilla/DeepSpeech/releases/download/v0.9.3/deepspeech-0.9.3-cp37-cp37m-linux_aarch64.whl
 
+pydbus~=0.6
+
 # SystemD integration
 sdnotify~=0.3
 
@@ -26,6 +28,7 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
+neon-phal-plugin-audio-receiver>=0.0.2a1
 neon-phal-plugin-reset~=0.3,>=0.3.1a2
 neon-phal-plugin-core-updater~=1.2,>=1.2.1
 neon-phal-plugin-device-updater~=0.0.1,>=0.0.2a1
@@ -53,4 +56,4 @@ neon-skill-update~=2.0,>=2.0.2a1
 ovos-skill-homescreen==0.0.3a6
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
-
+skill-markII-audio-receiver>=0.0.2a1
