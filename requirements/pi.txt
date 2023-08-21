@@ -28,7 +28,7 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
-neon-phal-plugin-audio-reciever>=0.0.2a1
+neon-phal-plugin-audio-receiver>=0.0.2a1
 neon-phal-plugin-reset~=0.3,>=0.3.1a2
 neon-phal-plugin-core-updater~=1.2,>=1.2.1
 neon-phal-plugin-device-updater~=0.0.1,>=0.0.2a1
