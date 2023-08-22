@@ -20,6 +20,8 @@ jobs:
           lfs: True
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
+      - name: Ensure LFS files are pulled
+        run: git lfs pull action/neon_debos
       - name: Export keys for image build
         run: |
           mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
