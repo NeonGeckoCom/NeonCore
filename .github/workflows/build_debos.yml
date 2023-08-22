@@ -14,10 +14,10 @@ jobs:
     runs-on: 2222.us
     steps:
       - name: Checkout Debos Repository
-        uses: actions/checkout@v3
+        uses: nschloe/action-cached-lfs-checkout@v1
         with:
           ref: ${{ github.ref }}
-          lfs: True
+#          lfs: True
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
       - name: Export keys for image build
