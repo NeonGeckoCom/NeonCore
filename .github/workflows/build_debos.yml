@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Debos Repository
         uses: actions/checkout@v3
         with:
-          ref: "dev"  # TODO: ${{ github.ref }}
+          ref: ${{ github.ref }}
           lfs: True
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
@@ -30,5 +30,4 @@ jobs:
           GOOGLE_KEY: ${{secrets.google_api_key}}
       - name: Build and Export Image
         run: |
-          bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml dev /var/www/html/app/files/neon_images/pi/mycroft_mark_2 dev
-          # TODO: ${{ github.ref }}
+          bash action/neon_debos/run_automation.sh debian-neon-image-rpi4.yml ${{ github.ref_name }} /var/www/html/app/files/neon_images/pi/mycroft_mark_2 ${{ github.ref_name }}
