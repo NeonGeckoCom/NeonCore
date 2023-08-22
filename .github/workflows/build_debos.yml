@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Debos Repository
         uses: nschloe/action-cached-lfs-checkout@v1
         with:
-          ref: ${{ github.ref }}
+          ref: "dev"  # TODO: ${{ github.ref }}
 #          lfs: True
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
