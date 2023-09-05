@@ -5,8 +5,8 @@ ovos-workshop~=0.0.12
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[audio,network]~=1.6,>=1.6.2a2  # Audio patching resolution
-ovos-utils==0.0.35  # TODO: Troubleshooting test failure
+neon-utils[network]~=1.6,>=1.6.2
+ovos-utils~=0.0.35
 ovos-bus-client~=0.0.5
 neon-transformers~=0.2
 ovos-config==0.0.11a9  # TODO: Pinned for stable release
