@@ -120,6 +120,7 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
     return data
 
 
+# TODO: Deprecate method
 def cli_send_diags():
     """
     CLI Entry Point to Send Diagnostics

@@ -95,6 +95,33 @@ def install_skill_requirements(skill_dir):
         click.echo(e)
 
 
+@neon_core_cli.command(help="Export Core Configuration")
+@click.argument("output_directory")
+def export_configuration(output_directory):
+    from neon_core.util.device_utils import export_user_config
+    from neon_utils.configuration_utils import init_config_dir
+    try:
+        init_config_dir()
+        output = export_user_config(output_directory)
+        click.echo(f"Exported configuration to: {output}")
+    except Exception as e:
+        click.echo(e)
+
+
+@neon_core_cli.command(help="Import Core Configuration")
+@click.argument("exported_configuration")
+def export_configuration(exported_configuration):
+    from neon_core.util.device_utils import import_user_config
+    from neon_utils.configuration_utils import init_config_dir
+    try:
+        init_config_dir()
+        config_path = import_user_config(exported_configuration)
+        click.echo(f"Imported configuration to: {config_path}. Services may "
+                   f"need to be restarted to load these changes")
+    except Exception as e:
+        click.echo(e)
+
+
 @neon_core_cli.command(help="Start Neon Skills module")
 @click.option("--install-skills", "-i", default=None,
               help="Path to local skills for which to install dependencies")

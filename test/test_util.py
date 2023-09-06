@@ -26,16 +26,19 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import importlib
-import json
 import os
 import shutil
 import sys
 import unittest
+from os.path import join, dirname, isfile, isdir
 
-from mock.mock import Mock
+import neon_utils.metrics_utils
+
+from mock import Mock
+
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
 
 TEST_SKILLS_NO_AUTH = [
     "https://github.com/NeonGeckoCom/alerts.neon/tree/dev",
@@ -134,6 +137,7 @@ class SkillUtilsTests(unittest.TestCase):
                              normalize_github_url(neon_skills[skill]["url"]))
 
     def test_install_local_skills(self):
+        import importlib
         import ovos_skills_manager.requirements
         import neon_core.util.skill_utils
         importlib.reload(neon_core.util.skill_utils)
@@ -244,6 +248,159 @@ class SkillUtilsTests(unittest.TestCase):
         except ModuleNotFoundError:
             # Class added in ovos-workwhop 0.0.12
             pass
+
+
+class DiagnosticUtilsTests(unittest.TestCase):
+    config_dir = os.path.join(os.path.dirname(__file__), "test_config")
+    report_metric = Mock()
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        os.makedirs(cls.config_dir, exist_ok=True)
+
+        os.environ["NEON_CONFIG_PATH"] = cls.config_dir
+        os.environ["XDG_CONFIG_HOME"] = cls.config_dir
+        test_dir = os.path.join(os.path.dirname(__file__), "diagnostic_files")
+        from neon_core.configuration import patch_config
+        patch_config({"log_dir": test_dir})
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        if os.getenv("NEON_CONFIG_PATH"):
+            os.environ.pop("NEON_CONFIG_PATH")
+        shutil.rmtree(cls.config_dir)
+
+    def setUp(self) -> None:
+        self.report_metric.reset_mock()
+        neon_utils.metrics_utils.report_metric = self.report_metric
+
+    def test_send_diagnostics_default(self):
+        from neon_core.util.diagnostic_utils import send_diagnostics
+        send_diagnostics()
+        self.report_metric.assert_called_once()
+        args = self.report_metric.call_args
+        self.assertEqual(args.args, ("diagnostics",))
+        data = args.kwargs
+        self.assertIsInstance(data, dict)
+        self.assertIsInstance(data["host"], str)
+        self.assertIsInstance(data["configurations"], str)
+        self.assertIsInstance(data["logs"], str)
+        # self.assertIsInstance(data["transcripts"], str)
+
+    def test_send_diagnostics_no_extras(self):
+        from neon_core.util.diagnostic_utils import send_diagnostics
+        send_diagnostics(False, False, False)
+        self.report_metric.assert_called_once()
+        args = self.report_metric.call_args
+        self.assertEqual(args.args, ("diagnostics",))
+        data = args.kwargs
+        self.assertIsInstance(data, dict)
+        self.assertIsInstance(data["host"], str)
+        self.assertIsNone(data["configurations"])
+        self.assertIsNone(data["logs"])
+        self.assertIsNone(data["transcripts"])
+
+    def test_send_diagnostics_allow_logs(self):
+        from neon_core.util.diagnostic_utils import send_diagnostics
+        send_diagnostics(True, False, False)
+        self.report_metric.assert_called_once()
+        args = self.report_metric.call_args
+        self.assertEqual(args.args, ("diagnostics",))
+        data = args.kwargs
+        self.assertIsInstance(data, dict)
+        self.assertIsInstance(data["host"], str)
+        self.assertIsNone(data["configurations"])
+        self.assertIsInstance(data["logs"], str)
+        self.assertIsNone(data["transcripts"])
+
+    def test_send_diagnostics_allow_transcripts(self):
+        from neon_core.util.diagnostic_utils import send_diagnostics
+        send_diagnostics(False, True, False)
+        self.report_metric.assert_called_once()
+        args = self.report_metric.call_args
+        self.assertEqual(args.args, ("diagnostics",))
+        data = args.kwargs
+        self.assertIsInstance(data, dict)
+        self.assertIsInstance(data["host"], str)
+        self.assertIsNone(data["configurations"])
+        self.assertIsNone(data["logs"])
+        # self.assertIsInstance(data["transcripts"], str)
+
+    def test_send_diagnostics_allow_config(self):
+        from neon_core.util.diagnostic_utils import send_diagnostics
+        send_diagnostics(False, False, True)
+        self.report_metric.assert_called_once()
+        args = self.report_metric.call_args
+        self.assertEqual(args.args, ("diagnostics",))
+        data = args.kwargs
+        self.assertIsInstance(data, dict)
+        self.assertIsInstance(data["host"], str)
+        self.assertIsInstance(data["configurations"], str)
+        self.assertIsNone(data["logs"])
+        self.assertIsNone(data["transcripts"])
+
+
+class DeviceUtilsTests(unittest.TestCase):
+    def test_export_user_config(self):
+        from neon_core.util.device_utils import export_user_config
+        output_path = join(dirname(__file__), "test_config_export")
+        config_path = join(output_path, "config")
+        output_file = export_user_config(output_path, config_path)
+        self.assertTrue(isfile(output_file))
+        self.assertEqual(dirname(output_file), output_path)
+
+        # Validate exported contents
+        extract_path = join(output_path, "exported")
+        shutil.unpack_archive(output_file, extract_path)
+        self.assertTrue(isdir(extract_path))
+        self.assertTrue(isfile(join(extract_path, "skills",
+                                    "skill-test.neon", "skill.json")),
+                        repr(os.listdir(extract_path)))
+        self.assertTrue(isfile(join(extract_path, "neon.yaml")))
+        with open(join(extract_path, "neon.yaml")) as f:
+            contents = f.read()
+        self.assertEqual(contents, "test: true\n")
+
+        # Validate export file exists
+        with self.assertRaises(FileExistsError):
+            export_user_config(output_path, config_path)
+
+        # Cleanup test files
+        shutil.rmtree(extract_path)
+        os.remove(output_file)
+
+    def test_import_user_config(self):
+        from neon_core.util.device_utils import import_user_config
+        valid_import_directory = join(dirname(__file__), "test_config_import",
+                                      "config")
+        valid_import_file = join(dirname(__file__), "test_config_import",
+                                 "neon_export.zip")
+        # Write test config to be overwritten
+        with open(join(valid_import_directory, "neon.yaml"), "w+") as f:
+            f.write("success: False\n")
+
+        # Validate imported contents
+        imported = import_user_config(valid_import_file, valid_import_directory)
+        self.assertEqual(imported, valid_import_directory)
+        self.assertTrue(isfile(join(valid_import_directory, "neon.yaml")))
+        self.assertTrue(isfile(join(valid_import_directory, "skills",
+                                    "skill-test.neon", "test.file")))
+        self.assertTrue(isfile(join(valid_import_directory, "skills",
+                                    "skill-test.neon", "skill.json")))
+        self.assertTrue(isfile(join(valid_import_directory, "neon.yaml")))
+        with open(join(valid_import_directory, "neon.yaml")) as f:
+            contents = f.read()
+        self.assertEqual(contents, "test: true\n")
+
+        # Validate import file exists
+        with self.assertRaises(FileNotFoundError):
+            import_user_config(valid_import_directory)
+
+        # Cleanup
+        os.remove(join(valid_import_directory, "neon.yaml"))
+        os.remove(join(valid_import_directory, "skills", "skill-test.neon",
+                       "skill.json"))
+
 
 if __name__ == '__main__':
     unittest.main()
