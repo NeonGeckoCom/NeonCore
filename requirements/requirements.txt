@@ -29,8 +29,7 @@ requests < 2.30.0
 # TODO: Patching dependencies ovos-core[skills,skills_lgpl] extra deps
 adapt-parser~=0.5
 padacioso~=0.1
-# TODO: Pinned for stable release
-ovos-lingua-franca==0.4.8a5
+ovos-lingua-franca==0.4.8a6  # TODO: Pinned for stable release
 ovos-phal-plugin-connectivity-events~=0.0.1
 padatious~=0.4.8
 fann2==1.0.7
