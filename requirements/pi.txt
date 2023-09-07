@@ -28,8 +28,7 @@ neon-tts-plugin-coqui~=0.7,>=0.7.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
-# TODO: Stable audio plugin release
-neon-phal-plugin-audio-receiver>=0.0.2a1
+neon-phal-plugin-audio-receiver>=0.0.3
 neon-phal-plugin-reset~=0.4
 neon-phal-plugin-core-updater~=1.3
 neon-phal-plugin-device-updater~=0.1
@@ -51,11 +50,10 @@ ovos-phal-plugin-ipgeo~=0.0.2
 ovos-gui-plugin-shell-companion~=0.0.0
 
 # Pi-specific skills
-# TODO: Stable skill releases
-neon-skill-update~=2.0,>=2.0.2a4
+neon-skill-update~=2.1
 # ovos-skill-homescreen~=0.0.2,>=0.0.3a6
 # TODO: Pinned for stable release
 ovos-skill-homescreen==0.0.3a6
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
-skill-markII-audio-receiver>=0.0.2a1
+skill-markII-audio-receiver>=0.0.4
