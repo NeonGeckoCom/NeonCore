@@ -63,8 +63,12 @@ def get_neon_skills_data(skill_meta_repository: str =
     temp_download_dir = mkdtemp()
     zip_url = download_url_from_github_url(skill_meta_repository, branch)
     base_dir = join(temp_download_dir, "neon_skill_meta")
-    download_extract_zip(zip_url, temp_download_dir, "neon_skill_meta.zip", base_dir)
-
+    try:
+        download_extract_zip(zip_url, temp_download_dir,
+                             "neon_skill_meta.zip", base_dir)
+    except PermissionError:
+        LOG.exception(f"Failed to download {zip_url} to {base_dir}")
+        return dict()
     meta_dir = join(base_dir, repo_metadata_path)
     for entry in listdir(meta_dir):
         with open(join(meta_dir, entry)) as f:

@@ -28,6 +28,7 @@
 
 import time
 import wave
+from typing import List
 
 from neon_transformers.text_transformers import UtteranceTransformersService
 from ovos_bus_client import Message, MessageBusClient
@@ -90,6 +91,14 @@ class NeonIntentService(IntentService):
         self.bus.on("neon.profile_update", self.handle_profile_update)
         self.bus.on("neon.languages.skills", self.handle_supported_languages)
 
+    @property
+    def supported_languages(self) -> List[str]:
+        """
+        Get a list of supported ISO 639-1 language codes
+        """
+        return [lang.split('-')[0] for lang in
+                self.language_config.get("supported_langs") or []]
+
     def handle_supported_languages(self, message):
         """
         Handle a request for supported skills languages
@@ -100,8 +109,7 @@ class NeonIntentService(IntentService):
         translate_langs = list(translator.translator.available_languages) if \
             translator and translator.translator else list()
 
-        native_langs = list(self.language_config.get('supported_langs') or
-                            ['en'])
+        native_langs = list(self.supported_languages or ['en'])
         skill_langs = list(set(native_langs + translate_langs))
         self.bus.emit(message.response({"skill_langs": skill_langs,
                                         "native_langs": native_langs,
@@ -168,7 +176,7 @@ class NeonIntentService(IntentService):
             lang = get_full_lang_code(
                 message.data.get('lang') or self.language_config["user"])
             message.data["lang"] = lang
-
+            LOG.debug(f"message_lang={lang}")
             # Add or init timing data
             message.context = message.context or {}
             if not message.context.get("timing"):
@@ -218,18 +226,46 @@ class NeonIntentService(IntentService):
                 self.bus.emit(reply)
                 return
 
-            # TODO: Try the original lang and fallback to translation
-            # If translated, make sure message.data['lang'] is updated
-            if message.context.get("translation_data") and \
+            if message.data["lang"].split('-')[0] in self.supported_languages:
+                LOG.debug(f'Native language support ({message.data["lang"]})')
+                if message.context.get("translation_data") and \
                     message.context.get("translation_data")[0].get(
                         "was_translated"):
+                    # TODO: Patching translation plugin supported language check
+                    LOG.warning(f"Translated supported input!")
+                    real_utterances = [message.context.get(
+                        "translation_data")[0].get("raw_utterance")]
+                    message.data["utterances"] = real_utterances
+            # If translated, make sure message.data['lang'] is updated
+            elif message.context.get("translation_data") and \
+                    message.context.get("translation_data")[0].get(
+                        "was_translated"):
+                LOG.info(f"Using utterance translated to: "
+                         f"{self.language_config['internal']}")
                 message.data["lang"] = self.language_config["internal"]
             # now pass our modified message to Mycroft
             # TODO: Consider how to implement 'and' parsing and converse DM
-            LOG.info(message.data.get('utterances'))
+            LOG.info(f"lang={message.data['lang']} "
+                     f"{message.data.get('utterances')}")
             super().handle_utterance(message)
         except Exception as err:
             LOG.exception(err)
+
+    def handle_get_padatious(self, message):
+        # TODO: Override to explicitly handle language
+        utterance = message.data["utterance"]
+        language = message.data.get("lang")
+        norm = message.data.get('norm_utt', utterance)
+        if language not in self.padatious_service.containers:
+            LOG.warning(f"{language} not found in padatious containers "
+                        f"{self.padatious_service.containers}")
+        intent = self.padatious_service.calc_intent(utterance, language)
+        if not intent and norm != utterance:
+            intent = self.padatious_service.calc_intent(norm, language)
+        if intent:
+            intent = intent.__dict__
+        self.bus.emit(message.reply("intent.service.padatious.reply",
+                                    {"intent": intent}))
 
 
 class NeonConverseService(ConverseService):
