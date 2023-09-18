@@ -29,5 +29,5 @@
 
 # Python package installation must occur in a separate thread, before module load, for the entry point to be loaded.
 neon install-default-skills
-neon install-skill-requirements /skills
+neon install-skill-requirements /skills  # TODO: Support xdg path
 neon run-skills
