@@ -9,4 +9,4 @@ neon-skill-translation~=1.0
 neon-skill-camera~=1.0
 ovos-skill-somafm~=0.0.1
 neon-homeassistant-skill~=0.0.13
-ovos-skill-jokes @ git+https://github.com/jarbasskills/skill-icanhazdadjokes
+ovos-skill-jokes @ git+https://github.com/openvoiceos/skill-ovos-icanhazdadjokes
