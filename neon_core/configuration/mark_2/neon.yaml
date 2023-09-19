@@ -89,9 +89,7 @@ skills:
   # TODO: extra_directories here is the default, can it be removed?
   extra_directories:
     - /home/neon/.local/share/neon/skills
-  default_skills:
-  # TODO: Defaults are just patching skills not yet pip installable
-  - https://github.com/JarbasSkills/skill-icanhazdadjokes/tree/dev
+  default_skills: []
 PHAL:
   ovos-PHAL-plugin-balena-wifi:
     enabled: false
