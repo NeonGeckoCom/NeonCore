@@ -28,7 +28,7 @@ confirm_listening: true
 listener:
   VAD:
     silence_method: vad_only
-    module: ovos-vad-plugin-webrtcvad
+    module: ovos-vad-plugin-silero
   mute_during_output: false
   instant_listen: true
   speech_begin: 0.5
