@@ -1,6 +1,6 @@
 # mycroft
 ovos-core~=0.0.7
-ovos-workshop~=0.0.12
+ovos-workshop==0.0.12  # TODO: 0.0.13a1 introduces bug in NeonFallbackSkill
 # padacioso==0.1.3a2
 ovos-plugin-common-play~=0.0.5
 
@@ -9,8 +9,8 @@ neon-utils[network]~=1.6,>=1.6.2
 ovos-utils~=0.0.35
 ovos-bus-client~=0.0.5
 neon-transformers~=0.2
-ovos-config==0.0.11a9  # TODO: Pinned for stable release
-ovos-skills-manager==0.0.13a4  # TODO: Pinned for stable release
+ovos-config~=0.0.11a9
+ovos-skills-manager~=0.0.13a4  # TODO: Deprecate usage
 ovos-plugin-manager~=0.0.21
 ovos-backend-client~=0.0.6
 psutil~=5.6
@@ -29,7 +29,7 @@ requests < 2.30.0
 # TODO: Patching dependencies ovos-core[skills,skills_lgpl] extra deps
 adapt-parser~=0.5
 padacioso~=0.1
-ovos-lingua-franca==0.4.8a6  # TODO: Pinned for stable release
+ovos-lingua-franca~=0.4.8a6
 ovos-phal-plugin-connectivity-events~=0.0.1
 padatious~=0.4.8
 fann2==1.0.7
