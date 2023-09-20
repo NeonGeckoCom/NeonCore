@@ -12,7 +12,7 @@ neon-mana-utils~=0.2,>=0.2.2
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
-onnx!=1.16.0  # TODO: Patching https://github.com/microsoft/onnxruntime/issues/17631
+onnxruntime!=1.16.0  # TODO: Patching https://github.com/microsoft/onnxruntime/issues/17631
 ovos-ww-plugin-precise~=0.1
 ovos-ww-plugin-precise-lite[tflite]~=0.1,>=0.1.2
 ovos-ww-plugin-vosk~=0.1,>=0.1.1

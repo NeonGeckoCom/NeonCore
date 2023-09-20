@@ -1,7 +1,7 @@
 neon-stt-plugin-deepspeech-stream-local~=2.0
 neon-stt-plugin-nemo~=0.0
 neon-tts-plugin-coqui~=0.7,>=0.7.1
-onnx!=1.16.0  # TODO: Patching https://github.com/microsoft/onnxruntime/issues/17631
+onnxruntime!=1.16.0  # TODO: Patching https://github.com/microsoft/onnxruntime/issues/17631
 # TODO: Local language plugin
 
 # Fallback
