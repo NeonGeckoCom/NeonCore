@@ -1,3 +1,4 @@
 pytest
 pytest-cov
 mock~=5.0
+ovos-skills-manager~=0.0.13a4
