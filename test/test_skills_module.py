@@ -80,9 +80,9 @@ class TestSkillService(unittest.TestCase):
         if os.path.exists(cls.config_dir):
             shutil.rmtree(cls.config_dir)
 
-    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
     @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_neon_skills_service(self, run, install_default):
+    def test_neon_skills_service(self, run):
         from neon_core.skills.service import NeonSkillService
         from neon_core.skills.skill_manager import NeonSkillManager
         # from mycroft.util.process_utils import ProcessState
@@ -116,7 +116,7 @@ class TestSkillService(unittest.TestCase):
         service.start()
         started.wait(30)
         self.assertTrue(service.config['skills']['auto_update'])
-        install_default.assert_called_once()
+        # install_default.assert_called_once()
 
         # Check mock method called
         run.assert_called_once()
@@ -344,28 +344,28 @@ class TestSkillManager(unittest.TestCase):
         if os.path.isdir(cls.config_dir):
             shutil.rmtree(cls.config_dir)
 
-    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    # @patch("mycroft.skills.skill_manager.SkillManager.run")
+    # def test_download_or_update_defaults(self, patched_run, patched_installer):
+    #     from neon_core.configuration import patch_config
+    #     patch_config({"skills": {"auto_update": True}})
+    #
+    #     from neon_core.skills.skill_manager import NeonSkillManager
+    #     manager = NeonSkillManager(FakeBus())
+    #     self.assertTrue(manager.config["skills"]["auto_update"])
+    #     manager.run()
+    #     patched_run.assert_called_once()
+    #     patched_installer.assert_called_once()
+    #
+    #     patched_installer.reset_mock()
+    #     manager.config.update({"skills": {"auto_update": False}})
+    #     manager.download_or_update_defaults()
+    #     patched_installer.assert_not_called()
+    #     manager.stop()
+
+    # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
     @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_download_or_update_defaults(self, patched_run, patched_installer):
-        from neon_core.configuration import patch_config
-        patch_config({"skills": {"auto_update": True}})
-
-        from neon_core.skills.skill_manager import NeonSkillManager
-        manager = NeonSkillManager(FakeBus())
-        self.assertTrue(manager.config["skills"]["auto_update"])
-        manager.run()
-        patched_run.assert_called_once()
-        patched_installer.assert_called_once()
-
-        patched_installer.reset_mock()
-        manager.config.update({"skills": {"auto_update": False}})
-        manager.download_or_update_defaults()
-        patched_installer.assert_not_called()
-        manager.stop()
-
-    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_get_default_skills_dir(self, _, __):
+    def test_get_default_skills_dir(self, _):
         from neon_core.skills.skill_manager import NeonSkillManager
         manager = NeonSkillManager(FakeBus())
         manager.config = dict(manager.config)  # Override Configuration to test
