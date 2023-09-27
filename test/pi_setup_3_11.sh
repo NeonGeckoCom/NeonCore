@@ -44,6 +44,6 @@ python3.11 -m venv "/core/venv" || exit 11
 . /core/venv/bin/activate
 
 pip install --upgrade pip wheel
-pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" || exit 11
+pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" --extra-index-url "https://whl.smartgic.io/" || exit 11
 
 cp -rf /core/test/pi_image_overlay/* /
