@@ -30,22 +30,11 @@ from os import makedirs
 from os.path import isdir, join, expanduser
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
-from neon_core.skills.skill_store import SkillsStore
-from neon_utils.net_utils import check_online as connected
 
 from mycroft.skills.skill_manager import SkillManager
 
 
 class NeonSkillManager(SkillManager):
-
-    def __init__(self, *args, **kwargs):
-        # self.load_lock = RLock()  # Prevent multiple network event handling
-        super().__init__(*args, **kwargs)
-        skill_dir = self.get_default_skills_dir()
-        self.skill_downloader = SkillsStore(
-            skills_dir=skill_dir,
-            config=self.config["skills"], bus=self.bus)
-        self.skill_downloader.skills_dir = skill_dir
 
     def get_default_skills_dir(self):
         """
@@ -72,24 +61,7 @@ class NeonSkillManager(SkillManager):
 
         return skill_dir
 
-    def download_or_update_defaults(self):
-        # on launch only install if missing, updates handled separately
-        # if osm is disabled in .conf this does nothing
-        if self.config["skills"].get("auto_update"):
-            try:
-                self.skill_downloader.install_default_skills()
-            except Exception as e:
-                if connected():
-                    # if there is internet log the error
-                    LOG.exception(e)
-                    LOG.error("default skills installation failed")
-                else:
-                    # if no internet just skip this update
-                    LOG.error("no internet, skipped default skills installation")
-
     def _load_new_skills(self, *args, **kwargs):
-        # with self.load_lock:
-        #     LOG.debug(f"Loading skills: {kwargs}")
         # Override load method for config module checks
         SkillManager._load_new_skills(self, *args, **kwargs)
 
@@ -105,10 +77,4 @@ class NeonSkillManager(SkillManager):
         environ.setdefault('OVOS_CONFIG_BASE_FOLDER', "neon")
         environ.setdefault('OVOS_CONFIG_FILENAME', "neon.yaml")
         LOG.debug("set default configuration to `neon/neon.yaml`")
-        self.download_or_update_defaults()
-        # from neon_utils.net_utils import check_online
-        # if check_online():
-        #     LOG.debug("Already online, allow skills to load")
-        #     self.bus.emit(Message("mycroft.network.connected"))
-        #     self.bus.emit(Message("mycroft.internet.connected"))
         SkillManager.run(self)
