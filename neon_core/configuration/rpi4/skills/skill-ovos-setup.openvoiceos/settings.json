@@ -1,0 +1,55 @@
+{
+    "enable_language_selection": false,
+    "enable_backend_selection": false,
+    "enable_stt_selection": false,
+    "enable_tts_selection": false,
+    "preferred_stt_engine": "deepspeech_stream_local",
+    "preferred_tts_engine": "coqui",
+    "tts_blacklist": [
+        "ovos-tts-plugin-SAM",
+        "ovos-tts-plugin-beepspeak",
+        "ovos_tts_plugin_espeakng"
+    ],
+    "stt_blacklist": [
+        "ovos-stt-plugin-pocketsphinx",
+        "ovos-stt-plugin-selene"
+    ],
+    "langs": [
+        {
+            "name": "English",
+            "code": "en",
+            "system_code": "en_US"
+        },
+        {
+            "name": "Italian",
+            "code": "it",
+            "system_code": "it_IT"
+        },
+        {
+            "name": "French",
+            "code": "fr",
+            "system_code": "fr_FR"
+        },
+        {
+            "name": "Spanish",
+            "code": "es",
+            "system_code": "es_ES"
+        },
+        {
+            "name": "Portuguese",
+            "code": "pt",
+            "system_code": "pt_PT"
+        },
+        {
+            "name": "German",
+            "code": "de",
+            "system_code": "de_DE"
+        },
+        {
+            "name": "Dutch",
+            "code": "nl",
+            "system_code": "nl_NL"
+        }
+    ],
+    "__mycroft_skill_firstrun": false
+}
