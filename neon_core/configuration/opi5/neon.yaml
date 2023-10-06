@@ -4,8 +4,8 @@ play_ogg_cmdline: "play %1"
 g2p:
   module: "dummy"
 tts:
-  module: coqui
-  fallback_module: neon-tts-plugin-coqui-remote
+  module: neon-tts-plugin-coqui-remote
+  fallback_module: coqui
   neon-tts-plugin-larynx-server:
     host: "https://larynx.2022.us"
   mozilla_remote:
