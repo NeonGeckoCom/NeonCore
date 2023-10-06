@@ -83,16 +83,16 @@ def install_default_skills():
     click.echo("Default Skills Installed")
 
 
-@neon_core_cli.command(help=
-                       "Install skill requirements for a specified directory")
-@click.argument("skill_dir")
-def install_skill_requirements(skill_dir):
-    from neon_core.util.skill_utils import install_local_skills
-    try:
-        installed = install_local_skills(skill_dir)
-        click.echo(f"Installed {len(installed)} skills from {skill_dir}")
-    except ValueError as e:
-        click.echo(e)
+# @neon_core_cli.command(help=
+#                        "Install skill requirements for a specified directory")
+# @click.argument("skill_dir")
+# def install_skill_requirements(skill_dir):
+#     from neon_core.util.skill_utils import install_local_skills
+#     try:
+#         installed = install_local_skills(skill_dir)
+#         click.echo(f"Installed {len(installed)} skills from {skill_dir}")
+#     except ValueError as e:
+#         click.echo(e)
 
 
 @neon_core_cli.command(help="Start Neon Skills module")
@@ -102,14 +102,15 @@ def run_skills(install_skills):
     from neon_utils.configuration_utils import init_config_dir
     init_config_dir()
 
-    from neon_core.util.skill_utils import install_local_skills
+    # from neon_core.util.skill_utils import install_local_skills
     from neon_core.skills.__main__ import main
     if install_skills:
-        click.echo(f"Handling installation of skills in: {install_skills}")
-        try:
-            install_local_skills(install_skills)
-        except ValueError as e:
-            click.echo(f"Skill Installation Failed: {e}")
+        click.echo(f"Local skill installation is deprecated. "
+                   f"Add pip specs to config.")
+        # try:
+        #     install_local_skills(install_skills)
+        # except ValueError as e:
+        #     click.echo(f"Skill Installation Failed: {e}")
     click.echo("Starting Skills Service")
     main()
     click.echo("Skills Service Shutdown")
