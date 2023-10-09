@@ -21,10 +21,10 @@ jobs:
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
       - name: Ensure LFS files are pulled
-        run: git lfs pull action/neon_debos
+        run: cd action/neon_debos && git lfs pull
       - name: Export keys for image build
         run: |
-          mkdir -p action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon
+          mkdir -p overlays/80-google-json-overlay/home/neon/.local/share/neon
           echo ${GOOGLE_KEY}>action/neon_debos/overlays/80-google-json-overlay/home/neon/.local/share/neon/google.json
         env:
           GOOGLE_KEY: ${{secrets.google_api_key}}
