@@ -1,11 +1,11 @@
 # mycroft
 ovos-core~=0.0.7
-ovos-workshop==0.0.12  # TODO: 0.0.13a1 introduces bug in NeonFallbackSkill
 # padacioso==0.1.3a2
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[network]~=1.6,>=1.6.2
+neon-utils[audio,network]~=1.6,>=1.6.3a2
+# TODO: Audio extra patching dependency resolution
 ovos-utils~=0.0.35
 ovos-bus-client~=0.0.5
 neon-transformers~=0.2
