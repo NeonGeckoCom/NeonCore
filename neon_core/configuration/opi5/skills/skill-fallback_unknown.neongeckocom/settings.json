@@ -1,0 +1,5 @@
+{
+  "emit_led": true,
+  "show_utterances": true,
+  "__mycroft_skill_firstrun": false
+}

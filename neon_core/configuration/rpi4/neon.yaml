@@ -114,6 +114,7 @@ PHAL:
       initramfs_path: /opt/neon/firmware/initramfs
       initramfs_update_path: /opt/neon/initramfs
       squashfs_url: "https://2222.us/app/files/neon_images/pi/mycroft_mark_2/updates/{}/"
+      # TODO: Generic squashfs update path?
       squashfs_path: /opt/neon/update.squashfs
       default_track: dev
     neon-phal-plugin-linear-led-neopixel:
@@ -126,7 +127,7 @@ PHAL:
     neon-phal-plugin-reset:
       enabled: true
       default_config_url: "https://github.com/NeonGeckoCom/NeonCore/archive/refs/tags/{}.zip"
-      default_config_path: neon_core/configuration/mark_2
+      default_config_path: neon_core/configuration/opi5
     neon-phal-plugin-audio-receiver:
       enabled: true
 ready_settings:
