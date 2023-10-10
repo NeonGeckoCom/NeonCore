@@ -77,8 +77,12 @@ try:
                 # skill_id and bus kwargs.
                 # these skills only have skill_id and bus available in initialize,
                 # not in __init__
-                if not self.instance._is_fully_initialized:
-                    self.instance._startup(self.bus, self.skill_id)
+                try:
+                    if not self.instance.is_fully_initialized:
+                        self.instance._startup(self.bus, self.skill_id)
+                except AttributeError:
+                    if not self.instance._is_fully_initialized:
+                        self.instance._startup(self.bus, self.skill_id)
             except Exception as e:
                 LOG.exception(f'Skill __init__ failed with {e}')
                 self.instance = None

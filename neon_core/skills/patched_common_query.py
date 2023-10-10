@@ -41,6 +41,8 @@ from ovos_utils.messagebus import get_message_lang
 
 from mycroft.skills.intent_services.base import IntentMatch
 from mycroft.skills.skill_data import CoreResources
+
+# TODO: Timeout from config
 # TODO: Port to ovos-core
 EXTENSION_TIME = 10
 MIN_RESPONSE_WAIT = 3
