@@ -167,3 +167,6 @@ system:
     user:
       - gui_websocket:host
       - websocket:host
+language:
+  detection_module: None
+  translation_module: libretranslate_plug
