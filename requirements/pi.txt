@@ -60,4 +60,4 @@ ovos-skill-volume~=0.0.1
 skill-markII-audio-receiver>=0.0.4
 
 # Backwards-compat
-ovos-skills-manager~=0.0.13a4  # TODO: Remove in 2024
+ovos-skills-manager~=0.0.13  # TODO: Remove in 2024
