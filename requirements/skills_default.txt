@@ -1,4 +1,4 @@
-skill-ddg~=0.0
+skill-ddg~=0.0,>=0.0.2a2
 neon-skill-alerts~=2.0
 neon-skill-caffeinewiz~=1.0
 neon-skill-data_controls~=2.0

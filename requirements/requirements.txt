@@ -4,12 +4,13 @@ ovos-core~=0.0.7
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[audio,network]~=1.6,>=1.6.3a3
+neon-utils[audio,network]~=1.6,>=1.6.3a4
 # TODO: Audio extra patching dependency resolution
 ovos-utils~=0.0.35
-ovos-bus-client~=0.0.5
+ovos-bus-client~=0.0.5,>=0.0.6a18
+# TODO: Above alpha just for testing compat.
 neon-transformers~=0.2
-ovos-config~=0.0.11a15
+ovos-config~=0.0.11
 ovos-plugin-manager~=0.0.21
 ovos-backend-client~=0.0.6
 psutil~=5.6
