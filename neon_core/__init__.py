@@ -28,7 +28,7 @@
 
 # import sys
 
-# from neon_core.config import setup_resolve_resource_file, get_core_version
+from neon_core.config import setup_resolve_resource_file, get_core_version
 from os.path import dirname
 
 
@@ -37,7 +37,7 @@ NEON_ROOT_PATH = dirname(__file__)
 # sys.path.append(NEON_ROOT_PATH)
 
 CORE_VERSION_STR = ""  # get_core_version()
-# setup_resolve_resource_file()
+setup_resolve_resource_file()
 
 __all__ = ['NEON_ROOT_PATH',
            'CORE_VERSION_STR']

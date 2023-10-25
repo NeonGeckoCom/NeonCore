@@ -55,11 +55,12 @@ def setup_resolve_resource_file():
     """
     from ovos_utils.log import log_deprecation
     from neon_utils.file_utils import resolve_neon_resource_file
-    log_deprecation("This method is deprecated; resource resolution is handled "
-                    "automatically.", "23.12.1")
 
     def patched_resolve_resource_file(res_name):
         from mycroft.util.file_utils import resolve_resource_file
+        log_deprecation("This method is deprecated; use "
+                        "`ovos_utils.file_utils.resolve_resource_file.",
+                        "23.12.1")
         resource = resolve_neon_resource_file(res_name) or \
             resolve_resource_file(res_name)
         return resource
