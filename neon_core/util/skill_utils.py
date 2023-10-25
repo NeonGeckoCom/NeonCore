@@ -186,7 +186,7 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     try:
         _write_pip_constraints_to_file(constraints_file)
     except PermissionError:
-        LOG.error(f"Unable to write pip constraints file {constraints_file}")
+        LOG.warning(f"Unable to write pip constraints file {constraints_file}")
         from ovos_skills_manager.utils import set_osm_constraints_file
         constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
         _write_pip_constraints_to_file(constraints_file)
@@ -205,7 +205,7 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     if token_set:
         from ovos_skills_manager.session import clear_github_token
         clear_github_token()
-    LOG.info(f"Installed skills to: {skill_dir}")
+    LOG.info(f"Installed {len(skills_to_install)} skills to: {skill_dir}")
 
 
 def install_skills_default(config: dict = None):
@@ -217,7 +217,9 @@ def install_skills_default(config: dict = None):
     if isinstance(skills_list, str):
         skills_list = _get_skills_from_remote_list(skills_list)
     assert isinstance(skills_list, list)
-    install_skills_from_list(skills_list, config)
+    if skills_list:
+        LOG.info(f"Installing configured skills: {skills_list}")
+        install_skills_from_list(skills_list, config)
 
 
 def _get_skills_from_remote_list(url: str) -> List[str]:
