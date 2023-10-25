@@ -1,14 +1,14 @@
-# mycroft
-ovos-core~=0.0.7
+# ovos-core version pinned for compat. with patches in NeonCore
+ovos-core==0.0.7
 # padacioso==0.1.3a2
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[audio,network]~=1.6,>=1.6.3a4
+neon-utils[audio,network]~=1.6,>=1.6.3a5
 # TODO: Audio extra patching dependency resolution
 ovos-utils~=0.0.35
-ovos-bus-client~=0.0.5,>=0.0.6a18
-# TODO: Above alpha just for testing compat.
+ovos-bus-client==0.0.5
+# TODO: Above pinned to reduce logs from ovos-core 0.0.7 with ovos-bus-client 0.0.6
 neon-transformers~=0.2
 ovos-config~=0.0.11
 ovos-plugin-manager~=0.0.21
