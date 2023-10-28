@@ -59,5 +59,8 @@ ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 skill-markII-audio-receiver>=0.0.4
 
+# Pinned for stable release (pulled by skill-ddg)
+ovos-classifiers==0.0.0a37
+
 # Backwards-compat
 ovos-skills-manager~=0.0.13  # TODO: Remove in 2024

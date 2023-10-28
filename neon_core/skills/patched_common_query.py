@@ -44,7 +44,7 @@ from mycroft.skills.skill_data import CoreResources
 
 # TODO: Timeout from config
 # TODO: Port to ovos-core
-EXTENSION_TIME = 10
+EXTENSION_TIME = 15
 MIN_RESPONSE_WAIT = 3
 
 
