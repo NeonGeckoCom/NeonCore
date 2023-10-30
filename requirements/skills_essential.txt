@@ -1,5 +1,7 @@
 neon-skill-about~=1.0
 neon-skill-date_time~=1.0
+# neon-skill-date_time~=1.0,>=1.0.1a2
 neon-skill-demo~=1.0
+# neon-skill-demo~=1.0,>=1.0.1a1
 neon-skill-device_controls~=1.0
 neon-skill-ip_address~=1.0

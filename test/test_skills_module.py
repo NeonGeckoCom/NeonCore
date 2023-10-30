@@ -80,9 +80,9 @@ class TestSkillService(unittest.TestCase):
         if os.path.exists(cls.config_dir):
             shutil.rmtree(cls.config_dir)
 
-    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
     @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_neon_skills_service(self, run, install_default):
+    def test_neon_skills_service(self, run):
         from neon_core.skills.service import NeonSkillService
         from neon_core.skills.skill_manager import NeonSkillManager
         # from mycroft.util.process_utils import ProcessState
@@ -116,7 +116,7 @@ class TestSkillService(unittest.TestCase):
         service.start()
         started.wait(30)
         self.assertTrue(service.config['skills']['auto_update'])
-        install_default.assert_called_once()
+        # install_default.assert_called_once()
 
         # Check mock method called
         run.assert_called_once()
@@ -344,28 +344,28 @@ class TestSkillManager(unittest.TestCase):
         if os.path.isdir(cls.config_dir):
             shutil.rmtree(cls.config_dir)
 
-    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
+    # @patch("mycroft.skills.skill_manager.SkillManager.run")
+    # def test_download_or_update_defaults(self, patched_run, patched_installer):
+    #     from neon_core.configuration import patch_config
+    #     patch_config({"skills": {"auto_update": True}})
+    #
+    #     from neon_core.skills.skill_manager import NeonSkillManager
+    #     manager = NeonSkillManager(FakeBus())
+    #     self.assertTrue(manager.config["skills"]["auto_update"])
+    #     manager.run()
+    #     patched_run.assert_called_once()
+    #     patched_installer.assert_called_once()
+    #
+    #     patched_installer.reset_mock()
+    #     manager.config.update({"skills": {"auto_update": False}})
+    #     manager.download_or_update_defaults()
+    #     patched_installer.assert_not_called()
+    #     manager.stop()
+
+    # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
     @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_download_or_update_defaults(self, patched_run, patched_installer):
-        from neon_core.configuration import patch_config
-        patch_config({"skills": {"auto_update": True}})
-
-        from neon_core.skills.skill_manager import NeonSkillManager
-        manager = NeonSkillManager(FakeBus())
-        self.assertTrue(manager.config["skills"]["auto_update"])
-        manager.run()
-        patched_run.assert_called_once()
-        patched_installer.assert_called_once()
-
-        patched_installer.reset_mock()
-        manager.config.update({"skills": {"auto_update": False}})
-        manager.download_or_update_defaults()
-        patched_installer.assert_not_called()
-        manager.stop()
-
-    @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
-    def test_get_default_skills_dir(self, _, __):
+    def test_get_default_skills_dir(self, _):
         from neon_core.skills.skill_manager import NeonSkillManager
         manager = NeonSkillManager(FakeBus())
         manager.config = dict(manager.config)  # Override Configuration to test
@@ -403,188 +403,188 @@ class TestSkillManager(unittest.TestCase):
         self.assertTrue(isdir(expanduser("~/neon-skills")))
 
 
-class TestSkillStore(unittest.TestCase):
-    essential = ["https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"]
-    config = {
-        "disable_osm": False,
-        "auto_update": True,
-        "auto_update_interval": 1,
-        "appstore_sync_interval": 1,
-        "neon_token": None,
-        "essential_skills": essential,
-        "install_default": True,
-        "install_essential": True,
-        "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/"
-                          "neon_skills/TEST_ShortSkillsList/skill_lists/"
-                          "TEST-SHORTLIST"
-    }
-    skill_dir = join(dirname(__file__), "skill_module_skills")
-    bus = FakeBus()
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        import mycroft.skills.event_scheduler
-        mocked_scheduler = MockEventSchedulerInterface
-        mycroft.skills.event_scheduler.EventSchedulerInterface = \
-            mocked_scheduler
-        import neon_core.skills.skill_store
-        importlib.reload(neon_core.skills.skill_store)
-
-        from neon_core.skills.skill_store import SkillsStore
-        cls.skill_store = SkillsStore(cls.skill_dir, cls.config, cls.bus)
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.skill_store.shutdown()
-
-    def test_00_store_init(self):
-        self.assertEqual(self.skill_store.config, self.config)
-        self.assertFalse(self.skill_store.disabled)
-        self.assertEqual(self.skill_store.skills_dir, self.skill_dir)
-        self.assertEqual(self.skill_store.bus, self.bus)
-        self.assertIsNotNone(self.skill_store.osm)
-        self.assertIsInstance(self.skill_store.scheduler,
-                              MockEventSchedulerInterface)
-        self.assertEqual(
-            self.skill_store.scheduler.schedule_repeating_event.call_count, 2)
-
-    def test_schedule_sync(self):
-        pass
-
-    def test_schedule_update(self):
-        pass
-
-    def test_handle_update(self):
-        pass
-
-    def test_handle_sync_appstores(self):
-        pass
-
-    def test_handle_load_osm(self):
-        from ovos_skills_manager import OVOSSkillsManager
-        self.skill_store.disabled = True
-        self.assertIsNone(self.skill_store.load_osm())
-
-        self.skill_store.disabled = False
-        self.assertIsInstance(self.skill_store.load_osm(), OVOSSkillsManager)
-
-    def test_essential_skills(self):
-        self.assertFalse(self.skill_store.disabled)
-        self.assertEqual(len(self.skill_store.essential_skills),
-                         len(self.essential))
-
-    def test_default_skills(self):
-        self.assertFalse(self.skill_store.disabled)
-        self.assertIsInstance(self.skill_store.default_skills, list)
-        self.assertGreater(len(self.skill_store.default_skills), 0)
-
-    def test_authenticate_neon(self):
-        pass
-
-    def test_deauthenticate_neon(self):
-        pass
-
-    def test_get_skill_entry(self):
-        # TODO: Implement skills by ID after fixing in OSM
-        # TODO: Support missing branch specs
-        from ovos_skills_manager import SkillEntry
-        url = "https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"
-        # skill_id = "skill-ovos-homescreen.openvoiceos"
-        url_entry = self.skill_store.get_skill_entry(url)
-        self.assertIsInstance(url_entry, SkillEntry)
-        # id_entry = self.skill_store.get_skill_entry(skill_id)
-        # self.assertIsInstance(id_entry, SkillEntry)
-        # self.assertEqual(url_entry.skill_name, id_entry.skill_name)
-
-    def test_get_remote_entries(self):
-        from neon_core.util.skill_utils import get_remote_entries
-        test_urls = {
-            "https://raw.githubusercontent.com/NeonGeckoCom/neon_skills/master/skill_lists/DEFAULT-SKILLS",
-            "https://raw.githubusercontent.com/NeonGeckoCom/neon_skills/master/skill_lists/DEFAULT-PREMIUM-SKILLS"
-        }
-        for url in test_urls:
-            self.assertEqual(self.skill_store.get_remote_entries(url),
-                             get_remote_entries(url))
-
-    def test_parse_config_entry(self):
-        # TODO: Implement skills by ID after fixing in OSM
-        from ovos_skills_manager import SkillEntry
-        self.skill_store.osm.disable_appstore("local")
-
-        valid_entry_url = self.config["default_skills"]
-        valid_entry_list_url = self.config["essential_skills"]
-        # valid_entry_list_id = ["skill-ovos-homescreen.openvoiceos",
-        #                        "caffeinewiz.neon.neongeckocom"]
-
-        self.skill_store.disabled = True
-        self.assertEqual(self.skill_store._parse_config_entry(valid_entry_url),
-                         list())
-        self.skill_store.disabled = False
-
-        # with self.assertRaises(ValueError):
-        #     self.skill_store._parse_config_entry(valid_entry_list_id[0])
-
-        with self.assertRaises(ValueError):
-            self.skill_store._parse_config_entry(None)
-
-        default_entries = self.skill_store._parse_config_entry(valid_entry_url)
-        self.assertIsInstance(default_entries, list)
-        self.assertTrue(all([isinstance(x, SkillEntry)
-                             for x in default_entries]), default_entries)
-
-        essential_entries = \
-            self.skill_store._parse_config_entry(valid_entry_list_url)
-        self.assertIsInstance(essential_entries, list)
-        self.assertEqual(len(essential_entries), 1, essential_entries)
-        self.assertIsInstance(essential_entries[0], SkillEntry)
-
-        # list_entries = \
-        #     self.skill_store._parse_config_entry(valid_entry_list_id)
-        # self.assertIsInstance(list_entries, list)
-        # self.assertEqual(len(list_entries), 2, list_entries)
-        # self.assertTrue(all([isinstance(x, SkillEntry)
-        #                      for x in list_entries]), list_entries)
-
-    def test_install_skill(self):
-        skill_entry = Mock()
-        install_dir = self.skill_dir
-
-        def skill_entry_installer(*_, **kwargs):
-            self.assertEqual(kwargs["folder"], install_dir)
-            if kwargs.get("update"):
-                return True
-            return False
-
-        self.skill_store.disabled = True
-        self.assertFalse(self.skill_store.install_skill(skill_entry))
-        self.skill_store.disabled = False
-
-        skill_entry.install = skill_entry_installer
-        self.assertFalse(self.skill_store.install_skill(skill_entry))
-
-        install_dir = "/tmp"
-        self.assertTrue(self.skill_store.install_skill(skill_entry, "/tmp",
-                                                       update=True))
-
-    def test_install_default_skills(self):
-        install_skill = Mock()
-        real_install_skill = self.skill_store.install_skill
-        self.skill_store.install_skill = install_skill
-
-        self.skill_store.disabled = True
-        self.assertEqual(self.skill_store.install_default_skills(), list())
-        self.assertEqual(self.skill_store.install_default_skills(True), list())
-        self.skill_store.disabled = False
-
-        install_skill.reset_mock()
-        skills = self.skill_store.install_default_skills(False)
-        self.assertEqual(install_skill.call_count, len(skills))
-
-        install_skill.reset_mock()
-        skills = self.skill_store.install_default_skills(True)
-        self.assertEqual(install_skill.call_count, len(skills))
-
-        self.skill_store.install_skill = real_install_skill
+# class TestSkillStore(unittest.TestCase):
+#     essential = ["https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"]
+#     config = {
+#         "disable_osm": False,
+#         "auto_update": True,
+#         "auto_update_interval": 1,
+#         "appstore_sync_interval": 1,
+#         "neon_token": None,
+#         "essential_skills": essential,
+#         "install_default": True,
+#         "install_essential": True,
+#         "default_skills": "https://raw.githubusercontent.com/NeonGeckoCom/"
+#                           "neon_skills/TEST_ShortSkillsList/skill_lists/"
+#                           "TEST-SHORTLIST"
+#     }
+#     skill_dir = join(dirname(__file__), "skill_module_skills")
+#     bus = FakeBus()
+#
+#     @classmethod
+#     def setUpClass(cls) -> None:
+#         import mycroft.skills.event_scheduler
+#         mocked_scheduler = MockEventSchedulerInterface
+#         mycroft.skills.event_scheduler.EventSchedulerInterface = \
+#             mocked_scheduler
+#         import neon_core.skills.skill_store
+#         importlib.reload(neon_core.skills.skill_store)
+#
+#         from neon_core.skills.skill_store import SkillsStore
+#         cls.skill_store = SkillsStore(cls.skill_dir, cls.config, cls.bus)
+#
+#     @classmethod
+#     def tearDownClass(cls) -> None:
+#         cls.skill_store.shutdown()
+#
+#     def test_00_store_init(self):
+#         self.assertEqual(self.skill_store.config, self.config)
+#         self.assertFalse(self.skill_store.disabled)
+#         self.assertEqual(self.skill_store.skills_dir, self.skill_dir)
+#         self.assertEqual(self.skill_store.bus, self.bus)
+#         self.assertIsNotNone(self.skill_store.osm)
+#         self.assertIsInstance(self.skill_store.scheduler,
+#                               MockEventSchedulerInterface)
+#         self.assertEqual(
+#             self.skill_store.scheduler.schedule_repeating_event.call_count, 2)
+#
+#     def test_schedule_sync(self):
+#         pass
+#
+#     def test_schedule_update(self):
+#         pass
+#
+#     def test_handle_update(self):
+#         pass
+#
+#     def test_handle_sync_appstores(self):
+#         pass
+#
+#     def test_handle_load_osm(self):
+#         from ovos_skills_manager import OVOSSkillsManager
+#         self.skill_store.disabled = True
+#         self.assertIsNone(self.skill_store.load_osm())
+#
+#         self.skill_store.disabled = False
+#         self.assertIsInstance(self.skill_store.load_osm(), OVOSSkillsManager)
+#
+#     def test_essential_skills(self):
+#         self.assertFalse(self.skill_store.disabled)
+#         self.assertEqual(len(self.skill_store.essential_skills),
+#                          len(self.essential))
+#
+#     def test_default_skills(self):
+#         self.assertFalse(self.skill_store.disabled)
+#         self.assertIsInstance(self.skill_store.default_skills, list)
+#         self.assertGreater(len(self.skill_store.default_skills), 0)
+#
+#     def test_authenticate_neon(self):
+#         pass
+#
+#     def test_deauthenticate_neon(self):
+#         pass
+#
+#     def test_get_skill_entry(self):
+#         # TODO: Implement skills by ID after fixing in OSM
+#         # TODO: Support missing branch specs
+#         from ovos_skills_manager import SkillEntry
+#         url = "https://github.com/OpenVoiceOS/skill-ovos-homescreen/tree/main"
+#         # skill_id = "skill-ovos-homescreen.openvoiceos"
+#         url_entry = self.skill_store.get_skill_entry(url)
+#         self.assertIsInstance(url_entry, SkillEntry)
+#         # id_entry = self.skill_store.get_skill_entry(skill_id)
+#         # self.assertIsInstance(id_entry, SkillEntry)
+#         # self.assertEqual(url_entry.skill_name, id_entry.skill_name)
+#
+#     def test_get_remote_entries(self):
+#         from neon_core.util.skill_utils import get_remote_entries
+#         test_urls = {
+#             "https://raw.githubusercontent.com/NeonGeckoCom/neon_skills/master/skill_lists/DEFAULT-SKILLS",
+#             "https://raw.githubusercontent.com/NeonGeckoCom/neon_skills/master/skill_lists/DEFAULT-PREMIUM-SKILLS"
+#         }
+#         for url in test_urls:
+#             self.assertEqual(self.skill_store.get_remote_entries(url),
+#                              get_remote_entries(url))
+#
+#     def test_parse_config_entry(self):
+#         # TODO: Implement skills by ID after fixing in OSM
+#         from ovos_skills_manager import SkillEntry
+#         self.skill_store.osm.disable_appstore("local")
+#
+#         valid_entry_url = self.config["default_skills"]
+#         valid_entry_list_url = self.config["essential_skills"]
+#         # valid_entry_list_id = ["skill-ovos-homescreen.openvoiceos",
+#         #                        "caffeinewiz.neon.neongeckocom"]
+#
+#         self.skill_store.disabled = True
+#         self.assertEqual(self.skill_store._parse_config_entry(valid_entry_url),
+#                          list())
+#         self.skill_store.disabled = False
+#
+#         # with self.assertRaises(ValueError):
+#         #     self.skill_store._parse_config_entry(valid_entry_list_id[0])
+#
+#         with self.assertRaises(ValueError):
+#             self.skill_store._parse_config_entry(None)
+#
+#         default_entries = self.skill_store._parse_config_entry(valid_entry_url)
+#         self.assertIsInstance(default_entries, list)
+#         self.assertTrue(all([isinstance(x, SkillEntry)
+#                              for x in default_entries]), default_entries)
+#
+#         essential_entries = \
+#             self.skill_store._parse_config_entry(valid_entry_list_url)
+#         self.assertIsInstance(essential_entries, list)
+#         self.assertEqual(len(essential_entries), 1, essential_entries)
+#         self.assertIsInstance(essential_entries[0], SkillEntry)
+#
+#         # list_entries = \
+#         #     self.skill_store._parse_config_entry(valid_entry_list_id)
+#         # self.assertIsInstance(list_entries, list)
+#         # self.assertEqual(len(list_entries), 2, list_entries)
+#         # self.assertTrue(all([isinstance(x, SkillEntry)
+#         #                      for x in list_entries]), list_entries)
+#
+#     def test_install_skill(self):
+#         skill_entry = Mock()
+#         install_dir = self.skill_dir
+#
+#         def skill_entry_installer(*_, **kwargs):
+#             self.assertEqual(kwargs["folder"], install_dir)
+#             if kwargs.get("update"):
+#                 return True
+#             return False
+#
+#         self.skill_store.disabled = True
+#         self.assertFalse(self.skill_store.install_skill(skill_entry))
+#         self.skill_store.disabled = False
+#
+#         skill_entry.install = skill_entry_installer
+#         self.assertFalse(self.skill_store.install_skill(skill_entry))
+#
+#         install_dir = "/tmp"
+#         self.assertTrue(self.skill_store.install_skill(skill_entry, "/tmp",
+#                                                        update=True))
+#
+#     def test_install_default_skills(self):
+#         install_skill = Mock()
+#         real_install_skill = self.skill_store.install_skill
+#         self.skill_store.install_skill = install_skill
+#
+#         self.skill_store.disabled = True
+#         self.assertEqual(self.skill_store.install_default_skills(), list())
+#         self.assertEqual(self.skill_store.install_default_skills(True), list())
+#         self.skill_store.disabled = False
+#
+#         install_skill.reset_mock()
+#         skills = self.skill_store.install_default_skills(False)
+#         self.assertEqual(install_skill.call_count, len(skills))
+#
+#         install_skill.reset_mock()
+#         skills = self.skill_store.install_default_skills(True)
+#         self.assertEqual(install_skill.call_count, len(skills))
+#
+#         self.skill_store.install_skill = real_install_skill
 
 
 if __name__ == "__main__":

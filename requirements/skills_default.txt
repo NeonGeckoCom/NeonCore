@@ -1,4 +1,5 @@
-skill-ddg~=0.0
+skill-ddg==0.0.2a3
+# TODO: Above pinned for stable release
 neon-skill-alerts~=2.0
 neon-skill-caffeinewiz~=1.0
 neon-skill-data_controls~=2.0
@@ -15,4 +16,4 @@ neon-skill-wikipedia~=1.0,>=1.0.1
 neon-skill-free_music_archive~=1.0
 neon-skill-local_music~=2.0
 # neon-skill-holidays~=0.0.0a1
-neon-skill-fallback_llm~=1.0
+neon-skill-fallback_llm~=1.0,>=1.0.1

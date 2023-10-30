@@ -12,6 +12,7 @@ neon-mana-utils~=0.2,>=0.2.2
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
+onnxruntime!=1.16.0  # TODO: Patching https://github.com/microsoft/onnxruntime/issues/17631
 ovos-ww-plugin-precise~=0.1
 ovos-ww-plugin-precise-lite[tflite]~=0.1,>=0.1.2
 ovos-ww-plugin-vosk~=0.1,>=0.1.1
@@ -24,7 +25,7 @@ neon-stt-plugin-nemo~=0.0.4
 ovos-tts-plugin-server==0.0.2a4
 
 # Fallback plugins
-neon-tts-plugin-coqui~=0.7,>=0.7.1
+neon-tts-plugin-coqui~=0.7,>=0.7.3a4
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
@@ -57,3 +58,9 @@ ovos-skill-homescreen==0.0.3a6
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 skill-markII-audio-receiver>=0.0.4
+
+# Pinned for stable release (pulled by skill-ddg)
+ovos-classifiers==0.0.0a37
+
+# Backwards-compat
+ovos-skills-manager~=0.0.13  # TODO: Remove in 2024
