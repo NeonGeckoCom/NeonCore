@@ -1,5 +1,4 @@
-skill-ddg==0.0.2a3
-# TODO: Above pinned for stable release
+skill-ddg~=0.0.2a3
 neon-skill-alerts~=2.0
 neon-skill-caffeinewiz~=1.0
 neon-skill-data_controls~=2.0
