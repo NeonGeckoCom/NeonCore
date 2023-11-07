@@ -21,8 +21,7 @@ neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
 
 neon-tts-plugin-coqui-remote~=0.0.3
 neon-stt-plugin-nemo~=0.0.4
-# TODO: Stable release for below plugin
-ovos-tts-plugin-server==0.0.2a4
+ovos-tts-plugin-server~=0.0.0,>=0.0.2a4
 
 # Fallback plugins
 neon-tts-plugin-coqui~=0.7,>=0.7.3a4
@@ -52,15 +51,10 @@ ovos-gui-plugin-shell-companion~=0.0.0
 
 # Pi-specific skills
 neon-skill-update~=2.1
-# ovos-skill-homescreen~=0.0.2,>=0.0.3a6
-# TODO: Pinned for stable release
-ovos-skill-homescreen==0.0.3a6
+ovos-skill-homescreen~=0.0.2,>=0.0.3a6
 ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 skill-markII-audio-receiver>=0.0.4
-
-# Pinned for stable release (pulled by skill-ddg)
-ovos-classifiers==0.0.0a37
 
 # Backwards-compat
 ovos-skills-manager~=0.0.13  # TODO: Remove in 2024
