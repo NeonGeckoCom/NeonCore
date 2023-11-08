@@ -66,6 +66,8 @@ class NeonIntentService(IntentService):
         self.converse = NeonConverseService(bus)
         self.config = Configuration()
         self.language_config = get_lang_config()
+        LOG.debug(f"Languages Adapt={self.adapt_service.engines.keys()}|"
+                  f"Padatious={self.padatious_service.containers.keys()}")
 
         # Initialize default user to inject into incoming messages
         try:
@@ -154,6 +156,7 @@ class NeonIntentService(IntentService):
         """
         utterances = message.data.get('utterances', [])
         message.context["lang"] = lang
+        LOG.debug(f"lang={lang}|utterances={utterances}")
         utterances, message.context = \
             self.transformers.transform(utterances, message.context)
         message.data["utterances"] = utterances
@@ -172,9 +175,15 @@ class NeonIntentService(IntentService):
         self.bus.emit(message.response())
 
         try:
+            requested_lang = message.data.get('lang')
             # Get language of the utterance
             lang = get_full_lang_code(
                 message.data.get('lang') or self.language_config["user"])
+            if requested_lang and \
+                    requested_lang.split('-')[0] != lang.split('-')[0]:
+                lang = get_full_lang_code(requested_lang.split('-')[0])
+                LOG.warning(f"requested={requested_lang}|resolved={lang}")
+
             message.data["lang"] = lang
             LOG.debug(f"message_lang={lang}")
             # Add or init timing data
