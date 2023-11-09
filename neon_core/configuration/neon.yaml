@@ -280,6 +280,7 @@ system_unit: metric
 time_format: half
 date_format: MDY
 lang: en-us
+secondary_langs: [en-us, uk-ua]
 location:
   city:
     code: Lawrence
