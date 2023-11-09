@@ -171,3 +171,6 @@ system:
 language:
   detection_module: None
   translation_module: libretranslate_plug
+utterance_transformers:
+  neon_utterance_translator_plugin:
+    enable_detector: False
