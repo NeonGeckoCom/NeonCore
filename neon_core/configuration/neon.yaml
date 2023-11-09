@@ -2,6 +2,7 @@
 utterance_transformers:
   neon_utterance_translator_plugin:
     active: True
+    enable_detector: True
   neon_utterance_normalizer_plugin:
     active: True
 
