@@ -24,7 +24,7 @@ mock~=5.0
 # default plugins
 neon-lang-plugin-libretranslate~=0.2
 neon-utterance-translator-plugin~=0.1,>=0.1.2a2
-neon-utterance-normalizer-plugin~=0.0.2
+neon-utterance-normalizer-plugin~=0.0.2,>=0.0.3a4
 
 # TODO: Patching test failures https://github.com/NeonGeckoCom/NeonCore/actions/runs/4888865255/jobs/8727164992?pr=422
 requests < 2.30.0
