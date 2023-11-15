@@ -28,10 +28,18 @@
 
 from os import makedirs
 from os.path import isdir, join, expanduser
+
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
 
 from mycroft.skills.skill_manager import SkillManager
+
+# Patch SkillManager module to use ovos-bus-client to suppress session warnings
+from ovos_bus_client.client import MessageBusClient
+from ovos_bus_client.message import Message
+import mycroft.skills.skill_manager
+mycroft.skills.skill_manager.Message = Message
+mycroft.skills.skill_manager.MessageBusClient = MessageBusClient
 
 
 class NeonSkillManager(SkillManager):

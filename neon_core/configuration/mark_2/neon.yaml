@@ -90,6 +90,8 @@ skills:
   extra_directories:
     - /home/neon/.local/share/neon/skills
   default_skills: []
+  common_query:
+    extension_time: 15
 PHAL:
   ovos-PHAL-plugin-balena-wifi:
     enabled: false

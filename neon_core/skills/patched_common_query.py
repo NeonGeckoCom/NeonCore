@@ -34,20 +34,17 @@ from threading import Event
 from typing import Dict
 from ovos_bus_client.session import SessionManager
 from ovos_bus_client.message import Message, dig_for_message
+from ovos_config import Configuration
 from ovos_utils import flatten_list
 from ovos_utils.enclosure.api import EnclosureAPI
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, log_deprecation
 from ovos_utils.messagebus import get_message_lang
 
 from mycroft.skills.intent_services.base import IntentMatch
 from mycroft.skills.skill_data import CoreResources
 
-# TODO: Timeout from config
-# TODO: Port to ovos-core
-EXTENSION_TIME = 15
-MIN_RESPONSE_WAIT = 3
 
-
+# TODO: Remove below patches with ovos-core 0.0.8
 @dataclass
 class Query:
     session_id: str
@@ -62,26 +59,31 @@ class Query:
 
 
 class CommonQuery:
+    # Left for `mycroft` backwards-compat.
+    _EXTENSION_TIME = 10
+
     def __init__(self, bus):
         self.bus = bus
-        self.skill_id = "common_query.neongeckocom"  # fake skill
+        self.skill_id = "common_query.openvoiceos"  # fake skill
         self.active_queries: Dict[str, Query] = dict()
         self.enclosure = EnclosureAPI(self.bus, self.skill_id)
         self._vocabs = {}
+        config = Configuration().get('skills', {}).get("common_query") or dict()
+        self._extension_time = config.get('extension_time') or 10
+        self._min_response_wait = config.get('min_response_wait') or 3
         self.bus.on('question:query.response', self.handle_query_response)
         self.bus.on('common_query.question', self.handle_question)
         # TODO: Register available CommonQuery skills
 
-    def voc_match(self, utterance, voc_filename, lang, exact=False):
-        """Determine if the given utterance contains the vocabulary provided.
+    def voc_match(self, utterance: str, voc_filename: str, lang: str,
+                  exact: bool = False) -> bool:
+        """
+        Determine if the given utterance contains the vocabulary provided.
 
-        By default the method checks if the utterance contains the given vocab
+        By default, the method checks if the utterance contains the given vocab
         thereby allowing the user to say things like "yes, please" and still
         match against "Yes.voc" containing only "yes". An exact match can be
         requested.
-
-        The method checks the "res/text/{lang}" folder of mycroft-core.
-        The result is cached to avoid hitting the disk each time the method is called.
 
         Args:
             utterance (str): Utterance to be tested
@@ -112,7 +114,13 @@ class CommonQuery:
 
         return match
 
-    def is_question_like(self, utterance, lang):
+    def is_question_like(self, utterance: str, lang: str):
+        """
+        Check if the input utterance looks like a question for CommonQuery
+        @param utterance: user input to evaluate
+        @param lang: language of input
+        @return: True if input might be a question to handle here
+        """
         # skip utterances with less than 3 words
         if len(utterance.split(" ")) < 3:
             return False
@@ -121,8 +129,9 @@ class CommonQuery:
             return False
         return True
 
-    def match(self, utterances, lang, message):
-        """Send common query request and select best response
+    def match(self, utterances: str, lang: str, message: Message):
+        """
+        Send common query request and select best response
 
         Args:
             utterances (list): List of tuples,
@@ -145,9 +154,9 @@ class CommonQuery:
                 break
         return match
 
-    def handle_question(self, message):
-        """ Send the phrase to the CommonQuerySkills and prepare for handling
-            the replies.
+    def handle_question(self, message: Message):
+        """
+        Send the phrase to CommonQuerySkills and prepare for handling replies.
         """
         utt = message.data.get('utterance')
         sid = SessionManager.get(message).session_id
@@ -166,20 +175,22 @@ class CommonQuery:
         msg = message.reply('question:query', data={'phrase': utt})
         if "skill_id" not in msg.context:
             msg.context["skill_id"] = self.skill_id
+        # Define the timeout_msg here before any responses modify context
+        timeout_msg = msg.response(msg.data)
         self.bus.emit(msg)
 
         query.timeout_time = time.time() + 1
         timeout = False
-        while not query.responses_gathered.wait(EXTENSION_TIME):
+        while not query.responses_gathered.wait(self._extension_time):
+            # forcefully timeout if search is still going
             if time.time() > query.timeout_time + 1:
                 LOG.debug(f"Timeout gathering responses ({query.session_id})")
                 timeout = True
                 break
 
-        # forcefully timeout if search is still going
         if timeout:
             LOG.warning(f"Timed out getting responses for: {query.query}")
-        self._query_timeout(message)
+        self._query_timeout(timeout_msg)
         if not query.completed.wait(10):
             raise TimeoutError("Timed out processing responses")
         answered = bool(query.answered)
@@ -188,7 +199,7 @@ class CommonQuery:
                   f"remaining active_queries={len(self.active_queries)}")
         return answered
 
-    def handle_query_response(self, message):
+    def handle_query_response(self, message: Message):
         search_phrase = message.data['phrase']
         skill_id = message.data['skill_id']
         searching = message.data.get('searching')
@@ -201,7 +212,7 @@ class CommonQuery:
         if searching:
             LOG.debug(f"{skill_id} is searching")
             # request extending the timeout by EXTENSION_TIME
-            query.timeout_time = time.time() + EXTENSION_TIME
+            query.timeout_time = time.time() + self._extension_time
             # TODO: Perhaps block multiple extensions?
             if skill_id not in query.extensions:
                 query.extensions.append(skill_id)
@@ -216,7 +227,8 @@ class CommonQuery:
                 LOG.debug(f"Done waiting for {skill_id}")
                 query.extensions.remove(skill_id)
 
-            time_to_wait = query.query_time + MIN_RESPONSE_WAIT - time.time()
+            time_to_wait = (query.query_time + self._min_response_wait -
+                            time.time())
             if time_to_wait > 0:
                 LOG.debug(f"Waiting {time_to_wait}s before checking extensions")
                 query.responses_gathered.wait(time_to_wait)
@@ -225,7 +237,14 @@ class CommonQuery:
                 LOG.debug(f"No more skills to wait for ({query.session_id})")
                 query.responses_gathered.set()
 
-    def _query_timeout(self, message):
+    def _query_timeout(self, message: Message):
+        """
+        All accepted responses have been provided, either because all skills
+        replied or a timeout condition was met. The best response is selected,
+        spoken, and `question:action` is emitted so the associated skill's
+        handler can perform any additional actions.
+        @param message: question:query.response Message with `phrase` data
+        """
         query = self.active_queries.get(SessionManager.get(message).session_id)
         LOG.info(f'Check responses with {len(query.replies)} replies')
         search_phrase = message.data.get('phrase', "")
@@ -249,38 +268,42 @@ class CommonQuery:
                 # TODO: Ask user to pick between ties or do it automagically
                 pass
 
-            # invoke best match
-            self.speak(best['answer'], message)
+            # invoke best match. `message` here already has source=skills ctx
+            if not best.get('handles_speech'):
+                self.speak(best['answer'], message.forward("", best))
             LOG.info('Handling with: ' + str(best['skill_id']))
-            cb = best.get('callback_data') or {}
+            response_data = {**best, "phrase": search_phrase}
             self.bus.emit(message.forward('question:action',
-                                          data={'skill_id': best['skill_id'],
-                                                'phrase': search_phrase,
-                                                'callback_data': cb}))
+                                          data=response_data))
             query.answered = True
         else:
             query.answered = False
         query.completed.set()
 
-    def speak(self, utterance, message=None):
+    def speak(self, utterance: str, message: Message = None):
         """Speak a sentence.
 
         Args:
-            utterance (str):        sentence mycroft should speak
+            utterance (str): response to be spoken
+            message (Message): Message associated with selected response
         """
+        log_deprecation("Skills should handle `speak` calls.", "0.1.0")
+        selected_skill = message.data['skill_id']
         # registers the skill as being active
-        self.enclosure.register(self.skill_id)
+        self.enclosure.register(selected_skill)
 
         message = message or dig_for_message()
         lang = get_message_lang(message)
         data = {'utterance': utterance,
                 'expect_response': False,
-                'meta': {"skill": self.skill_id},
+                'meta': {"skill": selected_skill},
                 'lang': lang}
 
-        m = message.forward("speak", data) if message \
-            else Message("speak", data)
-        m.context["skill_id"] = self.skill_id
+        # TODO: If this is an internal method, there will always be a `message`
+        m = message.reply("speak", data) if message \
+            else Message("speak", data, {"source": "skills",
+                                         "destination": ["audio"]})
+        m.context["skill_id"] = selected_skill
         self.bus.emit(m)
 
 

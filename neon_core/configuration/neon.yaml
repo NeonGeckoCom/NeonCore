@@ -163,6 +163,9 @@ skills:
     cross_activation: true
     cross_deactivation: true
     converse_priorities: {}
+  common_query:
+    extension_time: 10
+    min_response_wait: 3
   update_interval: 1.0
   disable_osm: false
   appstore_sync_interval: 6
