@@ -34,6 +34,7 @@ class PadatiousMatcher(_match):
                 self.conf = padatious_intent.conf
             self.has_result = True
         if self.conf and self.conf > limit:
+            LOG.debug(f"Matched intent {self.ret} for lang={lang}")
             return self.ret
 
 

@@ -239,8 +239,8 @@ class NeonIntentService(IntentService):
                 self.bus.emit(reply)
                 return
 
-            if lang.split('-')[0] in self.supported_languages:
-                LOG.debug(f'Native language support ({lang})')
+            if message.data["lang"].split('-')[0] in self.supported_languages:
+                LOG.debug(f'Native language support ({message.data["lang"]})')
                 if message.context.get("translation_data") and \
                     message.context.get("translation_data")[0].get(
                         "was_translated"):
