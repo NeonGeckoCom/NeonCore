@@ -284,19 +284,19 @@ lang: en-us
 secondary_langs: [en-us, uk-ua]
 location:
   city:
-    code: Lawrence
-    name: Lawrence
+    code: Renton
+    name: Renton
     state:
-      code: KS
-      name: Kansas
+      code: WA
+      name: Washington
       country:
         code: US
         name: United States
   coordinate:
-    latitude: 38.971669
-    longitude: -95.23525
+    latitude: 47.482880
+    longitude: -122.217064
   timezone:
-    code: America/Chicago
-    name: Central Standard Time
+    code: America/Los_Angeles
+    name: Pacific Standard Time
     dstOffset: 3600000
-    offset: -21600000
+    offset: -28800000
