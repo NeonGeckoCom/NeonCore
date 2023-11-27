@@ -64,7 +64,7 @@ class ResourceTests(unittest.TestCase):
             self.assertTrue(isfile(resolve_resource_file(join("text", "en-us",
                                                               file))))
 
-        for lang in ("en-au", "en-us", "en-uk", "ua-uk", "ru-ru"):
+        for lang in ("en-au", "en-us", "en-uk", "uk-ua", "ru-ru"):
             self.assertTrue(isfile(resolve_resource_file(join("text", lang,
                                                               "neon.voc"))))
 
