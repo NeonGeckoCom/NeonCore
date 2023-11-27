@@ -4,7 +4,7 @@ ovos-core==0.0.7
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[network,audio]~=1.7,>=1.7.1a2
+neon-utils[network,audio]~=1.7,>=1.7.1a6
 # TODO audio extra patching dependency resolution
 
 ovos-utils~=0.0.35
