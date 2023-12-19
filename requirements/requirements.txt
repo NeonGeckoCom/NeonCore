@@ -31,6 +31,9 @@ requests < 2.30.0
 
 # TODO: Pinning latest stable release
 ovos-workshop==0.0.12
+ovos-utils==0.0.36
+ovos-plugin-manager==0.0.24
+
 
 # TODO: Patching dependencies ovos-core[skills,skills_lgpl] extra deps
 adapt-parser~=0.5
