@@ -1,3 +1,6 @@
+# TODO: Patched to prevent resource warnings
+secondary_langs: [en-us]
+
 play_wav_cmdline: "play %1"
 play_mp3_cmdline: "play %1"
 play_ogg_cmdline: "play %1"
