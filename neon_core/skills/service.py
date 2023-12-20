@@ -156,19 +156,6 @@ class NeonSkillService(Thread):
         self.register_wifi_setup_events()
         announce_connection()
 
-    def _initialize_metrics_handler(self):
-        """
-        Start bus listener for metrics
-        """
-        def handle_metric(message):
-            report_metric(message.data.pop("name"), **message.data)
-
-        if self.config.get("server", {}).get('metrics'):
-            LOG.info("Metrics reporting enabled")
-            self.bus.on("neon.metric", handle_metric)
-        else:
-            LOG.info("Metrics reporting disabled")
-
     def _register_intent_services(self):
         """
         Start up the all intent services and connect them as needed.

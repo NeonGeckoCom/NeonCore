@@ -4,10 +4,10 @@ ovos-core==0.0.7
 ovos-plugin-common-play~=0.0.5
 
 # utils
-neon-utils[network]~=1.7
+neon-utils[network]~=1.8
+
 ovos-utils~=0.0.35
-ovos-bus-client==0.0.5
-# TODO: Above pinned to reduce logs from ovos-core 0.0.7 with ovos-bus-client 0.0.6
+ovos-bus-client~=0.0.5
 neon-transformers~=0.2
 ovos-config~=0.0.11
 ovos-plugin-manager~=0.0.24
@@ -23,20 +23,22 @@ mock~=5.0
 
 # default plugins
 neon-lang-plugin-libretranslate~=0.2
-neon-utterance-translator-plugin~=0.1
-neon-utterance-normalizer-plugin~=0.0.2
+neon-utterance-translator-plugin~=0.2
+neon-utterance-normalizer-plugin~=0.1
 
 # TODO: Patching test failures https://github.com/NeonGeckoCom/NeonCore/actions/runs/4888865255/jobs/8727164992?pr=422
 requests < 2.30.0
 
+# TODO: Pinning latest stable release
+ovos-workshop==0.0.12
+ovos-utils==0.0.36
+ovos-plugin-manager==0.0.24
+
+
 # TODO: Patching dependencies ovos-core[skills,skills_lgpl] extra deps
 adapt-parser~=0.5
 padacioso~=0.1
-# TODO: pinned for stable release
-ovos-lingua-franca==0.4.8a6
+ovos-lingua-franca==0.4.8a7
 ovos-phal-plugin-connectivity-events~=0.0.1
 padatious~=0.4.8
 fann2==1.0.7
-
-# TODO: Patching ovos-workshop alpha dependency resolution
-ovos-workshop==0.0.12

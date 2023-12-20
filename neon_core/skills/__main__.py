@@ -27,7 +27,6 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from neon_core.skills.service import NeonSkillService
-# from neon_core.skills.padatious_service import PadatiousService
 from neon_utils.log_utils import init_log
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import reset_sigint_handler, PIDLock as Lock

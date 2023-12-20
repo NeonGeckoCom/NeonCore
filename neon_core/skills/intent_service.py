@@ -66,6 +66,8 @@ class NeonIntentService(IntentService):
         self.converse = NeonConverseService(bus)
         self.config = Configuration()
         self.language_config = get_lang_config()
+        LOG.debug(f"Languages Adapt={self.adapt_service.engines.keys()}|"
+                  f"Padatious={self.padatious_service.containers.keys()}")
 
         # Initialize default user to inject into incoming messages
         try:
@@ -154,6 +156,7 @@ class NeonIntentService(IntentService):
         """
         utterances = message.data.get('utterances', [])
         message.context["lang"] = lang
+        LOG.debug(f"lang={lang}|utterances={utterances}")
         utterances, message.context = \
             self.transformers.transform(utterances, message.context)
         message.data["utterances"] = utterances
@@ -167,33 +170,43 @@ class NeonIntentService(IntentService):
         Arguments:
             message (Message): message associated with user request
         """
+        utt_received = time.time()
 
         # Notify emitting module that skills is handling this utterance
         self.bus.emit(message.response())
 
+        # Add or init timing data
+        message.context.setdefault("timing", dict())
+        message.context["timing"]["handle_utterance"] = utt_received
+        if message.context["timing"].get("client_sent") and \
+                not message.context["timing"].get("client_to_core"):
+            message.context["timing"]["client_to_core"] = \
+                utt_received - message.context["timing"]["client_sent"]
+
         try:
             # Get language of the utterance
+            requested_lang = message.data.get('lang')
             lang = get_full_lang_code(
                 message.data.get('lang') or self.language_config["user"])
+            if requested_lang and \
+                    requested_lang.split('-')[0] != lang.split('-')[0]:
+                lang = get_full_lang_code(requested_lang.split('-')[0])
+                LOG.warning(f"requested={requested_lang}|resolved={lang}")
             message.data["lang"] = lang
             LOG.debug(f"message_lang={lang}")
-            # Add or init timing data
-            message.context = message.context or {}
-            if not message.context.get("timing"):
-                LOG.debug("No timing data available at intent service")
-                message.context["timing"] = {}
-            message.context["timing"]["handle_utterance"] = time.time()
+        except Exception as e:
+            LOG.exception(e)
+            if '-' not in message.data.get("lang", ""):
+                raise RuntimeError(f"Full `lang` code not in message.data: "
+                                   f"{message.data}")
+            lang = message.data["lang"]
 
+        try:
             # Ensure user profile data is present
             if "user_profiles" not in message.context:
                 message.context["user_profiles"] = [self._default_user.content]
                 message.context["username"] = \
                     self._default_user.content["user"]["username"]
-
-            # Make sure there is a `transcribed` timestamp
-            if not message.context["timing"].get("transcribed"):
-                message.context["timing"]["transcribed"] = \
-                    message.context["timing"]["handle_utterance"]
 
             stopwatch = Stopwatch()
 
@@ -208,7 +221,9 @@ class NeonIntentService(IntentService):
             # Get text parser context
             with stopwatch:
                 message = self._get_parsers_service_context(message, lang)
+            # TODO: `text_parsers` timing context left for backwards-compat.
             message.context["timing"]["text_parsers"] = stopwatch.time
+            message.context["timing"]["transform_utterance"] = stopwatch.time
 
             # Normalize all utterances for intent engines
             message.data['utterances'] = [u.lower().strip() for u in
@@ -217,12 +232,10 @@ class NeonIntentService(IntentService):
 
             # Catch empty utterances after parser service
             if len(message.data['utterances']) == 0:
-                LOG.debug("Received empty utterance!!")
-                reply = \
-                    message.reply('intent_aborted',
-                                  {'utterances': message.data.get('utterances',
-                                                                  []),
-                                   'lang': lang})
+                LOG.info("Received empty utterance!")
+                reply = message.reply('intent_aborted',
+                                      {'utterances': message.data['utterances'],
+                                       'lang': lang})
                 self.bus.emit(reply)
                 return
 
