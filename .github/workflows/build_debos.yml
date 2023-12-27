@@ -5,7 +5,6 @@ on:
       debos_branch:
         type: string
         description: neon_debos branch to use
-        default: ${{ github.ref }}
   push:
     branches:
       - dev
