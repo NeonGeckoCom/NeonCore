@@ -35,9 +35,6 @@ jobs:
         run: |
           cd action/neon_debos
           git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-          
-          cat .lfs-assets-id
-          
           cd ../..
       - name: Restore LFS cache
         uses: actions/cache@v3
@@ -50,10 +47,6 @@ jobs:
         run: |
           cd action/neon_debos
           git lfs pull
-          
-          git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-          cat .lfs-assets-id
-          
           cd ../..
       - name: Save LFS Cache
         if: steps.lfs-cache.outputs.cache-hit != 'true'
@@ -76,6 +69,6 @@ jobs:
         run: |
           bash action/neon_debos/run_automation.sh debian-neon-image.yml ${{ github.ref_name }} /var/www/html/app/files/neon_images/orange_pi_5/ opi5 opi5
       - name: Stop Docker Build Containers
-        if: failure()
+        if: failure() || cancelled()
         run: |
           docker kill neon_debos_ghaction
