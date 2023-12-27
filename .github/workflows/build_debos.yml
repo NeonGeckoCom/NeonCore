@@ -32,7 +32,10 @@ jobs:
           path: action/neon_debos
 
       - name: Create LFS file list
-        run: git lfs ls-files -l action/neon_debos | cut -d' ' -f1 | sort > .lfs-assets-id
+        run: |
+          cd action/neon_debos
+          git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+          cd ../..
       - name: Restore LFS cache
         uses: actions/cache@v2
         id: lfs-cache
