@@ -1,6 +1,11 @@
 name: Build SquashFS Image
 on:
   workflow_dispatch:
+    inputs:
+      debos_branch:
+        type: string
+        description: neon_debos branch to use
+        default: ${{ github.ref }}
   push:
     branches:
       - dev
@@ -13,10 +18,16 @@ jobs:
   build_squashfs_image:
     runs-on: 2222.us
     steps:
+      - name: Get debos repo branch
+        id: branch
+        run: |
+          DEFAULT_REF=${{ github.ref }}
+          REQUEST_REF=${{ github.event.inputs.debos_branch }}
+          echo "::set-output name=debos::${REQUEST_REF:-${DEFAULT_REF}}"
       - name: Checkout Debos Repository
         uses: nschloe/action-cached-lfs-checkout@v1
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ steps.branch.outputs.debos }}
 #          lfs: True
           repository: NeonGeckoCom/neon_debos
           path: action/neon_debos
