@@ -37,8 +37,8 @@ jobs:
         uses: actions/cache@v2
         id: lfs-cache
         with:
-        path: action/neon_debos/.git/lfs
-        key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v1
+          path: action/neon_debos/.git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v1
       - name: Ensure LFS files are pulled
         run: |
           cd action/neon_debos
