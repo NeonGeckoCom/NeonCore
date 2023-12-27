@@ -35,6 +35,9 @@ jobs:
         run: |
           cd action/neon_debos
           git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+          
+          cat .lfs-assets-id
+          
           cd ../..
       - name: Restore LFS cache
         uses: actions/cache@v3
@@ -47,6 +50,10 @@ jobs:
         run: |
           cd action/neon_debos
           git lfs pull
+          
+          git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+          cat .lfs-assets-id
+          
           cd ../..
 
       - name: Export keys for image build
