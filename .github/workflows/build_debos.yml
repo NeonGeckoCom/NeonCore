@@ -55,6 +55,13 @@ jobs:
           cat .lfs-assets-id
           
           cd ../..
+      - name: Save LFS Cache
+        if: steps.lfs-cache.outputs.cache-hit != 'true'
+        id: lfs-cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: action/neon_debos/.git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}-v1
 
       - name: Export keys for image build
         run: |
