@@ -3,8 +3,7 @@ ovos-core==0.0.7
 # padacioso==0.1.3a2
 ovos-plugin-common-play~=0.0.5
 
-# utils
-neon-utils[network]~=1.8
+neon-utils[network]~=1.8,>=1.8.2
 
 ovos-utils~=0.0.35
 ovos-bus-client~=0.0.5
