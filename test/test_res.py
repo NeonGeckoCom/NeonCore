@@ -30,43 +30,46 @@ import os
 import sys
 import unittest
 
-from os.path import join, isfile
+from os.path import join, isfile, dirname
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 
 class ResourceTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        pass
-
     def test_resolve_resource_file(self):
-        import neon_core  # Ensure neon_core is imported
-        from mycroft.util.file_utils import resolve_resource_file
+        from ovos_utils.file_utils import resolve_resource_file
+        import neon_core
+        root_path = join(dirname(neon_core.__file__), 'res')
+        config = {'data_dir': root_path}
         for file in ("hey-neon.pb", "hey-neon.pb.params"):
             self.assertTrue(isfile(resolve_resource_file(join("precise_models",
-                                                              file))))
+                                                              file),
+                                                         config=config)))
         for file in ("acknowledge.mp3", "beep.wav", "loaded.wav",
                      "start_listening.wav"):
             self.assertTrue(isfile(resolve_resource_file(join("snd",
-                                                              file))))
+                                                              file),
+                                                         config=config)))
         for file in ("neon_logo.png", "SYSTEM_AnimatedImageFrame.qml",
                      "SYSTEM_HtmlFrame.qml", "SYSTEM_TextFrame.qml",
                      "SYSTEM_UrlFrame.qml", "WebViewHtmlFrame.qml",
                      "WebViewUrlFrame.qml"):
             self.assertTrue(isfile(resolve_resource_file(join("ui",
-                                                              file))))
+                                                              file),
+                                                         config=config)))
         for file in ("cancel.voc", "i didn't catch that.dialog",
                      "neon.voc", "no.voc", "not.loaded.dialog",
                      "not connected to the internet.dialog",
                      "phonetic_spellings.txt", "skill.error.dialog",
                      "skills updated.dialog", "yes.voc"):
             self.assertTrue(isfile(resolve_resource_file(join("text", "en-us",
-                                                              file))))
+                                                              file),
+                                                         config=config)))
 
         for lang in ("en-au", "en-us", "en-uk", "uk-ua", "ru-ru"):
             self.assertTrue(isfile(resolve_resource_file(join("text", lang,
-                                                              "neon.voc"))))
+                                                              "neon.voc"),
+                                                         config=config)))
 
 
 if __name__ == '__main__':
