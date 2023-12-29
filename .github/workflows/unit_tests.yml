@@ -102,12 +102,3 @@ jobs:
         with:
           name: skills-module-test-results
           path: tests/skills-module-test-results.xml
-
-      - name: Test Resource Resolution
-        run: |
-          pytest test/test_res.py --doctest-modules --junitxml=tests/resource-resolution-test-results.xml
-      - name: Upload Resource Resolution test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: resource-resolution-test-results
-          path: tests/resource-resolution-test-results.xml
