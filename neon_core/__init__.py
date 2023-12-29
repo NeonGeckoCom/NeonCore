@@ -41,3 +41,9 @@ setup_resolve_resource_file()
 
 __all__ = ['NEON_ROOT_PATH',
            'CORE_VERSION_STR']
+
+
+# TODO: Patching for ovos-core 0.0.7
+import ovos_utils.messagebus
+from ovos_utils import get_handler_name
+ovos_utils.messagebus.get_handler_name = get_handler_name
