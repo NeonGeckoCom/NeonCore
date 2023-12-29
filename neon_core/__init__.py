@@ -45,5 +45,6 @@ __all__ = ['NEON_ROOT_PATH',
 
 # TODO: Patching for ovos-core 0.0.7
 import ovos_utils.messagebus
-from ovos_utils import get_handler_name
+from ovos_utils.events import get_handler_name, create_wrapper
 ovos_utils.messagebus.get_handler_name = get_handler_name
+ovos_utils.messagebus.create_wrapper = create_wrapper
