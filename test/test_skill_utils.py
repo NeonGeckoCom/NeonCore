@@ -202,7 +202,8 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(FallbackSkill1, FallbackSkill)
         self.assertEqual(FallbackSkill2, FallbackSkill)
 
-        self.assertTrue(issubclass(FallbackSkill, PatchedMycroftSkill))
+        from neon_utils.skills.neon_skill import NeonSkill
+        self.assertTrue(issubclass(FallbackSkill, NeonSkill))
         self.assertTrue(issubclass(CommonPlaySkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonIoTSkill, PatchedMycroftSkill))
