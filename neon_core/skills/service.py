@@ -41,12 +41,11 @@ from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 from neon_utils.messagebus_utils import get_messagebus
 from ovos_bus_client.util.scheduler import EventScheduler
-from ovos_utils.skills.api import SkillApi
+from ovos_workshop.skills.api import SkillApi
 from ovos_workshop.skills.fallback import FallbackSkill
 
 from neon_core.skills.intent_service import NeonIntentService
 from neon_core.skills.skill_manager import NeonSkillManager
-from neon_core.util.diagnostic_utils import report_metric
 
 
 def on_started():
