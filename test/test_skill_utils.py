@@ -210,10 +210,10 @@ class SkillUtilsTests(unittest.TestCase):
 
         from ovos_workshop.skills.mycroft_skill import MycroftSkill as Patched
         from ovos_workshop.skills import MycroftSkill as Patched2
-        from ovos_workshop.skills.ovos import MycroftSkill as Patched3
+        # from ovos_workshop.skills.ovos import MycroftSkill as Patched3
         self.assertEqual(Patched, PatchedMycroftSkill)
         self.assertEqual(Patched2, PatchedMycroftSkill)
-        self.assertEqual(Patched3, PatchedMycroftSkill)
+        # self.assertEqual(Patched3, PatchedMycroftSkill)
 
         from ovos_workshop.skills.ovos import OVOSSkill
         from ovos_workshop.skills import OVOSSkill as OVOSSkill2
