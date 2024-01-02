@@ -232,16 +232,16 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(NeonFallbackSkill, NeonFallbackSkill2)
         self.assertEqual(NeonSkill, NeonSkill2)
 
-        from ovos_workshop.skills.common_play import OVOSCommonPlaybackSkill
-        self.assertTrue(issubclass(OVOSCommonPlaybackSkill,
-                                   PatchedMycroftSkill))
-
-        try:
-            from ovos_workshop.skills.common_query_skill import CommonQuerySkill
-            self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
-        except ModuleNotFoundError:
-            # Class added in ovos-workwhop 0.0.12
-            pass
+        # from ovos_workshop.skills.common_play import OVOSCommonPlaybackSkill
+        # self.assertTrue(issubclass(OVOSCommonPlaybackSkill,
+        #                            PatchedMycroftSkill))
+        #
+        # try:
+        #     from ovos_workshop.skills.common_query_skill import CommonQuerySkill
+        #     self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
+        # except ModuleNotFoundError:
+        #     # Class added in ovos-workwhop 0.0.12
+        #     pass
 
 
 if __name__ == '__main__':

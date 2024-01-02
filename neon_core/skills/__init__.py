@@ -37,11 +37,12 @@ from neon_core.skills.decorators import intent_handler, intent_file_handler, \
 import ovos_workshop.skills
 ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
-workshop_modules = ("ovos_workshop.skills.ovos",
-                    "ovos_workshop.skills.fallback",
-                    "ovos_workshop.skills.common_query_skill",
-                    "ovos_workshop.skills.common_play",
-                    "ovos_workshop.skills")
+# TODO: Patch OVOS Skill?
+# workshop_modules = ("ovos_workshop.skills.ovos",
+#                     "ovos_workshop.skills.fallback",
+#                     "ovos_workshop.skills.common_query_skill",
+#                     "ovos_workshop.skills.common_play",
+#                     "ovos_workshop.skills")
 neon_utils_modules = ("neon_utils.skills.neon_fallback_skill",
                       "neon_utils.skills")
 mycroft_skills_modules = ("mycroft.skills.mycroft_skill.mycroft_skill",
@@ -52,12 +53,12 @@ mycroft_skills_modules = ("mycroft.skills.mycroft_skill.mycroft_skill",
                           "mycroft.skills.common_iot_skill",
                           "mycroft.skills")
 
-# Reload ovos_workshop modules with Patched class
-for module in workshop_modules:
-    try:
-        importlib.reload(importlib.import_module(module))
-    except Exception as e:
-        LOG.exception(e)
+# # Reload ovos_workshop modules with Patched class
+# for module in workshop_modules:
+#     try:
+#         importlib.reload(importlib.import_module(module))
+#     except Exception as e:
+#         LOG.exception(e)
 
 # Reload neon_utils modules with Patched class
 for module in neon_utils_modules:
