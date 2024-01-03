@@ -58,7 +58,7 @@ neon-skill-core_ready~=0.0.1
 neon-skill-update~=2.1,>=2.1.2
 # ovos-skill-homescreen~=0.0.2,>=0.0.3a6
 ovos-skill-homescreen==0.0.3a6
-ovos-skill-setup~=0.0.1
+# ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 skill-markII-audio-receiver~=0.1
 
