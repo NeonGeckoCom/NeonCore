@@ -42,16 +42,15 @@ ovos-phal-plugin-balena-wifi~=1.0.0
 neon-phal-plugin-gui-network-client~=0.0.3
 ovos-phal-plugin-network-manager~=1.1
 ovos-phal-plugin-wifi-setup~=1.1,>=1.1.1
-ovos-phal-plugin-oauth~=0.0.2,>=0.0.3a1
+ovos-phal-plugin-oauth~=0.0.2,>=0.0.3a2
 ovos-phal-plugin-alsa~=0.0.3
 ovos-phal-plugin-system~=0.0.4
 ovos-phal-plugin-connectivity-events~=0.0.3
-# ovos-phal-plugin-homeassistant~=0.0.3,>=0.0.4a2
-ovos-phal-plugin-homeassistant~=0.0.3
+ovos-phal-plugin-homeassistant~=0.0.3,>=0.0.4a3
 ovos-phal-plugin-wallpaper-manager~=0.0.1
 ovos-phal-plugin-ipgeo~=0.0.2
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
-ovos-gui-plugin-shell-companion~=0.0.0
+ovos-gui-plugin-shell-companion~=0.0.0,>=0.0.1a4
 
 # Pi-specific skills
 neon-skill-core_ready~=0.0.1
