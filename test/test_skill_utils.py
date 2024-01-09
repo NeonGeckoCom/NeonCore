@@ -98,17 +98,21 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_WITH_AUTH))
         self.assertIn("i-like-brands.neon.neongeckocom", skill_dirs)
 
-    # def test_install_skills_default(self):
-    #     from neon_core.util.skill_utils import install_skills_default,\
-    #         _get_skills_from_remote_list
-    #     install_skills_default(SKILL_CONFIG)
-    #     skill_dirs = [d for d in os.listdir(SKILL_DIR) if
-    #                   os.path.isdir(os.path.join(SKILL_DIR, d))]
-    #     self.assertEqual(
-    #         len(skill_dirs),
-    #         len(_get_skills_from_remote_list(SKILL_CONFIG["default_skills"])),
-    #         f"{skill_dirs}\n\n"
-    #         f"{_get_skills_from_remote_list(SKILL_CONFIG['default_skills'])}")
+    @patch("neon_core.util.skill_utils.install_skills_from_list")
+    def test_install_skills_default(self, install_skills):
+        from neon_core.util.skill_utils import install_skills_default,\
+            _get_skills_from_remote_list
+        install_skills_default(SKILL_CONFIG)
+        expected = _get_skills_from_remote_list(SKILL_CONFIG["default_skills"])
+        install_skills.assert_called_once_with(expected,
+                                               install_skills.call_args[0][1])
+        # skill_dirs = [d for d in os.listdir(SKILL_DIR) if
+        #               os.path.isdir(os.path.join(SKILL_DIR, d))]
+        # self.assertEqual(
+        #     len(skill_dirs),
+        #     len(_get_skills_from_remote_list(SKILL_CONFIG["default_skills"])),
+        #     f"{skill_dirs}\n\n"
+        #     f"{_get_skills_from_remote_list(SKILL_CONFIG['default_skills'])}")
 
     def test_install_skills_with_pip(self):
         from neon_core.util.skill_utils import install_skills_from_list
