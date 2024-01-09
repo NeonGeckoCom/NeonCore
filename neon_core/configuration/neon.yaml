@@ -263,6 +263,8 @@ ignore_logs:
 - enclosure.mouth.viseme
 - enclosure.mouth.display
 
+data_dir: ~/.cache/neon/res
+
 # Backwards-compat semi-deprecated
 precise:
   use_precise: true

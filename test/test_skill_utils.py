@@ -30,7 +30,8 @@ import os
 import shutil
 import sys
 import unittest
-
+from os.path import dirname, join, exists, isdir
+from unittest.mock import patch
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -97,17 +98,21 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_WITH_AUTH))
         self.assertIn("i-like-brands.neon.neongeckocom", skill_dirs)
 
-    def test_install_skills_default(self):
+    @patch("neon_core.util.skill_utils.install_skills_from_list")
+    def test_install_skills_default(self, install_skills):
         from neon_core.util.skill_utils import install_skills_default,\
             _get_skills_from_remote_list
         install_skills_default(SKILL_CONFIG)
-        skill_dirs = [d for d in os.listdir(SKILL_DIR) if
-                      os.path.isdir(os.path.join(SKILL_DIR, d))]
-        self.assertEqual(
-            len(skill_dirs),
-            len(_get_skills_from_remote_list(SKILL_CONFIG["default_skills"])),
-            f"{skill_dirs}\n\n"
-            f"{_get_skills_from_remote_list(SKILL_CONFIG['default_skills'])}")
+        expected = _get_skills_from_remote_list(SKILL_CONFIG["default_skills"])
+        install_skills.assert_called_once_with(expected,
+                                               install_skills.call_args[0][1])
+        # skill_dirs = [d for d in os.listdir(SKILL_DIR) if
+        #               os.path.isdir(os.path.join(SKILL_DIR, d))]
+        # self.assertEqual(
+        #     len(skill_dirs),
+        #     len(_get_skills_from_remote_list(SKILL_CONFIG["default_skills"])),
+        #     f"{skill_dirs}\n\n"
+        #     f"{_get_skills_from_remote_list(SKILL_CONFIG['default_skills'])}")
 
     def test_install_skills_with_pip(self):
         from neon_core.util.skill_utils import install_skills_from_list
@@ -242,6 +247,30 @@ class SkillUtilsTests(unittest.TestCase):
         # except ModuleNotFoundError:
         #     # Class added in ovos-workwhop 0.0.12
         #     pass
+
+    @patch("neon_core.util.skill_utils.Configuration")
+    def test_update_default_resources(self, config):
+        from neon_core.util.skill_utils import update_default_resources
+        mock_config = {"data_dir": join(dirname(__file__), "test_resources",
+                                        "res")}
+        config.return_value = mock_config
+
+        # Valid create resource path
+        update_default_resources()
+        self.assertTrue(exists(mock_config['data_dir']))
+        self.assertTrue(isdir(join(mock_config['data_dir'], "text", "uk-ua")))
+
+        # Valid path already exists
+        update_default_resources()
+        self.assertTrue(exists(mock_config['data_dir']))
+        self.assertTrue(isdir(join(mock_config['data_dir'], "text", "uk-ua")))
+
+        os.remove(mock_config['data_dir'])
+
+        # Invalid path already exists
+        mock_config['data_dir'] = dirname(__file__)
+        update_default_resources()
+        self.assertFalse(isdir(join(mock_config['data_dir'], "text", "uk-ua")))
 
 
 if __name__ == '__main__':

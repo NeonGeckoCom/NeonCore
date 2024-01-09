@@ -1,3 +1,7 @@
+language:
+  supported_langs:
+    - en
+    - uk
 skills:
   wait_for_internet: false
   extra_directories:
