@@ -244,7 +244,7 @@ class SkillUtilsTests(unittest.TestCase):
         #     # Class added in ovos-workwhop 0.0.12
         #     pass
 
-    @patch("ovos_config.config.Configuration")
+    @patch("neon_core.util.skill_utils.Configuration")
     def test_update_default_resources(self, config):
         from neon_core.util.skill_utils import update_default_resources
         mock_config = {"data_dir": join(dirname(__file__), "test_resources",
