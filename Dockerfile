@@ -48,7 +48,8 @@ RUN pip install wheel && \
     pip install .[docker]
 
 COPY docker_overlay/ /
-RUN chmod ugo+x /root/run.sh
+RUN chmod ugo+x /root/run.sh && \
+    neon update-default-resources
 
 CMD ["/root/run.sh"]
 

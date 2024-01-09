@@ -30,7 +30,8 @@ import os
 import shutil
 import sys
 import unittest
-
+from os.path import dirname, join, exists, isdir
+from unittest.mock import patch
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -242,6 +243,30 @@ class SkillUtilsTests(unittest.TestCase):
         # except ModuleNotFoundError:
         #     # Class added in ovos-workwhop 0.0.12
         #     pass
+
+    @patch("ovos_config.config.Configuration")
+    def test_update_default_resources(self, config):
+        from neon_core.util.skill_utils import update_default_resources
+        mock_config = {"data_dir": join(dirname(__file__), "test_resources",
+                                        "res")}
+        config.return_value = mock_config
+
+        # Valid create resource path
+        update_default_resources()
+        self.assertTrue(exists(mock_config['data_dir']))
+        self.assertTrue(isdir(join(mock_config['data_dir'], "text", "uk-ua")))
+
+        # Valid path already exists
+        update_default_resources()
+        self.assertTrue(exists(mock_config['data_dir']))
+        self.assertTrue(isdir(join(mock_config['data_dir'], "text", "uk-ua")))
+
+        os.remove(mock_config['data_dir'])
+
+        # Invalid path already exists
+        mock_config['data_dir'] = dirname(__file__)
+        update_default_resources()
+        self.assertFalse(isdir(join(mock_config['data_dir'], "text", "uk-ua")))
 
 
 if __name__ == '__main__':
