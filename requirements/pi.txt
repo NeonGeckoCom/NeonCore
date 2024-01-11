@@ -39,14 +39,14 @@ neon-phal-plugin-fan~=0.1
 neon-phal-plugin-switches~=0.0.4
 neon-phal-plugin-linear_led~=0.2,>=0.2.2
 ovos-phal-plugin-balena-wifi~=1.0.0
-neon-phal-plugin-gui-network-client~=0.0.3
+neon-phal-plugin-gui-network-client~=0.0.3,>=0.0.4a1
 ovos-phal-plugin-network-manager~=1.1
-ovos-phal-plugin-wifi-setup~=1.1,>=1.1.1
+ovos-phal-plugin-wifi-setup~=1.1,>=1.1.2a1
 ovos-phal-plugin-oauth~=0.0.2,>=0.0.3a2
 ovos-phal-plugin-alsa~=0.0.3
-ovos-phal-plugin-system~=0.0.4
+ovos-phal-plugin-system~=0.0.4,>=0.0.5a1
 ovos-phal-plugin-connectivity-events~=0.0.3
-ovos-phal-plugin-homeassistant~=0.0.3,>=0.0.4a4
+ovos-phal-plugin-homeassistant~=0.0.3,>=0.0.4a5
 ovos-phal-plugin-wallpaper-manager~=0.0.1
 ovos-phal-plugin-ipgeo~=0.0.2
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
