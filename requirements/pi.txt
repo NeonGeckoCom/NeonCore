@@ -21,12 +21,10 @@ neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
 
 neon-tts-plugin-coqui-remote~=0.0.3
 neon-stt-plugin-nemo~=0.0.4
-# ovos-tts-plugin-server~=0.0.0,>=0.0.2a4
-ovos-tts-plugin-server==0.0.2a4
+ovos-tts-plugin-server~=0.0.0,>=0.0.2a4
 
 # Fallback plugins
-# neon-tts-plugin-coqui~=0.7,>=0.7.3a4
-neon-tts-plugin-coqui==0.7.3a4
+neon-tts-plugin-coqui~=0.7,>=0.7.3a4
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
