@@ -26,3 +26,4 @@ jobs:
       image_name: ${{ github.repository_owner }}/neon_skills
       base_tag: base
       extra_tag: default_skills
+      platforms: linux/amd64,linux/arm64
