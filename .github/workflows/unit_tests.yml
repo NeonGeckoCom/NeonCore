@@ -11,7 +11,7 @@ jobs:
     with:
       python_version: "3.8"
   docker_build_tests:
-    uses: neongeckocom/.github/.github/workflows/docker_build_tests.yml@FEAT_ExtendDockerBuildTimeout
+    uses: neongeckocom/.github/.github/workflows/docker_build_tests.yml@FIX_ExtendDockerBuildTimeout
     with:
       platforms: linux/amd64,linux/arm64
   util_tests:
