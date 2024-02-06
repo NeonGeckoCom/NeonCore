@@ -89,11 +89,11 @@ setup(
         "pi": get_requirements("pi.txt"),
         "docker": get_requirements("docker.txt"),
         # # TODO: Deprecate `_`-specified extras after 2024.5
-        # "core_modules": get_requirements("core_modules.txt"),
-        # "skills_required": get_requirements("skills_required.txt"),
-        # "skills_essential": get_requirements("skills_essential.txt"),
-        # "skills_default": get_requirements("skills_default.txt"),
-        # "skills_extended": get_requirements("skills_extended.txt"),
+        "core_modules": get_requirements("core_modules.txt"),
+        "skills_required": get_requirements("skills_required.txt"),
+        "skills_essential": get_requirements("skills_essential.txt"),
+        "skills_default": get_requirements("skills_default.txt"),
+        "skills_extended": get_requirements("skills_extended.txt"),
         # PEP503 specified normalization to `-`
         "core-modules": get_requirements("core_modules.txt"),
         "skills-required": get_requirements("skills_required.txt"),
