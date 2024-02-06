@@ -51,13 +51,16 @@ ovos-phal-plugin-ipgeo~=0.0.2
 ovos-gui-plugin-shell-companion~=0.0.0,>=0.0.1a4
 
 # Pi-specific skills
-neon-skill-core_ready~=0.0.1
-neon-skill-update~=2.1,>=2.1.2
+neon-skill-core_ready~=0.0.1,>=0.0.2a1
+neon-skill-update~=2.1,>=2.1.3a1
 # ovos-skill-homescreen~=0.0.2,>=0.0.3a6
 ovos-skill-homescreen==0.0.3a6
 # ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 skill-markII-audio-receiver~=0.1
+
+# TODO: Pinned to resolve install issue with PyICU introduced in 0.0.0a51
+ovos-classifiers==0.0.0a50
 
 # Backwards-compat
 ovos-skills-manager~=0.0.13  # TODO: Remove in 2024
