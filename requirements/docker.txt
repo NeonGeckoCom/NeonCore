@@ -3,3 +3,6 @@ ovos-tts-plugin-mimic
 
 # "Lite" homescreen disables edge-device functionality
 ovos-skill-homescreen-lite @ git+https://github.com/openvoiceos/skill-homescreen-lite
+
+# TODO: Pinned to resolve install issue with PyICU introduced in 0.0.0a51
+ovos-classifiers==0.0.0a50
