@@ -79,7 +79,6 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=get_requirements('requirements.txt'),
     extras_require={
-        "core_modules": get_requirements("core_modules.txt"),
         "client": get_requirements("client.txt"),
         "server": get_requirements("server.txt"),
         "dev": get_requirements("dev.txt"),
@@ -89,10 +88,18 @@ setup(
         "test": get_requirements("test.txt"),
         "pi": get_requirements("pi.txt"),
         "docker": get_requirements("docker.txt"),
+        # # TODO: Deprecate `_`-specified extras after 2024.5
+        "core_modules": get_requirements("core_modules.txt"),
         "skills_required": get_requirements("skills_required.txt"),
         "skills_essential": get_requirements("skills_essential.txt"),
         "skills_default": get_requirements("skills_default.txt"),
-        "skills_extended": get_requirements("skills_extended.txt")
+        "skills_extended": get_requirements("skills_extended.txt"),
+        # PEP503 specified normalization to `-`
+        "core-modules": get_requirements("core_modules.txt"),
+        "skills-required": get_requirements("skills_required.txt"),
+        "skills-essential": get_requirements("skills_essential.txt"),
+        "skills-default": get_requirements("skills_default.txt"),
+        "skills-extended": get_requirements("skills_extended.txt"),
     },
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*',
