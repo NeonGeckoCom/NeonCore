@@ -11,7 +11,7 @@ neon-transformers~=0.2
 ovos-config~=0.0.12
 ovos-plugin-manager~=0.0.25
 # ovos-backend-client~=0.1,>=0.1.1a2
-ovos-backend-client==0.0.1a5  # TODO
+ovos-backend-client==0.1.1a5  # TODO
 psutil~=5.6
 
 click~=8.0
