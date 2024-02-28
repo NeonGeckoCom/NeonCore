@@ -2,8 +2,7 @@
 ovos-core==0.0.7
 # padacioso==0.1.3a2
 
-# # TODO: Audio for alpha resolution
-neon-utils[network,audio]~=1.8,>=1.8.3a5
+neon-utils[network]~=1.9
 
 ovos-utils~=0.0.38
 ovos-bus-client~=0.0.8
