@@ -37,7 +37,6 @@ from neon_core.skills.decorators import intent_handler, intent_file_handler, \
 import ovos_workshop.skills
 ovos_workshop.skills.mycroft_skill.MycroftSkill = PatchedMycroftSkill
 
-# TODO: Patch OVOS Skill?
 workshop_modules = ("ovos_workshop.skills.ovos",
                     "ovos_workshop.skills.fallback",
                     "ovos_workshop.skills.common_query_skill",
