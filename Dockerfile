@@ -1,4 +1,4 @@
-FROM python:3.8-slim as base
+FROM python:3.10-slim as base
 
 LABEL vendor=neon.ai \
     ai.neon.name="neon-skills"
@@ -48,7 +48,8 @@ RUN pip install wheel && \
     pip install .[docker]
 
 COPY docker_overlay/ /
-RUN chmod ugo+x /root/run.sh
+RUN chmod ugo+x /root/run.sh && \
+    neon update-default-resources
 
 CMD ["/root/run.sh"]
 

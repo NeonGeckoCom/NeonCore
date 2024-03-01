@@ -21,12 +21,10 @@ neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.1
 
 neon-tts-plugin-coqui-remote~=0.0.3
 neon-stt-plugin-nemo~=0.0.4
-# ovos-tts-plugin-server~=0.0.0,>=0.0.2a4
-ovos-tts-plugin-server==0.0.2a4
+ovos-tts-plugin-server==0.0.2a12
 
 # Fallback plugins
-# neon-tts-plugin-coqui~=0.7,>=0.7.3a4
-neon-tts-plugin-coqui==0.7.3a4
+neon-tts-plugin-coqui~=0.7,>=0.7.3a4
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
@@ -39,26 +37,28 @@ neon-phal-plugin-fan~=0.1
 neon-phal-plugin-switches~=0.0.4
 neon-phal-plugin-linear_led~=0.2,>=0.2.2
 ovos-phal-plugin-balena-wifi~=1.0.0
-neon-phal-plugin-gui-network-client~=0.0.3
+neon-phal-plugin-gui-network-client~=0.0.4
 ovos-phal-plugin-network-manager~=1.1
-ovos-phal-plugin-wifi-setup~=1.1,>=1.1.1
-ovos-phal-plugin-oauth~=0.0.2
+ovos-phal-plugin-wifi-setup==1.1.2a1
+ovos-phal-plugin-oauth==0.0.3a2
 ovos-phal-plugin-alsa~=0.0.3
-ovos-phal-plugin-system~=0.0.4
+ovos-phal-plugin-system~=0.0.4 #,>=0.0.5a1
 ovos-phal-plugin-connectivity-events~=0.0.3
-# ovos-phal-plugin-homeassistant~=0.0.3,>=0.0.4a2
-ovos-phal-plugin-homeassistant~=0.0.3
+ovos-phal-plugin-homeassistant~=0.0.3 #,>=0.0.4a5
 ovos-phal-plugin-wallpaper-manager~=0.0.1
 ovos-phal-plugin-ipgeo~=0.0.2
+# ovos-phal-plugin-mk1 @ git+https://github.com/openvoiceos/ovos-phal-plugin-mk1@dev
+# TODO: Stable spec for mk1 plugin
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
-ovos-gui-plugin-shell-companion~=0.0.0
+ovos-gui-plugin-shell-companion==0.0.1a5
 
 # Pi-specific skills
-neon-skill-core_ready~=0.0.1
-neon-skill-update~=2.1,>=2.1.2
-# ovos-skill-homescreen~=0.0.2,>=0.0.3a6
-ovos-skill-homescreen==0.0.3a6
-ovos-skill-setup~=0.0.1
+neon-skill-core_ready~=0.0.1 #,>=0.0.2a1
+neon-skill-update~=2.1 #,>=2.1.3a1
+# ovos-skill-homescreen~=0.0.2,>=0.0.3a16
+ovos-skill-homescreen==0.0.3a16
+
+# ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.1
 skill-markII-audio-receiver~=0.1
 

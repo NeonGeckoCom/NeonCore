@@ -31,14 +31,13 @@ import os.path
 import re
 
 from copy import copy
-from os import listdir, makedirs
+from os import listdir, makedirs, symlink
 from tempfile import mkdtemp
 from shutil import rmtree
-from os.path import expanduser, join, isdir, dirname
+from os.path import expanduser, join, isdir, dirname, islink
 from typing import List
 
 from ovos_utils.xdg_utils import xdg_data_home
-from ovos_skill_installer import download_extract_zip
 from ovos_utils.log import LOG, log_deprecation
 
 from ovos_config.config import Configuration
@@ -51,11 +50,12 @@ def get_neon_skills_data(skill_meta_repository: str =
     """
     Get skill data from configured neon_skills repository.
     :param skill_meta_repository: URL of skills repository containing metadata
-    :param branch: branch of repository to checkout
+    :param branch: branch of repository to check out
     :param repo_metadata_path: Path to repo directory containing json metadata files
     """
     log_deprecation("This skill repository format is deprecated; specify skills as packages")
     from ovos_skills_manager.github import normalize_github_url, download_url_from_github_url
+    from ovos_skill_installer import download_extract_zip
     skills_data = dict()
     temp_download_dir = mkdtemp()
     zip_url = download_url_from_github_url(skill_meta_repository, branch)
@@ -229,3 +229,26 @@ def _get_skills_from_remote_list(url: str) -> List[str]:
         LOG.error(f"Unable to fetch skills list from: {url} ({resp.status_code})")
         return []
     return [s for s in resp.text.split("\n") if s.strip() and not s.startswith('#')]
+
+
+def update_default_resources():
+    """
+    Ensure the `res` directory contents are available at the configured data_dir
+    """
+    res_dir = Configuration().get('data_dir')
+    if not res_dir:
+        LOG.info("`data_dir` is None; not linking default resources.")
+        return
+    res_dir = expanduser(res_dir)
+    if isdir(res_dir):
+        LOG.info(f"Directory exists; not linking default resources. {res_dir}")
+        return
+    if islink(res_dir):
+        LOG.debug(f"Link exists; not doing anything.")
+        return
+    if not isdir(dirname(res_dir)):
+        # Ensure directory exists to link default resources in
+        makedirs(dirname(res_dir))
+
+    symlink(join(dirname(dirname(__file__)), "res"), res_dir)
+    LOG.debug("Updated Neon default resources")

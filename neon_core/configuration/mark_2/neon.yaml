@@ -91,6 +91,8 @@ skills:
     - skill-audio_record.neongeckocom
   default_skills: []
 PHAL:
+  ovos-PHAL-plugin-mk1:
+    enabled: false
   ovos-PHAL-plugin-balena-wifi:
     enabled: false
     debug: false
