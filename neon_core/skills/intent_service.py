@@ -285,6 +285,23 @@ class NeonConverseService(ConverseService):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def _collect_converse_skills(self):
-        # TODO: Patching bug in ovos-core 0.0.3
-        return self.get_active_skills()
+    # def _collect_converse_skills(self):
+    #     # TODO: Patching bug in ovos-core 0.0.3
+    #     return self.get_active_skills()
+
+    def converse(self, utterances, skill_id, lang, message):
+        # TODO: Deprecate upon ovos-core 0.0.8 refactor
+        if self._converse_allowed(skill_id):
+            converse_msg = message.reply(f"{skill_id}.converse.request",
+                                         {"skill_id": skill_id,
+                                          "utterances": utterances,
+                                          "lang": lang})
+            result = self.bus.wait_for_response(converse_msg,
+                                                f'{skill_id}.converse.response')
+            if result and 'error' in result.data:
+                error_msg = result.data['error']
+                LOG.error(f"{skill_id}: {error_msg}")
+                return False
+            elif result is not None:
+                return result.data.get('result', False)
+        return False
