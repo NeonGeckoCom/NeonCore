@@ -189,6 +189,7 @@ class SkillUtilsTests(unittest.TestCase):
     #     self.assertEqual(ovos_skills_manager.requirements.DEFAULT_CONSTRAINTS,
     #                      __file__)
 
+    @skip("Skill class patching is deprecated")
     def test_skill_class_patches(self):
         import neon_core.skills  # Import to do all the patching
         from neon_utils.skills.mycroft_skill import PatchedMycroftSkill

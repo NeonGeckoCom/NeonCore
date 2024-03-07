@@ -26,43 +26,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import importlib
-
-from ovos_utils.log import LOG
-from neon_utils.skills.mycroft_skill import PatchedMycroftSkill
 from neon_core.skills.decorators import intent_handler, intent_file_handler, \
     resting_screen_handler, conversational_intent
 
-# TODO: Remove below patches with ovos-core 0.0.8 refactor
-mycroft_skills_modules = ("mycroft.skills.mycroft_skill.mycroft_skill",
-                          "mycroft.skills.mycroft_skill",
-                          "mycroft.skills.fallback_skill",
-                          "mycroft.skills.common_play_skill",
-                          "mycroft.skills.common_query_skill",
-                          "mycroft.skills.common_iot_skill",
-                          "mycroft.skills")
-
-# Reload mycroft modules with Patched class
-for module in mycroft_skills_modules:
-    try:
-        importlib.reload(importlib.import_module(module))
-    except Exception as e:
-        LOG.exception(e)
-
-# Manually patch top-level `mycroft` references
-import mycroft
-mycroft.MycroftSkill = PatchedMycroftSkill
-mycroft.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
-
-# Manually patch re-defined classes in `mycroft.skills.core`
-import mycroft.skills.core
-mycroft.skills.core.MycroftSkill = PatchedMycroftSkill
-mycroft.skills.core.FallbackSkill = mycroft.skills.fallback_skill.FallbackSkill
-
-import neon_core.skills.patched_plugin_loader
-import neon_core.skills.patched_skill_settings
-import neon_core.skills.patched_common_query
-
+import mycroft.skills
 from mycroft.skills import api
 from mycroft.skills import skill_manager
 from mycroft.skills.intent_services import padatious_service, converse_service
