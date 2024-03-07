@@ -218,6 +218,7 @@ class SkillUtilsTests(unittest.TestCase):
         from ovos_workshop.skills.ovos import OVOSSkill
         from neon_utils.skills import NeonFallbackSkill, NeonSkill
         self.assertTrue(issubclass(NeonFallbackSkill, OVOSSkill))
+        self.assertTrue(issubclass(NeonSkill, OVOSSkill))
 
     @patch("neon_core.util.skill_utils.Configuration")
     def test_update_default_resources(self, config):
