@@ -32,6 +32,7 @@ import sys
 import unittest
 from os.path import dirname, join, exists, isdir
 from unittest.mock import patch
+from unittest import skip
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -82,6 +83,7 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertTrue(all(skill.startswith("https://github.com")
                             for skill in skills_list))
 
+    @skip("Installation from Git is deprecated")
     def test_install_skills_from_list_no_auth(self):
         from neon_core.util.skill_utils import install_skills_from_list
         install_skills_from_list(TEST_SKILLS_NO_AUTH, SKILL_CONFIG)
@@ -90,6 +92,7 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(len(skill_dirs), len(TEST_SKILLS_NO_AUTH))
         self.assertIn("alerts.neon.neongeckocom", skill_dirs)
 
+    @skip("Installation from Git is deprecated")
     def test_install_skills_from_list_with_auth(self):
         from neon_core.util.skill_utils import install_skills_from_list
         install_skills_from_list(TEST_SKILLS_WITH_AUTH, SKILL_CONFIG)
@@ -135,6 +138,7 @@ class SkillUtilsTests(unittest.TestCase):
             self.assertEqual(skill,
                              normalize_github_url(neon_skills[skill]["url"]))
 
+    # @skip("Local skill installation deprecated")
     # def test_install_local_skills(self):
     #     import ovos_skills_manager.requirements
     #     import neon_core.util.skill_utils
