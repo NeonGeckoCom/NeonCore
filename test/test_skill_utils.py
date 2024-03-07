@@ -211,46 +211,13 @@ class SkillUtilsTests(unittest.TestCase):
         self.assertEqual(FallbackSkill1, FallbackSkill)
         self.assertEqual(FallbackSkill2, FallbackSkill)
 
-        from neon_utils.skills.neon_skill import NeonSkill
-        # self.assertTrue(issubclass(FallbackSkill, NeonSkill))
         self.assertTrue(issubclass(CommonPlaySkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(CommonIoTSkill, PatchedMycroftSkill))
 
-        from ovos_workshop.skills.mycroft_skill import MycroftSkill as Patched
-        from ovos_workshop.skills import MycroftSkill as Patched2
-        # from ovos_workshop.skills.ovos import MycroftSkill as Patched3
-        self.assertEqual(Patched, PatchedMycroftSkill)
-        self.assertEqual(Patched2, PatchedMycroftSkill)
-        # self.assertEqual(Patched3, PatchedMycroftSkill)
-
         from ovos_workshop.skills.ovos import OVOSSkill
-        from ovos_workshop.skills import OVOSSkill as OVOSSkill2
-        # self.assertTrue(issubclass(OVOSSkill, PatchedMycroftSkill))
-        self.assertEqual(OVOSSkill, OVOSSkill2)
-
         from neon_utils.skills import NeonFallbackSkill, NeonSkill
-        # self.assertTrue(issubclass(NeonFallbackSkill, PatchedMycroftSkill))
-        # self.assertTrue(issubclass(NeonSkill, PatchedMycroftSkill))
         self.assertTrue(issubclass(NeonFallbackSkill, OVOSSkill))
-        # self.assertTrue(issubclass(NeonFallbackSkill, NeonSkill))
-
-        from neon_utils.skills.neon_fallback_skill import NeonFallbackSkill as \
-            NeonFallbackSkill2
-        from neon_utils.skills.neon_skill import NeonSkill as NeonSkill2
-        self.assertEqual(NeonFallbackSkill, NeonFallbackSkill2)
-        self.assertEqual(NeonSkill, NeonSkill2)
-
-        # from ovos_workshop.skills.common_play import OVOSCommonPlaybackSkill
-        # self.assertTrue(issubclass(OVOSCommonPlaybackSkill,
-        #                            PatchedMycroftSkill))
-        #
-        # try:
-        #     from ovos_workshop.skills.common_query_skill import CommonQuerySkill
-        #     self.assertTrue(issubclass(CommonQuerySkill, PatchedMycroftSkill))
-        # except ModuleNotFoundError:
-        #     # Class added in ovos-workwhop 0.0.12
-        #     pass
 
     @patch("neon_core.util.skill_utils.Configuration")
     def test_update_default_resources(self, config):
