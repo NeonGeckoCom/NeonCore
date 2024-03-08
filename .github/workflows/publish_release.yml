@@ -19,6 +19,20 @@ jobs:
         with:
           token: ${{secrets.GITHUB_TOKEN}}
           tag: ${{env.VERSION}}
+  trigger_os_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Release Action
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{secrets.NEON_OS_TOKEN}}
+          repository: neongeckocom/neon-os
+          event-type: Publish Release
+          client-payload: |-
+            {
+              "ref": "master",
+              "repo": "neon-core"
+            }
   build_and_publish_docker:
     uses: neongeckocom/.github/.github/workflows/publish_docker.yml@master
     secrets: inherit
