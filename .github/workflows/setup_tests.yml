@@ -38,7 +38,7 @@ jobs:
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/pi/debian-base-image-rpi4_2023-07-12_16_30.img.xz
+          base_image: https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
@@ -55,7 +55,7 @@ jobs:
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/pi/debian-base-image-rpi4_2023-07-12_16_30.img.xz
+          base_image: https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
