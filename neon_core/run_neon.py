@@ -35,7 +35,7 @@ from signal import SIGTERM
 from threading import Event
 from subprocess import Popen, STDOUT
 from ovos_bus_client import MessageBusClient, Message
-from typing.io import IO
+from typing import IO
 
 from neon_utils.configuration_utils import init_config_dir
 init_config_dir()

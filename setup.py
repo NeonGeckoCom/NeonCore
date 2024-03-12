@@ -110,13 +110,7 @@ setup(
     include_package_data=True,
     entry_points={
         'console_scripts': [
-            'neon=neon_core.cli:neon_core_cli',
-            # TODO: Deprecate below entrypoints
-            'neon_skills_service=neon_core.skills.__main__:main',
-            'neon-install-default-skills=neon_core.util.skill_utils:install_skills_default',
-            'neon-upload-diagnostics=neon_core.util.diagnostic_utils:cli_send_diags',
-            'neon-start=neon_core.run_neon:start_neon',
-            'neon-stop=neon_core.run_neon:stop_neon'
+            'neon=neon_core.cli:neon_core_cli'
         ]
     }
 )
