@@ -27,7 +27,6 @@
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import json
-import os.path
 import re
 
 from copy import copy
@@ -53,7 +52,8 @@ def get_neon_skills_data(skill_meta_repository: str =
     :param branch: branch of repository to check out
     :param repo_metadata_path: Path to repo directory containing json metadata files
     """
-    log_deprecation("This skill repository format is deprecated; specify skills as packages")
+    log_deprecation("This skill repository format is deprecated; "
+                    "specify skills as packages", "24.04")
     from ovos_skills_manager.github import normalize_github_url, download_url_from_github_url
     from ovos_skill_installer import download_extract_zip
     skills_data = dict()
@@ -75,14 +75,12 @@ def get_neon_skills_data(skill_meta_repository: str =
     return skills_data
 
 
-def _write_pip_constraints_to_file(output_file: str = None):
+def _write_pip_constraints_to_file(output_file):
     """
     Writes out a constraints file for OSM to use to prevent broken dependencies
     :param output_file: path to constraints file to write
     """
     from neon_utils.packaging_utils import get_package_dependencies
-    # TODO: Backwards-compat to be deprecated
-    output_file = output_file or '/etc/mycroft/constraints.txt'
     if not isdir(dirname(output_file)):
         makedirs(dirname(output_file))
 
@@ -102,46 +100,6 @@ def _write_pip_constraints_to_file(output_file: str = None):
     LOG.info(f"Wrote core constraints to file: {output_file}")
 
 
-def _install_skill_osm(skill_url: str, skill_dir: str, skills_catalog: dict):
-    """
-    Install a skill from source using OVOS Skills Manager
-    :param skill_url: URL of skill to install
-    :param skill_dir: Directory to install skill to
-    :param skills_catalog: dict Neon skill information (url to dict data)
-    """
-    from ovos_skills_manager.osm import OVOSSkillsManager
-    from ovos_skills_manager.skill_entry import SkillEntry
-    from ovos_skills_manager.github import normalize_github_url, get_branch_from_github_url
-    log_deprecation("Update all skills to `pip`-installable specs.")
-    osm = OVOSSkillsManager()
-    try:
-        normalized_url = normalize_github_url(skill_url)
-        # Check if this skill is in the Neon list
-        if normalized_url in skills_catalog:
-            branch = get_branch_from_github_url(skill_url)
-            # Set URL and branch to requested spec
-            skills_catalog[normalized_url]["url"] = normalized_url
-            skills_catalog[normalized_url]["branch"] = branch
-            entry = SkillEntry.from_json(skills_catalog.get(normalized_url), False)
-        else:
-            LOG.warning(f"Requested Skill not in Neon skill store ({skill_url})")
-            entry = osm.skill_entry_from_url(skill_url)
-            LOG.debug(entry.json)
-
-        osm.install_skill(entry, skill_dir)
-        if not os.path.isdir(os.path.join(skill_dir, entry.uuid)):
-            LOG.error(f"Failed to install: "
-                      f"{os.path.join(skill_dir, entry.uuid)}")
-            if entry.download(skill_dir):
-                LOG.info(f"Downloaded failed skill: {entry.uuid}")
-            else:
-                LOG.error(f"Failed to download: {entry.uuid}")
-        else:
-            LOG.info(f"Installed {skill_url} to {skill_dir}")
-    except Exception as e:
-        LOG.exception(e)
-
-
 def _install_skill_pip(skill_package: str, constraints_file: str) -> bool:
     """
     Pip install the specified package
@@ -159,20 +117,12 @@ def _install_skill_pip(skill_package: str, constraints_file: str) -> bool:
 
 def install_skills_from_list(skills_to_install: list, config: dict = None):
     """
-    Installs the passed list of skill URLs and/or PyPI package names
+    Installs the passed list of skills (valid pip arguments).
     :param skills_to_install: list of skills to install
     :param config: optional dict configuration
     """
     config = config or Configuration()["skills"]
-    LOG.info(f"extra_directories={config.get('extra_directories')}")
-    LOG.info(f"directory={config.get('directory')}")
-    skill_dir = expanduser(config.get("extra_directories")[0] if
-                           config.get("extra_directories") else
-                           config.get("directory") if config.get("directory")
-                           and config["directory"] != "skills" else
-                           join(xdg_data_home(), "neon", "skills"))
-    LOG.info(f"skill_dir={skill_dir}")
-    skills_catalog = None
+
     token_set = False
     if config.get("neon_token"):
         LOG.warning("Authenticated installation from git is deprecated. "
@@ -182,30 +132,19 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         set_github_token(config["neon_token"])
         LOG.info(f"Added token to request headers: {config.get('neon_token')}")
 
-    constraints_file = '/etc/mycroft/constraints.txt'
-    try:
-        _write_pip_constraints_to_file(constraints_file)
-    except PermissionError:
-        LOG.warning(f"Unable to write pip constraints file {constraints_file}")
-        from ovos_skills_manager.utils import set_osm_constraints_file
-        constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
-        _write_pip_constraints_to_file(constraints_file)
-        set_osm_constraints_file(constraints_file)
+    constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
+    _write_pip_constraints_to_file(constraints_file)
 
-    for url in skills_to_install:
-        if "://" in url and "git+" not in url:
-            skills_catalog = skills_catalog or get_neon_skills_data()
-            _install_skill_osm(url, skill_dir, skills_catalog)
-        else:
-            if not _install_skill_pip(url, constraints_file):
-                LOG.warning(f"Pip installation failed for: {url}")
-                skills_catalog = skills_catalog or get_neon_skills_data()
-                _install_skill_osm(url, skill_dir, skills_catalog)
+    for spec in skills_to_install:
+        if "://" in spec and "git+" not in spec:
+            LOG.error(f"Got an invalid package spec to install: {spec}")
+        elif not _install_skill_pip(spec, constraints_file):
+            LOG.error(f"Pip installation failed for: {spec}")
 
     if token_set:
         from ovos_skills_manager.session import clear_github_token
         clear_github_token()
-    LOG.info(f"Installed {len(skills_to_install)} skills to: {skill_dir}")
+    LOG.info(f"Installed {len(skills_to_install)} skills")
 
 
 def install_skills_default(config: dict = None):

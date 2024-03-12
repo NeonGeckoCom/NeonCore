@@ -89,17 +89,6 @@ def update_default_resources():
     click.echo("Updating Default Resources")
     update_default_resources()
 
-# @neon_core_cli.command(help=
-#                        "Install skill requirements for a specified directory")
-# @click.argument("skill_dir")
-# def install_skill_requirements(skill_dir):
-#     from neon_core.util.skill_utils import install_local_skills
-#     try:
-#         installed = install_local_skills(skill_dir)
-#         click.echo(f"Installed {len(installed)} skills from {skill_dir}")
-#     except ValueError as e:
-#         click.echo(e)
-
 
 @neon_core_cli.command(help="Start Neon Skills module")
 @click.option("--install-skills", "-i", default=None,
