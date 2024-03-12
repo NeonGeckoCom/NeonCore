@@ -118,21 +118,3 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
             "transcripts": transcripts}
     report_metric("diagnostics", **data)
     return data
-
-
-def cli_send_diags():
-    """
-    CLI Entry Point to Send Diagnostics
-    """
-    LOG.warning(f"This function is deprecated. Use `neon upload-diagnostics`")
-    import argparse
-    parser = argparse.ArgumentParser(description="Upload Neon Diagnostics Files", add_help=True)
-    parser.add_argument("--no-transcripts", dest="transcripts", default=True, action='store_false',
-                        help="Disable upload of all transcribed input")
-    parser.add_argument("--no-logs", dest="logs", default=True, action='store_false',
-                        help="Disable upload of Neon log files (NOTE: start_neon.log is always uploaded)")
-    parser.add_argument("--no-config", dest="config", default=True, action='store_false',
-                        help="Disable upload of Neon config files")
-
-    args = parser.parse_args()
-    send_diagnostics(args.logs, args.transcripts, args.config)
