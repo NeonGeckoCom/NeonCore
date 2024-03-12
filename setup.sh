@@ -28,6 +28,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+echo "WARNING: This script is no longer supported and will be removed with core version 24.05.x"
+
 # Check if run as root
 if [ "${USER}" == "root" ]; then
   read -r -p "Installing as root may cause problems, would you like to continue? [y/N]" -n1 input
