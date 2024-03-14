@@ -100,7 +100,7 @@ setup(
         "skills-essential": get_requirements("skills_essential.txt"),
         "skills-default": get_requirements("skills_default.txt"),
         "skills-extended": get_requirements("skills_extended.txt"),
-        "audio-receiver": get_requirements("audio_receiver")
+        "audio-receiver": get_requirements("audio_receiver.txt")
     },
     packages=find_packages(include=['neon_core*']),
     package_data={'neon_core': ['res/precise_models/*', 'res/snd/*',
