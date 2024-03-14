@@ -25,6 +25,11 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+from ovos_utils.log import log_deprecation
+log_deprecation("This module is deprecated. "
+                "Import from `ovos_workshop.decorators", "24.2.0")
+
 """Decorators for use with MycroftSkill methods"""
 import time
 import threading
@@ -34,8 +39,9 @@ from inspect import signature
 from ovos_bus_client import Message
 from ovos_utils import create_killable_daemon
 
-from mycroft.skills.mycroft_skill.decorators import intent_handler, \
-    intent_file_handler, resting_screen_handler, skill_api_method
+# Backwards-compat import
+from ovos_workshop.decorators import intent_handler, intent_file_handler, \
+    resting_screen_handler, skill_api_method
 
 
 class AbortEvent(StopIteration):

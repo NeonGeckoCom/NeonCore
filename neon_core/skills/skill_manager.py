@@ -31,7 +31,7 @@ from os.path import isdir, join, expanduser
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
 
-from mycroft.skills.skill_manager import SkillManager
+from ovos_core.skill_manager import SkillManager
 
 
 class NeonSkillManager(SkillManager):
