@@ -75,11 +75,14 @@ def get_neon_skills_data(skill_meta_repository: str =
     return skills_data
 
 
-def _write_pip_constraints_to_file(output_file):
+def _write_pip_constraints_to_file(output_file: str):
     """
     Writes out a constraints file for OSM to use to prevent broken dependencies
     :param output_file: path to constraints file to write
     """
+    if not output_file:
+        raise ValueError(f"Expected string path but got: {output_file}")
+
     from neon_utils.packaging_utils import get_package_dependencies
     if not isdir(dirname(output_file)):
         makedirs(dirname(output_file))
