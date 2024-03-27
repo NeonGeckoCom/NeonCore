@@ -133,6 +133,10 @@ class SkillUtilsTests(unittest.TestCase):
     def test_write_pip_constraints_to_file(self):
         from neon_core.util.skill_utils import _write_pip_constraints_to_file
         from neon_utils.packaging_utils import get_package_dependencies
+
+        with self.assertRaises(ValueError):
+            _write_pip_constraints_to_file("")
+
         real_deps = get_package_dependencies("neon-core")
         real_deps = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
                      else c for c in real_deps if '@' not in c]
