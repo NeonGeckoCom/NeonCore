@@ -109,6 +109,8 @@ PHAL:
     utterance_animation: refill
   neon-phal-plugin-fan:
     min_fan_temp: 40.0
+  ovos-PHAL-plugin-homeassistant:
+    disable_intents: true
   admin:
     neon-phal-plugin-device-updater:
       enabled: true
