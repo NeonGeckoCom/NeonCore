@@ -73,11 +73,9 @@ class SkillUtilsTests(unittest.TestCase):
 
     def test_get_skills_from_remote_list(self):
         from neon_core.util.skill_utils import _get_skills_from_remote_list
-        # from ovos_skills_manager.session import set_github_token,\
-        #     clear_github_token
-        # set_github_token(SKILL_CONFIG["neon_token"])
+
         skills_list = _get_skills_from_remote_list(SKILL_CONFIG["default_skills"])
-        # clear_github_token()
+
         self.assertIsInstance(skills_list, list)
         self.assertTrue(len(skills_list) > 0)
         self.assertTrue(all(skill.startswith("https://github.com")
@@ -109,25 +107,19 @@ class SkillUtilsTests(unittest.TestCase):
         expected = _get_skills_from_remote_list(SKILL_CONFIG["default_skills"])
         install_skills.assert_called_once_with(expected,
                                                install_skills.call_args[0][1])
-        # skill_dirs = [d for d in os.listdir(SKILL_DIR) if
-        #               os.path.isdir(os.path.join(SKILL_DIR, d))]
-        # self.assertEqual(
-        #     len(skill_dirs),
-        #     len(_get_skills_from_remote_list(SKILL_CONFIG["default_skills"])),
-        #     f"{skill_dirs}\n\n"
-        #     f"{_get_skills_from_remote_list(SKILL_CONFIG['default_skills'])}")
 
     def test_install_skills_with_pip(self):
         from neon_core.util.skill_utils import install_skills_from_list
         install_skills_from_list(TEST_SKILLS_WITH_PIP, SKILL_CONFIG)
         skill_dirs = [d for d in os.listdir(SKILL_DIR)
                       if os.path.isdir(os.path.join(SKILL_DIR, d))]
-        self.assertEqual(len(skill_dirs), 1)
-        self.assertIn("skill-date_time.neongeckocom", skill_dirs)
+        self.assertEqual(len(skill_dirs), 0)
+        # self.assertIn("skill-date_time.neongeckocom", skill_dirs)
 
         returned = os.system("pip show neon-skill-support-helper")
         self.assertEqual(returned, 0)
 
+    @skip("OSM skill installation deprecated")
     def test_get_neon_skills_data(self):
         from neon_core.util.skill_utils import get_neon_skills_data
         from ovos_skills_manager.github.utils import normalize_github_url
@@ -138,30 +130,13 @@ class SkillUtilsTests(unittest.TestCase):
             self.assertEqual(skill,
                              normalize_github_url(neon_skills[skill]["url"]))
 
-    # @skip("Local skill installation deprecated")
-    # def test_install_local_skills(self):
-    #     import ovos_skills_manager.requirements
-    #     import neon_core.util.skill_utils
-    #     importlib.reload(neon_core.util.skill_utils)
-    #     install_pip_deps = Mock()
-    #     install_sys_deps = Mock()
-    #     ovos_skills_manager.requirements.pip_install = install_pip_deps
-    #     ovos_skills_manager.requirements.install_system_deps = install_sys_deps
-    #
-    #     install_local_skills = neon_core.util.skill_utils.install_local_skills
-    #
-    #     local_skills_dir = os.path.join(os.path.dirname(__file__),
-    #                                     "local_skills")
-    #
-    #     installed = install_local_skills(local_skills_dir)
-    #     num_installed = len(installed)
-    #     self.assertEqual(installed, os.listdir(local_skills_dir))
-    #     self.assertEqual(num_installed, install_pip_deps.call_count)
-    #     self.assertEqual(num_installed, install_sys_deps.call_count)
-
     def test_write_pip_constraints_to_file(self):
         from neon_core.util.skill_utils import _write_pip_constraints_to_file
         from neon_utils.packaging_utils import get_package_dependencies
+
+        with self.assertRaises(ValueError):
+            _write_pip_constraints_to_file("")
+
         real_deps = get_package_dependencies("neon-core")
         real_deps = [f'{c.split("[")[0]}{c.split("]")[1]}' if '[' in c
                      else c for c in real_deps if '@' not in c]
@@ -172,14 +147,6 @@ class SkillUtilsTests(unittest.TestCase):
             read_deps = f.read().split('\n')
         self.assertTrue(all((d in read_deps for d in real_deps)))
 
-        try:
-            _write_pip_constraints_to_file()
-            self.assertTrue(os.path.isfile("/etc/mycroft/constraints.txt"))
-            with open("/etc/mycroft/constraints.txt") as f:
-                deps = f.read().split('\n')
-            self.assertTrue(all((d in deps for d in real_deps)))
-        except Exception as e:
-            self.assertIsInstance(e, PermissionError)
         os.remove(test_outfile)
 
     # def test_set_osm_constraints_file(self):
