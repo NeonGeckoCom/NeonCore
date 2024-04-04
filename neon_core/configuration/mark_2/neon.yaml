@@ -36,7 +36,7 @@ listener:
   instant_listen: true
   speech_begin: 0.5
   silence_end: 0.9
-  utterance_chunks_to_rewind: 1
+  utterance_chunks_to_rewind: 0
 hotwords:
   wake_up:
     active: false
@@ -91,7 +91,7 @@ skills:
     - skill-audio_record.neongeckocom
   default_skills: []
 PHAL:
-  ovos-PHAL-plugin-mk1:
+  ovos-phal-mk1:
     enabled: false
   ovos-PHAL-plugin-balena-wifi:
     enabled: false
