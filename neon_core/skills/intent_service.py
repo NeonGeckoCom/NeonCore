@@ -284,7 +284,3 @@ class NeonIntentService(IntentService):
 class NeonConverseService(ConverseService):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def _collect_converse_skills(self):
-        # TODO: Patching bug in ovos-core 0.0.3
-        return self.get_active_skills()
