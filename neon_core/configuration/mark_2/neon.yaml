@@ -36,7 +36,7 @@ listener:
   instant_listen: true
   speech_begin: 0.5
   silence_end: 0.9
-  utterance_chunks_to_rewind: 1
+  utterance_chunks_to_rewind: 0
 hotwords:
   wake_up:
     active: false
