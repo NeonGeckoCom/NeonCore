@@ -36,8 +36,8 @@ from ovos_bus_client.session import SessionManager
 from ovos_bus_client.message import Message, dig_for_message
 from ovos_utils import flatten_list
 from ovos_bus_client.apis.enclosure import EnclosureAPI
+from ovos_bus_client.util import get_message_lang
 from ovos_utils.log import LOG
-from ovos_utils.messagebus import get_message_lang
 
 from mycroft.skills.intent_services.base import IntentMatch
 from mycroft.skills.skill_data import CoreResources
