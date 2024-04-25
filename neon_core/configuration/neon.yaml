@@ -168,7 +168,6 @@ skills:
   appstore_sync_interval: 6
   auto_update: false
   auto_update_interval: 24
-  neon_token: ''
   install_essential: true
   essential_skills: []
   install_default: false
