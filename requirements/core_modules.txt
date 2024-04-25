@@ -1,6 +1,6 @@
 # neon core modules
-neon_messagebus~=2.0,>=2.0.1
-neon_enclosure~=1.7
-neon_speech~=4.4
-neon_gui~=1.3
-neon_audio~=1.5,>=1.5.1
+neon-messagebus~=2.0,>=2.0.1
+neon-enclosure~=1.7
+neon-speech~=4.4,>=4.4.1a1
+neon-gui~=1.3
+neon-audio~=1.5,>=1.5.1
