@@ -35,7 +35,7 @@ from ovos_bus_client import Message, MessageBusClient
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
 from ovos_utils.log import LOG
-from ovos_utils.skills.locations import get_plugin_skills, get_skill_directories
+from ovos_plugin_manager.skills import get_plugin_skills, get_skill_directories
 from ovos_utils.process_utils import StatusCallbackMap
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
