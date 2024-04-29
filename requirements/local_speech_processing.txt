@@ -6,7 +6,3 @@ onnxruntime!=1.16.0  # TODO: Patching https://github.com/microsoft/onnxruntime/i
 
 # Fallback
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
-ovos-tts-plugin-mimic~=0.2
-
-# Backwards-compat. for tests
-neon-tts-plugin-mimic
