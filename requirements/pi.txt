@@ -43,7 +43,8 @@ ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-network-manager~=1.1
 # TODO: wifi-setup pinned for stable release
 ovos-phal-plugin-wifi-setup==1.1.2a1
-ovos-phal-plugin-oauth~=0.0,>=0.0.3a3
+# TODO: oauth pinned for stable release
+ovos-phal-plugin-oauth==0.0.3a3
 ovos-phal-plugin-alsa~=0.0.3
 # TODO: system pinned for ovos-utils 0.0.x latest compat.
 ovos-phal-plugin-system==0.0.5a1
@@ -51,7 +52,7 @@ ovos-phal-plugin-connectivity-events~=0.0.3
 ovos-phal-plugin-homeassistant~=0.0.3  #,>=0.0.4a5
 ovos-phal-plugin-wallpaper-manager~=0.0.1
 ovos-phal-plugin-ipgeo~=0.0.2
-ovos-phal-plugin-mk1 @ git+https://github.com/openvoiceos/ovos-phal-plugin-mk1@dev
+#ovos-phal-plugin-mk1 @ git+https://github.com/openvoiceos/ovos-phal-plugin-mk1@dev
 # TODO: Stable spec for mk1 plugin
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
 ovos-gui-plugin-shell-companion==0.0.1a5
