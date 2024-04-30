@@ -74,8 +74,8 @@ gui:
   generic:
     homescreen_supported: true
 MQ:
-  server: mq.2023.us
-  port: 35672
+  server: mq.neonaiservices.com
+  port: 5672
   users:
     mq_handler:
       user: neon_api_utils
