@@ -73,13 +73,6 @@ gui:
   run_gui_file_server: false
   generic:
     homescreen_supported: true
-MQ:
-  server: mq.neonaiservices.com
-  port: 5672
-  users:
-    mq_handler:
-      user: neon_api_utils
-      password: Klatchat2021
 signal:
   use_signal_files: false
 skills:
