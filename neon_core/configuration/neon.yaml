@@ -211,7 +211,7 @@ network_tests:
   ncsi_endpoint: http://www.msftncsi.com/ncsi.txt
   ncsi_expected_text: Microsoft NCSI
 MQ:
-  server: mq.2021.us
+  server: mq.neonaiservices.com
   port: 5672
   users:
     mq_handler:
