@@ -31,7 +31,6 @@ from neon_core.skills.decorators import intent_handler, intent_file_handler, \
 
 # TODO: Remove below patches with ovos-core 0.0.8 refactor
 import neon_core.skills.patched_plugin_loader
-import neon_core.skills.patched_skill_settings
 import neon_core.skills.patched_common_query
 
 import mycroft.skills
