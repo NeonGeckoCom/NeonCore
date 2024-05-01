@@ -29,23 +29,6 @@ jobs:
       - name: Test Skills Installation
         run: |
           pip install .[skills_required,skills_essential,skills_default,skills_extended]
-#  pi_image_3_7:
-#    runs-on: ubuntu-latest
-#    timeout-minutes: 90
-#    steps:
-#      - uses: actions/checkout@v2
-#      - name: Test chroot installation
-#        uses: pguyot/arm-runner-action@v2
-#        with:
-#          optimize_image: false
-#          base_image: https://2222.us/app/files/neon_images/pi/debian-base-image-rpi4_2023-02-13_09_05.img.xz
-#          cpu: cortex-a53
-#          copy_repository_path: /core
-#          commands: |
-#            bash /core/test/pi_setup_3_7.sh || exit 2
-#            . /core/venv/bin/activate || exit 2
-#            neon-audio init-plugin -p coqui || exit 2
-#            neon-speech init-plugin -p neon-stt-plugin-nemo || exit 2
   pi_image_3_10:
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -55,7 +38,7 @@ jobs:
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/pi/debian-base-image-rpi4_2023-07-12_16_30.img.xz
+          base_image: https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
@@ -72,7 +55,7 @@ jobs:
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/pi/debian-base-image-rpi4_2023-07-12_16_30.img.xz
+          base_image: https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
@@ -80,91 +63,3 @@ jobs:
             . /core/venv/bin/activate || exit 2
             neon-audio init-plugin -p coqui || exit 2
             neon-speech init-plugin -p neon-stt-plugin-nemo || exit 2
-  legacy-remote:
-    strategy:
-      matrix:
-        python-version: [ 3.9 ]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Setup Core
-        run: |
-          mkdir -p ~/.local/share/neon
-          echo ${GOOGLE_KEY}>~/.local/share/neon/google.json
-          echo ${AWS_CREDS}>~/.local/share/neon/aws.json
-          bash test/legacy_setup_remote.sh ${NEON_TOKEN}
-        env:
-          NEON_TOKEN: ${{secrets.neon_token}}
-          GOOGLE_KEY: ${{secrets.google_api_key}}
-          AWS_CREDS: ${{secrets.amazon_creds}}
-      - name: Test Core Setup
-        timeout-minutes: 10
-        run: |
-          . test/.venv/bin/activate
-          pytest test/test_setup_remote.py --junitxml=tests/remote-setup-results.xml
-          pytest test/test_run_neon.py --junitxml=tests/remote-test-results.xml
-      - name: Upload Core Setup test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: pytest-results-remote-${{ matrix.python-version }}
-          path: tests/remote-test-results.xml
-        if: always()
-      - name: Upload Core Setup logs
-        uses: actions/upload-artifact@v2
-        with:
-          name: core-logs-remote-${{ matrix.python-version }}
-          path: ~/.local/share/neon/logs/*.log
-        if: always()
-      - name: Upload Configuration
-        uses: actions/upload-artifact@v2
-        with:
-          name: configuration-remote-${{ matrix.python-version }}
-          path: ~/.config/neon/neon.yaml
-        if: always()
-  legacy-dev_local:
-    strategy:
-      matrix:
-        python-version: [ 3.8 ]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Setup Core
-        run: |
-          bash test/legacy_setup_dev_local.sh ${NEON_TOKEN}
-        env:
-          NEON_TOKEN: ${{secrets.neon_token}}
-      - name: Test Core Setup
-        timeout-minutes: 10
-        run: |
-          . test/.venv/bin/activate
-          pip install pytest pytest-timeout
-          pytest test/test_setup_dev_local.py --junitxml=tests/dev_local-setup-results.xml
-          pytest test/test_run_neon.py --junitxml=tests/dev_local-test-results.xml
-      - name: Upload Core Setup test results
-        uses: actions/upload-artifact@v2
-        with:
-          name: pytest-results-local-${{ matrix.python-version }}
-          path: tests/dev_local-test-results.xml
-        if: always()
-      - name: Upload Core Setup logs
-        uses: actions/upload-artifact@v2
-        with:
-          name: core-logs-dev-local-${{ matrix.python-version }}
-          path: ~/test/logs/*.log
-        if: always()
-      - name: Upload Configuration
-        uses: actions/upload-artifact@v2
-        with:
-          name: configuration-dev-local-${{ matrix.python-version }}
-          path: ~/.config/neon/neon.yaml
-        if: always()

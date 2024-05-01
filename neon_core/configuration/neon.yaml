@@ -168,7 +168,6 @@ skills:
   appstore_sync_interval: 6
   auto_update: false
   auto_update_interval: 24
-  neon_token: ''
   install_essential: true
   essential_skills: []
   install_default: false
@@ -212,7 +211,7 @@ network_tests:
   ncsi_endpoint: http://www.msftncsi.com/ncsi.txt
   ncsi_expected_text: Microsoft NCSI
 MQ:
-  server: mq.2021.us
+  server: mq.neonaiservices.com
   port: 5672
   users:
     mq_handler:

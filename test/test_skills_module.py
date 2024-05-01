@@ -131,8 +131,8 @@ class TestSkillService(unittest.TestCase):
         stopping_hook.assert_called_once()
         service.join(10)
 
-    @patch("ovos_utils.skills.locations.get_plugin_skills")
-    @patch("ovos_utils.skills.locations.get_skill_directories")
+    @patch("ovos_plugin_manager.skills.get_plugin_skills")
+    @patch("ovos_plugin_manager.skills.get_skill_directories")
     def test_get_skill_dirs(self, skill_dirs, plugin_skills):
         from neon_core.skills.service import NeonSkillService
 
