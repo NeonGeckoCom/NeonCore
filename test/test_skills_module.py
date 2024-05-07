@@ -175,6 +175,10 @@ class TestIntentService(unittest.TestCase):
         os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
         os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         use_neon_core(init_config_dir)()
+        import ovos_config
+        import importlib
+        importlib.reload(ovos_config.config)
+        importlib.reload(ovos_config)
 
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
