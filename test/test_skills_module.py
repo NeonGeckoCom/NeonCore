@@ -96,7 +96,10 @@ class TestSkillService(unittest.TestCase):
             "location": {"timezone": {"code": "America/Los_Angeles",
                                       "name": "Pacific Standard Time",
                                       "dstOffset": 3600000,
-                                      "offset": -28800000}}
+                                      "offset": -28800000},
+                         "coordinate": {"latitude": 47.482880,
+                                        "longitude": -122.217064}
+                         }
         }
 
         started = Event()
