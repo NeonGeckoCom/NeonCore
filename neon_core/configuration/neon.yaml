@@ -217,6 +217,8 @@ MQ:
     mq_handler:
       user: neon_api_utils
       password: Klatchat2021
+hana:
+  url: "https://hana.neonaiservices.com"
 signal:
   use_signal_files: true
   max_wait_seconds: 300
