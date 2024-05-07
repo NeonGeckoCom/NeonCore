@@ -98,8 +98,15 @@ class TestSkillService(unittest.TestCase):
                                       "dstOffset": 3600000,
                                       "offset": -28800000},
                          "coordinate": {"latitude": 47.482880,
-                                        "longitude": -122.217064}
-                         }
+                                        "longitude": -122.217064},
+                         "city": {"code": "Renton",
+                                  "name": "Renton",
+                                  "state": {"code": "WA", "name": "Washington",
+                                            "country": {"code": "US",
+                                                        "name": "United States"}
+                                            }
+                                  }
+                         },
         }
 
         started = Event()
