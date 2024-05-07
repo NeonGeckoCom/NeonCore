@@ -88,11 +88,15 @@ class TestSkillService(unittest.TestCase):
         # from mycroft.util.process_utils import ProcessState
 
         config = {"skills": {
-                "disable_osm": False,
-                "auto_update": True,
-                "directory": join(dirname(__file__), "skill_module_skills"),
-                "run_gui_file_server": True
-            }
+            "disable_osm": False,
+            "auto_update": True,
+            "directory": join(dirname(__file__), "skill_module_skills"),
+            "run_gui_file_server": True
+        },
+            "location": {"timezone": {"code": "America/Los_Angeles",
+                                      "name": "Pacific Standard Time",
+                                      "dstOffset": 3600000,
+                                      "offset": -28800000}}
         }
 
         started = Event()
@@ -200,7 +204,7 @@ class TestIntentService(unittest.TestCase):
                                 "lang": "en-us"},
                                {"timing": {"transcribed": transcribe_time}})
         self.intent_service._save_utterance_transcription(test_message)
-        self.intent_service.transcript_service.write_transcript.\
+        self.intent_service.transcript_service.write_transcript. \
             assert_called_once_with(None, test_message.data["utterances"][0],
                                     transcribe_time, None)
 
@@ -252,11 +256,10 @@ class TestIntentService(unittest.TestCase):
 
         valid_parsers = {"cancel", "entity_parser", "translator"}
         self.assertTrue(all([p for p in valid_parsers if p in
-                        self.intent_service.transformers.loaded_modules]))
+                             self.intent_service.transformers.loaded_modules]))
 
     @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
     def test_handle_utterance(self, patched):
-
         test_message_invalid = Message("test", {"utterances": [' ', '  ']})
         self.intent_service.handle_utterance(test_message_invalid)
         patched.assert_not_called()
