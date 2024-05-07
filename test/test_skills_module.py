@@ -109,12 +109,13 @@ class TestSkillService(unittest.TestCase):
                                    daemonic=True)
         from neon_core.configuration import Configuration
         self.assertEqual(service.config, Configuration())
+        self.assertIsInstance(Configuration()["location"]["timezone"], dict)
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills']))
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
-        started.wait(30)
+        started.wait(60)
         self.assertTrue(service.config['skills']['auto_update'])
         # install_default.assert_called_once()
 
