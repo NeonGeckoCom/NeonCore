@@ -1,4 +1,4 @@
 # TODO: Stop skill deprecated with ovos-core 0.0.8; pinned last release (with stable dependencies)
 ovos-skill-stop==0.3.0a9
-neon-skill-fallback_unknown~=2.0
-neon-skill-communication~=0.1
+neon-skill-fallback_unknown~=2.0,>=2.0.1a1
+neon-skill-communication~=0.1,>=0.1.1a3
