@@ -88,11 +88,25 @@ class TestSkillService(unittest.TestCase):
         # from mycroft.util.process_utils import ProcessState
 
         config = {"skills": {
-                "disable_osm": False,
-                "auto_update": True,
-                "directory": join(dirname(__file__), "skill_module_skills"),
-                "run_gui_file_server": True
-            }
+            "disable_osm": False,
+            "auto_update": True,
+            "directory": join(dirname(__file__), "skill_module_skills"),
+            "run_gui_file_server": True
+        },
+            "location": {"timezone": {"code": "America/Los_Angeles",
+                                      "name": "Pacific Standard Time",
+                                      "dstOffset": 3600000,
+                                      "offset": -28800000},
+                         "coordinate": {"latitude": 47.482880,
+                                        "longitude": -122.217064},
+                         "city": {"code": "Renton",
+                                  "name": "Renton",
+                                  "state": {"code": "WA", "name": "Washington",
+                                            "country": {"code": "US",
+                                                        "name": "United States"}
+                                            }
+                                  }
+                         },
         }
 
         started = Event()
@@ -109,12 +123,13 @@ class TestSkillService(unittest.TestCase):
                                    daemonic=True)
         from neon_core.configuration import Configuration
         self.assertEqual(service.config, Configuration())
+        self.assertIsInstance(Configuration()["location"]["timezone"], dict)
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills']))
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
-        started.wait(30)
+        started.wait(60)
         self.assertTrue(service.config['skills']['auto_update'])
         # install_default.assert_called_once()
 
@@ -175,6 +190,10 @@ class TestIntentService(unittest.TestCase):
         os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
         os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         use_neon_core(init_config_dir)()
+        import ovos_config
+        import importlib
+        importlib.reload(ovos_config.config)
+        importlib.reload(ovos_config)
 
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
@@ -195,7 +214,7 @@ class TestIntentService(unittest.TestCase):
                                 "lang": "en-us"},
                                {"timing": {"transcribed": transcribe_time}})
         self.intent_service._save_utterance_transcription(test_message)
-        self.intent_service.transcript_service.write_transcript.\
+        self.intent_service.transcript_service.write_transcript. \
             assert_called_once_with(None, test_message.data["utterances"][0],
                                     transcribe_time, None)
 
@@ -247,11 +266,10 @@ class TestIntentService(unittest.TestCase):
 
         valid_parsers = {"cancel", "entity_parser", "translator"}
         self.assertTrue(all([p for p in valid_parsers if p in
-                        self.intent_service.transformers.loaded_modules]))
+                             self.intent_service.transformers.loaded_modules]))
 
     @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
     def test_handle_utterance(self, patched):
-
         test_message_invalid = Message("test", {"utterances": [' ', '  ']})
         self.intent_service.handle_utterance(test_message_invalid)
         patched.assert_not_called()

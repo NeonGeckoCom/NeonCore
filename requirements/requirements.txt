@@ -1,14 +1,16 @@
 # ovos-core version pinned for compat. with patches in NeonCore
-ovos-core==0.0.7
+ovos-core[mycroft,lgpl]>=0.0.8a95
 # padacioso==0.1.3a2
 
-neon-utils[network,audio]~=1.10,>=1.10.2a1
+neon-utils[network,audio]~=1.10,>=1.10.2a2
 # TODO: audio for alpha resolution
 ovos-utils~=0.0,>=0.0.38
-ovos-bus-client~=0.0.8
-neon-transformers~=0.2
+ovos-bus-client~=0.0.8,>=0.0.9a20
+neon-transformers~=0.2,>=0.2.1a4
 ovos-config~=0.0.12
-ovos-plugin-manager~=0.0.25
+ovos-plugin-manager~=0.0.25,>=0.0.26a19
+# TODO: ovos-backend-client pinned for stable release
+ovos-backend-client==0.1.1a5
 psutil~=5.6
 
 click~=8.0
@@ -19,15 +21,12 @@ mock~=5.0
 
 # default plugins
 neon-lang-plugin-libretranslate~=0.2
-neon-utterance-translator-plugin~=0.2
+neon-utterance-translator-plugin~=0.2,>=0.2.1a1
 neon-utterance-normalizer-plugin~=0.1
 
-requests~=2.29
+# TODO: Below adding support for ovos-utils 0.1.0
+#neon-mq-connector>=0.7.2a2
 
-# TODO: Patching dependencies ovos-core[skills,skills_lgpl] extra deps
-ovos-backend-client~=0.1,>=0.1.1a2
-adapt-parser~=0.5
-padacioso~=0.1
-ovos-phal-plugin-connectivity-events~=0.0.1
-padatious~=0.4.8
-fann2==1.0.7
+## TODO: Below supporting resolution of ovos-utils<0.1.0
+ovos-plugin-common-play==0.0.6
+ovos-utils~=0.0.38
