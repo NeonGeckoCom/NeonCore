@@ -46,7 +46,7 @@ from ovos_utils.log import LOG
 from neon_core.configuration import Configuration
 from neon_core.language import get_lang_config
 
-from ovos_core.intent_services import IntentService, ConverseService
+from ovos_core.intent_services import IntentService, ConverseService, IntentMatch
 
 try:
     from neon_utterance_translator_plugin import UtteranceTranslator
