@@ -26,7 +26,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import importlib
 import os
 import shutil
 import sys
@@ -36,10 +35,9 @@ import wave
 from copy import deepcopy
 from os.path import join, dirname, expanduser, isdir
 from threading import Event
-from time import time, sleep
+from time import time
 
-from mock import Mock
-from mock.mock import patch
+from unittest.mock import Mock, patch
 from ovos_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 from ovos_utils.xdg_utils import xdg_data_home
@@ -81,7 +79,7 @@ class TestSkillService(unittest.TestCase):
             shutil.rmtree(cls.config_dir)
 
     # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    @patch("ovos_core.skill_manager.SkillManager.run")
     def test_neon_skills_service(self, run):
         from neon_core.skills.service import NeonSkillService
         from neon_core.skills.skill_manager import NeonSkillManager
@@ -111,13 +109,14 @@ class TestSkillService(unittest.TestCase):
 
         started = Event()
 
-        def ready_hook():
+        def ready_hook(*_, **__):
             started.set()
 
         alive_hook = Mock()
         started_hook = Mock()
         error_hook = Mock()
         stopping_hook = Mock()
+        run.side_effect = ready_hook
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
                                    error_hook, stopping_hook, config=config,
                                    daemonic=True)
@@ -126,10 +125,11 @@ class TestSkillService(unittest.TestCase):
         self.assertIsInstance(Configuration()["location"]["timezone"], dict)
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills']))
+        self.assertIsInstance(service.config['location'], dict, service.config)
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
-        started.wait(60)
+        self.assertTrue(started.wait(30))
         self.assertTrue(service.config['skills']['auto_update'])
         # install_default.assert_called_once()
 
@@ -268,7 +268,7 @@ class TestIntentService(unittest.TestCase):
         self.assertTrue(all([p for p in valid_parsers if p in
                              self.intent_service.transformers.loaded_modules]))
 
-    @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
+    @patch("ovos_core.intent_services.IntentService.handle_utterance")
     def test_handle_utterance(self, patched):
         test_message_invalid = Message("test", {"utterances": [' ', '  ']})
         self.intent_service.handle_utterance(test_message_invalid)
@@ -382,7 +382,7 @@ class TestSkillManager(unittest.TestCase):
     #     manager.stop()
 
     # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    @patch("ovos_core.skill_manager.SkillManager.run")
     def test_get_default_skills_dir(self, _):
         from neon_core.skills.skill_manager import NeonSkillManager
         manager = NeonSkillManager(FakeBus())
