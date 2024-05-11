@@ -9,7 +9,7 @@ neon-skill-speed_test~=1.0,>=1.0.3a1
 neon-skill-spelling~=1.1
 neon-skill-stock~=1.0,>=1.0.1a4
 neon-skill-support_helper~=1.2,>=1.2.2
-neon-skill-user_settings~=1.0,>=1.0.5
+neon-skill-user_settings~=1.0,>=1.0.6a1
 neon-skill-weather~=2.0
 neon-skill-wikipedia~=1.0,>=1.0.2
 neon-skill-free_music_archive~=1.0,>=1.0.1
