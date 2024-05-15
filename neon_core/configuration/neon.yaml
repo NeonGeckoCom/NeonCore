@@ -205,6 +205,8 @@ gui_websocket:
   route: /gui
   ssl: false
 network_tests:
+  # TODO: Update to neonaiservices.com
+  ip_url: https://hana.neonaibeta.com/util/client_ip
   dns_primary: 1.1.1.1
   dns_secondary: 1.0.0.1
   web_url: https://www.google.com

@@ -47,7 +47,7 @@ ovos-phal-plugin-system~=0.0,>=0.0.5a1
 ovos-phal-plugin-connectivity-events~=0.0.3
 ovos-phal-plugin-homeassistant~=0.0.3,>=0.0.4a5
 ovos-phal-plugin-wallpaper-manager~=0.0.1
-ovos-phal-plugin-ipgeo~=0.0.2
+ovos-phal-plugin-ipgeo~=0.0.2,>=0.0.3a2
 ovos-phal-plugin-mk1 @ git+https://github.com/openvoiceos/ovos-phal-plugin-mk1@dev
 # TODO: Stable spec for mk1 plugin
 # ovos-phal-plugin-gpsd @ git+https://github.com/OpenVoiceOS/ovos-PHAL-plugin-gpsd
