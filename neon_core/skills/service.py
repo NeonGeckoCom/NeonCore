@@ -34,7 +34,7 @@ from threading import Thread
 from ovos_bus_client import Message, MessageBusClient
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, log_deprecation
 from ovos_plugin_manager.skills import get_plugin_skills, get_skill_directories
 from ovos_utils.process_utils import StatusCallbackMap
 from neon_utils.metrics_utils import announce_connection
@@ -99,8 +99,9 @@ class NeonSkillService(Thread):
 
     @property
     def status(self):
-        LOG.warning("This reference is deprecated. "
-                    "Use `NeonSkillService.skill_manager.status` directly.")
+        log_deprecation("This reference is deprecated. Use "
+                        "`NeonSkillService.skill_manager.status` directly.",
+                        "24.7.0")
         return self.skill_manager.status
 
     def _get_skill_dirs(self) -> list:

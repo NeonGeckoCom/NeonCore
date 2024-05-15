@@ -26,14 +26,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# TODO: Deprecate `conversational_intent`
-from neon_core.skills.decorators import conversational_intent
-
 # Backwards-compat import
 from ovos_workshop.decorators import intent_handler, intent_file_handler, \
     resting_screen_handler
 
 __all__ = ['intent_handler',
            'intent_file_handler',
-           'resting_screen_handler',
-           'conversational_intent']
+           'resting_screen_handler']

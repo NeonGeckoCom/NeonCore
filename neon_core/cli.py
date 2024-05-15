@@ -91,24 +91,14 @@ def update_default_resources():
 
 
 @neon_core_cli.command(help="Start Neon Skills module")
-@click.option("--install-skills", "-i", default=None,
-              help="Path to local skills for which to install dependencies")
-def run_skills(install_skills):
+def run_skills():
     from neon_utils.configuration_utils import init_config_dir
     init_config_dir()
 
     from neon_core.util.skill_utils import update_default_resources
     update_default_resources()
 
-    # from neon_core.util.skill_utils import install_local_skills
     from neon_core.skills.__main__ import main
-    if install_skills:
-        click.echo(f"Local skill installation is deprecated. "
-                   f"Add pip specs to config.")
-        # try:
-        #     install_local_skills(install_skills)
-        # except ValueError as e:
-        #     click.echo(f"Skill Installation Failed: {e}")
     click.echo("Starting Skills Service")
     main()
     click.echo("Skills Service Shutdown")
