@@ -1,3 +1,7 @@
+# TODO: Beta here to validate email and API proxy changes
+hana:
+  url: "https://hana.neonaibeta.com"
+
 # TODO: Patched to prevent resource warnings
 secondary_langs: [en-us]
 
