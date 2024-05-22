@@ -80,6 +80,10 @@ gui:
 signal:
   use_signal_files: false
 skills:
+  common_query:
+    extension_time: 5
+    min_response_wait: 2
+    max_response_wait: 8
   blacklisted_skills:
     - skill-ovos-setup.openvoiceos
     - skill-messaging.neongeckocom
