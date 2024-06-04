@@ -42,24 +42,24 @@ jobs:
         uses: actions/cache@v3
         id: lfs-cache
         with:
-          path: /core/pi_image_3.img.xz
+          path: ${{ GITHUB_WORKSPACE }}/pi_image_3.img.xz
           key: ${{ runner.os }}-lfs-${{ hashFiles('/core/pi_image_3.img.xz') }}-v1
       - name: Ensure LFS files are pulled
         if: steps.lfs-cache.outputs.cache-hit != 'true'
-        run: wget https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz -O /core/pi_image_3.img.xz
+        run: wget https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz -O ${{ GITHUB_WORKSPACE }}/pi_image_3.img.xz
       - name: Save LFS Cache
         if: steps.lfs-cache.outputs.cache-hit != 'true'
         id: lfs-cache-save
         uses: actions/cache/save@v3
         with:
-          path: /core/pi_image_3.img.xz
-          key: ${{ runner.os }}-lfs-${{ hashFiles('/core/pi_image_3.img.xz') }}-v1
+          path: ${{ GITHUB_WORKSPACE }}/pi_image_3.img.xz
+          key: ${{ runner.os }}-lfs-${{ hashFiles('${{ GITHUB_WORKSPACE }}/pi_image_3.img.xz') }}-v1
 
       - name: Test chroot installation
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: file:///core/pi_image_3.img.xz
+          base_image: file://${{ GITHUB_WORKSPACE }}/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
