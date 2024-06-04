@@ -37,13 +37,12 @@ jobs:
     steps:
       - name: Checkout neon-core
         uses: actions/checkout@v4
-
       - name: Restore LFS cache
         uses: actions/cache@v3
         id: lfs-cache
         with:
           path: ${{ github.workspace }}/pi_image_3.img.xz
-          key: ${{ runner.os }}-lfs-${{ hashFiles('/core/pi_image_3.img.xz') }}-v1
+          key: ${{ runner.os }}-lfs-pi_image_3.img.xz-v1
       - name: Ensure LFS files are pulled
         if: steps.lfs-cache.outputs.cache-hit != 'true'
         run: wget https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz -O ${{ github.workspace }}/pi_image_3.img.xz
@@ -53,8 +52,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: ${{ github.workspace }}/pi_image_3.img.xz
-          key: ${{ runner.os }}-lfs-${{ hashFiles('${{ github.workspace }}/pi_image_3.img.xz') }}-v1
-
+          key: ${{ runner.os }}-lfs-pi_image_3.img.xz-v1
       - name: Test chroot installation
         uses: pguyot/arm-runner-action@v2
         with:
@@ -71,12 +69,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout neon-core
+        uses: actions/checkout@v4
+      - name: Restore LFS cache
+        uses: actions/cache@v3
+        id: lfs-cache
+        with:
+          path: ${{ github.workspace }}/pi_image_3.img.xz
+          key: ${{ runner.os }}-lfs-pi_image_3.img.xz-v1
+      - name: Ensure LFS files are pulled
+        if: steps.lfs-cache.outputs.cache-hit != 'true'
+        run: wget https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz -O ${{ github.workspace }}/pi_image_3.img.xz
+      - name: Save LFS Cache
+        if: steps.lfs-cache.outputs.cache-hit != 'true'
+        id: lfs-cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ github.workspace }}/pi_image_3.img.xz
+          key: ${{ runner.os }}-lfs-pi_image_3.img.xz-v1
       - name: Test chroot installation
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz
+          base_image: file://${{ github.workspace }}/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
