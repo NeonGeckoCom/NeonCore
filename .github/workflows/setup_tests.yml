@@ -46,7 +46,7 @@ jobs:
           key: ${{ runner.os }}-lfs-${{ hashFiles('/core/pi_image_3.img.xz') }}-v1
       - name: Ensure LFS files are pulled
         if: steps.lfs-cache.outputs.cache-hit != 'true'
-        run: wget https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz -O ${{ GITHUB_WORKSPACE }}/pi_image_3.img.xz
+        run: wget https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz -O ${{ github.workspace }}/pi_image_3.img.xz
       - name: Save LFS Cache
         if: steps.lfs-cache.outputs.cache-hit != 'true'
         id: lfs-cache-save
