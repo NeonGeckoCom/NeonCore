@@ -10,10 +10,12 @@ audio_parsers:
   blacklist:
   - gender
 stt:
-  module: deepspeech_stream_local
-  fallback_module: google_cloud_streaming
+  module: ovos-stt-plugin-server
+  fallback_module: deepspeech_stream_local
+  ovos-stt-plugin-vosk:
+    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
   ovos-stt-plugin-server:
-    url: https://stt.openvoiceos.com/stt
+    url: https://whisper.neonaiservices.com/stt
 tts:
   pulse_duck: false
   preload_fallback: false

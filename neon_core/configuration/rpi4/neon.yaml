@@ -20,10 +20,7 @@ audio_parsers:
   blacklist:
   - gender
 stt:
-  module: google_cloud_streaming
   fallback_module: ovos-stt-plugin-vosk
-  ovos-stt-plugin-vosk:
-    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
 confirm_listening: true
 listener:
   VAD:
