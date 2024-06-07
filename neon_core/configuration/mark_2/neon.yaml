@@ -21,7 +21,7 @@ Audio:
       dbus_type: system
 audio_parsers:
   blacklist:
-  - gender
+    - gender
 stt:
   module: google_cloud_streaming
   fallback_module: ovos-stt-plugin-vosk
@@ -42,6 +42,8 @@ hotwords:
     active: false
   hey_neon:
     model_folder: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
+    active: false
+    listen: true
   hey_mycroft:
     module: ovos-ww-plugin-precise-lite
     model: https://github.com/OpenVoiceOS/precise-lite-models/raw/master/wakewords/en/hey_mycroft.tflite
@@ -49,7 +51,10 @@ hotwords:
     expected_duration: 3
     trigger_level: 3
     sensitivity: 0.5
-
+  hey_jarvis:
+    module: ovos-ww-plugin-openwakeword
+    active: false
+    listen: true
 sounds:
   start_listening: snd/start_listening.wav
   acknowledge: snd/acknowledge.mp3
@@ -98,7 +103,7 @@ PHAL:
     debug: false
     ssid: Neon
     psk:
-    color: '#ff8600'
+    color: "#ff8600"
     portal: start dot neon dot ai
     device: Neon Device
   ovos-PHAL-plugin-system:
