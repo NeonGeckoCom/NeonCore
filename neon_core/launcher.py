@@ -26,8 +26,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from mycroft.lock import Lock
-from mycroft.util import wait_for_exit_signal, reset_sigint_handler
+from ovos_utils import wait_for_exit_signal
+from ovos_utils.process_utils import reset_sigint_handler, PIDLock as Lock
 
 from neon_audio.service import NeonPlaybackService
 from neon_messagebus.service import NeonBusService

@@ -26,25 +26,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from neon_core.skills.decorators import intent_handler, intent_file_handler, \
-    resting_screen_handler, conversational_intent
-
-# TODO: Remove below patches with ovos-core 0.0.8 refactor
-import neon_core.skills.patched_plugin_loader
-import neon_core.skills.patched_skill_settings
-import neon_core.skills.patched_common_query
-
-import mycroft.skills
-from mycroft.skills import api
-from mycroft.skills import skill_manager
-from mycroft.skills.intent_services import padatious_service, converse_service
-from ovos_bus_client.message import Message
-mycroft.skills.api.Message = Message
-mycroft.skills.skill_manager.Message = Message
-mycroft.skills.intent_services.padatious_service.Message = Message
-mycroft.skills.intent_services.converse_service.Message = Message
+# Backwards-compat import
+from ovos_workshop.decorators import intent_handler, intent_file_handler, \
+    resting_screen_handler
 
 __all__ = ['intent_handler',
            'intent_file_handler',
-           'resting_screen_handler',
-           'conversational_intent']
+           'resting_screen_handler']

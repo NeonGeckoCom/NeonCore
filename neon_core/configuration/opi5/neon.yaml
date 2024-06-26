@@ -20,10 +20,7 @@ audio_parsers:
   blacklist:
   - gender
 stt:
-  module: neon-stt-plugin-nemo
   fallback_module: ovos-stt-plugin-vosk
-  ovos-stt-plugin-vosk:
-    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
 confirm_listening: true
 listener:
   VAD:
@@ -70,13 +67,6 @@ gui:
   run_gui_file_server: false
   generic:
     homescreen_supported: true
-MQ:
-  server: mq.2023.us
-  port: 35672
-  users:
-    mq_handler:
-      user: neon_api_utils
-      password: Klatchat2021
 signal:
   use_signal_files: false
 skills:

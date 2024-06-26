@@ -10,10 +10,12 @@ audio_parsers:
   blacklist:
   - gender
 stt:
-  module: deepspeech_stream_local
-  fallback_module: google_cloud_streaming
+  module: ovos-stt-plugin-server
+  fallback_module: deepspeech_stream_local
+  ovos-stt-plugin-vosk:
+    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
   ovos-stt-plugin-server:
-    url: https://stt.openvoiceos.com/stt
+    url: https://whisper.neonaiservices.com/stt
 tts:
   pulse_duck: false
   preload_fallback: false
@@ -163,12 +165,15 @@ skills:
     cross_activation: true
     cross_deactivation: true
     converse_priorities: {}
+  common_query:
+    extension_time: 3
+    min_response_wait: 2
+    max_response_wait: 6
   update_interval: 1.0
   disable_osm: false
   appstore_sync_interval: 6
   auto_update: false
   auto_update_interval: 24
-  neon_token: ''
   install_essential: true
   essential_skills: []
   install_default: false
@@ -206,18 +211,22 @@ gui_websocket:
   route: /gui
   ssl: false
 network_tests:
+  # TODO: Update to neonaiservices.com
+  ip_url: https://hana.neonaibeta.com/util/client_ip
   dns_primary: 1.1.1.1
   dns_secondary: 1.0.0.1
   web_url: https://www.google.com
   ncsi_endpoint: http://www.msftncsi.com/ncsi.txt
   ncsi_expected_text: Microsoft NCSI
 MQ:
-  server: mq.2021.us
+  server: mq.neonaiservices.com
   port: 5672
   users:
     mq_handler:
       user: neon_api_utils
       password: Klatchat2021
+hana:
+  url: "https://hana.neonaiservices.com"
 signal:
   use_signal_files: true
   max_wait_seconds: 300

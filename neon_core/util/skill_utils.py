@@ -26,53 +26,17 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import json
 import re
 
 from copy import copy
-from os import listdir, makedirs, symlink
-from tempfile import mkdtemp
-from shutil import rmtree
+from os import makedirs, symlink
 from os.path import expanduser, join, isdir, dirname, islink
 from typing import List
 
 from ovos_utils.xdg_utils import xdg_data_home
-from ovos_utils.log import LOG, log_deprecation
+from ovos_utils.log import LOG
 
 from ovos_config.config import Configuration
-
-
-def get_neon_skills_data(skill_meta_repository: str =
-                         "https://github.com/neongeckocom/neon_skills",
-                         branch: str = "master",
-                         repo_metadata_path: str = "skill_metadata") -> dict:
-    """
-    Get skill data from configured neon_skills repository.
-    :param skill_meta_repository: URL of skills repository containing metadata
-    :param branch: branch of repository to check out
-    :param repo_metadata_path: Path to repo directory containing json metadata files
-    """
-    log_deprecation("This skill repository format is deprecated; "
-                    "specify skills as packages", "24.04")
-    from ovos_skills_manager.github import normalize_github_url, download_url_from_github_url
-    from ovos_skill_installer import download_extract_zip
-    skills_data = dict()
-    temp_download_dir = mkdtemp()
-    zip_url = download_url_from_github_url(skill_meta_repository, branch)
-    base_dir = join(temp_download_dir, "neon_skill_meta")
-    try:
-        download_extract_zip(zip_url, temp_download_dir,
-                             "neon_skill_meta.zip", base_dir)
-    except PermissionError:
-        LOG.exception(f"Failed to download {zip_url} to {base_dir}")
-        return dict()
-    meta_dir = join(base_dir, repo_metadata_path)
-    for entry in listdir(meta_dir):
-        with open(join(meta_dir, entry)) as f:
-            skill_entry = json.load(f)
-        skills_data[normalize_github_url(skill_entry["url"])] = skill_entry
-    rmtree(temp_download_dir)
-    return skills_data
 
 
 def _write_pip_constraints_to_file(output_file: str):
@@ -124,17 +88,6 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param skills_to_install: list of skills to install
     :param config: optional dict configuration
     """
-    config = config or Configuration()["skills"]
-
-    token_set = False
-    if config.get("neon_token"):
-        LOG.warning("Authenticated installation from git is deprecated. "
-                    "Please remove `neon_token` from config")
-        from ovos_skills_manager.session import set_github_token
-        token_set = True
-        set_github_token(config["neon_token"])
-        LOG.info(f"Added token to request headers: {config.get('neon_token')}")
-
     constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
     _write_pip_constraints_to_file(constraints_file)
 
@@ -144,9 +97,6 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
         elif not _install_skill_pip(spec, constraints_file):
             LOG.error(f"Pip installation failed for: {spec}")
 
-    if token_set:
-        from ovos_skills_manager.session import clear_github_token
-        clear_github_token()
     LOG.info(f"Installed {len(skills_to_install)} skills")
 
 

@@ -25,11 +25,3 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-
-# TODO: Patching for ovos-core 0.0.7
-import ovos_utils.messagebus
-from ovos_utils.events import get_handler_name, create_wrapper, EventContainer
-ovos_utils.messagebus.get_handler_name = get_handler_name
-ovos_utils.messagebus.create_wrapper = create_wrapper
-ovos_utils.messagebus.EventContainer = EventContainer
