@@ -11,7 +11,7 @@ neon-cli-client~=0.3
 neon-mana-utils~=0.2,>=0.2.3a2
 
 # Default plugins
-ovos-vad-plugin-silero~=0.0.1
+ovos-vad-plugin-silero~=0.0.1,>=0.0.2a1
 onnxruntime!=1.16.0  # TODO: Patching https://github.com/microsoft/onnxruntime/issues/17631
 ovos-ww-plugin-precise~=0.1
 ovos-ww-plugin-precise-lite[tflite]~=0.1,>=0.1.2
