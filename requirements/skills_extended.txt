@@ -8,5 +8,5 @@ neon-skill-synonyms~=1.0,>=1.0.2
 neon-skill-translation~=1.0,>=1.0.1
 neon-skill-camera~=1.0,>=1.0.2a1
 ovos-skill-somafm~=0.0.1
-neon-homeassistant-skill~=0.0.14
+neon-homeassistant-skill~=0.0.18
 ovos-skill-icanhazdadjokes @ git+https://github.com/openvoiceos/skill-ovos-icanhazdadjokes@882f4bd1bab077a531b9f6979510b78f340a1886
