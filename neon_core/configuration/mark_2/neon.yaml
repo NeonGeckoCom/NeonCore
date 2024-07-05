@@ -151,8 +151,9 @@ log_dir: /home/neon/logs/
 log_level: INFO
 logs:
   path: /home/neon/.local/state/neon/
-  max_bytes: 50000000
-  backup_count: 3
+  # 2M max size per log file to keep within the 10M log limit
+  max_bytes: 1048576
+  backup_count: 1
   diagnostic: False
   level_overrides:
     error: []
