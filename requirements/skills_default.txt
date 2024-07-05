@@ -8,8 +8,8 @@ neon-skill-speak~=2.0,>=2.0.2a1
 neon-skill-speed_test~=1.0,>=1.0.3a1
 neon-skill-spelling~=1.1
 neon-skill-stock~=1.0,>=1.0.1a5
-neon-skill-support_helper~=1.2,>=1.2.3a1
-neon-skill-user_settings~=1.0,>=1.0.6a1
+neon-skill-support_helper~=1.2,>=1.2.3a2
+neon-skill-user_settings~=1.0,>=1.0.6a2
 neon-skill-weather~=2.0,>=2.0.1a2
 #neon-skill-wikipedia~=1.0,>=1.0.2
 ovos-skill-wikipedia==0.0.2a1
