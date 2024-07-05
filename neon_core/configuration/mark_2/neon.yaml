@@ -161,6 +161,11 @@ logs:
       - botocore
     info: []
     debug: []
+logging:
+  # 2M max size per log file to keep within  the 10M log limit
+  max_bytes: 2097152
+  # Backups count towards the cache limit too; skip any backups
+  backup_count: 0
 debug: False
 system_unit: imperial
 system:
