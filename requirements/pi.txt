@@ -32,7 +32,7 @@ ovos-stt-plugin-vosk~=0.1,>=0.1.4
 neon-phal-plugin-monitoring~=0.0.2
 neon-phal-plugin-audio-receiver~=0.0.4
 neon-phal-plugin-reset~=0.4,>=0.4.1
-neon-phal-plugin-device-updater~=0.2,>=0.2.1a2
+neon-phal-plugin-device-updater~=0.2,>=0.2.1a4
 neon-phal-plugin-fan~=0.1,>=0.1.1a1
 neon-phal-plugin-switches~=0.0.5
 neon-phal-plugin-linear_led~=0.2,>=0.2.3
