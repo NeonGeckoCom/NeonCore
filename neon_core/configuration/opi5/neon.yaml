@@ -130,19 +130,21 @@ server:
 
 # Logging Config
 log_dir: /home/neon/logs/
-log_level: INFO
-logs:
-  path: /home/neon/.local/state/neon/
-  max_bytes: 50000000
-  backup_count: 3
-  diagnostic: False
-  level_overrides:
-    error: []
-    warning:
-      - filelock
-      - botocore
-    info: []
-    debug: []
+logging:
+  log_level: INFO
+  logs:
+    path: /home/neon/.local/state/neon/
+    # 2M max size per log file to keep within the 10M log limit
+    max_bytes: 1048576
+    backup_count: 1
+    diagnostic: False
+  bus:
+    log_level: INFO
+    path: /home/neon/.local/state/neon/
+    # 2M max size per log file to keep within the 10M log limit
+    max_bytes: 1048576
+    backup_count: 1
+    diagnostic: False
 debug: False
 system_unit: imperial
 system:
