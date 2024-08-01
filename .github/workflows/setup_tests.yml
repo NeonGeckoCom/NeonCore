@@ -32,7 +32,7 @@ jobs:
         run: |
           pip install .[skills_required,skills_essential,skills_default,skills_extended]
   pi_image_3_10:
-    runs-on: ubuntu-latest
+    runs-on: image-builder
     timeout-minutes: 90
     steps:
       - name: Checkout neon-core
