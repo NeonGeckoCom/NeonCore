@@ -26,7 +26,7 @@ ovos-stt-plugin-server~=0.0.3
 ovos-tts-plugin-piper~=0.0.1a11
 
 # Fallback plugins
-neon-tts-plugin-coqui~=0.8,>=0.8.1a1
+neon-tts-plugin-coqui~=0.8,>=0.8.1a2
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
