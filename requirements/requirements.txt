@@ -7,9 +7,9 @@ neon-utils[network,audio]~=1.11,>=1.11.1a3
 ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0.10
 neon-transformers~=0.2,>=0.2.1a4
-ovos-config~=0.2
-ovos-plugin-manager~=0.3
-ovos-backend-client~=1.0
+ovos-config~=0.0,>=0.0.12
+ovos-plugin-manager~=0.0,>=0.0.25
+ovos-backend-client<=2.0
 psutil~=5.6
 
 click~=8.0
