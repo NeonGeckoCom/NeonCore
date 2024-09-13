@@ -203,6 +203,8 @@ class TestIntentService(unittest.TestCase):
         assert meta['default_config_path'].endswith('neon.yaml')
         importlib.reload(ovos_config.locations)
         assert ovos_config.locations.DEFAULT_CONFIG == meta['default_config_path']
+        import ovos_config.models
+        importlib.reload(ovos_config.models)
         importlib.reload(ovos_config.config)
         importlib.reload(ovos_config)
         assert ovos_config.config.Configuration.default.path == meta['default_config_path']
