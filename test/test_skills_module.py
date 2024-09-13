@@ -202,6 +202,9 @@ class TestIntentService(unittest.TestCase):
         importlib.reload(ovos_config.config)
         importlib.reload(ovos_config)
 
+        meta = ovos_config.meta.get_ovos_config()
+        assert meta['default_config_path'].endswith('neon.yaml')
+
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
         assert set(cls.intent_service.config['utterance_transformers'].keys()) \
