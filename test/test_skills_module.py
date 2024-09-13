@@ -188,6 +188,9 @@ class TestIntentService(unittest.TestCase):
     def setUpClass(cls) -> None:
         # from neon_core.util.runtime_utils import use_neon_core
         # from neon_utils.configuration_utils import init_config_dir
+
+        # Import to set default config path
+        import neon_core
         os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
         os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
         os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
