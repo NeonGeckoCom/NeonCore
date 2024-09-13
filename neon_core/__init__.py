@@ -25,3 +25,9 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+from os import environ
+from os.path import join, dirname
+
+environ["OVOS_DEFAULT_CONFIG"] = join(dirname(__file__),
+                                      "configuration", "neon.yaml")
