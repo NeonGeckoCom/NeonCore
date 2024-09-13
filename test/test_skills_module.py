@@ -204,6 +204,7 @@ class TestIntentService(unittest.TestCase):
 
         meta = ovos_config.meta.get_ovos_config()
         assert meta['default_config_path'].endswith('neon.yaml')
+        assert ovos_config.config.Configuration.default.path == meta['default_config_path']
 
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
