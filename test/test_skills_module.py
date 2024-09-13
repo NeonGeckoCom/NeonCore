@@ -186,12 +186,12 @@ class TestIntentService(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        from neon_core.util.runtime_utils import use_neon_core
-        from neon_utils.configuration_utils import init_config_dir
+        # from neon_core.util.runtime_utils import use_neon_core
+        # from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
         os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
         os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
-        use_neon_core(init_config_dir)()
+        # use_neon_core(init_config_dir)()
         import ovos_config
         import importlib
         importlib.reload(ovos_config.config)
@@ -307,6 +307,9 @@ class TestIntentService(unittest.TestCase):
 
         # Patch things
         real_config = self.intent_service.language_config
+        self.assertIn("neon_utterance_translator_plugin",
+                      self.intent_service.transformers.loaded_modules,
+                      self.intent_service.transformers.loaded_modules)
         translator = self.intent_service.transformers.loaded_modules.get(
             'neon_utterance_translator_plugin')
         real_plug = translator.translator
