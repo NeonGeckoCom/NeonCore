@@ -32,8 +32,8 @@ import unittest
 import yaml
 
 from copy import deepcopy
-from pprint import pformat
-from ovos_utils.log import LOG
+# from pprint import pformat
+# from ovos_utils.log import LOG
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -42,24 +42,24 @@ class ConfigurationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
-        # os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        # os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
-        from neon_core.util.runtime_utils import use_neon_core
-        from neon_utils.configuration_utils import init_config_dir
-        use_neon_core(init_config_dir)()
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        # from neon_core.util.runtime_utils import use_neon_core
+        # from neon_utils.configuration_utils import init_config_dir
+        # use_neon_core(init_config_dir)()
 
         # import neon_core
         # assert isinstance(neon_core.CORE_VERSION_STR, str)
-        assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
-                                           "OpenVoiceOS", "ovos.conf"))
+        # assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
+        #                                    "OpenVoiceOS", "ovos.conf"))
 
-        from ovos_config.meta import get_ovos_config
-        from neon_core.configuration import Configuration
-        ovos_config = use_neon_core(get_ovos_config)()
-        LOG.info(pformat(ovos_config))
-        assert ovos_config['config_filename'] == 'neon.yaml'
-        assert os.path.basename(ovos_config['default_config_path']) == "neon.yaml"
-        assert Configuration.default.path == ovos_config['default_config_path']
+        # from ovos_config.meta import get_ovos_config
+        # from neon_core.configuration import Configuration
+        # ovos_config = use_neon_core(get_ovos_config)()
+        # LOG.info(pformat(ovos_config))
+        # assert ovos_config['config_filename'] == 'neon.yaml'
+        # assert os.path.basename(ovos_config['default_config_path']) == "neon.yaml"
+        # assert Configuration.default.path == ovos_config['default_config_path']
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -100,11 +100,11 @@ class ConfigurationTests(unittest.TestCase):
         self.assertTrue(DEFAULT_CONFIG.endswith("neon.yaml"))
         self.assertTrue(Configuration.default.path == DEFAULT_CONFIG,
                         Configuration.default.path)
-        with open(join(test_config_dir, "OpenVoiceOS", 'ovos.conf')) as f:
-            ovos_conf = json.load(f)
-        self.assertEqual(ovos_conf['submodule_mappings']['neon_core'],
-                         "neon_core")
-        self.assertIsInstance(ovos_conf['module_overrides']['neon_core'], dict)
+        # with open(join(test_config_dir, "OpenVoiceOS", 'ovos.conf')) as f:
+        #     ovos_conf = json.load(f)
+        # self.assertEqual(ovos_conf['submodule_mappings']['neon_core'],
+        #                  "neon_core")
+        # self.assertIsInstance(ovos_conf['module_overrides']['neon_core'], dict)
 
         from neon_core.configuration import patch_config
         test_config = {"new_key": {'val': True}}

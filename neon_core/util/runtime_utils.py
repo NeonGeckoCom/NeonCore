@@ -26,7 +26,12 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from ovos_utils.log import deprecated
 
+
+@deprecated("ovos.conf meta configuration is deprecated. Use envvars "
+            "`OVOS_CONFIG_FILENAME`, `OVOS_CONFIG_BASE_FOLDER`, and "
+            "`OVOS_DEFAULT_CONFIG`.", "24.11.0")
 def use_neon_core(func):
     """
     Wrapper to ensure call originates from neon_core for stack checks.

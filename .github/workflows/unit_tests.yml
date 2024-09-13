@@ -41,9 +41,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
       - name: Upload Skill Utils test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: skill-utils-test-results
+          name: skill-utils-test-results-${{ matrix.python-version }}
           path: tests/skill-utils-test-results.xml
 
       - name: Test Diagnostic Utils
@@ -52,9 +52,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
       - name: Upload Diagnostic Utils test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: diagnostic-utils-test-results
+          name: diagnostic-utils-test-results-${{ matrix.python-version }}
           path: tests/diagnostic-utils-test-results.xml
 
   unit_tests:
@@ -82,25 +82,25 @@ jobs:
         run: |
           pytest test/test_configuration.py --doctest-modules --junitxml=tests/configuration-test-results.xml
       - name: Upload Configuration test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: configuration-test-results
+          name: configuration-test-results-${{ matrix.python-version }}
           path: tests/configuration-test-results.xml
 
       - name: Test Language
         run: |
           pytest test/test_language.py --doctest-modules --junitxml=tests/language-test-results.xml
       - name: Upload Language test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: language-test-results
+          name: language-test-results-${{ matrix.python-version }}
           path: tests/language-test-results.xml
 
       - name: Test Skills Module
         run: |
           pytest test/test_skills_module.py --doctest-modules --junitxml=tests/skills-module-test-results.xml
       - name: Upload Language test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: skills-module-test-results
+          name: skills-module-test-results-${{ matrix.python-version }}
           path: tests/skills-module-test-results.xml

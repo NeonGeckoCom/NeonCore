@@ -66,11 +66,13 @@ class TestSkillService(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        from neon_core.util.runtime_utils import use_neon_core
-        from neon_utils.configuration_utils import init_config_dir
+        # from neon_core.util.runtime_utils import use_neon_core
+        # from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        use_neon_core(init_config_dir)()
-        assert os.path.isdir(cls.config_dir)
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        # use_neon_core(init_config_dir)()
+        # assert os.path.isdir(cls.config_dir)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -184,19 +186,34 @@ class TestIntentService(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        from neon_core.util.runtime_utils import use_neon_core
-        from neon_utils.configuration_utils import init_config_dir
+        # from neon_core.util.runtime_utils import use_neon_core
+        # from neon_utils.configuration_utils import init_config_dir
+
+        # Import to set default config path
+        import neon_core
+
         os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
         os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
         os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
-        use_neon_core(init_config_dir)()
+        # use_neon_core(init_config_dir)()
         import ovos_config
         import importlib
+        importlib.reload(ovos_config.meta)
+        meta = ovos_config.meta.get_ovos_config()
+        assert meta['default_config_path'].endswith('neon.yaml')
+        importlib.reload(ovos_config.locations)
+        assert ovos_config.locations.DEFAULT_CONFIG == meta['default_config_path']
+        import ovos_config.models
+        importlib.reload(ovos_config.models)
         importlib.reload(ovos_config.config)
         importlib.reload(ovos_config)
+        assert ovos_config.config.Configuration.default.path == meta['default_config_path']
 
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
+        assert set(cls.intent_service.config['utterance_transformers'].keys()) \
+               == {"neon_utterance_translator_plugin",
+                   "neon_utterance_normalizer_plugin"}
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -305,6 +322,9 @@ class TestIntentService(unittest.TestCase):
 
         # Patch things
         real_config = self.intent_service.language_config
+        self.assertIn("neon_utterance_translator_plugin",
+                      self.intent_service.transformers.loaded_modules,
+                      self.intent_service.transformers.loaded_modules)
         translator = self.intent_service.transformers.loaded_modules.get(
             'neon_utterance_translator_plugin')
         real_plug = translator.translator
