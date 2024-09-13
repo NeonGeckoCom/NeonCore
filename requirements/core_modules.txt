@@ -3,5 +3,8 @@ neon-messagebus~=2.0,>=2.0.2a6
 neon-enclosure~=1.7,>=1.7.1a2
 neon-speech~=4.4,>=4.4.1
 neon-gui~=1.3,>=1.3.1a1
+
+# TODO: Patching breaking change in ovos-audio/OPM
 neon-audio==1.5.2a6
 ovos-audio==0.0.2a42
+ovos-plugin-manager==0.0.26a19
