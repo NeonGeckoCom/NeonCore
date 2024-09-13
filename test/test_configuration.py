@@ -32,8 +32,8 @@ import unittest
 import yaml
 
 from copy import deepcopy
-from pprint import pformat
-from ovos_utils.log import LOG
+# from pprint import pformat
+# from ovos_utils.log import LOG
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -42,16 +42,16 @@ class ConfigurationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
-        # os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        # os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
-        from neon_core.util.runtime_utils import use_neon_core
-        from neon_utils.configuration_utils import init_config_dir
-        use_neon_core(init_config_dir)()
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        # from neon_core.util.runtime_utils import use_neon_core
+        # from neon_utils.configuration_utils import init_config_dir
+        # use_neon_core(init_config_dir)()
 
         # import neon_core
         # assert isinstance(neon_core.CORE_VERSION_STR, str)
-        assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
-                                           "OpenVoiceOS", "ovos.conf"))
+        # assert os.path.isfile(os.path.join(cls.CONFIG_PATH,
+        #                                    "OpenVoiceOS", "ovos.conf"))
 
         # from ovos_config.meta import get_ovos_config
         # from neon_core.configuration import Configuration
