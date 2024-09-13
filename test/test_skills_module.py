@@ -191,17 +191,22 @@ class TestIntentService(unittest.TestCase):
 
         # Import to set default config path
         import neon_core
+
         os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
         os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
         os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         # use_neon_core(init_config_dir)()
         import ovos_config
         import importlib
+        importlib.reload(ovos_config.locations)
         importlib.reload(ovos_config.config)
         importlib.reload(ovos_config)
 
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
+        assert set(cls.intent_service.config['utterance_transformers'].keys()) \
+               == {"neon_utterance_translator_plugin",
+                   "neon_utterance_normalizer_plugin"}
 
     @classmethod
     def tearDownClass(cls) -> None:
