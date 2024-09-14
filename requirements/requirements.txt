@@ -8,7 +8,7 @@ ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0.8,>=0.0.9a25
 neon-transformers~=0.2,>=0.2.1a4
 ovos-config~=0.0.12,>=0.0.13a27
-ovos-plugin-manager~=0.0.25,>=0.0.26a19
+ovos-plugin-manager==0.0.26a20
 # TODO: ovos-backend-client pinned for stable release
 ovos-backend-client==0.1.1a5
 psutil~=5.6
