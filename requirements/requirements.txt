@@ -1,5 +1,5 @@
 # ovos-core version pinned for compat. with patches in NeonCore
-ovos-core[mycroft,lgpl]>=0.0.8a95
+ovos-core[mycroft,lgpl]>=0.0.8a95,<=0.0.8a100
 # padacioso==0.1.3a2
 
 neon-utils[network,audio]~=1.11,>=1.11.1a3
@@ -8,7 +8,7 @@ ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0.8,>=0.0.9a25
 neon-transformers~=0.2,>=0.2.1a4
 ovos-config~=0.0.12,>=0.0.13a27
-ovos-plugin-manager==0.0.26a20
+ovos-plugin-manager~=0.0.25,>=0.0.26a19
 # TODO: ovos-backend-client pinned for stable release
 ovos-backend-client==0.1.1a5
 psutil~=5.6
