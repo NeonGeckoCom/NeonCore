@@ -1,5 +1,5 @@
 # ovos-core version pinned for compat. with patches in NeonCore
-ovos-core[mycroft,lgpl]>=0.0.8a95
+ovos-core[mycroft,lgpl]>=0.0.8a95,<=0.0.8a100
 # padacioso==0.1.3a2
 
 neon-utils[network,audio]~=1.11,>=1.11.1a3
