@@ -1,3 +1,6 @@
+# TODO: Below adding intermediate support for ovos-audio 0.x
+enable_old_audioservice: True
+
 # Plugin Configuration
 utterance_transformers:
   neon_utterance_translator_plugin:
