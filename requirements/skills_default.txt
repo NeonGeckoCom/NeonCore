@@ -1,7 +1,6 @@
 skill-ddg~=0.0.2
 neon-skill-alerts~=3.0,>=3.0.1a1
-#neon-skill-caffeinewiz~=1.0,>=1.0.2
-neon-skill-caffeinewiz @ git+https://github.com/NeonGeckoCom/skill-caffeinewiz@ORG_UpdateOvosDependencies
+neon-skill-caffeinewiz~=1.0,>=1.0.3a1
 neon-skill-data_controls~=2.0,>=2.0.3a1
 neon-skill-fallback_wolfram_alpha~=2.1,>=2.1.1a1
 neon-skill-personal~=1.0,>=1.0.3a1
