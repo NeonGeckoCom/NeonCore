@@ -2,7 +2,7 @@ neon-skill-audio_recording~=0.0,>=0.0.1a1
 neon-skill-custom_conversation>=0.0.1a10,<0.0.2
 neon-skill-instructions~=0.1,>=0.1.1a5
 neon-skill-launcher~=1.0,>=1.0.2a2
-skill-news~=0.0.3
+skill-news~=0.0.4
 neon-skill-recipes>=0.0.1a9
 neon-skill-synonyms~=1.0,>=1.0.3a1
 neon-skill-translation~=1.0,>=1.0.2a1
