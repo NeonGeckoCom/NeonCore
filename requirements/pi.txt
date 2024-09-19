@@ -30,14 +30,14 @@ neon-tts-plugin-coqui~=0.8,>=0.8.1a2
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
-neon-phal-plugin-monitoring~=0.0.2
+neon-phal-plugin-monitoring~=0.0.2,>=0.0.3a1
 neon-phal-plugin-audio-receiver~=0.0.4
-neon-phal-plugin-reset~=0.4,>=0.4.1
+neon-phal-plugin-reset~=0.4,>=0.4.2a1
 neon-phal-plugin-device-updater~=0.3
-neon-phal-plugin-fan~=0.1,>=0.1.1a1
-neon-phal-plugin-switches~=0.0.5
-neon-phal-plugin-linear_led~=0.2,>=0.2.3
-neon-phal-plugin-gui-network-client~=0.0.5
+neon-phal-plugin-fan~=0.1,>=0.1.1a2
+neon-phal-plugin-switches~=0.0.5,>=0.0.6a1
+neon-phal-plugin-linear_led~=0.2,>=0.2.4a1
+neon-phal-plugin-gui-network-client~=0.0.5,>=0.0.6a1
 ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-network-manager~=1.1
 ovos-phal-plugin-wifi-setup~=1.0,>=1.1.2a1
