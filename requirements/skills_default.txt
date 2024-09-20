@@ -4,7 +4,7 @@ neon-skill-caffeinewiz~=1.0,>=1.0.3a1
 neon-skill-data_controls~=2.0,>=2.0.3a1
 neon-skill-fallback_wolfram_alpha~=2.1,>=2.1.1a1
 neon-skill-personal~=1.0,>=1.0.3a1
-neon-skill-speak~=2.0,>=2.0.3a1
+neon-skill-speak~=2.0,>=2.0.3a2
 neon-skill-speed_test~=1.0,>=1.0.4a1
 neon-skill-spelling~=1.1,>=1.1.1a1
 neon-skill-stock~=1.0,>=1.0.1a6
