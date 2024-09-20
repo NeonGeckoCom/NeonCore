@@ -2,7 +2,7 @@
 ovos-core[lgpl]~=0.0.8
 # padacioso==0.1.3a2
 
-neon-utils[network,audio]~=1.11,>=1.11.1a3
+neon-utils[network,audio]~=1.11,>=1.11.1a4
 # TODO: `audio` extra for dependency resolution
 ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0,>=0.0.10
