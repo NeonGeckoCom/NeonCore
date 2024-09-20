@@ -30,6 +30,10 @@ import os
 import shutil
 import sys
 import unittest
+from unittest.mock import patch
+
+from ovos_utils.fakebus import FakeBus
+
 import neon_utils.metrics_utils
 
 from mock import Mock
@@ -62,7 +66,9 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.report_metric.reset_mock()
         neon_utils.metrics_utils.report_metric = self.report_metric
 
-    def test_send_diagnostics_default(self):
+    @patch("ovos_bus_client.util.get_mycroft_bus")
+    def test_send_diagnostics_default(self, get_bus):
+        get_bus.return_value = FakeBus()
         from neon_core.util.diagnostic_utils import send_diagnostics
         send_diagnostics()
         self.report_metric.assert_called_once()
@@ -75,7 +81,9 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.assertIsInstance(data["logs"], str)
         # self.assertIsInstance(data["transcripts"], str)
 
-    def test_send_diagnostics_no_extras(self):
+    @patch("ovos_bus_client.util.get_mycroft_bus")
+    def test_send_diagnostics_no_extras(self, get_bus):
+        get_bus.return_value = FakeBus()
         from neon_core.util.diagnostic_utils import send_diagnostics
         send_diagnostics(False, False, False)
         self.report_metric.assert_called_once()
@@ -88,7 +96,9 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.assertIsNone(data["logs"])
         self.assertIsNone(data["transcripts"])
 
-    def test_send_diagnostics_allow_logs(self):
+    @patch("ovos_bus_client.util.get_mycroft_bus")
+    def test_send_diagnostics_allow_logs(self, get_bus):
+        get_bus.return_value = FakeBus()
         from neon_core.util.diagnostic_utils import send_diagnostics
         send_diagnostics(True, False, False)
         self.report_metric.assert_called_once()
@@ -101,7 +111,9 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.assertIsInstance(data["logs"], str)
         self.assertIsNone(data["transcripts"])
 
-    def test_send_diagnostics_allow_transcripts(self):
+    @patch("ovos_bus_client.util.get_mycroft_bus")
+    def test_send_diagnostics_allow_transcripts(self, get_bus):
+        get_bus.return_value = FakeBus()
         from neon_core.util.diagnostic_utils import send_diagnostics
         send_diagnostics(False, True, False)
         self.report_metric.assert_called_once()
@@ -114,7 +126,9 @@ class DiagnosticUtilsTests(unittest.TestCase):
         self.assertIsNone(data["logs"])
         # self.assertIsInstance(data["transcripts"], str)
 
-    def test_send_diagnostics_allow_config(self):
+    @patch("ovos_bus_client.util.get_mycroft_bus")
+    def test_send_diagnostics_allow_config(self, get_bus):
+        get_bus.return_value = FakeBus()
         from neon_core.util.diagnostic_utils import send_diagnostics
         send_diagnostics(False, False, True)
         self.report_metric.assert_called_once()
