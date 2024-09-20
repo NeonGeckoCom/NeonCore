@@ -35,6 +35,8 @@ neon-phal-plugin-audio-receiver~=0.0.4
 neon-phal-plugin-reset~=0.4,>=0.4.2a1
 neon-phal-plugin-device-updater~=0.3,>=0.3.1a1
 neon-phal-plugin-fan~=0.1,>=0.1.1a2
+# TODO: Below patching dependency resolution for fan plugin
+sj201-interface>=0.0.3a4
 neon-phal-plugin-switches~=0.0.5,>=0.0.6a1
 neon-phal-plugin-linear_led~=0.2,>=0.2.4a1
 neon-phal-plugin-gui-network-client~=0.0.5,>=0.0.6a1
