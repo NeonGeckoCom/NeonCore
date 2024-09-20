@@ -42,7 +42,7 @@ ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-network-manager~=1.1
 ovos-phal-plugin-wifi-setup~=1.0,>=1.1.2a1
 ovos-phal-plugin-oauth~=0.1
-ovos-phal-plugin-alsa~=0.0.3
+ovos-phal-plugin-alsa~=0.0,>=0.0.3
 ovos-phal-plugin-system~=0.1
 ovos-phal-plugin-connectivity-events~=0.1
 ovos-phal-plugin-homeassistant~=0.0.3,>=0.0.4a5
