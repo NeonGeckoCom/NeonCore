@@ -43,8 +43,6 @@ hotwords:
     active: false
   hey_neon:
     model_folder: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
-    active: true
-    listen: true
   hey_mycroft:
     module: ovos-ww-plugin-precise-lite
     model: https://github.com/OpenVoiceOS/precise-lite-models/raw/master/wakewords/en/hey_mycroft.tflite
