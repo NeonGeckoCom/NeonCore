@@ -20,8 +20,8 @@ click-default-group~=1.2
 mock~=5.0
 
 # default plugins
-neon-lang-plugin-libretranslate~=0.2
-neon-utterance-translator-plugin~=0.2,>=0.2.1a1
+neon-lang-plugin-libretranslate~=0.2,>=0.2.1a2
+neon-utterance-translator-plugin~=0.2,>=0.2.1a2
 neon-utterance-normalizer-plugin~=0.1,>=0.1.1a1
 
 # Ensure uk-ua language support
