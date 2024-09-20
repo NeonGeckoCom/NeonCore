@@ -19,7 +19,7 @@ ovos-ww-plugin-vosk~=0.1,>=0.1.1
 ovos-ww-plugin-openwakeword~=0.2
 neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.2a3
 
-neon-tts-plugin-coqui-remote~=0.0.3,>=0.0.4a2
+neon-tts-plugin-coqui-remote~=0.0.3,>=0.0.4a3
 neon-stt-plugin-nemo~=0.0.4,>=0.0.5a4
 ovos-tts-plugin-server==0.0.2a12
 ovos-stt-plugin-server~=0.0.3
