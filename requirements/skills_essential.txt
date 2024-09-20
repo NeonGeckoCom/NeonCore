@@ -3,3 +3,5 @@ neon-skill-date_time~=1.1,>=1.1.1a2
 neon-skill-demo~=1.0,>=1.0.4a1
 neon-skill-device_controls~=1.1,>=1.1.1a3
 neon-skill-ip-address~=1.2,>=1.2.1a5
+# TODO: Below patching skill-demo dependency resolution
+neon-tts-plugin-audiofiles>=0.0.3a2
