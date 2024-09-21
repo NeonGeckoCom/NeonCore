@@ -60,8 +60,5 @@ def patch_config(config: dict = None):
     local_config.update(config)
     local_config.store()
     Configuration().reload()
-    try:
-        import mycroft.configuration
-        mycroft.configuration.Configuration().reload()
-    except ImportError:
-        pass
+    import mycroft.configuration
+    mycroft.configuration.Configuration().reload()
