@@ -80,8 +80,8 @@ play_ogg_cmdline: ogg123 -q %1
 # Speech Module
 confirm_listening: true
 listener:
-  wake_word: hey_neon
-  stand_up_word: wake_up
+  wake_word: hey_neon  # TODO: Deprecated
+  stand_up_word: wake_up  # TODO: Deprecated
   sample_rate: 16000
   mic_meter_ipc: true
   record_wake_words: false
@@ -131,6 +131,7 @@ hotwords:
     version: "0.3"
     model: "https://github.com/MycroftAI/precise-data/raw/models-dev/hey-mycroft.tar.gz"
   hey_neon:
+    active: true
     module: ovos-ww-plugin-vosk
     listen: true
     sound: snd/start_listening.wav
