@@ -42,3 +42,6 @@ play_mp3_cmdline: "play %1"
 play_ogg_cmdline: "play %1"
 ready_settings:
   - skills
+signal:
+  use_signal_files: false
+  patch_imports: false

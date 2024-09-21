@@ -81,6 +81,7 @@ gui:
     homescreen_supported: true
 signal:
   use_signal_files: false
+  patch_imports: false
 skills:
   common_query:
     extension_time: 5

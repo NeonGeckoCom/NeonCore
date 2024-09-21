@@ -231,7 +231,7 @@ MQ:
 hana:
   url: "https://hana.neonaiservices.com"
 signal:
-  use_signal_files: true
+  use_signal_files: false
   max_wait_seconds: 300
 
 # Logging Config
