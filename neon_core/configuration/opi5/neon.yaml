@@ -86,8 +86,6 @@ PHAL:
     color: '#ff8600'
     portal: start dot neon dot ai
     device: Neon Device
-  ovos-PHAL-plugin-system:
-    core_service: neon.service
   neon-phal-plugin-linear-led:
     mute_color: burnt_orange
     sleep_color: red
@@ -95,6 +93,9 @@ PHAL:
   neon-phal-plugin-fan:
     min_fan_temp: 40.0
   admin:
+    ovos-PHAL-plugin-system:
+      enabled: true
+      core_service: neon.service
     neon-phal-plugin-device-updater:
       enabled: true
       initramfs_url: "https://github.com/NeonGeckoCom/neon_debos/raw/{}/overlays/02-opi5/boot/uInitrd"
