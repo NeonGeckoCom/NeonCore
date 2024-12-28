@@ -92,10 +92,13 @@ PHAL:
     utterance_animation: refill
   neon-phal-plugin-fan:
     min_fan_temp: 40.0
+  ovos-PHAL-plugin-wallpaper-manager:
+    selected_wallpaper: /home/neon/.local/share/neon/filesystem/skills/skill-ovos-homescreen.openvoiceos/wallpapers/neon_default.jpg
   admin:
-    ovos-PHAL-plugin-system:
+    neon-phal-plugin-system:
       enabled: true
       core_service: neon.service
+      core_service_is_user: False
     neon-phal-plugin-device-updater:
       enabled: true
       initramfs_url: "https://github.com/NeonGeckoCom/neon_debos/raw/{}/overlays/02-opi5/boot/uInitrd"
