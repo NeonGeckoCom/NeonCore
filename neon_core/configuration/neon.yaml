@@ -231,6 +231,8 @@ MQ:
       password: Klatchat2021
 hana:
   url: "https://hana.neonaiservices.com"
+  username: guest
+  password: password
 signal:
   use_signal_files: false
   max_wait_seconds: 300
