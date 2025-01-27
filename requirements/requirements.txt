@@ -2,10 +2,11 @@
 ovos-core[lgpl]~=0.0.8
 # padacioso==0.1.3a2
 
-neon-utils[network,audio]~=1.11,>=1.11.1a7
-# TODO: `audio` extra for dependency resolution
-ovos-utils~=0.0,>=0.0.38,<0.6.0
-# TODO: ovos-utils 0.6 constraint added to minimize deprecation logs on startup
+# TODO ovos-classifiers required for common-play
+ovos-classifiers
+
+neon-utils[network]~=1.12
+ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0,>=0.0.10
 neon-transformers~=0.2,>=0.2.1a4
 ovos-config~=0.0,>=0.0.12

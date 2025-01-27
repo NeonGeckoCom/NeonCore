@@ -31,3 +31,27 @@ from os.path import join, dirname
 
 environ["OVOS_DEFAULT_CONFIG"] = join(dirname(__file__),
                                       "configuration", "neon.yaml")
+
+# Patching deprecation warnings
+# TODO: Deprecate after migration to ovos-workshop 1.0+ and ovos-core 0.1+
+import ovos_workshop.resource_files
+import ovos_core.intent_services.stop_service
+from ovos_utils.bracket_expansion import expand_template
+ovos_workshop.resource_files.expand_options = expand_template
+ovos_core.intent_services.stop_service.expand_options = expand_template
+
+
+# Patching backwards-compat. intent language codes
+import ovos_core.intent_services
+from ovos_bus_client.util import get_message_lang
+
+
+def _patched_get_message_lang(*args, **kwargs):
+    # https://github.com/OpenVoiceOS/ovos-utils/pull/267 started normalizing
+    # lang codes to `en-US`, where previously this would be `en-us`. This
+    # patches the intent_service to use the lowercase tags for improved
+    # backwards-compatibility
+    return get_message_lang(*args, **kwargs).lower()
+
+
+ovos_core.intent_services.get_message_lang = _patched_get_message_lang
