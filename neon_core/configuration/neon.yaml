@@ -187,6 +187,26 @@ padatious:
   train_delay: 4
   single_thread: false
   regex_only: false
+  conf_high: 0.95
+  conf_med: 0.75
+  conf_low: 0.50
+intents:
+  pipeline:
+    - stop_high
+    - converse
+    - ocp_high
+    - padatious_high
+    - adapt_high
+    - ocp_medium
+    - fallback_high
+    - stop_medium
+    - adapt_medium
+    - padatious_medium
+    - adapt_low
+    - common_qa
+    - fallback_medium
+    - padatious_low
+    - fallback_low
 # GUI Service
 gui:
   extension: generic
@@ -299,6 +319,7 @@ system_unit: metric
 time_format: half
 date_format: MDY
 lang: en-us
+# secondary_langs defines what languages are loaded in ovos-core intent services
 secondary_langs: [en-us, uk-ua]
 location:
   city:
