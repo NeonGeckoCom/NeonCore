@@ -8,7 +8,8 @@ skills:
   - /default_skills
   - /skills
   upload_skill_manifest: false
-  blacklisted_skills: []
+  blacklisted_skills:
+    - skill-recipes.neongeckocom
   priority_skills: []
   fallbacks:
     fallback_priorities: {}

@@ -91,6 +91,7 @@ skills:
     - skill-custom_conversation.neongeckocom
     - skill-instructions.neongeckocom
     - skill-audio_record.neongeckocom
+    - skill-recipes.neongeckocom
   default_skills: []
 PHAL:
   ovos-phal-mk1:
