@@ -26,12 +26,19 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from threading import Thread
 
 import click
 
+from os import environ
+from os.path import join, dirname
+from threading import Thread
 from click_default_group import DefaultGroup
 from neon_utils.packaging_utils import get_neon_core_version
+
+_DEFAULT_CONFIG_FILE = join(dirname(__file__), 'configuration', 'neon.yaml')
+environ.setdefault("OVOS_CONFIG_BASE_FOLDER", "neon")
+environ.setdefault("OVOS_CONFIG_FILENAME", "neon.yaml")
+environ.setdefault("OVOS_DEFAULT_CONFIG", _DEFAULT_CONFIG_FILE)
 
 
 @click.group("neon", cls=DefaultGroup,
@@ -92,9 +99,6 @@ def update_default_resources():
 
 @neon_core_cli.command(help="Start Neon Skills module")
 def run_skills():
-    from neon_utils.configuration_utils import init_config_dir
-    init_config_dir()
-
     from neon_core.util.skill_utils import update_default_resources
     update_default_resources()
 
