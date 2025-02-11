@@ -1,11 +1,11 @@
-FROM python:3.10-slim as base
+FROM python:3.10-slim AS base
 
 LABEL vendor=neon.ai \
     ai.neon.name="neon-skills"
 
-ENV OVOS_CONFIG_BASE_FOLDER neon
-ENV OVOS_CONFIG_FILENAME neon.yaml
-ENV XDG_CONFIG_HOME /config
+ENV OVOS_CONFIG_BASE_FOLDER=neon
+ENV OVOS_CONFIG_FILENAME=neon.yaml
+ENV XDG_CONFIG_HOME=/config
 
 RUN  apt-get update && \
      apt-get install -y \
@@ -53,6 +53,6 @@ RUN chmod ugo+x /root/run.sh && \
 
 CMD ["/root/run.sh"]
 
-FROM base as default_skills
+FROM base AS default_skills
 RUN pip install .[skills_required,skills_essential,skills_default,skills_extended]
 # Default skills from configuration are installed at container creation

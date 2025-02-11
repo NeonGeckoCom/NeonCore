@@ -27,6 +27,3 @@ neon-utterance-normalizer-plugin~=0.1,>=0.1.1a1
 
 # Ensure uk-ua language support
 ovos-lingua-franca~=0.4,>=0.4.8a13
-
-# TODO: Below adding support for latest OVOS package resolution
-neon-mq-connector>=0.7.2a3

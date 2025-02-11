@@ -29,15 +29,13 @@
 from neon_core.skills.service import NeonSkillService
 from neon_utils.log_utils import init_log
 from ovos_utils.log import LOG
-from ovos_utils.process_utils import reset_sigint_handler, PIDLock as Lock
+from ovos_utils.process_utils import reset_sigint_handler
 from ovos_utils import wait_for_exit_signal
 from neon_utils.process_utils import start_malloc, snapshot_malloc, print_malloc
 
 
 def main(*args, **kwargs):
     reset_sigint_handler()
-    # Create PID file, prevent multiple instances of this service
-    Lock('skills')
     init_log(log_name="skills")
     malloc_running = start_malloc(stack_depth=4)
     service = NeonSkillService(*args, **kwargs)
