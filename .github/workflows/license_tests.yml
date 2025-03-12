@@ -7,4 +7,4 @@ jobs:
   license_tests:
     uses: neongeckocom/.github/.github/workflows/license_tests.yml@master
     with:
-      packages-exclude: '^(precise-runner|fann2|tqdm|bs4|ovos-phal-plugin|ovos-skill|neon-core|nvidia|neon-phal-plugin|bitstruct|audioread).*'
+      packages-exclude: '^(precise-runner|fann2|tqdm|bs4|ovos-phal-plugin|ovos-skill|neon-core|nvidia|neon-phal-plugin|bitstruct|audioread|RapidFuzz).*'
