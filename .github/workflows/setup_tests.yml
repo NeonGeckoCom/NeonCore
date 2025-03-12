@@ -58,7 +58,7 @@ jobs:
         with:
           optimize_image: false
           base_image: file://${{ github.workspace }}/pi_image_3.img.xz
-          cpu: cortex-a76
+          cpu: cortex-a53
           copy_repository_path: /core
           commands: |
             bash /core/test/pi_setup_3_10.sh || exit 2
@@ -92,7 +92,7 @@ jobs:
         with:
           optimize_image: false
           base_image: file://${{ github.workspace }}/pi_image_3.img.xz
-          cpu: cortex-a76
+          cpu: cortex-a53
           copy_repository_path: /core
           commands: |
             bash /core/test/pi_setup_3_11.sh || exit 2
