@@ -7,8 +7,8 @@ pydbus~=0.6
 sdnotify~=0.3
 
 # Default debug client
-neon-cli-client~=0.3,>=0.3.1a1
-neon-mana-utils~=0.2,>=0.2.3a2
+neon-cli-client~=0.3,>=0.3.1
+neon-mana-utils~=0.3
 
 # Default plugins
 ovos-vad-plugin-silero~=0.0.1
@@ -17,30 +17,28 @@ ovos-ww-plugin-precise~=0.1
 ovos-ww-plugin-precise-lite[tflite]~=0.1,>=0.1.2
 ovos-ww-plugin-vosk~=0.1,>=0.1.1
 ovos-ww-plugin-openwakeword~=0.2
-neon-stt-plugin-google-cloud-streaming~=1.0,>=1.0.2a3
+neon-stt-plugin-google-cloud-streaming~=2.0
 
 neon-tts-plugin-coqui-remote~=0.1
-neon-stt-plugin-nemo~=0.0.4,>=0.0.5a4
+neon-stt-plugin-nemo~=0.0.4,>=0.0.5a8
 ovos-tts-plugin-server~=0.0.2
 ovos-stt-plugin-server~=0.0.3
 ovos-tts-plugin-piper~=0.0.2
 
 # Fallback plugins
-neon-tts-plugin-coqui~=0.8,>=0.8.1a3
+neon-tts-plugin-coqui~=0.8,>=0.8.1
 ovos-stt-plugin-vosk~=0.1,>=0.1.4
 
 # PHAL Plugins
-neon-phal-plugin-monitoring~=0.0.2,>=0.0.3a1
+neon-phal-plugin-monitoring~=0.0.3
 neon-phal-plugin-audio-receiver~=0.0.4
-neon-phal-plugin-reset~=0.4,>=0.4.2a1
-neon-phal-plugin-device-updater~=0.3,>=0.3.1a1
-neon-phal-plugin-fan~=0.1,>=0.1.1a2
-# TODO: Below patching dependency resolution for fan plugin
-sj201-interface>=0.0.3a4
-neon-phal-plugin-switches~=0.0.5,>=0.0.6a1
-neon-phal-plugin-linear_led~=0.2,>=0.2.4a1
-neon-phal-plugin-gui-network-client~=0.0.5,>=0.0.6a1
-neon-phal-plugin-system~=1.0,>=1.3.0a3
+neon-phal-plugin-reset~=0.5
+neon-phal-plugin-device-updater~=0.3,>=0.3.1
+neon-phal-plugin-fan~=0.1,>=0.1.1
+neon-phal-plugin-switches~=0.0.6
+neon-phal-plugin-linear_led~=0.2,>=0.2.4
+neon-phal-plugin-gui-network-client~=0.0.6
+neon-phal-plugin-system~=1.3
 ovos-phal-plugin-balena-wifi~=1.0.0
 ovos-phal-plugin-network-manager~=1.1
 ovos-phal-plugin-wifi-setup~=1.0,>=1.1.3
