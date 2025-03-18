@@ -1,2 +1,2 @@
-neon-skill-fallback_unknown~=2.0,>=2.0.2a1
-neon-skill-communication~=0.1,>=0.1.2a1
+neon-skill-fallback_unknown~=2.0,>=2.0.2
+neon-skill-communication~=0.1,>=0.1.2
