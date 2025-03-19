@@ -3,4 +3,4 @@ neon-messagebus~=2.1
 neon-enclosure~=1.8
 neon-speech~=4.5
 neon-gui~=1.4
-neon-audio~=1.5,>=1.5.2a16
+neon-audio~=1.6
