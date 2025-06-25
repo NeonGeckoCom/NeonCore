@@ -168,7 +168,6 @@ class NeonSkillService(Thread):
         self.event_scheduler.start()
         SkillApi.connect_bus(self.bus)
         LOG.info("Starting Skill Manager")
-        self.skill_manager.bus = self.bus
         self.skill_manager.start()
         LOG.info("Skill Manager started")
 
