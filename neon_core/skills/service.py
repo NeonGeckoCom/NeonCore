@@ -76,12 +76,13 @@ class NeonSkillService(Thread):
                  error_hook: callable = on_error,
                  stopping_hook: callable = on_stopping,
                  watchdog: Optional[callable] = None,
+                 bus: Optional[MessageBusClient] = None,
                  config: Optional[dict] = None, daemonic: bool = False):
         Thread.__init__(self)
         LOG.debug("Starting Skills Service")
         self._status_from_bus_connection = False
         self.daemon = daemonic
-        self.bus: MessageBusClient = get_messagebus(timeout=300)
+        self.bus: MessageBusClient = bus or get_messagebus(timeout=300)
         self.http_server = None
         self.event_scheduler = None
         self.watchdog = watchdog
