@@ -5,7 +5,7 @@ ovos-core[lgpl]~=0.0.8
 # TODO ovos-classifiers required for common-play
 ovos-classifiers
 
-neon-utils[network]~=1.12
+neon-utils[network]~=1.12,>=1.12.2a2
 ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0,>=0.0.10
 neon-transformers~=1.0

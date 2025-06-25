@@ -31,14 +31,25 @@ from neon_utils.log_utils import init_log
 from ovos_utils.log import LOG
 from ovos_utils.process_utils import reset_sigint_handler
 from ovos_utils import wait_for_exit_signal
-from neon_utils.process_utils import start_malloc, snapshot_malloc, print_malloc
+from neon_utils.process_utils import (
+    start_malloc,
+    snapshot_malloc,
+    print_malloc,
+)
 
 
 def main(*args, **kwargs):
     reset_sigint_handler()
     init_log(log_name="skills")
     malloc_running = start_malloc(stack_depth=4)
+    health_check_server_port = kwargs.pop("health_check_server_port", None)
     service = NeonSkillService(*args, **kwargs)
+    if health_check_server_port is not None:
+        from neon_utils.process_utils import start_health_check_server
+
+        start_health_check_server(
+            service.skill_manager.status, health_check_server_port, service.check_health
+        )
     try:
         service.start()
         wait_for_exit_signal()

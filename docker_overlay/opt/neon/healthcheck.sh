@@ -1,10 +1,8 @@
 #!/bin/bash
-# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
 # All trademark and other rights reserved by their respective owners
 # Copyright 2008-2025 Neongecko.com Inc.
-# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
-# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
-# BSD-3 License
+# BSD-3
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -27,6 +25,13 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Python package installation must occur in a separate thread, before module load, for the entry point to be loaded.
-neon install-default-skills
-neon run-skills -hp 8000
+port=8000
+# Perform the health check using curl
+resp_content=$(curl -s http://localhost:${port}/status)
+status=$(echo "${resp_content}" | jq -r '.status')
+if [ "${status}" == "Ready" ]; then
+  exit 0  # Success
+else
+  echo "Health check failed with response: ${resp_content}" >&2
+  exit 1  # Failure
+fi

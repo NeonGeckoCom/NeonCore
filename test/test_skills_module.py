@@ -121,7 +121,7 @@ class TestSkillService(unittest.TestCase):
         run.side_effect = ready_hook
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
                                    error_hook, stopping_hook, config=config,
-                                   daemonic=True)
+                                   daemonic=True, bus=FakeBus())
         from neon_core.configuration import Configuration
         self.assertEqual(service.config, Configuration())
         self.assertIsInstance(Configuration()["location"]["timezone"], dict)
@@ -160,7 +160,7 @@ class TestSkillService(unittest.TestCase):
                                             "skill-plugin")],
                                       ["skill-plugin.neongeckocom"])
 
-        skill_dirs = NeonSkillService()._get_skill_dirs()
+        skill_dirs = NeonSkillService(bus=FakeBus())._get_skill_dirs()
         # listdir doesn't guarantee order, base skill directory order matters
         self.assertEqual(set(skill_dirs),
                          {join(test_dir, "plugins", "skill-plugin"),
