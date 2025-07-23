@@ -5,4 +5,4 @@ on:
 
 jobs:
   license_tests:
-    uses: neongeckocom/.github/.github/workflows/license_tests.yml@master
+    uses: neongeckocom/.github/.github/workflows/license_tests.yml@FEAT_UpdateLicenseTestAction
