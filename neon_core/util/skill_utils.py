@@ -78,6 +78,10 @@ def _install_skill_pip(skill_package: str, constraints_file: str) -> bool:
     LOG.info(f"Requested installation of plugin skill: {skill_package}")
     returned = pip.main(['install', skill_package, "-c",
                          constraints_file])
+    if returned == 0 and skill_package.startswith("git+"):
+        # Force install git packages, even if same version is installed
+        returned = pip.main(['install', skill_package, "--no-deps", 
+                             "--force-reinstall"])
     LOG.info(f"pip status: {returned}")
     return returned == 0
 
@@ -136,7 +140,7 @@ def update_default_resources():
         LOG.info(f"Directory exists; not linking default resources. {res_dir}")
         return
     if islink(res_dir):
-        LOG.debug(f"Link exists; not doing anything.")
+        LOG.debug("Link exists; not doing anything.")
         return
     if not isdir(dirname(res_dir)):
         # Ensure directory exists to link default resources in
