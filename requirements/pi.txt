@@ -60,7 +60,6 @@ ovos-skill-homescreen~=0.0.3
 
 # ovos-skill-setup~=0.0.1
 ovos-skill-volume~=0.0.2
-skill-markII-audio-receiver~=0.1
 
 # Used for Demo Skill
 ovos-tts-plugin-mimic~=0.3
