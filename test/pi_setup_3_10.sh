@@ -38,6 +38,7 @@ curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | a
 echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
 apt update
 apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev mimic espeak-ng g++ libjpeg-dev make libcairo2-dev libgirepository1.0-dev || exit 1
+find /usr/lib /usr/lib/aarch64-linux-gnu -name girepository-2.0.pc
 
 cd /core || exit 10
 python3.10 -m venv "/core/venv" || exit 11
