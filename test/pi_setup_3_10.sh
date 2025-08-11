@@ -33,17 +33,13 @@ echo "nameserver 1.1.1.1" | tee /etc/resolv.conf
 
 # install system packages
 apt update
-apt install -y curl apt-utils
+apt install -y curl
 curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
 echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
 apt update
 apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev mimic espeak-ng g++ libjpeg-dev make || exit 1
 # Audio Receiver dependencies
 apt install -y libcairo2-dev libgirepository1.0-dev bluez* libbluetooth-dev pulseaudio-module-bluetooth 
-
-# TODO: For troubleshooting GHA failure
-find /usr/lib /usr/lib/aarch64-linux-gnu -name girepository-2.0.pc || echo "girepository-2.0.pc not found"
-
 
 cd /core || exit 10
 python3.10 -m venv "/core/venv" || exit 11
