@@ -14,6 +14,7 @@ jobs:
     uses: neongeckocom/.github/.github/workflows/docker_build_tests.yml@master
     with:
       platforms: linux/amd64,linux/arm64
+      build_timeout: 120
   util_tests:
     strategy:
       matrix:

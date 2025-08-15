@@ -1,9 +1,43 @@
 # TODO: Beta here to validate email and API proxy changes
 hana:
   url: "https://hana.neonaibeta.com"
+  username: guest
+  password: password
+
 
 # TODO: Patched to prevent resource warnings
 secondary_langs: [en-us]
+
+# TODO Below block patching for 2025.08 Release
+enable_old_audioservice: True
+audio_parsers:
+  blacklist:
+    - gender
+padatious:
+  intent_cache: ~/.local/share/mycroft/intent_cache
+  train_delay: 4
+  single_thread: false
+  regex_only: false
+  conf_high: 0.95
+  conf_med: 0.75
+  conf_low: 0.50
+intents:
+  pipeline:
+    - stop_high
+    - converse
+    - ocp_high
+    - padatious_high
+    - adapt_high
+    - ocp_medium
+    - fallback_high
+    - stop_medium
+    - adapt_medium
+    - padatious_medium
+    - adapt_low
+    - common_qa
+    - fallback_medium
+    - padatious_low
+    - fallback_low
 
 play_wav_cmdline: "play %1"
 play_mp3_cmdline: "play %1"
@@ -11,6 +45,10 @@ play_ogg_cmdline: "play %1"
 g2p:
   module: "dummy"
 tts:
+  # TODO: Patching 2025.08 Release
+  pulse_duck: false
+  preload_fallback: false
+
   module: neon-tts-plugin-coqui-remote
   fallback_module: coqui
   neon-tts-plugin-larynx-server:
@@ -23,11 +61,15 @@ Audio:
       type: ovos_common_play
       active: true
       dbus_type: system
-audio_parsers:
-  blacklist:
-    - gender
+  # TODO: Patching 2025.08 Release
+  default-backend: OCP
 stt:
   fallback_module: ovos-stt-plugin-vosk
+  # TODO: Patching 2025.08 Release
+  module: ovos-stt-plugin-server
+  ovos-stt-plugin-server:
+    url: https://whisper.neonaiservices.com/stt
+  
 confirm_listening: true
 listener:
   VAD:
@@ -184,3 +226,6 @@ language:
 utterance_transformers:
   neon_utterance_translator_plugin:
     enable_detector: False
+  # TODO: Patching 2025.08 Release
+  neon_utterance_normalizer_plugin:
+    active: True
