@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -34,9 +34,9 @@ from threading import Thread
 from ovos_bus_client import Message, MessageBusClient
 from ovos_config.locale import set_default_lang, set_default_tz
 from ovos_config.config import Configuration
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, log_deprecation
 from ovos_plugin_manager.skills import get_plugin_skills, get_skill_directories
-from ovos_utils.process_utils import StatusCallbackMap
+from ovos_utils.process_utils import StatusCallbackMap, ProcessState
 from neon_utils.metrics_utils import announce_connection
 from neon_utils.signal_utils import init_signal_handlers, init_signal_bus
 from neon_utils.messagebus_utils import get_messagebus
@@ -76,12 +76,13 @@ class NeonSkillService(Thread):
                  error_hook: callable = on_error,
                  stopping_hook: callable = on_stopping,
                  watchdog: Optional[callable] = None,
+                 bus: Optional[MessageBusClient] = None,
                  config: Optional[dict] = None, daemonic: bool = False):
         Thread.__init__(self)
         LOG.debug("Starting Skills Service")
+        self._status_from_bus_connection = False
         self.daemon = daemonic
-        self.bus: Optional[MessageBusClient] = None
-        self.skill_manager = None
+        self.bus: MessageBusClient = bus or get_messagebus(timeout=300)
         self.http_server = None
         self.event_scheduler = None
         self.watchdog = watchdog
@@ -96,12 +97,45 @@ class NeonSkillService(Thread):
             from neon_core.configuration import patch_config
             patch_config(config)
         self.config = Configuration()
+        self.skill_manager = NeonSkillManager(
+            bus=self.bus, watchdog=self.watchdog,
+            alive_hook=self.callbacks.on_alive,
+            started_hook=self.callbacks.on_started,
+            ready_hook=self.callbacks.on_ready,
+            error_hook=self.callbacks.on_error,
+            stopping_hook=self.callbacks.on_stopping)
+        self.skill_manager.name = "skill_manager"
 
     @property
     def status(self):
-        LOG.warning("This reference is deprecated. "
-                    "Use `NeonSkillService.skill_manager.status` directly.")
+        log_deprecation("This reference is deprecated. Use "
+                        "`NeonSkillService.skill_manager.status` directly.",
+                        "24.7.0")
         return self.skill_manager.status
+
+
+    def check_health(self):
+        """
+        Check the health of the skills service and get an error state if the
+        service is unhealthy.
+        """
+        if self.skill_manager.status.state not in (ProcessState.READY, ProcessState.ERROR):
+            # Service is starting or stopping; skip health check
+            LOG.debug(f"Skipping health check during startup or shutdown. status={self.skill_manager.status.state}")
+            return
+        try:
+            self.bus.client.send(
+                    Message("neon.skills.health_check",
+                            context={"session": {"session_id": "default"}})
+                    .serialize())
+            if self._status_from_bus_connection:
+                self.skill_manager.status.set_ready()
+                self._status_from_bus_connection = False
+        except Exception as e:
+            LOG.error(f"Health check failed: {e}")
+            # Log without setting an error state as the bus should reconnect
+            self.skill_manager.status.set_error(f"Health check failed: {e}")
+            self._status_from_bus_connection = True
 
     def _get_skill_dirs(self) -> list:
         """
@@ -123,13 +157,6 @@ class NeonSkillService(Thread):
         set_default_tz()
 
         # Setup signal manager
-        try:
-            self.bus = self.bus or get_messagebus(timeout=300)
-        except TimeoutError as e:
-            LOG.exception(e)
-            self.callbacks.on_error(repr(e))
-            raise e
-
         init_signal_bus(self.bus)
         init_signal_handlers()
 
@@ -141,14 +168,6 @@ class NeonSkillService(Thread):
         self.event_scheduler.start()
         SkillApi.connect_bus(self.bus)
         LOG.info("Starting Skill Manager")
-        self.skill_manager = NeonSkillManager(
-            bus=self.bus, watchdog=self.watchdog,
-            alive_hook=self.callbacks.on_alive,
-            started_hook=self.callbacks.on_started,
-            ready_hook=self.callbacks.on_ready,
-            error_hook=self.callbacks.on_error,
-            stopping_hook=self.callbacks.on_stopping)
-        self.skill_manager.name = "skill_manager"
         self.skill_manager.start()
         LOG.info("Skill Manager started")
 

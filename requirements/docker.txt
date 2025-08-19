@@ -1,5 +1,5 @@
 # TTS Plugin configured for Demo Skill
-ovos-tts-plugin-mimic
+ovos-tts-plugin-mimic~=0.2
 
 # "Lite" homescreen disables edge-device functionality
 ovos-skill-homescreen-lite @ git+https://github.com/openvoiceos/skill-homescreen-lite

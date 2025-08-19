@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -26,7 +26,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import importlib
 import os
 import shutil
 import sys
@@ -36,10 +35,9 @@ import wave
 from copy import deepcopy
 from os.path import join, dirname, expanduser, isdir
 from threading import Event
-from time import time, sleep
+from time import time
 
-from mock import Mock
-from mock.mock import patch
+from unittest.mock import Mock, patch
 from ovos_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 from ovos_utils.xdg_utils import xdg_data_home
@@ -68,11 +66,13 @@ class TestSkillService(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        from neon_core.util.runtime_utils import use_neon_core
-        from neon_utils.configuration_utils import init_config_dir
+        # from neon_core.util.runtime_utils import use_neon_core
+        # from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        use_neon_core(init_config_dir)()
-        assert os.path.isdir(cls.config_dir)
+        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
+        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
+        # use_neon_core(init_config_dir)()
+        # assert os.path.isdir(cls.config_dir)
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -81,40 +81,57 @@ class TestSkillService(unittest.TestCase):
             shutil.rmtree(cls.config_dir)
 
     # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    @patch("ovos_core.skill_manager.SkillManager.run")
     def test_neon_skills_service(self, run):
         from neon_core.skills.service import NeonSkillService
         from neon_core.skills.skill_manager import NeonSkillManager
         # from mycroft.util.process_utils import ProcessState
 
         config = {"skills": {
-                "disable_osm": False,
-                "auto_update": True,
-                "directory": join(dirname(__file__), "skill_module_skills"),
-                "run_gui_file_server": True
-            }
+            "disable_osm": False,
+            "auto_update": True,
+            "directory": join(dirname(__file__), "skill_module_skills"),
+            "run_gui_file_server": True
+        },
+            "location": {"timezone": {"code": "America/Los_Angeles",
+                                      "name": "Pacific Standard Time",
+                                      "dstOffset": 3600000,
+                                      "offset": -28800000},
+                         "coordinate": {"latitude": 47.482880,
+                                        "longitude": -122.217064},
+                         "city": {"code": "Renton",
+                                  "name": "Renton",
+                                  "state": {"code": "WA", "name": "Washington",
+                                            "country": {"code": "US",
+                                                        "name": "United States"}
+                                            }
+                                  }
+                         },
         }
 
         started = Event()
 
-        def ready_hook():
+        def ready_hook(*_, **__):
             started.set()
 
         alive_hook = Mock()
         started_hook = Mock()
         error_hook = Mock()
         stopping_hook = Mock()
+        run.side_effect = ready_hook
         service = NeonSkillService(alive_hook, started_hook, ready_hook,
                                    error_hook, stopping_hook, config=config,
-                                   daemonic=True)
+                                   daemonic=True, bus=FakeBus())
         from neon_core.configuration import Configuration
         self.assertEqual(service.config, Configuration())
+        self.assertIsInstance(Configuration()["location"]["timezone"], dict)
         self.assertTrue(all(config['skills'][x] == service.config['skills'][x]
                             for x in config['skills']))
+        self.assertIsInstance(service.config['location'], dict, service.config)
         service.bus = FakeBus()
         service.bus.connected_event = Event()
         service.start()
-        started.wait(30)
+        self.assertTrue(started.wait(30))
         self.assertTrue(service.config['skills']['auto_update'])
         # install_default.assert_called_once()
 
@@ -143,7 +160,7 @@ class TestSkillService(unittest.TestCase):
                                             "skill-plugin")],
                                       ["skill-plugin.neongeckocom"])
 
-        skill_dirs = NeonSkillService()._get_skill_dirs()
+        skill_dirs = NeonSkillService(bus=FakeBus())._get_skill_dirs()
         # listdir doesn't guarantee order, base skill directory order matters
         self.assertEqual(set(skill_dirs),
                          {join(test_dir, "plugins", "skill-plugin"),
@@ -169,15 +186,34 @@ class TestIntentService(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        from neon_core.util.runtime_utils import use_neon_core
-        from neon_utils.configuration_utils import init_config_dir
+        # from neon_core.util.runtime_utils import use_neon_core
+        # from neon_utils.configuration_utils import init_config_dir
+
+        # Import to set default config path
+        import neon_core
+
         os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
         os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
         os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
-        use_neon_core(init_config_dir)()
+        # use_neon_core(init_config_dir)()
+        import ovos_config
+        import importlib
+        importlib.reload(ovos_config.meta)
+        meta = ovos_config.meta.get_ovos_config()
+        assert meta['default_config_path'].endswith('neon.yaml')
+        importlib.reload(ovos_config.locations)
+        assert ovos_config.locations.DEFAULT_CONFIG == meta['default_config_path']
+        import ovos_config.models
+        importlib.reload(ovos_config.models)
+        importlib.reload(ovos_config.config)
+        importlib.reload(ovos_config)
+        assert ovos_config.config.Configuration.default.path == meta['default_config_path']
 
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
+        assert set(cls.intent_service.config['utterance_transformers'].keys()) \
+               == {"neon_utterance_translator_plugin",
+                   "neon_utterance_normalizer_plugin"}
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -195,7 +231,7 @@ class TestIntentService(unittest.TestCase):
                                 "lang": "en-us"},
                                {"timing": {"transcribed": transcribe_time}})
         self.intent_service._save_utterance_transcription(test_message)
-        self.intent_service.transcript_service.write_transcript.\
+        self.intent_service.transcript_service.write_transcript. \
             assert_called_once_with(None, test_message.data["utterances"][0],
                                     transcribe_time, None)
 
@@ -247,11 +283,10 @@ class TestIntentService(unittest.TestCase):
 
         valid_parsers = {"cancel", "entity_parser", "translator"}
         self.assertTrue(all([p for p in valid_parsers if p in
-                        self.intent_service.transformers.loaded_modules]))
+                             self.intent_service.transformers.loaded_modules]))
 
-    @patch("mycroft.skills.intent_service.IntentService.handle_utterance")
+    @patch("ovos_core.intent_services.IntentService.handle_utterance")
     def test_handle_utterance(self, patched):
-
         test_message_invalid = Message("test", {"utterances": [' ', '  ']})
         self.intent_service.handle_utterance(test_message_invalid)
         patched.assert_not_called()
@@ -287,6 +322,9 @@ class TestIntentService(unittest.TestCase):
 
         # Patch things
         real_config = self.intent_service.language_config
+        self.assertIn("neon_utterance_translator_plugin",
+                      self.intent_service.transformers.loaded_modules,
+                      self.intent_service.transformers.loaded_modules)
         translator = self.intent_service.transformers.loaded_modules.get(
             'neon_utterance_translator_plugin')
         real_plug = translator.translator
@@ -364,7 +402,7 @@ class TestSkillManager(unittest.TestCase):
     #     manager.stop()
 
     # @patch("neon_core.skills.skill_store.SkillsStore.install_default_skills")
-    @patch("mycroft.skills.skill_manager.SkillManager.run")
+    @patch("ovos_core.skill_manager.SkillManager.run")
     def test_get_default_skills_dir(self, _):
         from neon_core.skills.skill_manager import NeonSkillManager
         manager = NeonSkillManager(FakeBus())

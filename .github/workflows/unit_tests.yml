@@ -14,16 +14,17 @@ jobs:
     uses: neongeckocom/.github/.github/workflows/docker_build_tests.yml@master
     with:
       platforms: linux/amd64,linux/arm64
+      build_timeout: 120
   util_tests:
     strategy:
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, '3.10', '3.11' ]
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
@@ -41,9 +42,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
       - name: Upload Skill Utils test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: skill-utils-test-results
+          name: skill-utils-test-results-${{ matrix.python-version }}
           path: tests/skill-utils-test-results.xml
 
       - name: Test Diagnostic Utils
@@ -52,21 +53,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.neon_token}}
       - name: Upload Diagnostic Utils test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: diagnostic-utils-test-results
+          name: diagnostic-utils-test-results-${{ matrix.python-version }}
           path: tests/diagnostic-utils-test-results.xml
 
   unit_tests:
     strategy:
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, '3.10', '3.11' ]
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install Dependencies
@@ -82,25 +83,25 @@ jobs:
         run: |
           pytest test/test_configuration.py --doctest-modules --junitxml=tests/configuration-test-results.xml
       - name: Upload Configuration test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: configuration-test-results
+          name: configuration-test-results-${{ matrix.python-version }}
           path: tests/configuration-test-results.xml
 
       - name: Test Language
         run: |
           pytest test/test_language.py --doctest-modules --junitxml=tests/language-test-results.xml
       - name: Upload Language test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: language-test-results
+          name: language-test-results-${{ matrix.python-version }}
           path: tests/language-test-results.xml
 
       - name: Test Skills Module
         run: |
           pytest test/test_skills_module.py --doctest-modules --junitxml=tests/skills-module-test-results.xml
       - name: Upload Language test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
-          name: skills-module-test-results
+          name: skills-module-test-results-${{ matrix.python-version }}
           path: tests/skills-module-test-results.xml

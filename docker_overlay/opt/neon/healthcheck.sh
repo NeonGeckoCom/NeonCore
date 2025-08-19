@@ -1,9 +1,8 @@
-# NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
+#!/bin/bash
+# NEON AI (TM) SOFTWARE, Software Development Kit & Application Development System
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
-# Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
-# Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
-# BSD-3 License
+# Copyright 2008-2025 Neongecko.com Inc.
+# BSD-3
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 # 1. Redistributions of source code must retain the above copyright notice,
@@ -26,23 +25,13 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from ovos_utils.log import LOG
-# TODO: Deprecate with ovos-backend-client update
-try:
-    import ovos_workshop.settings
-    from ovos_workshop.settings import SkillSettingsManager as _SM
-    from ovos_backend_client.api import DeviceApi
-    from mock import Mock
-
-    class SkillSettingsManager(_SM):
-        def __init__(self, skill):
-            self.download_timer = None
-            self.skill = skill
-            self.api = DeviceApi()
-            self.remote_settings = Mock()
-            self.register_bus_handlers()
-
-    LOG.info("Patching SkillSettingsManager")
-    ovos_workshop.settings.SkillSettingsManager = SkillSettingsManager
-except ImportError:
-    pass
+port=8000
+# Perform the health check using curl
+resp_content=$(curl -s http://localhost:${port}/status)
+status=$(echo "${resp_content}" | jq -r '.status')
+if [ "${status}" == "Ready" ]; then
+  exit 0  # Success
+else
+  echo "Health check failed with response: ${resp_content}" >&2
+  exit 1  # Failure
+fi

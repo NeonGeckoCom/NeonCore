@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -26,10 +26,32 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from os import environ
+from os.path import join, dirname
 
-# TODO: Patching for ovos-core 0.0.7
-import ovos_utils.messagebus
-from ovos_utils.events import get_handler_name, create_wrapper, EventContainer
-ovos_utils.messagebus.get_handler_name = get_handler_name
-ovos_utils.messagebus.create_wrapper = create_wrapper
-ovos_utils.messagebus.EventContainer = EventContainer
+environ["OVOS_DEFAULT_CONFIG"] = join(dirname(__file__),
+                                      "configuration", "neon.yaml")
+
+# Patching deprecation warnings
+# TODO: Deprecate after migration to ovos-workshop 1.0+ and ovos-core 0.1+
+import ovos_workshop.resource_files
+import ovos_core.intent_services.stop_service
+from ovos_utils.bracket_expansion import expand_template
+ovos_workshop.resource_files.expand_options = expand_template
+ovos_core.intent_services.stop_service.expand_options = expand_template
+
+
+# Patching backwards-compat. intent language codes
+import ovos_core.intent_services
+from ovos_bus_client.util import get_message_lang
+
+
+def _patched_get_message_lang(*args, **kwargs):
+    # https://github.com/OpenVoiceOS/ovos-utils/pull/267 started normalizing
+    # lang codes to `en-US`, where previously this would be `en-us`. This
+    # patches the intent_service to use the lowercase tags for improved
+    # backwards-compatibility
+    return get_message_lang(*args, **kwargs).lower()
+
+
+ovos_core.intent_services.get_message_lang = _patched_get_message_lang

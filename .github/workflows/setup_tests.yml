@@ -9,15 +9,17 @@ jobs:
   core_and_skills:
     strategy:
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', '3.11' ]
+        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout neon-core
+        uses: actions/checkout@v4
       - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
       - name: Install System Dependencies
         run: |
           sudo apt update
@@ -33,12 +35,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout neon-core
+        uses: actions/checkout@v4
+      - name: Restore base image cache
+        uses: actions/cache@v3
+        id: image-cache
+        with:
+          path: ${{ github.workspace }}/pi_image_3.img.xz
+          key: ${{ runner.os }}-pi_image_3.img.xz-v1
+      - name: Ensure base image files are pulled
+        if: steps.image-cache.outputs.cache-hit != 'true'
+        run: wget https://download.neonaiservices.com/test_images/pi_image_3.img.xz -O ${{ github.workspace }}/pi_image_3.img.xz
+      - name: Save base image Cache
+        if: steps.image-cache.outputs.cache-hit != 'true'
+        id: image-cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ github.workspace }}/pi_image_3.img.xz
+          key: ${{ runner.os }}-pi_image_3.img.xz-v1
       - name: Test chroot installation
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz
+          base_image: file://${{ github.workspace }}/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |
@@ -50,12 +69,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout neon-core
+        uses: actions/checkout@v4
+      - name: Restore base image cache
+        uses: actions/cache@v3
+        id: image-cache
+        with:
+          path: ${{ github.workspace }}/pi_image_3.img.xz
+          key: ${{ runner.os }}-pi_image_3.img.xz-v1
+      - name: Ensure base image is pulled
+        if: steps.image-cache.outputs.cache-hit != 'true'
+        run: wget https://download.neonaiservices.com/test_images/pi_image_3.img.xz -O ${{ github.workspace }}/pi_image_3.img.xz
+      - name: Save base image Cache
+        if: steps.image-cache.outputs.cache-hit != 'true'
+        id: image-cache-save
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ github.workspace }}/pi_image_3.img.xz
+          key: ${{ runner.os }}-pi_image_3.img.xz-v1
       - name: Test chroot installation
         uses: pguyot/arm-runner-action@v2
         with:
           optimize_image: false
-          base_image: https://2222.us/app/files/neon_images/test_images/pi_image_3.img.xz
+          base_image: file://${{ github.workspace }}/pi_image_3.img.xz
           cpu: cortex-a53
           copy_repository_path: /core
           commands: |

@@ -1,11 +1,11 @@
-FROM python:3.10-slim as base
+FROM python:3.10-slim AS base
 
 LABEL vendor=neon.ai \
     ai.neon.name="neon-skills"
 
-ENV OVOS_CONFIG_BASE_FOLDER neon
-ENV OVOS_CONFIG_FILENAME neon.yaml
-ENV XDG_CONFIG_HOME /config
+ENV OVOS_CONFIG_BASE_FOLDER=neon
+ENV OVOS_CONFIG_FILENAME=neon.yaml
+ENV XDG_CONFIG_HOME=/config
 
 RUN  apt-get update && \
      apt-get install -y \
@@ -21,6 +21,8 @@ RUN  curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.ke
 
 RUN apt-get update && \
     apt-get install -y \
+    curl \
+    jq \
     gcc \
     g++ \
     python3-dev \
@@ -41,18 +43,19 @@ RUN apt-get update && \
 # TODO: git required for getting scripts, skill should be refactored to remove this dependency
 # TODO: sox, mimic required for demo skill, audio service should be refactored to handle TTS engines/voices in request
 
-ADD . /neon_core
+COPY . /neon_core
 WORKDIR /neon_core
 
-RUN pip install wheel && \
-    pip install .[docker]
+RUN pip install --no-cache-dir wheel && \
+    pip install --no-cache-dir .[docker]
 
 COPY docker_overlay/ /
 RUN chmod ugo+x /root/run.sh && \
     neon update-default-resources
 
+HEALTHCHECK CMD "/opt/neon/healthcheck.sh"
 CMD ["/root/run.sh"]
 
-FROM base as default_skills
-RUN pip install .[skills_required,skills_essential,skills_default,skills_extended]
+FROM base AS default_skills
+RUN pip install --no-cache-dir .[skills_required,skills_essential,skills_default,skills_extended]
 # Default skills from configuration are installed at container creation

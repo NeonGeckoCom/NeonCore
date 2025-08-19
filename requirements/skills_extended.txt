@@ -1,12 +1,12 @@
-neon-skill-audio_record~=1.0,>=1.0.1
-# neon-skill-custom_conversation>=0.0.1a8,<0.0.2
-# neon-skill-instructions~=0.1,>=0.1.1a4
-neon-skill-launcher~=1.0,>=1.0.1
+neon-skill-audio_recording~=0.0.1 #,>=0.0.2a1
+#neon-skill-custom_conversation>=0.0.1a10,<0.0.2
+neon-skill-instructions~=1.0
+neon-skill-launcher~=1.1
 skill-news~=0.0.3
-# neon-skill-recipes>=0.0.1a8
-neon-skill-synonyms~=1.0,>=1.0.2
-neon-skill-translation~=1.0,>=1.0.1
-neon-skill-camera~=1.0,>=1.0.1
-ovos-skill-somafm~=0.0.1
-neon-homeassistant-skill~=0.0.14
-ovos-skill-icanhazdadjokes @ git+https://github.com/openvoiceos/skill-ovos-icanhazdadjokes@882f4bd1bab077a531b9f6979510b78f340a1886
+#neon-skill-recipes>=0.0.1a9
+neon-skill-synonyms~=1.0,>=1.0.3
+neon-skill-translation~=1.0,>=1.0.2
+neon-skill-camera~=1.2
+ovos-skill-somafm~=0.0,>=0.0.1
+neon-homeassistant-skill~=0.0.18
+ovos-skill-icanhazdadjokes~=0.1

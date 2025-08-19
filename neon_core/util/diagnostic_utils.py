@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -33,10 +33,11 @@ import glob
 from os.path import join, isfile, basename, splitext
 from json_database import xdg_data_home, xdg_config_home
 
-from neon_utils import LOG
-from neon_utils.metrics_utils import report_metric
+from ovos_utils.log import LOG
 from neon_utils.configuration_utils import NGIConfig
 
+from ovos_bus_client.message import Message
+from ovos_bus_client.util import get_mycroft_bus
 from ovos_config.config import Configuration
 
 
@@ -111,10 +112,12 @@ def send_diagnostics(allow_logs=True, allow_transcripts=True, allow_config=True)
     # else:
     transcripts = None
 
-    data = {"host": socket.gethostname(),
+    data = {"name": "diagnostics",
+            "host": socket.gethostname(),
             "startup": startup_text,
             "configurations": json.dumps(configs) if configs else None,
             "logs": json.dumps(logs) if logs else None,
             "transcripts": transcripts}
-    report_metric("diagnostics", **data)
+    bus = get_mycroft_bus()
+    bus.emit(Message("neon.metric", data=data))
     return data

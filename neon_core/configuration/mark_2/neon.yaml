@@ -1,5 +1,43 @@
+# TODO: Beta here to validate email and API proxy changes
+hana:
+  url: "https://hana.neonaibeta.com"
+  username: guest
+  password: password
+
+
 # TODO: Patched to prevent resource warnings
 secondary_langs: [en-us]
+
+# TODO Below block patching for 2025.08 Release
+enable_old_audioservice: True
+audio_parsers:
+  blacklist:
+    - gender
+padatious:
+  intent_cache: ~/.local/share/mycroft/intent_cache
+  train_delay: 4
+  single_thread: false
+  regex_only: false
+  conf_high: 0.95
+  conf_med: 0.75
+  conf_low: 0.50
+intents:
+  pipeline:
+    - stop_high
+    - converse
+    - ocp_high
+    - padatious_high
+    - adapt_high
+    - ocp_medium
+    - fallback_high
+    - stop_medium
+    - adapt_medium
+    - padatious_medium
+    - adapt_low
+    - common_qa
+    - fallback_medium
+    - padatious_low
+    - fallback_low
 
 play_wav_cmdline: "play %1"
 play_mp3_cmdline: "play %1"
@@ -7,6 +45,10 @@ play_ogg_cmdline: "play %1"
 g2p:
   module: "dummy"
 tts:
+  # TODO: Patching 2025.08 Release
+  pulse_duck: false
+  preload_fallback: false
+
   module: neon-tts-plugin-coqui-remote
   fallback_module: coqui
   neon-tts-plugin-larynx-server:
@@ -19,14 +61,15 @@ Audio:
       type: ovos_common_play
       active: true
       dbus_type: system
-audio_parsers:
-  blacklist:
-  - gender
+  # TODO: Patching 2025.08 Release
+  default-backend: OCP
 stt:
-  module: google_cloud_streaming
   fallback_module: ovos-stt-plugin-vosk
-  ovos-stt-plugin-vosk:
-    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
+  # TODO: Patching 2025.08 Release
+  module: ovos-stt-plugin-server
+  ovos-stt-plugin-server:
+    url: https://whisper.neonaiservices.com/stt
+  
 confirm_listening: true
 listener:
   VAD:
@@ -49,7 +92,10 @@ hotwords:
     expected_duration: 3
     trigger_level: 3
     sensitivity: 0.5
-
+  hey_jarvis:
+    module: ovos-ww-plugin-openwakeword
+    active: false
+    listen: true
 sounds:
   start_listening: snd/start_listening.wav
   acknowledge: snd/acknowledge.mp3
@@ -75,13 +121,19 @@ gui:
     homescreen_supported: true
 signal:
   use_signal_files: false
+  patch_imports: false
 skills:
+  common_query:
+    extension_time: 5
+    min_response_wait: 2
+    max_response_wait: 8
   blacklisted_skills:
     - skill-ovos-setup.openvoiceos
     - skill-messaging.neongeckocom
     - skill-custom_conversation.neongeckocom
     - skill-instructions.neongeckocom
     - skill-audio_record.neongeckocom
+    - skill-recipes.neongeckocom
   default_skills: []
 PHAL:
   ovos-phal-mk1:
@@ -91,18 +143,22 @@ PHAL:
     debug: false
     ssid: Neon
     psk:
-    color: '#ff8600'
+    color: "#ff8600"
     portal: start dot neon dot ai
     device: Neon Device
-  ovos-PHAL-plugin-system:
-    core_service: neon.service
   neon-phal-plugin-linear-led:
     mute_color: burnt_orange
     sleep_color: red
     utterance_animation: refill
+  ovos-PHAL-plugin-wallpaper-manager:
+    selected_wallpaper: /home/neon/.local/share/neon/filesystem/skills/skill-ovos-homescreen.openvoiceos/wallpapers/neon_default.jpg
   neon-phal-plugin-fan:
     min_fan_temp: 40.0
   admin:
+    neon-phal-plugin-system:
+      enabled: true
+      core_service: neon.service
+      core_service_is_user: False
     neon-phal-plugin-device-updater:
       enabled: true
       initramfs_url: "https://github.com/NeonGeckoCom/neon_debos/raw/{}/overlays/02-rpi4/boot/firmware/initramfs"
@@ -138,19 +194,21 @@ server:
 
 # Logging Config
 log_dir: /home/neon/logs/
-log_level: INFO
-logs:
-  path: /home/neon/.local/state/neon/
-  max_bytes: 50000000
-  backup_count: 3
-  diagnostic: False
-  level_overrides:
-    error: []
-    warning:
-      - filelock
-      - botocore
-    info: []
-    debug: []
+logging:
+  log_level: INFO
+  logs:
+    path: /home/neon/.local/state/neon/
+    # 2M max size per log file to keep within the 10M log limit
+    max_bytes: 1048576
+    backup_count: 1
+    diagnostic: False
+  bus:
+    log_level: INFO
+    path: /home/neon/.local/state/neon/
+    # 2M max size per log file to keep within the 10M log limit
+    max_bytes: 1048576
+    backup_count: 1
+    diagnostic: False
 debug: False
 system_unit: imperial
 system:
@@ -168,3 +226,6 @@ language:
 utterance_transformers:
   neon_utterance_translator_plugin:
     enable_detector: False
+  # TODO: Patching 2025.08 Release
+  neon_utterance_normalizer_plugin:
+    active: True

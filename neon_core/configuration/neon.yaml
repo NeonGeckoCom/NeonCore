@@ -1,3 +1,6 @@
+# TODO: Below adding intermediate support for ovos-audio 0.x
+enable_old_audioservice: True
+
 # Plugin Configuration
 utterance_transformers:
   neon_utterance_translator_plugin:
@@ -10,10 +13,12 @@ audio_parsers:
   blacklist:
   - gender
 stt:
-  module: deepspeech_stream_local
-  fallback_module: google_cloud_streaming
+  module: ovos-stt-plugin-server
+  fallback_module: deepspeech_stream_local
+  ovos-stt-plugin-vosk:
+    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
   ovos-stt-plugin-server:
-    url: https://stt.openvoiceos.com/stt
+    url: https://whisper.neonaiservices.com/stt
 tts:
   pulse_duck: false
   preload_fallback: false
@@ -75,8 +80,8 @@ play_ogg_cmdline: ogg123 -q %1
 # Speech Module
 confirm_listening: true
 listener:
-  wake_word: hey_neon
-  stand_up_word: wake_up
+  wake_word: hey_neon  # TODO: Deprecated
+  stand_up_word: wake_up  # TODO: Deprecated
   sample_rate: 16000
   mic_meter_ipc: true
   record_wake_words: false
@@ -126,6 +131,7 @@ hotwords:
     version: "0.3"
     model: "https://github.com/MycroftAI/precise-data/raw/models-dev/hey-mycroft.tar.gz"
   hey_neon:
+    active: true
     module: ovos-ww-plugin-vosk
     listen: true
     sound: snd/start_listening.wav
@@ -163,6 +169,10 @@ skills:
     cross_activation: true
     cross_deactivation: true
     converse_priorities: {}
+  common_query:
+    extension_time: 3
+    min_response_wait: 2
+    max_response_wait: 6
   update_interval: 1.0
   disable_osm: false
   appstore_sync_interval: 6
@@ -177,6 +187,26 @@ padatious:
   train_delay: 4
   single_thread: false
   regex_only: false
+  conf_high: 0.95
+  conf_med: 0.75
+  conf_low: 0.50
+intents:
+  pipeline:
+    - stop_high
+    - converse
+    - ocp_high
+    - padatious_high
+    - adapt_high
+    - ocp_medium
+    - fallback_high
+    - stop_medium
+    - adapt_medium
+    - padatious_medium
+    - adapt_low
+    - common_qa
+    - fallback_medium
+    - padatious_low
+    - fallback_low
 # GUI Service
 gui:
   extension: generic
@@ -205,6 +235,8 @@ gui_websocket:
   route: /gui
   ssl: false
 network_tests:
+  # TODO: Update to neonaiservices.com
+  ip_url: https://hana.neonaibeta.com/util/client_ip
   dns_primary: 1.1.1.1
   dns_secondary: 1.0.0.1
   web_url: https://www.google.com
@@ -217,17 +249,22 @@ MQ:
     mq_handler:
       user: neon_api_utils
       password: Klatchat2021
+hana:
+  url: "https://hana.neonaiservices.com"
+  username: guest
+  password: password
 signal:
-  use_signal_files: true
+  use_signal_files: false
   max_wait_seconds: 300
 
 # Logging Config
-log_level: INFO
-logs:
-  path:
-  max_bytes: 50000000
-  backup_count: 3
-  diagnostic: False
+logging:
+  log_level: INFO
+  logs:
+    path:
+    max_bytes: 50000000
+    backup_count: 3
+    diagnostic: False
   level_overrides:
     error: []
     warning:
@@ -282,6 +319,7 @@ system_unit: metric
 time_format: half
 date_format: MDY
 lang: en-us
+# secondary_langs defines what languages are loaded in ovos-core intent services
 secondary_langs: [en-us, uk-ua]
 location:
   city:

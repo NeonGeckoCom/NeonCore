@@ -1,6 +1,6 @@
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -31,7 +31,7 @@ from os.path import isdir, join, expanduser
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
 
-from mycroft.skills.skill_manager import SkillManager
+from ovos_core.skill_manager import SkillManager
 
 
 class NeonSkillManager(SkillManager):

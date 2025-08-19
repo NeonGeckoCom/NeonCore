@@ -20,10 +20,7 @@ audio_parsers:
   blacklist:
   - gender
 stt:
-  module: neon-stt-plugin-nemo
   fallback_module: ovos-stt-plugin-vosk
-  ovos-stt-plugin-vosk:
-    model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
 confirm_listening: true
 listener:
   VAD:
@@ -89,15 +86,19 @@ PHAL:
     color: '#ff8600'
     portal: start dot neon dot ai
     device: Neon Device
-  ovos-PHAL-plugin-system:
-    core_service: neon.service
   neon-phal-plugin-linear-led:
     mute_color: burnt_orange
     sleep_color: red
     utterance_animation: refill
   neon-phal-plugin-fan:
     min_fan_temp: 40.0
+  ovos-PHAL-plugin-wallpaper-manager:
+    selected_wallpaper: /home/neon/.local/share/neon/filesystem/skills/skill-ovos-homescreen.openvoiceos/wallpapers/neon_default.jpg
   admin:
+    neon-phal-plugin-system:
+      enabled: true
+      core_service: neon.service
+      core_service_is_user: False
     neon-phal-plugin-device-updater:
       enabled: true
       initramfs_url: "https://github.com/NeonGeckoCom/neon_debos/raw/{}/overlays/02-opi5/boot/uInitrd"
@@ -133,19 +134,21 @@ server:
 
 # Logging Config
 log_dir: /home/neon/logs/
-log_level: INFO
-logs:
-  path: /home/neon/.local/state/neon/
-  max_bytes: 50000000
-  backup_count: 3
-  diagnostic: False
-  level_overrides:
-    error: []
-    warning:
-      - filelock
-      - botocore
-    info: []
-    debug: []
+logging:
+  log_level: INFO
+  logs:
+    path: /home/neon/.local/state/neon/
+    # 2M max size per log file to keep within the 10M log limit
+    max_bytes: 1048576
+    backup_count: 1
+    diagnostic: False
+  bus:
+    log_level: INFO
+    path: /home/neon/.local/state/neon/
+    # 2M max size per log file to keep within the 10M log limit
+    max_bytes: 1048576
+    backup_count: 1
+    diagnostic: False
 debug: False
 system_unit: imperial
 system:

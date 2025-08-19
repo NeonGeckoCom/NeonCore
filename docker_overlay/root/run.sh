@@ -1,7 +1,7 @@
 #!/bin/bash
 # NEON AI (TM) SOFTWARE, Software Development Kit & Application Framework
 # All trademark and other rights reserved by their respective owners
-# Copyright 2008-2022 Neongecko.com Inc.
+# Copyright 2008-2025 Neongecko.com Inc.
 # Contributors: Daniel McKnight, Guy Daniels, Elon Gasper, Richard Leeds,
 # Regina Bloomstine, Casimiro Ferreira, Andrii Pernatii, Kirill Hrymailo
 # BSD-3 License
@@ -29,4 +29,4 @@
 
 # Python package installation must occur in a separate thread, before module load, for the entry point to be loaded.
 neon install-default-skills
-neon run-skills
+neon run-skills -hp 8000

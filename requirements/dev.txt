@@ -1,3 +1,3 @@
-neon-cli-client~=0.2
-neon-mana-utils~=0.2,>=0.2.1
-neon-minerva~=0.1
+neon-cli-client~=0.2,>=0.3.1
+neon-mana-utils~=0.3
+neon-minerva~=0.3
