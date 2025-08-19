@@ -38,12 +38,14 @@ curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | a
 echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
 apt update
 apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev mimic espeak-ng g++ libjpeg-dev make || exit 1
+# Audio Receiver dependencies
+apt install -y libcairo2-dev libgirepository1.0-dev bluez* libbluetooth-dev pulseaudio-module-bluetooth 
 
 cd /core || exit 10
 python3.10 -m venv "/core/venv" || exit 11
 . /core/venv/bin/activate
 
 pip install --upgrade pip wheel
-pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" || exit 11
+pip install ".[core-modules,skills-required,skills-essential,skills-default,skills-extended,pi,audio-receiver]" || exit 11
 
 cp -rf /core/test/pi_image_overlay/* /

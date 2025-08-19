@@ -37,7 +37,7 @@ apt install -y curl
 curl https://forslund.github.io/mycroft-desktop-repo/mycroft-desktop.gpg.key | apt-key add - 2> /dev/null && \
 echo "deb http://forslund.github.io/mycroft-desktop-repo bionic main" | tee /etc/apt/sources.list.d/mycroft-desktop.list
 apt update
-apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev mimic espeak-ng g++ libjpeg-dev make python3.11-dev python3.11-venv || exit 1
+apt install -y sox gcc libfann-dev swig libssl-dev portaudio19-dev git libpulse-dev mimic espeak-ng g++ libjpeg-dev make python3.11-dev python3.11-venv libcairo2-dev libgirepository1.0-dev || exit 1
 
 cd /core || exit 10
 python3.11 -m venv "/core/venv" || exit 11
@@ -46,6 +46,6 @@ python3.11 -m venv "/core/venv" || exit 11
 pip install --upgrade pip wheel
 pip install https://github.com/smartgic/python-tflite-runtime/releases/download/2.13.0-cp311/tflite_runtime-2.13.0-cp311-cp311-linux_aarch64.whl
 #pip install https://whl.smartgic.io/tflite_runtime-2.13.0-cp311-cp311-linux_aarch64.whl
-pip install ".[core_modules,skills_required,skills_essential,skills_default,skills_extended,pi]" || exit 11
+pip install ".[core-modules,skills-required,skills-essential,skills-default,skills-extended,pi]" || exit 11
 
 cp -rf /core/test/pi_image_overlay/* /
