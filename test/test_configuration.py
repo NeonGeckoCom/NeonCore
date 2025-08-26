@@ -69,10 +69,10 @@ class ConfigurationTests(unittest.TestCase):
         # os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
         # os.environ.pop("OVOS_CONFIG_FILENAME")
 
+    @unittest.skip("mycroft.configuration is deprecated")
     def test_neon_core_config_init(self):
         from neon_core.configuration import Configuration
         from mycroft.configuration import Configuration as MycroftConfig
-        # TODO: Replace test after ovos_utils YML config compat.
         from neon_core.util.runtime_utils import use_neon_core
 
         configuration = Configuration()
@@ -84,10 +84,8 @@ class ConfigurationTests(unittest.TestCase):
         from ovos_config.config import read_mycroft_config
         self.assertEqual(configuration, use_neon_core(read_mycroft_config)())
 
+    @unittest.skip("mycroft.configuration is deprecated")
     def test_patch_config(self):
-        from os.path import join
-        import json
-
         test_config_dir = os.path.join(os.path.dirname(__file__), "config")
         os.makedirs(test_config_dir, exist_ok=True)
         os.environ["XDG_CONFIG_HOME"] = test_config_dir
