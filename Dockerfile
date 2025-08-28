@@ -57,5 +57,5 @@ HEALTHCHECK CMD "/opt/neon/healthcheck.sh"
 CMD ["/root/run.sh"]
 
 FROM base AS default_skills
-RUN pip install --no-cache-dir .[skills_required,skills_essential,skills_default,skills_extended]
+RUN pip install --no-cache-dir .[skills-required,skills-essential,skills-default,skills-extended]
 # Default skills from configuration are installed at container creation
