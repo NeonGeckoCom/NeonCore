@@ -29,7 +29,7 @@
 from ovos_config.config import Configuration
 from os.path import exists, isdir, dirname
 from os import makedirs
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, deprecated
 
 """
 Neon modules should import config from this module since module_overrides will
@@ -37,6 +37,7 @@ result in different configurations depending on originating module.
 """
 
 
+@deprecated("get_private_keys is deprecated without replacement", "25.10.0")
 def get_private_keys():
     return Configuration().get("keys", {})
 

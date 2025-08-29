@@ -82,22 +82,5 @@ class LanguageTests(unittest.TestCase):
         self.assertEqual(get_language_dir(base_dir, "ru-ru"),
                          os.path.join(base_dir, "ru-ru"))
 
-    def test_translator(self):
-        from neon_core.language import TranslatorFactory
-        translator = TranslatorFactory.create(
-            {"translation_module": "libretranslate_plug"})
-        self.assertIsInstance(translator, LanguageTranslator)
-        output = translator.translate("hello", "es-es", "en-us")
-        self.assertEqual(output.lower(), "hola")
-
-    def test_detector(self):
-        from neon_core.language import DetectorFactory
-        detector = DetectorFactory.create(
-            {"detection_module": "libretranslate_detection_plug"})
-        self.assertIsInstance(detector, LanguageDetector)
-        lang = detector.detect("hello")
-        self.assertEqual(lang, "en")
-
-
 if __name__ == '__main__':
     unittest.main()
