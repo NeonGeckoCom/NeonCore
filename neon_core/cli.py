@@ -35,6 +35,7 @@ from os.path import join, dirname
 from threading import Thread
 from click_default_group import DefaultGroup
 from neon_utils.packaging_utils import get_neon_core_version
+from ovos_utils.log import deprecated
 
 _DEFAULT_CONFIG_FILE = join(dirname(__file__), "configuration", "neon.yaml")
 environ.setdefault("OVOS_CONFIG_BASE_FOLDER", "neon")
@@ -61,6 +62,10 @@ def neon_core_cli(version: bool = False):
         click.echo(f"Neon version {get_neon_core_version()}")
 
 
+@deprecated(
+    "start_neon is deprecated; use containers or start services individually",
+    "25.10.0",
+)
 @neon_core_cli.command(help="Start Neon Core")
 def start_neon():
     from neon_core.run_neon import start_neon
@@ -70,6 +75,10 @@ def start_neon():
     click.echo("Neon Started")
 
 
+@deprecated(
+    "stop_neon is deprecated; use containers or start services individually",
+    "25.10.0",
+)
 @neon_core_cli.command(help="Stop Neon Core")
 def stop_neon():
     from neon_core.run_neon import stop_neon

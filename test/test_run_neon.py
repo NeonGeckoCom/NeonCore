@@ -95,7 +95,7 @@ class TestRunNeon(unittest.TestCase):
         i = 0
         response = self.bus.wait_for_response(Message('mycroft.voice.is_ready'))
         while not response.data['status'] and i < 10:
-            LOG.warning(f"Speech not ready when core reported ready!")
+            LOG.warning("Speech not ready when core reported ready!")
             sleep(5)
             response = self.bus.wait_for_response(Message('mycroft.voice.is_ready'))
             i += 1
