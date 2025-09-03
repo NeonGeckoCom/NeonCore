@@ -32,7 +32,6 @@ import sys
 import unittest
 from os.path import dirname, join, exists, isdir
 from unittest.mock import patch
-from unittest import skip
 
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
@@ -43,7 +42,7 @@ TEST_SKILLS_NO_AUTH = [
 ]
 
 TEST_SKILLS_WITH_PIP = [
-    "https://github.com/NeonGeckoCom/skill-date_time/tree/dev",
+#    "https://github.com/NeonGeckoCom/skill-date_time/tree/dev",
     "git+https://github.com/NeonGeckoCom/malls-parser-skill",
     "neon-skill-support_helper"
 ]

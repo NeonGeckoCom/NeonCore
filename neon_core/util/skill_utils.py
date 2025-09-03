@@ -33,7 +33,6 @@ from os import makedirs, symlink
 from os.path import expanduser, join, isdir, dirname, islink
 from typing import List
 
-from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG, deprecated
 
 from ovos_config.config import Configuration
