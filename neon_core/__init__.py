@@ -33,7 +33,7 @@ environ["OVOS_DEFAULT_CONFIG"] = join(dirname(__file__),
                                       "configuration", "neon.yaml")
 
 # Patching deprecation warnings
-# TODO: Deprecate after migration to ovos-workshop 1.0+ and ovos-core 0.1+
+# TODO: Deprecate after migration to ovos-workshop 1.0+ and ovos-core 0.3.0
 import ovos_workshop.resource_files
 import ovos_core.intent_services.stop_service
 from ovos_utils.bracket_expansion import expand_template
