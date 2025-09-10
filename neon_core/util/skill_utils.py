@@ -94,8 +94,11 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param config: optional dict configuration
     """
     from neon_utils.packaging_utils import install_packages_from_pip
-    install_packages_from_pip("neon-core", skills_to_install, True)
-    LOG.info(f"Installed {len(skills_to_install)} skills")
+    ret_code = install_packages_from_pip("neon-core", skills_to_install, True)
+    if ret_code == 0:
+        LOG.info(f"Installed {len(skills_to_install)} skills")
+    else:
+        LOG.error(f"Error installing skills: {ret_code}")
 
 
 def install_skills_default(config: dict = None):
