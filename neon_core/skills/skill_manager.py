@@ -35,13 +35,13 @@ from ovos_core.skill_manager import SkillManager
 
 
 class NeonSkillManager(SkillManager):
-    def _load_on_startup(self):
+    def _sync_skill_loading_state(self):
         """
         Override to wait for configured ready settings before announcing the
         service is ready
         """
-        SkillManager._load_on_startup(self)
-        LOG.info(f"Waiting for skill ready settings")  # TODO Log is only for debugging
+        SkillManager._sync_skill_loading_state(self)
+        LOG.info("Waiting for skill ready settings")  # TODO Log is only for debugging
         self._wait_until_skills_ready()
 
     def get_default_skills_dir(self):
