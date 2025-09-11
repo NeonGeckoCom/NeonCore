@@ -28,6 +28,7 @@
 
 from os import makedirs
 from os.path import isdir, join, expanduser
+from threading import Thread
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
 from ovos_bus_client.message import Message
@@ -43,6 +44,12 @@ class NeonSkillManager(SkillManager):
         SkillManager._sync_skill_loading_state(self)
         LOG.info("Waiting for skill ready settings")  # TODO Log is only for debugging
         self._wait_until_skills_ready()
+
+        # Start a background thread to check for configured ready settings
+        # while allowing the skills service to continue initialization
+        ready_event_thread = Thread(target=self._check_device_ready)
+        ready_event_thread.daemon = True
+        ready_event_thread.start()
 
     def get_default_skills_dir(self):
         """
@@ -90,7 +97,7 @@ class NeonSkillManager(SkillManager):
             if not self._internet_loaded.wait(self._network_skill_timeout):
                 LOG.error("Timeout waiting for internet skills to load")
                 return False
-        LOG.info(f"Configured ready settings met: {ready_settings}")
+        LOG.info(f"Configured skill load conditions met")
         return True
 
     def _check_device_ready(self):
