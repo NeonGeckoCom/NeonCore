@@ -1,7 +1,9 @@
 language:
   supported_langs:
     - en
-    - uk
+# secondary_langs defines what languages are loaded in ovos-core intent services
+secondary_langs: [en-us]
+
 skills:
   wait_for_internet: false
   extra_directories:
