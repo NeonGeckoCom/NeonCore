@@ -1,5 +1,4 @@
-# ovos-core version pinned for compat. with patches in NeonCore
-ovos-core[lgpl]~=0.1
+ovos-core[lgpl]~=0.2
 
 
 neon-utils[network]~=1.13,>=1.13.1a4

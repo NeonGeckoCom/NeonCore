@@ -37,8 +37,6 @@ class ConfigurationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.CONFIG_PATH
-        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
 
     @classmethod
     def tearDownClass(cls) -> None:
