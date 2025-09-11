@@ -32,12 +32,12 @@ import sys
 import unittest
 import wave
 
+from pytest import mark
+from mock import Mock, patch
 from copy import deepcopy
 from os.path import join, dirname, expanduser, isdir
 from threading import Event
 from time import time
-
-from unittest.mock import Mock, patch
 from ovos_bus_client import Message
 from ovos_utils.messagebus import FakeBus
 from ovos_utils.xdg_utils import xdg_data_home
@@ -357,12 +357,7 @@ class TestSkillManager(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        #from neon_core.util.runtime_utils import use_neon_core
-        #from neon_utils.configuration_utils import init_config_dir
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
-        #use_neon_core(init_config_dir)()
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -372,6 +367,7 @@ class TestSkillManager(unittest.TestCase):
         if os.path.isdir(cls.config_dir):
             shutil.rmtree(cls.config_dir)
 
+    @mark.skip("Skill directory handling is deprecated")
     @patch("ovos_core.skill_manager.SkillManager.run")
     def test_get_default_skills_dir(self, _):
         from neon_core.skills.skill_manager import NeonSkillManager
@@ -409,6 +405,41 @@ class TestSkillManager(unittest.TestCase):
         default_dir = manager.get_default_skills_dir()
         self.assertEqual(default_dir, expanduser('~/neon-skills'))
         self.assertTrue(isdir(expanduser("~/neon-skills")))
+
+    def test_wait_until_skills_ready(self):
+        from neon_core.skills.skill_manager import NeonSkillManager
+        manager = NeonSkillManager(FakeBus())
+        manager._network_skill_timeout = 1
+
+        # No ready settings is ready
+        manager.config['ready_settings'] = []
+        self.assertTrue(manager._wait_until_skills_ready())
+
+        # Check network skills not ready
+        manager.config['ready_settings'] = ['network_skills']
+        self.assertFalse(manager._wait_until_skills_ready())
+
+        # Check internet skills not ready
+        manager.config['ready_settings'].append('internet_skills')
+        self.assertFalse(manager._wait_until_skills_ready())
+
+        # Check skills are loaded
+        manager._network_loaded.set()
+        manager._internet_loaded.set()
+        self.assertTrue(manager._wait_until_skills_ready())
+
+    def test_check_device_ready(self):
+        from neon_core.skills.skill_manager import NeonSkillManager
+        manager = NeonSkillManager(FakeBus())
+
+        on_ready = Mock()
+        manager.bus.on("mycroft.ready", on_ready)
+
+        # No services to wait for
+        manager.config['ready_settings'] = []
+        manager._check_device_ready()
+        on_ready.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -42,7 +42,9 @@ class NeonSkillManager(SkillManager):
         service is ready
         """
         SkillManager._sync_skill_loading_state(self)
-        LOG.info("Waiting for skill ready settings")  # TODO Log is only for debugging
+        LOG.info(
+            "Waiting for skill ready settings"
+        )  # TODO Log is only for debugging
         self._wait_until_skills_ready()
 
         # Start a background thread to check for configured ready settings
@@ -56,11 +58,14 @@ class NeonSkillManager(SkillManager):
         Go through legacy config params to locate the default skill directory
         """
         skill_config = self.config["skills"]
-        skill_dir = skill_config.get("directory") or \
-            skill_config.get("extra_directories")
-        skill_dir = skill_dir[0] if isinstance(skill_dir, list) and \
-            len(skill_dir) > 0 else skill_dir or \
-            join(xdg_data_home(), "neon", "skills")
+        skill_dir = skill_config.get("directory") or skill_config.get(
+            "extra_directories"
+        )
+        skill_dir = (
+            skill_dir[0]
+            if isinstance(skill_dir, list) and len(skill_dir) > 0
+            else skill_dir or join(xdg_data_home(), "neon", "skills")
+        )
 
         skill_dir = expanduser(skill_dir)
         if not isdir(skill_dir):
@@ -104,18 +109,42 @@ class NeonSkillManager(SkillManager):
         while not self._wait_until_skills_ready():
             LOG.warning("Skills not ready, still waiting...")
         ready_settings = self.config.get("ready_settings", ["skills"])
-        valid_services = ("skills", "voice", "audio", "gui_service", "internet")
-        ready_services = {s: False for s in ready_settings if s in valid_services}
+        valid_services = (
+            "skills",
+            "voice",
+            "audio",
+            "gui_service",
+            "internet",
+        )
+        ready_services = {
+            s: False for s in ready_settings if s in valid_services
+        }
         LOG.info(f"Waiting for services: {ready_services}")
         while not all(ready_services.values()):
             for service in ready_services:
                 if not ready_services[service]:
-                    resp = self.bus.wait_for_response(Message(f"mycroft.{service}.is_ready", context={"source": ["skills"], "destination": [service]}))
-                    LOG.debug(resp.data if resp else f"No response for service={service}")  # TODO: Log to be downgraded to debug
+                    resp = self.bus.wait_for_response(
+                        Message(
+                            f"mycroft.{service}.is_ready",
+                            context={
+                                "source": ["skills"],
+                                "destination": [service],
+                            },
+                        )
+                    )
+                    LOG.debug(
+                        resp.data
+                        if resp
+                        else f"No response for service={service}"
+                    )
                     service_ready = resp and resp.data.get("status")
                     if service_ready:
                         LOG.info(f"{service} reports ready")
                         ready_services[service] = service_ready
         LOG.info(f"All configured ready settings met: {ready_services}")
-        self.bus.emit(Message("mycroft.ready", context={"source": ["skills"], "destination": valid_services}))
-
+        self.bus.emit(
+            Message(
+                "mycroft.ready",
+                context={"source": ["skills"], "destination": valid_services},
+            )
+        )
