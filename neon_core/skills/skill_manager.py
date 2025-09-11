@@ -97,7 +97,7 @@ class NeonSkillManager(SkillManager):
             if not self._internet_loaded.wait(self._network_skill_timeout):
                 LOG.error("Timeout waiting for internet skills to load")
                 return False
-        LOG.info(f"Configured skill load conditions met")
+        LOG.debug("Configured skill load conditions met")
         return True
 
     def _check_device_ready(self):
@@ -106,14 +106,17 @@ class NeonSkillManager(SkillManager):
         ready_settings = self.config.get("ready_settings", ["skills"])
         valid_services = ("skills", "voice", "audio", "gui_service", "internet")
         ready_services = {s: False for s in ready_settings if s in valid_services}
+        LOG.info(f"Waiting for services: {ready_services}")
         while not all(ready_services.values()):
             for service in ready_services:
                 if not ready_services[service]:
                     resp = self.bus.wait_for_response(Message(f"mycroft.{service}.is_ready", context={"source": ["skills"], "destination": [service]}))
+                    LOG.info(resp)  # TODO: Log to be downgraded to debug
                     service_ready = resp and resp.data.get("status") == "ready"
                     if service_ready:
                         LOG.info(f"{service} reports ready")
                         ready_services[service] = service_ready
+            LOG.info(f"Services ready: {ready_services}")  # TODO: Log to be downgraded to debug
         LOG.info(f"All configured ready settings met: {ready_services}")
         self.bus.emit(Message("mycroft.ready", context={"source": ["skills"], "destination": valid_services}))
 
