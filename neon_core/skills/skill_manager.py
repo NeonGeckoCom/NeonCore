@@ -87,7 +87,7 @@ class NeonSkillManager(SkillManager):
                 LOG.error("Timeout waiting for network skills to load")
                 return False
         if "internet_skills" in ready_settings:
-            if not self._internet_loaded.wait(self._internet_skill_timeout):
+            if not self._internet_loaded.wait(self._network_skill_timeout):
                 LOG.error("Timeout waiting for internet skills to load")
                 return False
         LOG.info(f"Configured ready settings met: {ready_settings}")
