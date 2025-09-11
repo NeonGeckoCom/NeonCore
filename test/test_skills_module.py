@@ -67,8 +67,6 @@ class TestSkillService(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["XDG_CONFIG_HOME"] = cls.config_dir
-        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -184,8 +182,6 @@ class TestIntentService(unittest.TestCase):
         import neon_core
 
         os.environ["XDG_CONFIG_HOME"] = cls.test_config_dir
-        os.environ["OVOS_CONFIG_BASE_FOLDER"] = "neon"
-        os.environ["OVOS_CONFIG_FILENAME"] = "neon.yaml"
         import ovos_config
         import importlib
         importlib.reload(ovos_config.meta)
@@ -209,8 +205,6 @@ class TestIntentService(unittest.TestCase):
     def tearDownClass(cls) -> None:
         cls.intent_service.shutdown()
         os.environ.pop("XDG_CONFIG_HOME")
-        os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
-        os.environ.pop("OVOS_CONFIG_FILENAME")
         shutil.rmtree(cls.test_config_dir)
 
     def test_save_utterance_transcription(self):
@@ -362,8 +356,6 @@ class TestSkillManager(unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         os.environ.pop("XDG_CONFIG_HOME")
-        os.environ.pop("OVOS_CONFIG_BASE_FOLDER")
-        os.environ.pop("OVOS_CONFIG_FILENAME")
         if os.path.isdir(cls.config_dir):
             shutil.rmtree(cls.config_dir)
 
