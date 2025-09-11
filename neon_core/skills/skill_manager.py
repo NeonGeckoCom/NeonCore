@@ -30,7 +30,7 @@ from os import makedirs
 from os.path import isdir, join, expanduser
 from ovos_utils.xdg_utils import xdg_data_home
 from ovos_utils.log import LOG
-
+from ovos_bus_client.message import Message
 from ovos_core.skill_manager import SkillManager
 
 
@@ -71,10 +71,50 @@ class NeonSkillManager(SkillManager):
             LOG.debug("Ignoring request not to bind bus")
         return SkillManager._get_plugin_skill_loader(self, skill_id, True)
 
-    def run(self):
-        """Load skills and update periodically from disk and internet."""
-        from os import environ
-        environ.setdefault('OVOS_CONFIG_BASE_FOLDER', "neon")
-        environ.setdefault('OVOS_CONFIG_FILENAME', "neon.yaml")
-        LOG.debug("set default configuration to `neon/neon.yaml`")
-        SkillManager.run(self)
+    # Re-implement support for internet and network skill load
+    def _wait_until_skills_ready(self):
+        """
+        Block until configured network and internet skills are loaded to
+        delay skills service reporting ready.
+        """
+        ready_settings = self.config.get("ready_settings", ["skills"])
+        if "network_skills" in ready_settings:
+            if not self._network_loaded.wait(self._network_skill_timeout):
+                LOG.error("Timeout waiting for network skills to load")
+                return False
+        if "internet_skills" in ready_settings:
+            if not self._internet_loaded.wait(self._internet_skill_timeout):
+                LOG.error("Timeout waiting for internet skills to load")
+                return False
+        LOG.info(f"Configured  ready settings met: {ready_settings}")
+        return True
+
+    def _check_device_ready(self):
+        while not self._wait_until_skills_ready():
+            LOG.warning("Skills not ready, still waiting...")
+        ready_settings = self.config.get("ready_settings", ["skills"])
+        valid_services = ("skills", "voice", "audio", "gui_service", "internet")
+        ready_services = {s: False for s in ready_settings if s in valid_services}
+        while not all(ready_services.values()):
+            for service in ready_services:
+                if not ready_services[service]:
+                    resp = self.bus.wait_for_response(Message(f"mycroft.{service}.is_ready", context={"source": ["skills"], "destination": [service]}))
+                    service_ready = resp and resp.data.get("status") == "ready"
+                    if service_ready:
+                        LOG.info(f"{service} reports ready")
+                        ready_services[service] = service_ready
+        LOG.info(f"All configured ready settings met: {ready_services}")
+        self.bus.emit(Message("mycroft.ready", context={"source": ["skills"], "destination": valid_services}))
+
+    # Override to maintain skill load support
+    def handle_initial_training(self, message):
+        """
+        This method blocks `run` until network and internet skills are loaded
+        (if configured). After `self.initial_load_complete` is set to True,
+        the skills service will be marked as ready
+        """
+        # Wait for network and internet skills to load as configured
+        if not self._wait_until_skills_ready():
+            LOG.error("Skills did not report ready. Continuing anyway.")
+        self.initial_load_complete = True
+            
