@@ -38,6 +38,8 @@ class NeonSkillManager(SkillManager):
     def _define_message_bus_events(self):
         # Overriding to use overridden handlers in this class
         SkillManager._define_message_bus_events(self)
+        self.bus.remove_all_listeners("mycroft.skills.trained")
+        self.bus.once("mycroft.skills.trained", self.handle_initial_training)
 
     def get_default_skills_dir(self):
         """
