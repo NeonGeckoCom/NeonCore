@@ -35,6 +35,9 @@ from ovos_core.skill_manager import SkillManager
 
 
 class NeonSkillManager(SkillManager):
+    def _define_message_bus_events(self):
+        # Overriding to use overridden handlers in this class
+        SkillManager._define_message_bus_events(self)
 
     def get_default_skills_dir(self):
         """
@@ -86,7 +89,7 @@ class NeonSkillManager(SkillManager):
             if not self._internet_loaded.wait(self._internet_skill_timeout):
                 LOG.error("Timeout waiting for internet skills to load")
                 return False
-        LOG.info(f"Configured  ready settings met: {ready_settings}")
+        LOG.info(f"Configured ready settings met: {ready_settings}")
         return True
 
     def _check_device_ready(self):
@@ -113,6 +116,7 @@ class NeonSkillManager(SkillManager):
         (if configured). After `self.initial_load_complete` is set to True,
         the skills service will be marked as ready
         """
+        LOG.debug(f"Handling message: {message.msg_type}")
         # Wait for network and internet skills to load as configured
         if not self._wait_until_skills_ready():
             LOG.error("Skills did not report ready. Continuing anyway.")
