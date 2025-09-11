@@ -35,11 +35,14 @@ from ovos_core.skill_manager import SkillManager
 
 
 class NeonSkillManager(SkillManager):
-    def _define_message_bus_events(self):
-        # Overriding to use overridden handlers in this class
-        SkillManager._define_message_bus_events(self)
-        self.bus.remove_all_listeners("mycroft.skills.trained")
-        self.bus.once("mycroft.skills.trained", self.handle_initial_training)
+    def _load_on_startup(self):
+        """
+        Override to wait for configured ready settings before announcing the
+        service is ready
+        """
+        SkillManager._load_on_startup(self)
+        LOG.info(f"Waiting for skill ready settings")  # TODO Log is only for debugging
+        self._wait_until_skills_ready()
 
     def get_default_skills_dir(self):
         """
@@ -65,10 +68,6 @@ class NeonSkillManager(SkillManager):
                     makedirs(skill_dir, exist_ok=True)
 
         return skill_dir
-
-    def _load_new_skills(self, *args, **kwargs):
-        # Override load method for config module checks
-        SkillManager._load_new_skills(self, *args, **kwargs)
 
     def _get_plugin_skill_loader(self, skill_id, init_bus=True):
         assert self.bus is not None
@@ -111,16 +110,3 @@ class NeonSkillManager(SkillManager):
         LOG.info(f"All configured ready settings met: {ready_services}")
         self.bus.emit(Message("mycroft.ready", context={"source": ["skills"], "destination": valid_services}))
 
-    # Override to maintain skill load support
-    def handle_initial_training(self, message):
-        """
-        This method blocks `run` until network and internet skills are loaded
-        (if configured). After `self.initial_load_complete` is set to True,
-        the skills service will be marked as ready
-        """
-        LOG.debug(f"Handling message: {message.msg_type}")
-        # Wait for network and internet skills to load as configured
-        if not self._wait_until_skills_ready():
-            LOG.error("Skills did not report ready. Continuing anyway.")
-        self.initial_load_complete = True
-            
