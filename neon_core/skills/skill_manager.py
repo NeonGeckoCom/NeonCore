@@ -30,7 +30,7 @@ from os import makedirs
 from os.path import isdir, join, expanduser
 from threading import Thread
 from ovos_utils.xdg_utils import xdg_data_home
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, deprecated
 from ovos_bus_client.message import Message
 from ovos_core.skill_manager import SkillManager
 
@@ -53,6 +53,8 @@ class NeonSkillManager(SkillManager):
         ready_event_thread.daemon = True
         ready_event_thread.start()
 
+    @deprecated("Legacy skills are deprecated and this method should not "
+                "be used.", "25.10.1")
     def get_default_skills_dir(self):
         """
         Go through legacy config params to locate the default skill directory
