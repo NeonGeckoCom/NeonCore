@@ -111,12 +111,11 @@ class NeonSkillManager(SkillManager):
             for service in ready_services:
                 if not ready_services[service]:
                     resp = self.bus.wait_for_response(Message(f"mycroft.{service}.is_ready", context={"source": ["skills"], "destination": [service]}))
-                    LOG.info(resp.data if resp else f"No response for service={service}")  # TODO: Log to be downgraded to debug
-                    service_ready = resp and resp.data.get("status") == "ready"
+                    LOG.debug(resp.data if resp else f"No response for service={service}")  # TODO: Log to be downgraded to debug
+                    service_ready = resp and resp.data.get("status")
                     if service_ready:
                         LOG.info(f"{service} reports ready")
                         ready_services[service] = service_ready
-            LOG.info(f"Services ready: {ready_services}")  # TODO: Log to be downgraded to debug
         LOG.info(f"All configured ready settings met: {ready_services}")
         self.bus.emit(Message("mycroft.ready", context={"source": ["skills"], "destination": valid_services}))
 
