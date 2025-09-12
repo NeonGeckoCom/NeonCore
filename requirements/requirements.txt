@@ -1,7 +1,7 @@
 ovos-core[lgpl]~=0.2
 
 
-neon-utils[network]~=1.13,>=1.13.1a4
+neon-utils[network]~=1.13,>=1.13.1a8
 ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0,>=0.0.10
 neon-transformers~=1.0
