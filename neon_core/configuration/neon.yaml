@@ -20,7 +20,6 @@ stt:
   ovos-stt-plugin-server:
     urls:
     - https://whisper.neonaiservices.com/stt
-    - https://whisper.tigregotico.pt/stt
     - https://stt.smartgic.io/fasterwhisper/stt
 tts:
   pulse_duck: false
