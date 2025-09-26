@@ -18,7 +18,9 @@ stt:
   ovos-stt-plugin-vosk:
     model: /home/neon/.local/share/neon/vosk-model-small-en-us-0.15
   ovos-stt-plugin-server:
-    url: https://whisper.neonaiservices.com/stt
+    urls:
+    - https://whisper.neonaiservices.com/stt
+    - https://stt.smartgic.io/fasterwhisper/stt
 tts:
   pulse_duck: false
   preload_fallback: false
