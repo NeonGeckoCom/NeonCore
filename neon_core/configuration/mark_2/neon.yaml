@@ -16,10 +16,6 @@ g2p:
 tts:
   module: neon-tts-plugin-coqui-remote
   fallback_module: coqui
-  neon-tts-plugin-larynx-server:
-    host: "https://larynx.2022.us"
-  mozilla_remote:
-    api_url: "https://mtts.2022.us/api/tts"
 Audio:
   backends:
     OCP:
