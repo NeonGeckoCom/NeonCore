@@ -4,7 +4,7 @@ enable_old_audioservice: True
 # Plugin Configuration
 utterance_transformers:
   neon_utterance_translator_plugin:
-    active: True
+    active: False
     enable_detector: True
   neon_utterance_normalizer_plugin:
     active: True
