@@ -1,6 +1,5 @@
 ovos-core[lgpl]~=0.2
 
-
 neon-utils[network]~=1.14
 ovos-utils~=0.0,>=0.0.38
 ovos-bus-client~=0.0,>=0.0.10
@@ -16,6 +15,7 @@ psutil~=5.6
 
 click~=8.0
 click-default-group~=1.2
+setuptools
 
 # Used for patching skill settings
 mock~=5.0
