@@ -195,6 +195,10 @@ class TestIntentService(unittest.TestCase):
         importlib.reload(ovos_config)
         assert ovos_config.config.Configuration.default.path == meta['default_config_path']
 
+        # Patch configuration
+        ovos_config.config.Configuration()[
+                'utterance_transformers']['neon_utterance_translator_plugin'] = {"active": True}
+
         from neon_core.skills.intent_service import NeonIntentService
         cls.intent_service = NeonIntentService(cls.bus)
         assert set(cls.intent_service.config['utterance_transformers'].keys()) \
@@ -306,9 +310,9 @@ class TestIntentService(unittest.TestCase):
 
         # Patch things
         real_config = self.intent_service.language_config
-        # self.assertIn("neon_utterance_translator_plugin",
-        #               self.intent_service.transformers.loaded_modules,
-        #               self.intent_service.transformers.loaded_modules)
+        self.assertIn("neon_utterance_translator_plugin",
+                      self.intent_service.transformers.loaded_modules,
+                      self.intent_service.transformers.loaded_modules)
         translator = self.intent_service.transformers.loaded_modules.get(
             'neon_utterance_translator_plugin')
         real_plug = translator.translator
