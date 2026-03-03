@@ -13,9 +13,11 @@ ovos-classifiers
 # TODO: Remove when run_neon.py is deprecated
 psutil~=5.6
 
+# TODO: Patching `setuptools` imports
+setuptools<82.0
+
 click~=8.0
 click-default-group~=1.2
-setuptools
 
 # Used for patching skill settings
 mock~=5.0
