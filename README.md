@@ -9,7 +9,7 @@
 # Welcome to Neon AI
 Neon AI is an open source voice assistant. Follow these instructions to start 
 using Neon on your computer. If you are using a Mycroft Mark2 or Raspberry Pi, 
-you may use the prebuilt image available [on our website](https://neon.ai/Download).
+you may use the prebuilt image available with the [latest Neon OS release](https://github.com/NeonGeckoCom/neon-os/releases/latest).
 
 # Quick Start
 The fastest method for getting started with Neon is to run the modules in Docker containers.
