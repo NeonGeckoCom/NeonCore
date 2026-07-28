@@ -1,4 +1,4 @@
-neon-skill-audio_recording~=0.0.1,>=0.0.2a4
+neon-skill-audio_recording~=1.0
 #neon-skill-custom_conversation>=0.0.1a10,<0.0.2
 neon-skill-instructions~=1.0
 neon-skill-launcher~=1.1
