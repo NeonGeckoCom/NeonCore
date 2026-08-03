@@ -9,7 +9,7 @@ jobs:
   core_and_skills:
     strategy:
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
+        python-version: [ '3.10', '3.11', '3.12' ]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -27,10 +27,10 @@ jobs:
           pip install wheel
       - name: Test Core Module Installation
         run: |
-          pip install .[core_modules]
+          pip install .[core-modules]
       - name: Test Skills Installation
         run: |
-          pip install .[skills_required,skills_essential,skills_default,skills_extended]
+          pip install .[skills-required,skills-essential,skills-default,skills-extended]
   pi_image_3_10:
     runs-on: ubuntu-latest
     timeout-minutes: 90

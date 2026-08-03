@@ -43,6 +43,9 @@ init_config_dir()
 from ovos_utils.gui import is_gui_running
 from neon_utils.log_utils import remove_old_logs, archive_logs, LOG, \
     get_log_file_for_module
+from ovos_utils.log import log_deprecation
+
+log_deprecation("This script is deprecated. Recommended method is to use containers", "25.10.0")
 
 LOG_FILES = {}
 PROCESSES = {}

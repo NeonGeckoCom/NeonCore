@@ -33,12 +33,12 @@ from os import makedirs, symlink
 from os.path import expanduser, join, isdir, dirname, islink
 from typing import List
 
-from ovos_utils.xdg_utils import xdg_data_home
-from ovos_utils.log import LOG
+from ovos_utils.log import LOG, deprecated
 
 from ovos_config.config import Configuration
 
 
+@deprecated("Internal function is deprecated", "25.09.01")
 def _write_pip_constraints_to_file(output_file: str):
     """
     Writes out a constraints file for OSM to use to prevent broken dependencies
@@ -67,6 +67,7 @@ def _write_pip_constraints_to_file(output_file: str):
     LOG.info(f"Wrote core constraints to file: {output_file}")
 
 
+@deprecated("Internal function is deprecated", "25.09.01")
 def _install_skill_pip(skill_package: str, constraints_file: str) -> bool:
     """
     Pip install the specified package
@@ -92,16 +93,12 @@ def install_skills_from_list(skills_to_install: list, config: dict = None):
     :param skills_to_install: list of skills to install
     :param config: optional dict configuration
     """
-    constraints_file = join(xdg_data_home(), "neon", "constraints.txt")
-    _write_pip_constraints_to_file(constraints_file)
-
-    for spec in skills_to_install:
-        if "://" in spec and "git+" not in spec:
-            LOG.error(f"Got an invalid package spec to install: {spec}")
-        elif not _install_skill_pip(spec, constraints_file):
-            LOG.error(f"Pip installation failed for: {spec}")
-
-    LOG.info(f"Installed {len(skills_to_install)} skills")
+    from neon_utils.packaging_utils import install_packages_from_pip
+    ret_code = install_packages_from_pip("neon-core", skills_to_install, True)
+    if ret_code == 0:
+        LOG.info(f"Installed {len(skills_to_install)} skills")
+    else:
+        LOG.error(f"Error installing skills: {ret_code}")
 
 
 def install_skills_default(config: dict = None):

@@ -28,10 +28,8 @@
 
 import os
 
-from ovos_plugin_manager.language import OVOSLangDetectionFactory as DetectorFactory
-from ovos_plugin_manager.language import OVOSLangTranslationFactory as TranslatorFactory
-
-from neon_core.configuration import Configuration
+from ovos_utils.log import deprecated
+from ovos_config.config import Configuration
 
 
 def get_lang_config():
@@ -44,6 +42,7 @@ def get_lang_config():
     return lang_config
 
 
+@deprecated("get_language_dir is deprecated without replacement", "25.10.0")
 def get_language_dir(base_path, lang="en-us"):
     """ checks for all language variations and returns best path """
     lang_path = os.path.join(base_path, lang)

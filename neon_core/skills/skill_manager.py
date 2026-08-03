@@ -28,24 +28,46 @@
 
 from os import makedirs
 from os.path import isdir, join, expanduser
+from threading import Thread
 from ovos_utils.xdg_utils import xdg_data_home
-from ovos_utils.log import LOG
-
+from ovos_utils.log import LOG, deprecated
+from ovos_bus_client.message import Message
 from ovos_core.skill_manager import SkillManager
 
 
 class NeonSkillManager(SkillManager):
+    def _sync_skill_loading_state(self):
+        """
+        Override to wait for configured ready settings before announcing the
+        service is ready
+        """
+        SkillManager._sync_skill_loading_state(self)
+        LOG.info(
+            "Waiting for skill ready settings"
+        )  # TODO Log is only for debugging
+        self._wait_until_skills_ready()
 
+        # Start a background thread to check for configured ready settings
+        # while allowing the skills service to continue initialization
+        ready_event_thread = Thread(target=self._check_device_ready)
+        ready_event_thread.daemon = True
+        ready_event_thread.start()
+
+    @deprecated("Legacy skills are deprecated and this method should not "
+                "be used.", "25.10.1")
     def get_default_skills_dir(self):
         """
         Go through legacy config params to locate the default skill directory
         """
         skill_config = self.config["skills"]
-        skill_dir = skill_config.get("directory") or \
-            skill_config.get("extra_directories")
-        skill_dir = skill_dir[0] if isinstance(skill_dir, list) and \
-            len(skill_dir) > 0 else skill_dir or \
-            join(xdg_data_home(), "neon", "skills")
+        skill_dir = skill_config.get("directory") or skill_config.get(
+            "extra_directories"
+        )
+        skill_dir = (
+            skill_dir[0]
+            if isinstance(skill_dir, list) and len(skill_dir) > 0
+            else skill_dir or join(xdg_data_home(), "neon", "skills")
+        )
 
         skill_dir = expanduser(skill_dir)
         if not isdir(skill_dir):
@@ -61,20 +83,70 @@ class NeonSkillManager(SkillManager):
 
         return skill_dir
 
-    def _load_new_skills(self, *args, **kwargs):
-        # Override load method for config module checks
-        SkillManager._load_new_skills(self, *args, **kwargs)
-
     def _get_plugin_skill_loader(self, skill_id, init_bus=True):
         assert self.bus is not None
         if not init_bus:
             LOG.debug("Ignoring request not to bind bus")
         return SkillManager._get_plugin_skill_loader(self, skill_id, True)
 
-    def run(self):
-        """Load skills and update periodically from disk and internet."""
-        from os import environ
-        environ.setdefault('OVOS_CONFIG_BASE_FOLDER', "neon")
-        environ.setdefault('OVOS_CONFIG_FILENAME', "neon.yaml")
-        LOG.debug("set default configuration to `neon/neon.yaml`")
-        SkillManager.run(self)
+    # Re-implement support for internet and network skill load
+    def _wait_until_skills_ready(self):
+        """
+        Block until configured network and internet skills are loaded to
+        delay skills service reporting ready.
+        """
+        ready_settings = self.config.get("ready_settings", ["skills"])
+        if "network_skills" in ready_settings:
+            if not self._network_loaded.wait(self._network_skill_timeout):
+                LOG.error("Timeout waiting for network skills to load")
+                return False
+        if "internet_skills" in ready_settings:
+            if not self._internet_loaded.wait(self._network_skill_timeout):
+                LOG.error("Timeout waiting for internet skills to load")
+                return False
+        LOG.debug("Configured skill load conditions met")
+        return True
+
+    def _check_device_ready(self):
+        while not self._wait_until_skills_ready():
+            LOG.warning("Skills not ready, still waiting...")
+        ready_settings = self.config.get("ready_settings", ["skills"])
+        valid_services = (
+            "skills",
+            "voice",
+            "audio",
+            "gui_service",
+            "internet",
+        )
+        ready_services = {
+            s: False for s in ready_settings if s in valid_services
+        }
+        LOG.info(f"Waiting for services: {ready_services}")
+        while not all(ready_services.values()):
+            for service in ready_services:
+                if not ready_services[service]:
+                    resp = self.bus.wait_for_response(
+                        Message(
+                            f"mycroft.{service}.is_ready",
+                            context={
+                                "source": ["skills"],
+                                "destination": [service],
+                            },
+                        )
+                    )
+                    LOG.debug(
+                        resp.data
+                        if resp
+                        else f"No response for service={service}"
+                    )
+                    service_ready = resp and resp.data.get("status")
+                    if service_ready:
+                        LOG.info(f"{service} reports ready")
+                        ready_services[service] = service_ready
+        LOG.info(f"All configured ready settings met: {ready_services}")
+        self.bus.emit(
+            Message(
+                "mycroft.ready",
+                context={"source": ["skills"], "destination": valid_services},
+            )
+        )
