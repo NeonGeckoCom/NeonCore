@@ -10,3 +10,4 @@ neon-skill-camera~=1.2
 ovos-skill-somafm~=0.0,>=0.0.1
 neon-homeassistant-skill~=0.0.18
 ovos-skill-icanhazdadjokes~=0.1
+neon-skill-messaging~=0.0.1,>=0.0.2a8
