@@ -48,3 +48,6 @@ ready_settings:
 signal:
   use_signal_files: false
   patch_imports: false
+# Avoid fork-based Padatious training; it races with filelock in containers.
+padatious:
+  single_thread: true
